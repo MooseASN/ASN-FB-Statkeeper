@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, History, Plus, Trophy } from "lucide-react";
+import { Home, Users, History, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import MooseIcon from "@/components/MooseIcon";
 
 export default function Layout({ children }) {
   const location = useLocation();
@@ -14,8 +15,8 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <Trophy className="w-8 h-8 text-[#1e3a5f]" />
-              <span className="text-xl font-bold text-[#1e3a5f] hidden sm:block">Court Metrics</span>
+              <MooseIcon className="w-8 h-8 text-[#1e3a5f]" />
+              <span className="text-xl font-bold text-[#1e3a5f] hidden sm:block">StatMoose</span>
             </Link>
             
             <nav className="flex items-center gap-1 sm:gap-2">
