@@ -122,7 +122,7 @@ async def get_optional_user(request: Request, session_token: Optional[str] = Coo
 
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister, response: Response):
-    """Register a new user with email/username/password"""
+    """Register a new user with email/username/password and security questions"""
     # Check for existing email
     existing_email = await db.users.find_one({"email": user_data.email.lower()}, {"_id": 0})
     if existing_email:
@@ -132,6 +132,20 @@ async def register(user_data: UserRegister, response: Response):
     existing_username = await db.users.find_one({"username": user_data.username.lower()}, {"_id": 0})
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already taken")
+    
+    # Validate security questions (require at least 2)
+    if len(user_data.security_questions) < 2:
+        raise HTTPException(status_code=400, detail="Please answer at least 2 security questions")
+    
+    # Hash security question answers (case-insensitive)
+    hashed_security_questions = []
+    for sq in user_data.security_questions:
+        if sq.question not in SECURITY_QUESTIONS:
+            raise HTTPException(status_code=400, detail=f"Invalid security question: {sq.question}")
+        hashed_security_questions.append({
+            "question": sq.question,
+            "answer_hash": pwd_context.hash(sq.answer.lower().strip())
+        })
     
     # Create user
     user_id = f"user_{uuid.uuid4().hex[:12]}"
@@ -143,6 +157,7 @@ async def register(user_data: UserRegister, response: Response):
         "username": user_data.username.lower(),
         "name": user_data.name or user_data.username,
         "password_hash": hashed_password,
+        "security_questions": hashed_security_questions,
         "picture": None,
         "auth_provider": "local",
         "created_at": datetime.now(timezone.utc).isoformat()
