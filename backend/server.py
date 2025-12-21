@@ -56,6 +56,17 @@ class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
     away: List[int] = [0, 0, 0, 0]
 
+class PlayByPlayEntry(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    quarter: int
+    team: str  # "home" or "away"
+    player_name: str
+    player_number: str
+    action: str  # "FT Made", "FT Missed", "2PT Made", etc.
+    points: int = 0
+    home_score: int = 0
+    away_score: int = 0
+
 class Game(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -68,6 +79,7 @@ class Game(BaseModel):
     status: str = "active"  # active, completed
     current_quarter: int = 1
     quarter_scores: QuarterScores = Field(default_factory=QuarterScores)
+    play_by_play: List[PlayByPlayEntry] = []
     share_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
