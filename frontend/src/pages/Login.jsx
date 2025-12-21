@@ -75,6 +75,11 @@ export default function Login({ onLogin }) {
                 required
                 data-testid="login-password"
               />
+              <div className="flex justify-end mt-1">
+                <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-black">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
             <Button type="submit" className="w-full bg-black hover:bg-gray-800" disabled={loading} data-testid="login-submit">
               {loading ? "Signing in..." : "Sign In"}
