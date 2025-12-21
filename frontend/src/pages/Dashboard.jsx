@@ -45,7 +45,7 @@ export default function Dashboard() {
     <Layout>
       <div className="space-y-8" data-testid="dashboard">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2d5a87] rounded-2xl p-8 text-white">
+        <div className="bg-gradient-to-r from-[#000000] to-[#2d5a87] rounded-2xl p-8 text-white">
           <div className="flex items-center gap-3 mb-4">
             <MooseIcon className="w-10 h-10" />
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">StatMoose Basketball</h1>
@@ -71,14 +71,14 @@ export default function Dashboard() {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <Card className="border-l-4 border-l-[#1e3a5f]">
+          <Card className="border-l-4 border-l-[#000000]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Teams</p>
-                  <p className="text-3xl font-bold text-[#1e3a5f]">{teams.length}</p>
+                  <p className="text-3xl font-bold text-[#000000]">{teams.length}</p>
                 </div>
-                <Users className="w-10 h-10 text-[#1e3a5f]/20" />
+                <Users className="w-10 h-10 text-[#000000]/20" />
               </div>
             </CardContent>
           </Card>
@@ -121,7 +121,7 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.home_team_name}</p>
-                          <p className="text-4xl font-bold score-display text-[#1e3a5f]">
+                          <p className="text-4xl font-bold score-display text-[#000000]">
                             {calculateScore(game.quarter_scores, "home")}
                           </p>
                         </div>
@@ -132,7 +132,7 @@ export default function Dashboard() {
                         </div>
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.away_team_name}</p>
-                          <p className="text-4xl font-bold score-display text-[#1e3a5f]">
+                          <p className="text-4xl font-bold score-display text-[#000000]">
                             {calculateScore(game.quarter_scores, "away")}
                           </p>
                         </div>

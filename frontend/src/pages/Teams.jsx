@@ -19,7 +19,7 @@ const ColorPicker = ({ value, onChange }) => {
   
   const presetColors = [
     "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0d9488",
-    "#2563eb", "#7c3aed", "#db2777", "#1e3a5f", "#4b5563"
+    "#2563eb", "#7c3aed", "#db2777", "#000000", "#4b5563"
   ];
   
   return (
@@ -141,13 +141,13 @@ export default function Teams() {
       <div className="space-y-6" data-testid="teams-page">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a5f]">Teams</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">Teams</h1>
             <p className="text-muted-foreground">Manage your basketball teams and rosters</p>
           </div>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-[#1e3a5f] hover:bg-[#2d5a87]" data-testid="create-team-btn">
+              <Button className="bg-[#000000] hover:bg-[#2d5a87]" data-testid="create-team-btn">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Team
               </Button>
@@ -208,7 +208,7 @@ export default function Teams() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {teams.map((team) => (
               <Link key={team.id} to={`/teams/${team.id}`}>
-                <Card className="hover:shadow-lg transition-all cursor-pointer group" style={{ borderLeft: `4px solid ${team.color || '#1e3a5f'}` }} data-testid={`team-card-${team.id}`}>
+                <Card className="hover:shadow-lg transition-all cursor-pointer group" style={{ borderLeft: `4px solid ${team.color || '#000000'}` }} data-testid={`team-card-${team.id}`}>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-4">
                       {team.logo_url ? (
@@ -220,20 +220,20 @@ export default function Teams() {
                       ) : (
                         <div 
                           className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl"
-                          style={{ backgroundColor: team.color || '#1e3a5f' }}
+                          style={{ backgroundColor: team.color || '#000000' }}
                         >
                           {team.name.charAt(0).toUpperCase()}
                         </div>
                       )}
                       <div className="flex-1">
-                        <h3 className="font-semibold text-lg group-hover:text-[#1e3a5f] transition-colors">
+                        <h3 className="font-semibold text-lg group-hover:text-[#000000] transition-colors">
                           {team.name}
                         </h3>
                         <p className="text-sm text-muted-foreground">
                           {team.roster?.length || 0} players
                         </p>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#1e3a5f] transition-colors" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-[#000000] transition-colors" />
                     </div>
                     <div className="flex justify-end mt-4 pt-4 border-t">
                       <Button

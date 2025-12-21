@@ -19,7 +19,7 @@ const ColorPicker = ({ value, onChange }) => {
   
   const presetColors = [
     "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0d9488",
-    "#2563eb", "#7c3aed", "#db2777", "#1e3a5f", "#4b5563"
+    "#2563eb", "#7c3aed", "#db2777", "#000000", "#4b5563"
   ];
   
   return (
@@ -94,7 +94,7 @@ export default function TeamDetail() {
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
   const [teamName, setTeamName] = useState("");
   const [teamLogo, setTeamLogo] = useState("");
-  const [teamColor, setTeamColor] = useState("#1e3a5f");
+  const [teamColor, setTeamColor] = useState("#000000");
 
   useEffect(() => {
     const loadTeam = async () => {
@@ -103,7 +103,7 @@ export default function TeamDetail() {
         setTeam(res.data);
         setTeamName(res.data.name);
         setTeamLogo(res.data.logo_url || "");
-        setTeamColor(res.data.color || "#1e3a5f");
+        setTeamColor(res.data.color || "#000000");
         setRoster(res.data.roster || []);
       } catch (error) {
         toast.error("Failed to load team");
@@ -121,7 +121,7 @@ export default function TeamDetail() {
       setTeam(res.data);
       setTeamName(res.data.name);
       setTeamLogo(res.data.logo_url || "");
-      setTeamColor(res.data.color || "#1e3a5f");
+      setTeamColor(res.data.color || "#000000");
       setRoster(res.data.roster || []);
     } catch (error) {
       toast.error("Failed to load team");
@@ -200,7 +200,7 @@ export default function TeamDetail() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a5f]">{team?.name}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">{team?.name}</h1>
             <p className="text-muted-foreground">Manage team details and roster</p>
           </div>
         </div>
@@ -336,7 +336,7 @@ export default function TeamDetail() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} className="bg-[#1e3a5f] hover:bg-[#2d5a87]" data-testid="save-team-btn">
+          <Button onClick={handleSave} className="bg-[#000000] hover:bg-[#2d5a87]" data-testid="save-team-btn">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>

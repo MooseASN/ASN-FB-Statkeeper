@@ -456,7 +456,7 @@ export default function LiveGame() {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <MooseIcon className="w-12 h-12 animate-pulse mx-auto text-[#1e3a5f]" />
+          <MooseIcon className="w-12 h-12 animate-pulse mx-auto text-[#000000]" />
           <p className="mt-4 text-muted-foreground">Loading game...</p>
         </div>
       </div>
@@ -526,7 +526,7 @@ export default function LiveGame() {
       />
 
       {/* Top Navigation Bar */}
-      <header className="bg-[#1e3a5f] text-white sticky top-0 z-50">
+      <header className="bg-[#000000] text-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

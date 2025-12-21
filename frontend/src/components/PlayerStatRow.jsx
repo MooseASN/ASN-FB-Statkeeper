@@ -52,7 +52,7 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
         <CollapsibleTrigger asChild>
           <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-slate-50 transition-colors">
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-[#1e3a5f] text-white flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-full bg-[#000000] text-white flex items-center justify-center font-bold">
                 {player.player_number}
               </div>
               <div>

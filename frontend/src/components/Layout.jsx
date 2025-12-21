@@ -15,8 +15,8 @@ export default function Layout({ children }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <MooseIcon className="w-8 h-8 text-[#1e3a5f]" />
-              <span className="text-xl font-bold text-[#1e3a5f] hidden sm:block">StatMoose</span>
+              <MooseIcon className="w-8 h-8 text-[#000000]" />
+              <span className="text-xl font-bold text-[#000000] hidden sm:block">StatMoose</span>
             </Link>
             
             <nav className="flex items-center gap-1 sm:gap-2">
@@ -56,7 +56,7 @@ export default function Layout({ children }) {
               <Link to="/new-game">
                 <Button 
                   size="sm" 
-                  className="bg-[#1e3a5f] hover:bg-[#2d5a87] gap-2"
+                  className="bg-[#000000] hover:bg-[#2d5a87] gap-2"
                   data-testid="nav-new-game"
                 >
                   <Plus className="w-4 h-4" />

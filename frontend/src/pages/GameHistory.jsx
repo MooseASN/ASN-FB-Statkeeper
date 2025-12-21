@@ -56,7 +56,7 @@ export default function GameHistory() {
     <Layout>
       <div className="space-y-6" data-testid="game-history-page">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a5f]">Game History</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">Game History</h1>
           <p className="text-muted-foreground">View past games and download box scores</p>
         </div>
 
@@ -89,7 +89,7 @@ export default function GameHistory() {
                         <div className="flex-1">
                           <div className="flex items-center gap-4">
                             <div className={`flex-1 ${isHomeWinner ? 'font-bold' : ''}`}>
-                              <span className="text-[#1e3a5f]">{game.home_team_name}</span>
+                              <span className="text-[#000000]">{game.home_team_name}</span>
                               <span className="ml-2 text-2xl score-display">{homeScore}</span>
                             </div>
                             <div className="text-slate-300">-</div>

@@ -71,7 +71,7 @@ export default function NewGame() {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#1e3a5f]">Start New Game</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">Start New Game</h1>
             <p className="text-muted-foreground">Select teams to begin tracking</p>
           </div>
         </div>
@@ -95,7 +95,7 @@ export default function NewGame() {
             <CardContent className="space-y-6">
               {/* Home Team */}
               <div>
-                <Label className="text-base font-semibold text-[#1e3a5f]">Home Team</Label>
+                <Label className="text-base font-semibold text-[#000000]">Home Team</Label>
                 <Select value={homeTeamId} onValueChange={setHomeTeamId}>
                   <SelectTrigger className="mt-2" data-testid="home-team-select">
                     <SelectValue placeholder="Select home team" />
@@ -144,7 +144,7 @@ export default function NewGame() {
 
               {/* Preview */}
               {homeTeamId && awayTeamId && (
-                <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2d5a87] rounded-xl p-6 text-white text-center">
+                <div className="bg-gradient-to-r from-[#000000] to-[#2d5a87] rounded-xl p-6 text-white text-center">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex-1">
                       <p className="text-lg font-semibold">{selectedHome?.name}</p>

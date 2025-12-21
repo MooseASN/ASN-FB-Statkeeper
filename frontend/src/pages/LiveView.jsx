@@ -185,7 +185,7 @@ export default function LiveView() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[#1e3a5f]" />
+          <RefreshCw className="w-8 h-8 animate-spin mx-auto text-[#000000]" />
           <p className="mt-4 text-muted-foreground">Loading live stats...</p>
         </div>
       </div>
@@ -197,7 +197,7 @@ export default function LiveView() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
           <MooseIcon className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-          <h2 className="text-2xl font-bold text-[#1e3a5f] mb-2">Game Not Found</h2>
+          <h2 className="text-2xl font-bold text-[#000000] mb-2">Game Not Found</h2>
           <p className="text-muted-foreground">This share link may have expired or is invalid.</p>
         </div>
       </div>
@@ -226,8 +226,8 @@ export default function LiveView() {
         <div className="max-w-6xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <MooseIcon className="w-6 h-6 text-[#1e3a5f]" />
-              <span className="font-bold text-[#1e3a5f]">StatMoose</span>
+              <MooseIcon className="w-6 h-6 text-[#000000]" />
+              <span className="font-bold text-[#000000]">StatMoose</span>
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <RefreshCw className="w-4 h-4" />
@@ -248,7 +248,7 @@ export default function LiveView() {
       </div>
 
       {/* Game Title Banner */}
-      <div className="bg-[#1e3a5f] text-white py-4">
+      <div className="bg-[#000000] text-white py-4">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <h1 className="text-2xl md:text-3xl font-bold" data-testid="game-title">
             {game.home_team_name} vs {game.away_team_name}
@@ -260,7 +260,7 @@ export default function LiveView() {
       </div>
 
       {/* Scoreboard */}
-      <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2d5a87] text-white">
+      <div className="bg-gradient-to-r from-[#000000] to-[#2d5a87] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
@@ -315,7 +315,7 @@ export default function LiveView() {
       {/* Team Stats Summary */}
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-bold text-[#1e3a5f] mb-4">Team Statistics</h2>
+          <h2 className="text-xl font-bold text-[#000000] mb-4">Team Statistics</h2>
           
           {/* Shooting Stats */}
           <div className="grid grid-cols-2 gap-8 mb-6">
@@ -404,11 +404,11 @@ export default function LiveView() {
           <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t">
             <div className="text-center">
               <p className="text-xs text-muted-foreground uppercase">Lead Changes</p>
-              <p className="text-2xl font-bold text-[#1e3a5f]">{game.game_stats?.lead_changes || 0}</p>
+              <p className="text-2xl font-bold text-[#000000]">{game.game_stats?.lead_changes || 0}</p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground uppercase">Times Tied</p>
-              <p className="text-2xl font-bold text-[#1e3a5f]">{game.game_stats?.ties || 0}</p>
+              <p className="text-2xl font-bold text-[#000000]">{game.game_stats?.ties || 0}</p>
             </div>
             <div className="text-center">
               <p className="text-xs text-muted-foreground uppercase">{game.home_team_name} Lead</p>
@@ -439,7 +439,7 @@ export default function LiveView() {
           {/* Box Score */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
             <div className="text-center mb-6 pb-4 border-b">
-              <h2 className="text-2xl font-bold text-[#1e3a5f]" data-testid="boxscore-title">
+              <h2 className="text-2xl font-bold text-[#000000]" data-testid="boxscore-title">
                 {game.home_team_name} vs {game.away_team_name}
               </h2>
               <p className="text-muted-foreground">Box Score</p>
@@ -462,7 +462,7 @@ export default function LiveView() {
           
           {/* Play by Play */}
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-bold text-[#1e3a5f] mb-4">Play-by-Play</h2>
+            <h2 className="text-xl font-bold text-[#000000] mb-4">Play-by-Play</h2>
             <ScrollArea className="h-[600px]">
               {playByPlay.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">No plays recorded yet</p>
