@@ -62,7 +62,7 @@ const TeamTable = ({ teamName, stats, totals, isHome }) => (
           </TableRow>
         </TableHeader>
         <TableBody>
-          {stats.map(s => {
+          {sortByNumber(stats).map(s => {
             const calc = calculatePlayerStats(s);
             return (
               <TableRow key={s.id}>
