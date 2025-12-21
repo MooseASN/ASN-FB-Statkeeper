@@ -417,46 +417,47 @@ class GameUpdate(BaseModel):
 # ============ TEAM ENDPOINTS ============
 
 @api_router.post("/teams", response_model=Team)
-async def create_team(team_data: TeamCreate):
+async def create_team(team_data: TeamCreate, user: User = Depends(get_current_user)):
     team = Team(**team_data.model_dump())
+    team.user_id = user.user_id
     doc = team.model_dump()
     await db.teams.insert_one(doc)
     return team
 
 @api_router.get("/teams", response_model=List[Team])
-async def get_teams():
-    teams = await db.teams.find({}, {"_id": 0}).to_list(100)
+async def get_teams(user: User = Depends(get_current_user)):
+    teams = await db.teams.find({"user_id": user.user_id}, {"_id": 0}).to_list(100)
     return teams
 
 @api_router.get("/teams/{team_id}", response_model=Team)
-async def get_team(team_id: str):
-    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+async def get_team(team_id: str, user: User = Depends(get_current_user)):
+    team = await db.teams.find_one({"id": team_id, "user_id": user.user_id}, {"_id": 0})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     return team
 
 @api_router.put("/teams/{team_id}", response_model=Team)
-async def update_team(team_id: str, team_data: TeamCreate):
-    existing = await db.teams.find_one({"id": team_id})
+async def update_team(team_id: str, team_data: TeamCreate, user: User = Depends(get_current_user)):
+    existing = await db.teams.find_one({"id": team_id, "user_id": user.user_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Team not found")
     
     update_data = team_data.model_dump()
-    await db.teams.update_one({"id": team_id}, {"$set": update_data})
+    await db.teams.update_one({"id": team_id, "user_id": user.user_id}, {"$set": update_data})
     
     updated = await db.teams.find_one({"id": team_id}, {"_id": 0})
     return updated
 
 @api_router.delete("/teams/{team_id}")
-async def delete_team(team_id: str):
-    result = await db.teams.delete_one({"id": team_id})
+async def delete_team(team_id: str, user: User = Depends(get_current_user)):
+    result = await db.teams.delete_one({"id": team_id, "user_id": user.user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Team not found")
     return {"message": "Team deleted"}
 
 @api_router.post("/teams/{team_id}/roster/csv")
-async def upload_roster_csv(team_id: str, file: UploadFile = File(...)):
-    team = await db.teams.find_one({"id": team_id})
+async def upload_roster_csv(team_id: str, file: UploadFile = File(...), user: User = Depends(get_current_user)):
+    team = await db.teams.find_one({"id": team_id, "user_id": user.user_id})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     
