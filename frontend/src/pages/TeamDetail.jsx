@@ -155,6 +155,7 @@ export default function TeamDetail() {
       await axios.put(`${API}/teams/${id}`, {
         name: teamName,
         logo_url: teamLogo || null,
+        color: teamColor,
         roster: roster
       });
       toast.success("Team updated successfully");
