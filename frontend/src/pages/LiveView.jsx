@@ -106,8 +106,8 @@ export default function LiveView() {
 
   const TeamTable = ({ teamName, stats, totals, isHome }) => (
     <div className="mb-8">
-      <h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${isHome ? 'text-[#1e3a5f]' : 'text-orange-500'}`}>
-        <div className={`w-3 h-3 rounded-full ${isHome ? 'bg-[#1e3a5f]' : 'bg-orange-500'}`}></div>
+      <h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${isHome ? 'text-[#dc2626]' : 'text-[#7c3aed]'}`}>
+        <div className={`w-3 h-3 rounded-full ${isHome ? 'bg-[#dc2626]' : 'bg-[#7c3aed]'}`}></div>
         {teamName}
       </h3>
       <div className="overflow-x-auto">
@@ -192,6 +192,11 @@ export default function LiveView() {
                   LIVE
                 </span>
               )}
+              {game.status === "completed" && (
+                <span className="ml-2 px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
+                  FINAL
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -244,8 +249,67 @@ export default function LiveView() {
         </div>
       </div>
 
+      {/* Team Stats Summary */}
+      <div className="max-w-6xl mx-auto px-4 py-6">
+        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+          <h2 className="text-xl font-bold text-[#1e3a5f] mb-4">Team Statistics</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-center">
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Off. Reb</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.oreb}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.oreb}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Def. Reb</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.dreb}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.dreb}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Total Reb</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.reb}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.reb}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Assists</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.ast}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.ast}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Steals</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.stl}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.stl}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Blocks</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.blk}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.blk}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Turnovers</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.to}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.to}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground uppercase">Fouls</p>
+              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.pf}</p>
+              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.pf}</p>
+            </div>
+          </div>
+          <div className="flex justify-center gap-8 mt-4 text-xs">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#dc2626]"></div>
+              <span>{game.home_team_name}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 rounded-full bg-[#7c3aed]"></div>
+              <span>{game.away_team_name}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Box Score Tables */}
-      <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 pb-8">
         <div className="bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6">Box Score</h2>
           
