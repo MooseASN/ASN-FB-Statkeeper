@@ -34,13 +34,33 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# ============ SECURITY QUESTIONS ============
+
+SECURITY_QUESTIONS = [
+    "What was the name of your first pet?",
+    "What city were you born in?",
+    "What is your mother's maiden name?",
+    "What was the name of your first school?",
+    "What is the name of the street you grew up on?",
+    "What was the make and model of your first car?",
+    "What is the name of your favorite childhood teacher?",
+    "What is your favorite movie?",
+    "What is the name of the company where you had your first job?",
+    "What is your favorite sports team?"
+]
+
 # ============ AUTH MODELS ============
+
+class SecurityQuestionAnswer(BaseModel):
+    question: str
+    answer: str
 
 class UserRegister(BaseModel):
     email: str
     username: str
     password: str
     name: Optional[str] = None
+    security_questions: List[SecurityQuestionAnswer] = []
 
 class UserLogin(BaseModel):
     email: str
