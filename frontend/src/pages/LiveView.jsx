@@ -132,20 +132,6 @@ export default function LiveView() {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
 
-  const calculatePlayerStats = (stats) => {
-    const pts = stats.ft_made + (stats.fg2_made * 2) + (stats.fg3_made * 3);
-    const totalReb = stats.offensive_rebounds + stats.defensive_rebounds;
-    const fg_made = stats.fg2_made + stats.fg3_made;
-    const fg_att = fg_made + stats.fg2_missed + stats.fg3_missed;
-    const fg_pct = fg_att > 0 ? Math.round((fg_made / fg_att) * 100) : 0;
-    const fg3_att = stats.fg3_made + stats.fg3_missed;
-    const fg3_pct = fg3_att > 0 ? Math.round((stats.fg3_made / fg3_att) * 100) : 0;
-    const ft_att = stats.ft_made + stats.ft_missed;
-    const ft_pct = ft_att > 0 ? Math.round((stats.ft_made / ft_att) * 100) : 0;
-    
-    return { pts, totalReb, fg_made, fg_att, fg_pct, fg3_att, fg3_pct, ft_att, ft_pct };
-  };
-
   const calculateTeamTotals = (statsArray) => {
     const totals = {
       pts: 0, fg_made: 0, fg_att: 0, fg3_made: 0, fg3_att: 0,
