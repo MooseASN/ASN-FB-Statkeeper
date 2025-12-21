@@ -9,11 +9,14 @@ import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Users, Trash2, ChevronRight } from "lucide-react";
 import Layout from "@/components/Layout";
+import { ChromePicker } from "react-color";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Color Picker Component
+// Advanced Color Picker Component with color map and hex input
 const ColorPicker = ({ value, onChange }) => {
+  const [showPicker, setShowPicker] = useState(false);
+  
   const presetColors = [
     "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0d9488",
     "#2563eb", "#7c3aed", "#db2777", "#1e3a5f", "#4b5563"
@@ -23,13 +26,28 @@ const ColorPicker = ({ value, onChange }) => {
     <div className="space-y-3">
       <div className="flex items-center gap-3">
         <div className="relative">
-          <input
-            type="color"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-12 h-12 rounded-lg cursor-pointer border-2 border-slate-200"
-            style={{ padding: 0 }}
+          <button
+            type="button"
+            onClick={() => setShowPicker(!showPicker)}
+            className="w-12 h-12 rounded-lg cursor-pointer border-2 border-slate-200 hover:border-slate-400 transition-colors"
+            style={{ backgroundColor: value }}
+            data-testid="color-picker-trigger"
           />
+          {showPicker && (
+            <div className="absolute z-50 top-14 left-0">
+              <div 
+                className="fixed inset-0" 
+                onClick={() => setShowPicker(false)}
+              />
+              <div className="relative">
+                <ChromePicker
+                  color={value}
+                  onChange={(color) => onChange(color.hex)}
+                  disableAlpha
+                />
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex-1">
           <Label className="text-xs text-muted-foreground">Hex Code</Label>
@@ -37,8 +55,8 @@ const ColorPicker = ({ value, onChange }) => {
             value={value}
             onChange={(e) => {
               const hex = e.target.value;
-              if (/^#[0-9A-Fa-f]{0,6}$/.test(hex)) {
-                onChange(hex);
+              if (/^#[0-9A-Fa-f]{0,6}$/.test(hex) || hex === "") {
+                onChange(hex.startsWith("#") ? hex : `#${hex}`);
               }
             }}
             placeholder="#000000"
