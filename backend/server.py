@@ -472,7 +472,7 @@ async def upload_roster_csv(team_id: str, file: UploadFile = File(...), user: Us
         if number and name:
             roster.append({"number": str(number).strip(), "name": name.strip()})
     
-    await db.teams.update_one({"id": team_id}, {"$set": {"roster": roster}})
+    await db.teams.update_one({"id": team_id, "user_id": user.user_id}, {"$set": {"roster": roster}})
     return {"message": f"Uploaded {len(roster)} players", "roster": roster}
 
 # ============ GAME ENDPOINTS ============
