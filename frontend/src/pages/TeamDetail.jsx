@@ -83,7 +83,7 @@ const ColorPicker = ({ value, onChange }) => {
   );
 };
 
-export default function TeamDetail() {
+export default function TeamDetail({ user, onLogout }) {
   const { id } = useParams();
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
@@ -186,14 +186,14 @@ export default function TeamDetail() {
 
   if (loading) {
     return (
-      <Layout>
+      <Layout user={user} onLogout={onLogout}>
         <div className="text-center py-12 text-muted-foreground">Loading...</div>
       </Layout>
     );
   }
 
   return (
-    <Layout>
+    <Layout user={user} onLogout={onLogout}>
       <div className="space-y-6" data-testid="team-detail-page">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/teams")} data-testid="back-btn">

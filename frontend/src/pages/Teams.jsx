@@ -83,7 +83,7 @@ const ColorPicker = ({ value, onChange }) => {
   );
 };
 
-export default function Teams() {
+export default function Teams({ user, onLogout }) {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -137,7 +137,7 @@ export default function Teams() {
   };
 
   return (
-    <Layout>
+    <Layout user={user} onLogout={onLogout}>
       <div className="space-y-6" data-testid="teams-page">
         <div className="flex items-center justify-between">
           <div>

@@ -11,7 +11,7 @@ import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export default function NewGame() {
+export default function NewGame({ user, onLogout }) {
   const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
   const [homeTeamId, setHomeTeamId] = useState("");
@@ -64,7 +64,7 @@ export default function NewGame() {
   const selectedAway = teams.find(t => t.id === awayTeamId);
 
   return (
-    <Layout>
+    <Layout user={user} onLogout={onLogout}>
       <div className="max-w-2xl mx-auto space-y-6" data-testid="new-game-page">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="icon" onClick={() => navigate("/")} data-testid="back-btn">

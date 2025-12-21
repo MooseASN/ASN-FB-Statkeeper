@@ -9,7 +9,7 @@ import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export default function Dashboard() {
+export default function Dashboard({ user, onLogout }) {
   const [activeGames, setActiveGames] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
   const [teams, setTeams] = useState([]);
@@ -42,7 +42,7 @@ export default function Dashboard() {
   };
 
   return (
-    <Layout>
+    <Layout user={user} onLogout={onLogout}>
       <div className="space-y-8" data-testid="dashboard">
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#000000] to-[#333333] rounded-2xl p-8 text-white">

@@ -9,7 +9,7 @@ import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-export default function GameHistory() {
+export default function GameHistory({ user, onLogout }) {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -53,7 +53,7 @@ export default function GameHistory() {
   };
 
   return (
-    <Layout>
+    <Layout user={user} onLogout={onLogout}>
       <div className="space-y-6" data-testid="game-history-page">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">Game History</h1>
