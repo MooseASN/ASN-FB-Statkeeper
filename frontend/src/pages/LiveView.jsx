@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Trophy, RefreshCw } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -41,10 +42,13 @@ export default function LiveView() {
     const totalReb = stats.offensive_rebounds + stats.defensive_rebounds;
     const fg_made = stats.fg2_made + stats.fg3_made;
     const fg_att = fg_made + stats.fg2_missed + stats.fg3_missed;
+    const fg_pct = fg_att > 0 ? Math.round((fg_made / fg_att) * 100) : 0;
     const fg3_att = stats.fg3_made + stats.fg3_missed;
+    const fg3_pct = fg3_att > 0 ? Math.round((stats.fg3_made / fg3_att) * 100) : 0;
     const ft_att = stats.ft_made + stats.ft_missed;
+    const ft_pct = ft_att > 0 ? Math.round((stats.ft_made / ft_att) * 100) : 0;
     
-    return { pts, totalReb, fg_made, fg_att, fg3_att, ft_att };
+    return { pts, totalReb, fg_made, fg_att, fg_pct, fg3_att, fg3_pct, ft_att, ft_pct };
   };
 
   const calculateTeamTotals = (statsArray) => {
@@ -72,8 +76,18 @@ export default function LiveView() {
       totals.to += s.turnovers;
       totals.pf += s.fouls;
     });
+
+    // Calculate percentages
+    totals.fg_pct = totals.fg_att > 0 ? Math.round((totals.fg_made / totals.fg_att) * 100) : 0;
+    totals.fg3_pct = totals.fg3_att > 0 ? Math.round((totals.fg3_made / totals.fg3_att) * 100) : 0;
+    totals.ft_pct = totals.ft_att > 0 ? Math.round((totals.ft_made / totals.ft_att) * 100) : 0;
     
     return totals;
+  };
+
+  const getQuarterLabel = (q) => {
+    if (q <= 4) return `Q${q}`;
+    return `OT${q - 4}`;
   };
 
   if (loading) {
@@ -103,6 +117,12 @@ export default function LiveView() {
   const awayStats = game.away_player_stats || [];
   const homeTotals = calculateTeamTotals(homeStats);
   const awayTotals = calculateTeamTotals(awayStats);
+  const playByPlay = game.play_by_play || [];
+  
+  // Determine quarters
+  const homeScores = game.quarter_scores?.home || [0, 0, 0, 0];
+  const awayScores = game.quarter_scores?.away || [0, 0, 0, 0];
+  const totalQuarters = Math.max(4, homeScores.length, game.current_quarter);
 
   const TeamTable = ({ teamName, stats, totals, isHome }) => (
     <div className="mb-8">
@@ -118,8 +138,11 @@ export default function LiveView() {
               <TableHead>Player</TableHead>
               <TableHead className="text-center">PTS</TableHead>
               <TableHead className="text-center">FG</TableHead>
+              <TableHead className="text-center">FG%</TableHead>
               <TableHead className="text-center">3PT</TableHead>
+              <TableHead className="text-center">3P%</TableHead>
               <TableHead className="text-center">FT</TableHead>
+              <TableHead className="text-center">FT%</TableHead>
               <TableHead className="text-center">OREB</TableHead>
               <TableHead className="text-center">DREB</TableHead>
               <TableHead className="text-center">REB</TableHead>
@@ -139,8 +162,11 @@ export default function LiveView() {
                   <TableCell className="font-medium">{s.player_name}</TableCell>
                   <TableCell className="text-center font-bold">{calc.pts}</TableCell>
                   <TableCell className="text-center">{calc.fg_made}-{calc.fg_att}</TableCell>
+                  <TableCell className="text-center">{calc.fg_pct}%</TableCell>
                   <TableCell className="text-center">{s.fg3_made}-{calc.fg3_att}</TableCell>
+                  <TableCell className="text-center">{calc.fg3_pct}%</TableCell>
                   <TableCell className="text-center">{s.ft_made}-{calc.ft_att}</TableCell>
+                  <TableCell className="text-center">{calc.ft_pct}%</TableCell>
                   <TableCell className="text-center">{s.offensive_rebounds}</TableCell>
                   <TableCell className="text-center">{s.defensive_rebounds}</TableCell>
                   <TableCell className="text-center">{calc.totalReb}</TableCell>
@@ -157,8 +183,11 @@ export default function LiveView() {
               <TableCell>TOTALS</TableCell>
               <TableCell className="text-center">{totals.pts}</TableCell>
               <TableCell className="text-center">{totals.fg_made}-{totals.fg_att}</TableCell>
+              <TableCell className="text-center">{totals.fg_pct}%</TableCell>
               <TableCell className="text-center">{totals.fg3_made}-{totals.fg3_att}</TableCell>
+              <TableCell className="text-center">{totals.fg3_pct}%</TableCell>
               <TableCell className="text-center">{totals.ft_made}-{totals.ft_att}</TableCell>
+              <TableCell className="text-center">{totals.ft_pct}%</TableCell>
               <TableCell className="text-center">{totals.oreb}</TableCell>
               <TableCell className="text-center">{totals.dreb}</TableCell>
               <TableCell className="text-center">{totals.reb}</TableCell>
@@ -219,21 +248,21 @@ export default function LiveView() {
                 <span className={`text-xl font-bold px-4 py-2 rounded-lg ${
                   game.status === "active" ? "bg-orange-500" : "bg-white/20"
                 }`}>
-                  {game.status === "active" ? `Q${game.current_quarter}` : "FINAL"}
+                  {game.status === "active" ? getQuarterLabel(game.current_quarter) : "FINAL"}
                 </span>
               </div>
-              <div className="grid grid-cols-5 gap-3 text-sm">
+              <div className="grid gap-3 text-sm" style={{ gridTemplateColumns: `auto repeat(${totalQuarters}, 1fr)` }}>
                 <div></div>
-                {[1, 2, 3, 4].map(q => (
-                  <div key={q} className="text-white/60">Q{q}</div>
+                {Array.from({ length: totalQuarters }, (_, i) => i + 1).map(q => (
+                  <div key={q} className="text-white/60">{getQuarterLabel(q)}</div>
                 ))}
                 <div className="text-left">Home</div>
-                {game.quarter_scores?.home?.map((s, i) => (
-                  <div key={i} className="font-bold">{s}</div>
+                {Array.from({ length: totalQuarters }, (_, i) => (
+                  <div key={i} className="font-bold">{homeScores[i] || 0}</div>
                 ))}
                 <div className="text-left">Away</div>
-                {game.quarter_scores?.away?.map((s, i) => (
-                  <div key={i} className="font-bold">{s}</div>
+                {Array.from({ length: totalQuarters }, (_, i) => (
+                  <div key={i} className="font-bold">{awayScores[i] || 0}</div>
                 ))}
               </div>
             </div>
@@ -253,7 +282,53 @@ export default function LiveView() {
       <div className="max-w-6xl mx-auto px-4 py-6">
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <h2 className="text-xl font-bold text-[#1e3a5f] mb-4">Team Statistics</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 text-center">
+          
+          {/* Shooting Stats */}
+          <div className="grid grid-cols-2 gap-8 mb-6">
+            <div>
+              <p className="font-semibold text-[#dc2626] mb-2">{game.home_team_name} Shooting</p>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">FG</p>
+                  <p className="font-bold">{homeTotals.fg_made}/{homeTotals.fg_att}</p>
+                  <p className="text-lg font-bold text-[#dc2626]">{homeTotals.fg_pct}%</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">3PT</p>
+                  <p className="font-bold">{homeTotals.fg3_made}/{homeTotals.fg3_att}</p>
+                  <p className="text-lg font-bold text-[#dc2626]">{homeTotals.fg3_pct}%</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">FT</p>
+                  <p className="font-bold">{homeTotals.ft_made}/{homeTotals.ft_att}</p>
+                  <p className="text-lg font-bold text-[#dc2626]">{homeTotals.ft_pct}%</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <p className="font-semibold text-[#7c3aed] mb-2">{game.away_team_name} Shooting</p>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">FG</p>
+                  <p className="font-bold">{awayTotals.fg_made}/{awayTotals.fg_att}</p>
+                  <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.fg_pct}%</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">3PT</p>
+                  <p className="font-bold">{awayTotals.fg3_made}/{awayTotals.fg3_att}</p>
+                  <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.fg3_pct}%</p>
+                </div>
+                <div className="bg-slate-50 rounded-lg p-3">
+                  <p className="text-xs text-muted-foreground">FT</p>
+                  <p className="font-bold">{awayTotals.ft_made}/{awayTotals.ft_att}</p>
+                  <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.ft_pct}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Other Stats */}
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
             <div>
               <p className="text-xs text-muted-foreground uppercase">Off. Reb</p>
               <p className="text-lg font-bold text-[#dc2626]">{homeTotals.oreb}</p>
@@ -280,11 +355,6 @@ export default function LiveView() {
               <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.stl}</p>
             </div>
             <div>
-              <p className="text-xs text-muted-foreground uppercase">Blocks</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.blk}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.blk}</p>
-            </div>
-            <div>
               <p className="text-xs text-muted-foreground uppercase">Turnovers</p>
               <p className="text-lg font-bold text-[#dc2626]">{homeTotals.to}</p>
               <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.to}</p>
@@ -308,24 +378,57 @@ export default function LiveView() {
         </div>
       </div>
 
-      {/* Box Score Tables */}
+      {/* Box Score Tables and Play-by-Play */}
       <div className="max-w-6xl mx-auto px-4 pb-8">
-        <div className="bg-white rounded-xl shadow-sm p-6">
-          <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6">Box Score</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Box Score */}
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6">Box Score</h2>
+            
+            <TeamTable 
+              teamName={game.home_team_name} 
+              stats={homeStats} 
+              totals={homeTotals}
+              isHome={true}
+            />
+            
+            <TeamTable 
+              teamName={game.away_team_name} 
+              stats={awayStats} 
+              totals={awayTotals}
+              isHome={false}
+            />
+          </div>
           
-          <TeamTable 
-            teamName={game.home_team_name} 
-            stats={homeStats} 
-            totals={homeTotals}
-            isHome={true}
-          />
-          
-          <TeamTable 
-            teamName={game.away_team_name} 
-            stats={awayStats} 
-            totals={awayTotals}
-            isHome={false}
-          />
+          {/* Play by Play */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <h2 className="text-xl font-bold text-[#1e3a5f] mb-4">Play-by-Play</h2>
+            <ScrollArea className="h-[600px]">
+              {playByPlay.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No plays recorded yet</p>
+              ) : (
+                <div className="space-y-2">
+                  {[...playByPlay].reverse().map((play, idx) => (
+                    <div 
+                      key={play.id || idx} 
+                      className={`p-3 rounded text-sm ${play.team === 'home' ? 'bg-red-50 border-l-2 border-red-500' : 'bg-purple-50 border-l-2 border-purple-500'}`}
+                    >
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <span className="font-medium">#{play.player_number} {play.player_name}</span>
+                          <p className="text-muted-foreground">{play.action}</p>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs text-muted-foreground">{getQuarterLabel(play.quarter)}</span>
+                          <p className="font-bold">{play.home_score}-{play.away_score}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </div>
         </div>
         
         <p className="text-center text-sm text-muted-foreground mt-4">
