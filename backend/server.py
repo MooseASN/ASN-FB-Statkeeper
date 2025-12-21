@@ -312,6 +312,23 @@ async def record_stat(game_id: str, stat: StatUpdate):
         {"$set": {field: new_value}}
     )
     
+    # Action labels for play-by-play
+    action_labels = {
+        "ft_made": "FT Made",
+        "ft_missed": "FT Missed",
+        "fg2_made": "2PT Made",
+        "fg2_missed": "2PT Missed",
+        "fg3_made": "3PT Made",
+        "fg3_missed": "3PT Missed",
+        "assist": "Assist",
+        "oreb": "Off. Rebound",
+        "dreb": "Def. Rebound",
+        "turnover": "Turnover",
+        "steal": "Steal",
+        "block": "Block",
+        "foul": "Foul"
+    }
+    
     # Update quarter scores if it's a scoring stat
     points = 0
     if stat.stat_type == "ft_made":
@@ -321,16 +338,52 @@ async def record_stat(game_id: str, stat: StatUpdate):
     elif stat.stat_type == "fg3_made":
         points = 3 * stat.increment
     
+    team_key = "home" if player_stat["team_id"] == game["home_team_id"] else "away"
+    quarter_idx = game["current_quarter"] - 1
+    quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
+    
+    # Extend quarter_scores arrays for overtime if needed
+    while len(quarter_scores["home"]) <= quarter_idx:
+        quarter_scores["home"].append(0)
+        quarter_scores["away"].append(0)
+    
     if points != 0:
-        quarter_idx = game["current_quarter"] - 1
-        if quarter_idx < 4:
-            team_key = "home" if player_stat["team_id"] == game["home_team_id"] else "away"
-            quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
-            quarter_scores[team_key][quarter_idx] = max(0, quarter_scores[team_key][quarter_idx] + points)
-            await db.games.update_one(
-                {"id": game_id},
-                {"$set": {"quarter_scores": quarter_scores, "updated_at": datetime.now(timezone.utc).isoformat()}}
-            )
+        quarter_scores[team_key][quarter_idx] = max(0, quarter_scores[team_key][quarter_idx] + points)
+    
+    # Calculate current scores for play-by-play
+    home_score = sum(quarter_scores["home"])
+    away_score = sum(quarter_scores["away"])
+    
+    # Add play-by-play entry (only for positive increments)
+    play_by_play = game.get("play_by_play", [])
+    if stat.increment > 0:
+        entry = {
+            "id": str(uuid.uuid4()),
+            "quarter": game["current_quarter"],
+            "team": team_key,
+            "player_name": player_stat["player_name"],
+            "player_number": player_stat["player_number"],
+            "action": action_labels.get(stat.stat_type, stat.stat_type),
+            "points": max(0, points),
+            "home_score": home_score,
+            "away_score": away_score
+        }
+        play_by_play.append(entry)
+    elif stat.increment < 0 and play_by_play:
+        # Remove last matching entry on undo
+        for i in range(len(play_by_play) - 1, -1, -1):
+            if play_by_play[i]["action"] == action_labels.get(stat.stat_type):
+                play_by_play.pop(i)
+                break
+    
+    await db.games.update_one(
+        {"id": game_id},
+        {"$set": {
+            "quarter_scores": quarter_scores,
+            "play_by_play": play_by_play,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
     
     updated_stat = await db.player_stats.find_one({"id": stat.player_id}, {"_id": 0})
     return updated_stat
