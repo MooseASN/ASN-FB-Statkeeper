@@ -33,10 +33,10 @@ const sortByNumber = (players) => {
 };
 
 // TeamTable component - moved outside main component to avoid re-creation on render
-const TeamTable = ({ teamName, stats, totals, isHome }) => (
+const TeamTable = ({ teamName, stats, totals, teamColor }) => (
   <div className="mb-8">
-    <h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${isHome ? 'text-[#dc2626]' : 'text-[#7c3aed]'}`}>
-      <div className={`w-3 h-3 rounded-full ${isHome ? 'bg-[#dc2626]' : 'bg-[#7c3aed]'}`}></div>
+    <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: teamColor }}>
+      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: teamColor }}></div>
       {teamName}
     </h3>
     <div className="overflow-x-auto">
