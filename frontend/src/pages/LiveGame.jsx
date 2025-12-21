@@ -686,14 +686,14 @@ export default function LiveGame() {
               <div className="flex items-center justify-between mb-4">
                 <div className="text-center flex-1">
                   <p className="text-sm text-muted-foreground">{game.home_team_name}</p>
-                  <p className="text-5xl font-bold text-[#dc2626]" data-testid="home-score">
+                  <p className="text-5xl font-bold" style={{ color: homeColor }} data-testid="home-score">
                     {calculateScore("home")}
                   </p>
                 </div>
                 <div className="px-4 text-2xl text-slate-300">-</div>
                 <div className="text-center flex-1">
                   <p className="text-sm text-muted-foreground">{game.away_team_name}</p>
-                  <p className="text-5xl font-bold text-[#7c3aed]" data-testid="away-score">
+                  <p className="text-5xl font-bold" style={{ color: awayColor }} data-testid="away-score">
                     {calculateScore("away")}
                   </p>
                 </div>
