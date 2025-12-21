@@ -478,9 +478,9 @@ async def upload_roster_csv(team_id: str, file: UploadFile = File(...), user: Us
 # ============ GAME ENDPOINTS ============
 
 @api_router.post("/games", response_model=Game)
-async def create_game(game_data: GameCreate):
-    home_team = await db.teams.find_one({"id": game_data.home_team_id}, {"_id": 0})
-    away_team = await db.teams.find_one({"id": game_data.away_team_id}, {"_id": 0})
+async def create_game(game_data: GameCreate, user: User = Depends(get_current_user)):
+    home_team = await db.teams.find_one({"id": game_data.home_team_id, "user_id": user.user_id}, {"_id": 0})
+    away_team = await db.teams.find_one({"id": game_data.away_team_id, "user_id": user.user_id}, {"_id": 0})
     
     if not home_team or not away_team:
         raise HTTPException(status_code=404, detail="Team not found")
@@ -495,6 +495,7 @@ async def create_game(game_data: GameCreate):
         home_team_color=home_team.get("color", "#dc2626"),
         away_team_color=away_team.get("color", "#7c3aed")
     )
+    game.user_id = user.user_id
     
     doc = game.model_dump()
     await db.games.insert_one(doc)
