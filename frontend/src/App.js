@@ -94,6 +94,8 @@ function App() {
           <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
           <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
           <Route path="/auth/callback" element={<AuthCallback onLogin={handleLogin} />} />
+          <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPassword />} />
+          <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPassword />} />
           
           {/* Protected routes */}
           <Route path="/" element={<ProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></ProtectedRoute>} />
