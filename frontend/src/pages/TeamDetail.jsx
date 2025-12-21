@@ -336,7 +336,7 @@ export default function TeamDetail() {
 
         {/* Save Button */}
         <div className="flex justify-end">
-          <Button onClick={handleSave} className="bg-[#000000] hover:bg-[#2d5a87]" data-testid="save-team-btn">
+          <Button onClick={handleSave} className="bg-[#000000] hover:bg-[#333333]" data-testid="save-team-btn">
             <Save className="w-4 h-4 mr-2" />
             Save Changes
           </Button>

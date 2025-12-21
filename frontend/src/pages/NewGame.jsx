@@ -144,7 +144,7 @@ export default function NewGame() {
 
               {/* Preview */}
               {homeTeamId && awayTeamId && (
-                <div className="bg-gradient-to-r from-[#000000] to-[#2d5a87] rounded-xl p-6 text-white text-center">
+                <div className="bg-gradient-to-r from-[#000000] to-[#333333] rounded-xl p-6 text-white text-center">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex-1">
                       <p className="text-lg font-semibold">{selectedHome?.name}</p>

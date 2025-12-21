@@ -45,7 +45,7 @@ export default function Dashboard() {
     <Layout>
       <div className="space-y-8" data-testid="dashboard">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-[#000000] to-[#2d5a87] rounded-2xl p-8 text-white">
+        <div className="bg-gradient-to-r from-[#000000] to-[#333333] rounded-2xl p-8 text-white">
           <div className="flex items-center gap-3 mb-4">
             <MooseIcon className="w-10 h-10" />
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">StatMoose Basketball</h1>

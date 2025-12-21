@@ -260,7 +260,7 @@ export default function LiveView() {
       </div>
 
       {/* Scoreboard */}
-      <div className="bg-gradient-to-r from-[#000000] to-[#2d5a87] text-white">
+      <div className="bg-gradient-to-r from-[#000000] to-[#333333] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
           <div className="flex items-center justify-between">
             <div className="text-center flex-1">
