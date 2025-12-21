@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Users, History, PlayCircle, Trophy } from "lucide-react";
+import { Plus, Users, History, PlayCircle } from "lucide-react";
 import Layout from "@/components/Layout";
+import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -46,8 +47,8 @@ export default function Dashboard() {
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2d5a87] rounded-2xl p-8 text-white">
           <div className="flex items-center gap-3 mb-4">
-            <Trophy className="w-10 h-10" />
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">Court Metrics</h1>
+            <MooseIcon className="w-10 h-10" />
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">StatMoose Basketball</h1>
           </div>
           <p className="text-white/80 text-lg mb-6 max-w-xl">
             Track basketball statistics in real-time. Share live stats with your audience.
