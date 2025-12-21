@@ -365,47 +365,68 @@ export default function LiveView() {
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 text-center">
             <div>
               <p className="text-xs text-muted-foreground uppercase">Off. Reb</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.oreb}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.oreb}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.oreb}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.oreb}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase">Def. Reb</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.dreb}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.dreb}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.dreb}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.dreb}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase">Total Reb</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.reb}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.reb}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.reb}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.reb}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase">Assists</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.ast}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.ast}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.ast}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.ast}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase">Steals</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.stl}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.stl}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.stl}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.stl}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase">Turnovers</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.to}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.to}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.to}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.to}</p>
             </div>
             <div>
               <p className="text-xs text-muted-foreground uppercase">Fouls</p>
-              <p className="text-lg font-bold text-[#dc2626]">{homeTotals.pf}</p>
-              <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.pf}</p>
+              <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.pf}</p>
+              <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.pf}</p>
             </div>
           </div>
+          
+          {/* Game Flow Stats */}
+          <div className="grid grid-cols-4 gap-4 mt-4 pt-4 border-t">
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground uppercase">Lead Changes</p>
+              <p className="text-2xl font-bold text-[#1e3a5f]">{game.game_stats?.lead_changes || 0}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground uppercase">Times Tied</p>
+              <p className="text-2xl font-bold text-[#1e3a5f]">{game.game_stats?.ties || 0}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground uppercase">{game.home_team_name} Lead</p>
+              <p className="text-2xl font-bold" style={{ color: homeColor }}>{game.game_stats?.home_largest_lead || 0}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground uppercase">{game.away_team_name} Lead</p>
+              <p className="text-2xl font-bold" style={{ color: awayColor }}>{game.game_stats?.away_largest_lead || 0}</p>
+            </div>
+          </div>
+          
           <div className="flex justify-center gap-8 mt-4 text-xs">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#dc2626]"></div>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
               <span>{game.home_team_name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#7c3aed]"></div>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }}></div>
               <span>{game.away_team_name}</span>
             </div>
           </div>
