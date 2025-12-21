@@ -536,8 +536,8 @@ export default function LiveGame() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex items-center gap-2">
-                <Trophy className="w-6 h-6" />
-                <span className="font-bold hidden sm:block">Court Metrics</span>
+                <MooseIcon className="w-6 h-6" />
+                <span className="font-bold hidden sm:block">StatMoose</span>
               </div>
             </div>
             
