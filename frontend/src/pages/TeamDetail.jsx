@@ -25,8 +25,22 @@ export default function TeamDetail() {
   const [teamLogo, setTeamLogo] = useState("");
 
   useEffect(() => {
-    fetchTeam();
-  }, [id]);
+    const loadTeam = async () => {
+      try {
+        const res = await axios.get(`${API}/teams/${id}`);
+        setTeam(res.data);
+        setTeamName(res.data.name);
+        setTeamLogo(res.data.logo_url || "");
+        setRoster(res.data.roster || []);
+      } catch (error) {
+        toast.error("Failed to load team");
+        navigate("/teams");
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadTeam();
+  }, [id, navigate]);
 
   const fetchTeam = async () => {
     try {
