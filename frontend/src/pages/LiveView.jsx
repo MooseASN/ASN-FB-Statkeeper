@@ -7,6 +7,101 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Helper function to calculate player stats - moved outside component
+const calculatePlayerStats = (stats) => {
+  const pts = stats.ft_made + (stats.fg2_made * 2) + (stats.fg3_made * 3);
+  const totalReb = stats.offensive_rebounds + stats.defensive_rebounds;
+  const fg_made = stats.fg2_made + stats.fg3_made;
+  const fg_att = fg_made + stats.fg2_missed + stats.fg3_missed;
+  const fg_pct = fg_att > 0 ? Math.round((fg_made / fg_att) * 100) : 0;
+  const fg3_att = stats.fg3_made + stats.fg3_missed;
+  const fg3_pct = fg3_att > 0 ? Math.round((stats.fg3_made / fg3_att) * 100) : 0;
+  const ft_att = stats.ft_made + stats.ft_missed;
+  const ft_pct = ft_att > 0 ? Math.round((stats.ft_made / ft_att) * 100) : 0;
+  
+  return { pts, totalReb, fg_made, fg_att, fg_pct, fg3_att, fg3_pct, ft_att, ft_pct };
+};
+
+// TeamTable component - moved outside main component to avoid re-creation on render
+const TeamTable = ({ teamName, stats, totals, isHome }) => (
+  <div className="mb-8">
+    <h3 className={`text-lg font-bold mb-3 flex items-center gap-2 ${isHome ? 'text-[#dc2626]' : 'text-[#7c3aed]'}`}>
+      <div className={`w-3 h-3 rounded-full ${isHome ? 'bg-[#dc2626]' : 'bg-[#7c3aed]'}`}></div>
+      {teamName}
+    </h3>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow className="bg-slate-100">
+            <TableHead className="w-12">#</TableHead>
+            <TableHead>Player</TableHead>
+            <TableHead className="text-center">PTS</TableHead>
+            <TableHead className="text-center">FG</TableHead>
+            <TableHead className="text-center">FG%</TableHead>
+            <TableHead className="text-center">3PT</TableHead>
+            <TableHead className="text-center">3P%</TableHead>
+            <TableHead className="text-center">FT</TableHead>
+            <TableHead className="text-center">FT%</TableHead>
+            <TableHead className="text-center">OREB</TableHead>
+            <TableHead className="text-center">DREB</TableHead>
+            <TableHead className="text-center">REB</TableHead>
+            <TableHead className="text-center">AST</TableHead>
+            <TableHead className="text-center">STL</TableHead>
+            <TableHead className="text-center">BLK</TableHead>
+            <TableHead className="text-center">TO</TableHead>
+            <TableHead className="text-center">PF</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {stats.map(s => {
+            const calc = calculatePlayerStats(s);
+            return (
+              <TableRow key={s.id}>
+                <TableCell className="font-bold">{s.player_number}</TableCell>
+                <TableCell className="font-medium">{s.player_name}</TableCell>
+                <TableCell className="text-center font-bold">{calc.pts}</TableCell>
+                <TableCell className="text-center">{calc.fg_made}-{calc.fg_att}</TableCell>
+                <TableCell className="text-center">{calc.fg_pct}%</TableCell>
+                <TableCell className="text-center">{s.fg3_made}-{calc.fg3_att}</TableCell>
+                <TableCell className="text-center">{calc.fg3_pct}%</TableCell>
+                <TableCell className="text-center">{s.ft_made}-{calc.ft_att}</TableCell>
+                <TableCell className="text-center">{calc.ft_pct}%</TableCell>
+                <TableCell className="text-center">{s.offensive_rebounds}</TableCell>
+                <TableCell className="text-center">{s.defensive_rebounds}</TableCell>
+                <TableCell className="text-center">{calc.totalReb}</TableCell>
+                <TableCell className="text-center">{s.assists}</TableCell>
+                <TableCell className="text-center">{s.steals}</TableCell>
+                <TableCell className="text-center">{s.blocks}</TableCell>
+                <TableCell className="text-center">{s.turnovers}</TableCell>
+                <TableCell className="text-center">{s.fouls >= 5 ? <span className="text-red-500 font-bold">{s.fouls}</span> : s.fouls}</TableCell>
+              </TableRow>
+            );
+          })}
+          <TableRow className="bg-slate-100 font-bold">
+            <TableCell></TableCell>
+            <TableCell>TOTALS</TableCell>
+            <TableCell className="text-center">{totals.pts}</TableCell>
+            <TableCell className="text-center">{totals.fg_made}-{totals.fg_att}</TableCell>
+            <TableCell className="text-center">{totals.fg_pct}%</TableCell>
+            <TableCell className="text-center">{totals.fg3_made}-{totals.fg3_att}</TableCell>
+            <TableCell className="text-center">{totals.fg3_pct}%</TableCell>
+            <TableCell className="text-center">{totals.ft_made}-{totals.ft_att}</TableCell>
+            <TableCell className="text-center">{totals.ft_pct}%</TableCell>
+            <TableCell className="text-center">{totals.oreb}</TableCell>
+            <TableCell className="text-center">{totals.dreb}</TableCell>
+            <TableCell className="text-center">{totals.reb}</TableCell>
+            <TableCell className="text-center">{totals.ast}</TableCell>
+            <TableCell className="text-center">{totals.stl}</TableCell>
+            <TableCell className="text-center">{totals.blk}</TableCell>
+            <TableCell className="text-center">{totals.to}</TableCell>
+            <TableCell className="text-center">{totals.pf}</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </div>
+  </div>
+);
+
 export default function LiveView() {
   const { shareCode } = useParams();
   const [game, setGame] = useState(null);
