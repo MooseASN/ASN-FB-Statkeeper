@@ -62,16 +62,19 @@ Build a basketball statistics tracking website similar to pressboxhoops.com with
 3. ✅ CSV roster upload
 4. ✅ All personal statistics tracking (FT, 2PT, 3PT, AST, OREB, DREB, TO, STL, BLK, PF)
 5. ✅ Team fouls calculation
-6. ✅ Shooting percentage calculation
+6. ✅ Shooting percentage calculation (FG%, 3PT%, FT% for players and teams)
 7. ✅ Team stats aggregation (OREB, DREB, Total REB, Steals separated)
-8. ✅ Quarter-by-quarter scores
-9. ✅ Shareable live stats page with full box score
+8. ✅ Quarter-by-quarter scores with overtime support
+9. ✅ Shareable live stats page with full box score and shooting stats
 10. ✅ PDF box score export with all stats
-11. ✅ Quarter tracking (no clock)
+11. ✅ Quarter tracking with overtime capability (OT1, OT2, etc.)
 12. ✅ Add players mid-game
 13. ✅ Split UI with players on both sides
 14. ✅ Undo last action feature
 15. ✅ Make/Miss modal when clicking FT, 2PT, 3PT buttons
+16. ✅ Player shooting stats display (FG: X/Y Z%, 3PT: X/Y Z%, FT: X/Y Z%)
+17. ✅ Team shooting stats in team stats area
+18. ✅ Play-by-Play log (without timestamps)
 
 ## Next Tasks / Enhancements
 1. Add overtime period support
