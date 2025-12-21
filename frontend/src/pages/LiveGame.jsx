@@ -646,7 +646,7 @@ export default function LiveGame() {
           <div className="order-1 lg:order-1">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-[#dc2626]"></div>
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
                 <h2 className="font-bold text-lg">{game.home_team_name}</h2>
               </div>
               {isActive && (
@@ -665,7 +665,7 @@ export default function LiveGame() {
                 <PlayerCard 
                   key={player.id}
                   player={player}
-                  teamColor="#dc2626"
+                  teamColor={homeColor}
                   onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
                   disabled={!isActive}
