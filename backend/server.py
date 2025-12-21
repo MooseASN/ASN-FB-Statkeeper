@@ -360,6 +360,44 @@ async def record_stat(game_id: str, stat: StatUpdate):
     home_score = sum(quarter_scores["home"])
     away_score = sum(quarter_scores["away"])
     
+    # Track game flow stats (lead changes, ties, largest leads)
+    game_stats = game.get("game_stats", {
+        "home_largest_lead": 0,
+        "away_largest_lead": 0,
+        "lead_changes": 0,
+        "ties": 0,
+        "last_leader": None  # "home", "away", or None (tie)
+    })
+    
+    if points != 0:
+        # Calculate lead
+        lead = home_score - away_score
+        
+        # Update largest leads
+        if lead > 0 and lead > game_stats.get("home_largest_lead", 0):
+            game_stats["home_largest_lead"] = lead
+        elif lead < 0 and abs(lead) > game_stats.get("away_largest_lead", 0):
+            game_stats["away_largest_lead"] = abs(lead)
+        
+        # Determine current leader
+        if lead > 0:
+            current_leader = "home"
+        elif lead < 0:
+            current_leader = "away"
+        else:
+            current_leader = None  # tie
+        
+        # Check for lead change or tie
+        last_leader = game_stats.get("last_leader")
+        if current_leader is None and last_leader is not None:
+            # It's now a tie
+            game_stats["ties"] = game_stats.get("ties", 0) + 1
+        elif current_leader is not None and last_leader is not None and current_leader != last_leader:
+            # Lead changed
+            game_stats["lead_changes"] = game_stats.get("lead_changes", 0) + 1
+        
+        game_stats["last_leader"] = current_leader
+    
     # Add play-by-play entry (only for positive increments)
     play_by_play = game.get("play_by_play", [])
     if stat.increment > 0:
