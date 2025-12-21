@@ -425,6 +425,7 @@ async def record_stat(game_id: str, stat: StatUpdate):
         {"$set": {
             "quarter_scores": quarter_scores,
             "play_by_play": play_by_play,
+            "game_stats": game_stats,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }}
     )
