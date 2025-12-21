@@ -7,16 +7,29 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Users, Trash2, Edit, ChevronRight } from "lucide-react";
+import { Plus, Users, Trash2, ChevronRight } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+const TEAM_COLORS = [
+  { name: "Red", value: "#dc2626" },
+  { name: "Blue", value: "#2563eb" },
+  { name: "Green", value: "#16a34a" },
+  { name: "Purple", value: "#7c3aed" },
+  { name: "Orange", value: "#ea580c" },
+  { name: "Navy", value: "#1e3a5f" },
+  { name: "Teal", value: "#0d9488" },
+  { name: "Pink", value: "#db2777" },
+  { name: "Yellow", value: "#ca8a04" },
+  { name: "Gray", value: "#4b5563" },
+];
 
 export default function Teams() {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTeam, setNewTeam] = useState({ name: "", logo_url: "" });
+  const [newTeam, setNewTeam] = useState({ name: "", logo_url: "", color: "#dc2626" });
 
   useEffect(() => {
     fetchTeams();
@@ -42,7 +55,7 @@ export default function Teams() {
     try {
       await axios.post(`${API}/teams`, newTeam);
       toast.success("Team created successfully");
-      setNewTeam({ name: "", logo_url: "" });
+      setNewTeam({ name: "", logo_url: "", color: "#dc2626" });
       setIsDialogOpen(false);
       fetchTeams();
     } catch (error) {
