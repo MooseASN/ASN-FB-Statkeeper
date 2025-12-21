@@ -561,15 +561,15 @@ async def get_game_by_share_code(share_code: str):
     }
 
 @api_router.put("/games/{game_id}", response_model=Game)
-async def update_game(game_id: str, update: GameUpdate):
-    game = await db.games.find_one({"id": game_id})
+async def update_game(game_id: str, update: GameUpdate, user: User = Depends(get_current_user)):
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
     update_data = {k: v for k, v in update.model_dump().items() if v is not None}
     update_data["updated_at"] = datetime.now(timezone.utc).isoformat()
     
-    await db.games.update_one({"id": game_id}, {"$set": update_data})
+    await db.games.update_one({"id": game_id, "user_id": user.user_id}, {"$set": update_data})
     updated = await db.games.find_one({"id": game_id}, {"_id": 0})
     return updated
 
