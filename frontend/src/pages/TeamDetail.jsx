@@ -329,7 +329,7 @@ export default function TeamDetail() {
             )}
 
             <div className="mt-4 p-4 bg-slate-50 rounded-lg text-sm text-muted-foreground">
-              <strong>CSV Format:</strong> Your CSV should have columns for "number" (or "#") and "name" (or "player").
+              <strong>CSV Format:</strong> Your CSV should have columns for &quot;number&quot; (or &quot;#&quot;) and &quot;name&quot; (or &quot;player&quot;).
             </div>
           </CardContent>
         </Card>
