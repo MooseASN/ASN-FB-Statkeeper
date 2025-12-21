@@ -261,31 +261,72 @@ async def logout(request: Request, response: Response, session_token: Optional[s
     response.delete_cookie(key="session_token", path="/")
     return {"message": "Logged out successfully"}
 
-class ForgotPasswordRequest(BaseModel):
+# ============ SECURITY QUESTIONS ENDPOINTS ============
+
+@api_router.get("/auth/security-questions")
+async def get_security_questions():
+    """Get list of available security questions"""
+    return {"questions": SECURITY_QUESTIONS}
+
+class SecurityQuestionCheckRequest(BaseModel):
     email: str
 
-class ResetPasswordRequest(BaseModel):
-    token: str
-    password: str
+class SecurityQuestionVerifyRequest(BaseModel):
+    email: str
+    question: str
+    answer: str
 
-@api_router.post("/auth/forgot-password")
-async def forgot_password(request: Request, data: ForgotPasswordRequest):
-    """Request password reset - returns reset link directly (no email service)"""
-    email = data.email.lower()
+@api_router.post("/auth/security-question/get")
+async def get_user_security_question(data: SecurityQuestionCheckRequest):
+    """Get a random security question for a user (for password reset)"""
+    import random
     
-    # Find user
+    email = data.email.lower()
     user = await db.users.find_one({"email": email}, {"_id": 0})
     
-    # If no user found, return generic message
     if not user:
-        return {"message": "If an account with that email exists, a password reset link will be provided."}
+        # Return a fake question to prevent email enumeration
+        return {"question": random.choice(SECURITY_QUESTIONS), "has_questions": False}
+    
+    security_questions = user.get("security_questions", [])
+    if not security_questions:
+        return {"question": None, "has_questions": False, "message": "No security questions set for this account"}
+    
+    # Return a random question
+    selected = random.choice(security_questions)
+    return {"question": selected["question"], "has_questions": True}
+
+@api_router.post("/auth/security-question/verify")
+async def verify_security_question(request: Request, data: SecurityQuestionVerifyRequest):
+    """Verify security question answer and generate reset link"""
+    email = data.email.lower()
+    user = await db.users.find_one({"email": email}, {"_id": 0})
+    
+    if not user:
+        raise HTTPException(status_code=400, detail="Invalid answer")
+    
+    security_questions = user.get("security_questions", [])
+    
+    # Find the matching question
+    matched_question = None
+    for sq in security_questions:
+        if sq["question"] == data.question:
+            matched_question = sq
+            break
+    
+    if not matched_question:
+        raise HTTPException(status_code=400, detail="Invalid answer")
+    
+    # Verify the answer (case-insensitive)
+    if not pwd_context.verify(data.answer.lower().strip(), matched_question["answer_hash"]):
+        raise HTTPException(status_code=400, detail="Invalid answer")
     
     # Generate reset token
     reset_token = secrets.token_urlsafe(32)
     expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
     
     # Store reset token
-    await db.password_resets.delete_many({"user_id": user["user_id"]})  # Remove old tokens
+    await db.password_resets.delete_many({"user_id": user["user_id"]})
     await db.password_resets.insert_one({
         "user_id": user["user_id"],
         "token": reset_token,
@@ -297,10 +338,35 @@ async def forgot_password(request: Request, data: ForgotPasswordRequest):
     origin = request.headers.get("origin", "http://localhost:3000")
     reset_url = f"{origin}/reset-password?token={reset_token}"
     
-    # Return the reset link directly (no email service configured)
     return {
-        "message": "Password reset link generated successfully.",
+        "message": "Security question verified successfully.",
         "reset_link": reset_url
+    }
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: Request, data: ForgotPasswordRequest):
+    """Check if user exists and has security questions"""
+    email = data.email.lower()
+    
+    # Find user
+    user = await db.users.find_one({"email": email}, {"_id": 0})
+    
+    if not user:
+        return {"exists": False, "has_security_questions": False}
+    
+    security_questions = user.get("security_questions", [])
+    has_security_questions = len(security_questions) > 0
+    
+    return {
+        "exists": True,
+        "has_security_questions": has_security_questions
     }
 
 @api_router.post("/auth/reset-password")
