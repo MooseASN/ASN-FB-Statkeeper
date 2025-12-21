@@ -495,32 +495,32 @@ export default function LiveGame() {
         onMiss={() => handleShotResult(false)}
       />
 
-      {/* Side Action Buttons */}
-      <SideActionButton 
-        label="Away Rebound" 
-        onClick={() => handleTeamRebound("away", "dreb")} 
-        color="#7c3aed" 
-        position="left-0 top-1/4"
-        disabled={!isActive}
-      />
-      <SideActionButton 
-        label="Away Turnover" 
-        onClick={() => handleTeamTurnover("away")} 
-        color="#7c3aed" 
-        position="left-0 top-1/2"
-        disabled={!isActive}
-      />
+      {/* Side Action Buttons - Home on Left, Away on Right */}
       <SideActionButton 
         label="Home Rebound" 
         onClick={() => handleTeamRebound("home", "dreb")} 
-        color="#dc2626" 
-        position="right-0 top-1/4"
+        color={homeColor} 
+        position="left-0 top-1/4"
         disabled={!isActive}
       />
       <SideActionButton 
         label="Home Turnover" 
         onClick={() => handleTeamTurnover("home")} 
-        color="#dc2626" 
+        color={homeColor} 
+        position="left-0 top-1/2"
+        disabled={!isActive}
+      />
+      <SideActionButton 
+        label="Away Rebound" 
+        onClick={() => handleTeamRebound("away", "dreb")} 
+        color={awayColor} 
+        position="right-0 top-1/4"
+        disabled={!isActive}
+      />
+      <SideActionButton 
+        label="Away Turnover" 
+        onClick={() => handleTeamTurnover("away")} 
+        color={awayColor} 
         position="right-0 top-1/2"
         disabled={!isActive}
       />
