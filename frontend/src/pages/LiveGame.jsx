@@ -69,6 +69,15 @@ const calcShootingStats = (player) => {
   return { ft_att, ft_pct, fg2_att, fg2_pct, fg3_att, fg3_pct, fg_made, fg_att, fg_pct };
 };
 
+// Sort players by jersey number numerically
+const sortByNumber = (players) => {
+  return [...players].sort((a, b) => {
+    const numA = parseInt(a.player_number, 10) || 0;
+    const numB = parseInt(b.player_number, 10) || 0;
+    return numA - numB;
+  });
+};
+
 // Player Card Component
 const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
