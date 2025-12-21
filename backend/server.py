@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Request, Response, Depends, Cookie
 from fastapi.responses import StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -9,7 +9,7 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import csv
 import io
 from reportlab.lib import colors
@@ -17,6 +17,8 @@ from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+from passlib.context import CryptContext
+import httpx
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -26,10 +28,296 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# Password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-# ============ MODELS ============
+# ============ AUTH MODELS ============
+
+class UserRegister(BaseModel):
+    email: str
+    username: str
+    password: str
+    name: Optional[str] = None
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
+class User(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    user_id: str
+    email: str
+    username: str
+    name: Optional[str] = None
+    picture: Optional[str] = None
+    auth_provider: str = "local"  # "local" or "google"
+
+# ============ AUTH HELPERS ============
+
+async def get_current_user(request: Request, session_token: Optional[str] = Cookie(default=None)) -> User:
+    """Get current authenticated user from session token (cookie or header)"""
+    token = session_token
+    
+    # Fallback to Authorization header
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+    
+    if not token:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    # Find session
+    session = await db.user_sessions.find_one({"session_token": token}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=401, detail="Invalid session")
+    
+    # Check expiry
+    expires_at = session["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=401, detail="Session expired")
+    
+    # Get user
+    user = await db.users.find_one({"user_id": session["user_id"]}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return User(**user)
+
+async def get_optional_user(request: Request, session_token: Optional[str] = Cookie(default=None)) -> Optional[User]:
+    """Get current user if authenticated, otherwise return None"""
+    try:
+        return await get_current_user(request, session_token)
+    except HTTPException:
+        return None
+
+# ============ AUTH ROUTES ============
+
+@api_router.post("/auth/register")
+async def register(user_data: UserRegister, response: Response):
+    """Register a new user with email/username/password"""
+    # Check for existing email
+    existing_email = await db.users.find_one({"email": user_data.email.lower()}, {"_id": 0})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Check for existing username
+    existing_username = await db.users.find_one({"username": user_data.username.lower()}, {"_id": 0})
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
+    # Create user
+    user_id = f"user_{uuid.uuid4().hex[:12]}"
+    hashed_password = pwd_context.hash(user_data.password)
+    
+    user_doc = {
+        "user_id": user_id,
+        "email": user_data.email.lower(),
+        "username": user_data.username.lower(),
+        "name": user_data.name or user_data.username,
+        "password_hash": hashed_password,
+        "picture": None,
+        "auth_provider": "local",
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
+    
+    # Create session
+    session_token = f"session_{uuid.uuid4().hex}"
+    session_doc = {
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60
+    )
+    
+    return {
+        "user_id": user_id,
+        "email": user_data.email.lower(),
+        "username": user_data.username.lower(),
+        "name": user_data.name or user_data.username,
+        "session_token": session_token
+    }
+
+@api_router.post("/auth/login")
+async def login(credentials: UserLogin, response: Response):
+    """Login with email and password"""
+    user = await db.users.find_one({"email": credentials.email.lower()}, {"_id": 0})
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    if user.get("auth_provider") == "google":
+        raise HTTPException(status_code=400, detail="This account uses Google login. Please sign in with Google.")
+    
+    if not pwd_context.verify(credentials.password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    # Create session
+    session_token = f"session_{uuid.uuid4().hex}"
+    session_doc = {
+        "user_id": user["user_id"],
+        "session_token": session_token,
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60
+    )
+    
+    return {
+        "user_id": user["user_id"],
+        "email": user["email"],
+        "username": user.get("username", ""),
+        "name": user.get("name", ""),
+        "session_token": session_token
+    }
+
+@api_router.post("/auth/google/session")
+async def google_session(request: Request, response: Response):
+    """Exchange Google session_id for local session"""
+    body = await request.json()
+    session_id = body.get("session_id")
+    
+    if not session_id:
+        raise HTTPException(status_code=400, detail="session_id required")
+    
+    # Exchange session_id with Emergent Auth
+    async with httpx.AsyncClient() as client:
+        auth_response = await client.get(
+            "https://demobackend.emergentagent.com/auth/v1/env/oauth/session-data",
+            headers={"X-Session-ID": session_id}
+        )
+    
+    if auth_response.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid session_id")
+    
+    google_data = auth_response.json()
+    email = google_data["email"].lower()
+    
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": email}, {"_id": 0})
+    
+    if existing_user:
+        user_id = existing_user["user_id"]
+        # Update user info from Google
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "name": google_data.get("name", existing_user.get("name")),
+                "picture": google_data.get("picture"),
+                "auth_provider": "google"
+            }}
+        )
+    else:
+        # Create new user from Google
+        user_id = f"user_{uuid.uuid4().hex[:12]}"
+        # Generate unique username from email
+        base_username = email.split("@")[0].lower()
+        username = base_username
+        counter = 1
+        while await db.users.find_one({"username": username}, {"_id": 0}):
+            username = f"{base_username}{counter}"
+            counter += 1
+        
+        user_doc = {
+            "user_id": user_id,
+            "email": email,
+            "username": username,
+            "name": google_data.get("name", ""),
+            "picture": google_data.get("picture"),
+            "password_hash": None,
+            "auth_provider": "google",
+            "created_at": datetime.now(timezone.utc).isoformat()
+        }
+        await db.users.insert_one(user_doc)
+    
+    # Create local session
+    session_token = f"session_{uuid.uuid4().hex}"
+    session_doc = {
+        "user_id": user_id,
+        "session_token": session_token,
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "created_at": datetime.now(timezone.utc)
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Set cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        secure=True,
+        samesite="none",
+        path="/",
+        max_age=7 * 24 * 60 * 60
+    )
+    
+    user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    
+    return {
+        "user_id": user_id,
+        "email": user["email"],
+        "username": user.get("username", ""),
+        "name": user.get("name", ""),
+        "picture": user.get("picture"),
+        "session_token": session_token
+    }
+
+@api_router.get("/auth/me")
+async def get_me(user: User = Depends(get_current_user)):
+    """Get current authenticated user"""
+    return {
+        "user_id": user.user_id,
+        "email": user.email,
+        "username": user.username,
+        "name": user.name,
+        "picture": user.picture
+    }
+
+@api_router.post("/auth/logout")
+async def logout(request: Request, response: Response, session_token: Optional[str] = Cookie(default=None)):
+    """Logout and clear session"""
+    token = session_token
+    if not token:
+        auth_header = request.headers.get("Authorization")
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+    
+    if token:
+        await db.user_sessions.delete_one({"session_token": token})
+    
+    response.delete_cookie(key="session_token", path="/")
+    return {"message": "Logged out successfully"}
+
+# ============ DATA MODELS ============
 
 class Player(BaseModel):
     number: str
@@ -38,15 +326,16 @@ class Player(BaseModel):
 class TeamCreate(BaseModel):
     name: str
     logo_url: Optional[str] = None
-    color: str = "#1e3a5f"  # Default team color
+    color: str = "#000000"  # Default team color
     roster: List[Player] = []
 
 class Team(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str = ""  # Owner of this team
     name: str
     logo_url: Optional[str] = None
-    color: str = "#1e3a5f"
+    color: str = "#000000"
     roster: List[Player] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
