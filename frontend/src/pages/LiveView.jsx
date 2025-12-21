@@ -22,6 +22,15 @@ const calculatePlayerStats = (stats) => {
   return { pts, totalReb, fg_made, fg_att, fg_pct, fg3_att, fg3_pct, ft_att, ft_pct };
 };
 
+// Sort players by jersey number numerically
+const sortByNumber = (players) => {
+  return [...players].sort((a, b) => {
+    const numA = parseInt(a.player_number, 10) || 0;
+    const numB = parseInt(b.player_number, 10) || 0;
+    return numA - numB;
+  });
+};
+
 // TeamTable component - moved outside main component to avoid re-creation on render
 const TeamTable = ({ teamName, stats, totals, isHome }) => (
   <div className="mb-8">
