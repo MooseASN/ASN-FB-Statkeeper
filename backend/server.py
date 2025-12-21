@@ -78,6 +78,8 @@ class Game(BaseModel):
     away_team_name: str = ""
     home_team_logo: Optional[str] = None
     away_team_logo: Optional[str] = None
+    home_team_color: str = "#dc2626"
+    away_team_color: str = "#7c3aed"
     status: str = "active"  # active, completed
     current_quarter: int = 1
     quarter_scores: QuarterScores = Field(default_factory=QuarterScores)
