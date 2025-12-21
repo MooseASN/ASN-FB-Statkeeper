@@ -3,6 +3,36 @@ import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, Minus } from "lucide-react";
 
+const StatButton = ({ label, onClick, variant = "default", testId, disabled }) => (
+  <Button
+    size="sm"
+    variant={variant}
+    className={`stat-btn h-10 min-w-[60px] ${
+      variant === "make" ? "bg-emerald-500 hover:bg-emerald-600 text-white" :
+      variant === "miss" ? "bg-red-500 hover:bg-red-600 text-white" :
+      "bg-slate-600 hover:bg-slate-700 text-white"
+    }`}
+    onClick={onClick}
+    disabled={disabled}
+    data-testid={testId}
+  >
+    {label}
+  </Button>
+);
+
+const UndoButton = ({ onClick, testId, disabled }) => (
+  <Button
+    size="sm"
+    variant="outline"
+    className="h-8 w-8 p-0"
+    onClick={onClick}
+    disabled={disabled}
+    data-testid={testId}
+  >
+    <Minus className="w-3 h-3" />
+  </Button>
+);
+
 export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
   const [isOpen, setIsOpen] = useState(false);
   
@@ -15,36 +45,6 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
   
   const ft_att = player.ft_made + player.ft_missed;
   const ft_pct = ft_att > 0 ? ((player.ft_made / ft_att) * 100).toFixed(1) : 0;
-
-  const StatButton = ({ label, onClick, variant = "default", testId }) => (
-    <Button
-      size="sm"
-      variant={variant}
-      className={`stat-btn h-10 min-w-[60px] ${
-        variant === "make" ? "bg-emerald-500 hover:bg-emerald-600 text-white" :
-        variant === "miss" ? "bg-red-500 hover:bg-red-600 text-white" :
-        "bg-slate-600 hover:bg-slate-700 text-white"
-      }`}
-      onClick={onClick}
-      disabled={disabled}
-      data-testid={testId}
-    >
-      {label}
-    </Button>
-  );
-
-  const UndoButton = ({ onClick, testId }) => (
-    <Button
-      size="sm"
-      variant="outline"
-      className="h-8 w-8 p-0"
-      onClick={onClick}
-      disabled={disabled}
-      data-testid={testId}
-    >
-      <Minus className="w-3 h-3" />
-    </Button>
-  );
 
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
@@ -91,12 +91,14 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       variant="make" 
                       onClick={() => onStatUpdate(player.id, "ft_made")}
                       testId={`ft-make-${player.id}`}
+                      disabled={disabled}
                     />
                     <StatButton 
                       label="Miss" 
                       variant="miss" 
                       onClick={() => onStatUpdate(player.id, "ft_missed")}
                       testId={`ft-miss-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -109,12 +111,14 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       variant="make" 
                       onClick={() => onStatUpdate(player.id, "fg2_made")}
                       testId={`fg2-make-${player.id}`}
+                      disabled={disabled}
                     />
                     <StatButton 
                       label="Miss" 
                       variant="miss" 
                       onClick={() => onStatUpdate(player.id, "fg2_missed")}
                       testId={`fg2-miss-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -127,12 +131,14 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       variant="make" 
                       onClick={() => onStatUpdate(player.id, "fg3_made")}
                       testId={`fg3-make-${player.id}`}
+                      disabled={disabled}
                     />
                     <StatButton 
                       label="Miss" 
                       variant="miss" 
                       onClick={() => onStatUpdate(player.id, "fg3_missed")}
                       testId={`fg3-miss-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -154,10 +160,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "assist")}
                       testId={`assist-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "assist", -1)}
                       testId={`assist-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -172,10 +180,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "oreb")}
                       testId={`oreb-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "oreb", -1)}
                       testId={`oreb-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -190,10 +200,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "dreb")}
                       testId={`dreb-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "dreb", -1)}
                       testId={`dreb-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -208,10 +220,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "steal")}
                       testId={`steal-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "steal", -1)}
                       testId={`steal-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -226,10 +240,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "block")}
                       testId={`block-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "block", -1)}
                       testId={`block-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -244,10 +260,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "turnover")}
                       testId={`turnover-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "turnover", -1)}
                       testId={`turnover-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
@@ -262,10 +280,12 @@ export default function PlayerStatRow({ player, onStatUpdate, disabled }) {
                       label="+" 
                       onClick={() => onStatUpdate(player.id, "foul")}
                       testId={`foul-${player.id}`}
+                      disabled={disabled}
                     />
                     <UndoButton 
                       onClick={() => onStatUpdate(player.id, "foul", -1)}
                       testId={`foul-undo-${player.id}`}
+                      disabled={disabled}
                     />
                   </div>
                 </div>
