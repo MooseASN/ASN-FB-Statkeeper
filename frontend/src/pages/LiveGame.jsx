@@ -805,7 +805,7 @@ export default function LiveGame() {
               )}
             </div>
             <div className="space-y-2 max-h-[calc(100vh-250px)] overflow-y-auto pr-2">
-              {awayStats.map(player => (
+              {sortByNumber(awayStats).map(player => (
                 <PlayerCard 
                   key={player.id}
                   player={player}
