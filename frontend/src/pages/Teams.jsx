@@ -159,7 +159,7 @@ export default function Teams() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {teams.map((team) => (
               <Link key={team.id} to={`/teams/${team.id}`}>
-                <Card className="hover:shadow-lg transition-all cursor-pointer group" data-testid={`team-card-${team.id}`}>
+                <Card className="hover:shadow-lg transition-all cursor-pointer group" style={{ borderLeft: `4px solid ${team.color || '#1e3a5f'}` }} data-testid={`team-card-${team.id}`}>
                   <CardContent className="pt-6">
                     <div className="flex items-center gap-4">
                       {team.logo_url ? (
@@ -169,7 +169,10 @@ export default function Teams() {
                           className="w-16 h-16 rounded-full object-cover"
                         />
                       ) : (
-                        <div className="logo-placeholder">
+                        <div 
+                          className="w-16 h-16 rounded-full flex items-center justify-center text-white font-bold text-xl"
+                          style={{ backgroundColor: team.color || '#1e3a5f' }}
+                        >
                           {team.name.charAt(0).toUpperCase()}
                         </div>
                       )}
