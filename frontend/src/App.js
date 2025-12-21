@@ -13,6 +13,8 @@ import GameHistory from "@/pages/GameHistory";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import AuthCallback from "@/pages/AuthCallback";
+import ForgotPassword from "@/pages/ForgotPassword";
+import ResetPassword from "@/pages/ResetPassword";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
