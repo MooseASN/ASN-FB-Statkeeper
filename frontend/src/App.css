@@ -1,34 +1,56 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* App-specific styles */
+.app-container {
+  min-height: 100vh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Logo placeholder */
+.logo-placeholder {
+  @apply w-16 h-16 rounded-full bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center text-slate-500 font-bold text-xl;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+/* Stat grid */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.5rem;
 }
 
-.App-link {
-    color: #61dafb;
+/* Player row hover */
+.player-row {
+  @apply transition-colors duration-150;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.player-row:hover {
+  @apply bg-slate-50;
+}
+
+/* Make/Miss buttons */
+.btn-make {
+  @apply bg-emerald-500 hover:bg-emerald-600 text-white;
+}
+
+.btn-miss {
+  @apply bg-red-500 hover:bg-red-600 text-white;
+}
+
+.btn-stat {
+  @apply bg-slate-600 hover:bg-slate-700 text-white;
+}
+
+/* Scoreboard */
+.scoreboard {
+  background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+}
+
+/* Quarter tabs */
+.quarter-tab {
+  @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
+}
+
+.quarter-tab.active {
+  @apply bg-white text-[#1e3a5f] shadow-md;
+}
+
+.quarter-tab:not(.active) {
+  @apply text-white/80 hover:text-white hover:bg-white/10;
 }
