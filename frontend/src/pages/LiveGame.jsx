@@ -456,7 +456,7 @@ export default function LiveGame() {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <Trophy className="w-12 h-12 animate-pulse mx-auto text-[#1e3a5f]" />
+          <MooseIcon className="w-12 h-12 animate-pulse mx-auto text-[#1e3a5f]" />
           <p className="mt-4 text-muted-foreground">Loading game...</p>
         </div>
       </div>
