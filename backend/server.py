@@ -522,8 +522,8 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     return game
 
 @api_router.get("/games", response_model=List[Game])
-async def get_games():
-    games = await db.games.find({}, {"_id": 0}).sort("created_at", -1).to_list(100)
+async def get_games(user: User = Depends(get_current_user)):
+    games = await db.games.find({"user_id": user.user_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
     return games
 
 @api_router.get("/games/{game_id}")
