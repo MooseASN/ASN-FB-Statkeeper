@@ -94,6 +94,7 @@ export default function TeamDetail() {
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
   const [teamName, setTeamName] = useState("");
   const [teamLogo, setTeamLogo] = useState("");
+  const [teamColor, setTeamColor] = useState("#1e3a5f");
 
   useEffect(() => {
     const loadTeam = async () => {
@@ -102,6 +103,7 @@ export default function TeamDetail() {
         setTeam(res.data);
         setTeamName(res.data.name);
         setTeamLogo(res.data.logo_url || "");
+        setTeamColor(res.data.color || "#1e3a5f");
         setRoster(res.data.roster || []);
       } catch (error) {
         toast.error("Failed to load team");
@@ -119,6 +121,7 @@ export default function TeamDetail() {
       setTeam(res.data);
       setTeamName(res.data.name);
       setTeamLogo(res.data.logo_url || "");
+      setTeamColor(res.data.color || "#1e3a5f");
       setRoster(res.data.roster || []);
     } catch (error) {
       toast.error("Failed to load team");
