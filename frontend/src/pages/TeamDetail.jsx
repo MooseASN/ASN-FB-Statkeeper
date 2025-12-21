@@ -9,8 +9,79 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Plus, Trash2, Upload, Save } from "lucide-react";
 import Layout from "@/components/Layout";
+import { ChromePicker } from "react-color";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Advanced Color Picker Component with color map and hex input
+const ColorPicker = ({ value, onChange }) => {
+  const [showPicker, setShowPicker] = useState(false);
+  
+  const presetColors = [
+    "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0d9488",
+    "#2563eb", "#7c3aed", "#db2777", "#1e3a5f", "#4b5563"
+  ];
+  
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          <button
+            type="button"
+            onClick={() => setShowPicker(!showPicker)}
+            className="w-12 h-12 rounded-lg cursor-pointer border-2 border-slate-200 hover:border-slate-400 transition-colors"
+            style={{ backgroundColor: value }}
+            data-testid="color-picker-trigger"
+          />
+          {showPicker && (
+            <div className="absolute z-50 top-14 left-0">
+              <div 
+                className="fixed inset-0" 
+                onClick={() => setShowPicker(false)}
+              />
+              <div className="relative">
+                <ChromePicker
+                  color={value}
+                  onChange={(color) => onChange(color.hex)}
+                  disableAlpha
+                />
+              </div>
+            </div>
+          )}
+        </div>
+        <div className="flex-1">
+          <Label className="text-xs text-muted-foreground">Hex Code</Label>
+          <Input
+            value={value}
+            onChange={(e) => {
+              const hex = e.target.value;
+              if (/^#[0-9A-Fa-f]{0,6}$/.test(hex) || hex === "") {
+                onChange(hex.startsWith("#") ? hex : `#${hex}`);
+              }
+            }}
+            placeholder="#000000"
+            className="font-mono text-sm"
+            data-testid="color-hex-input"
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {presetColors.map((color) => (
+          <button
+            key={color}
+            type="button"
+            onClick={() => onChange(color)}
+            className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${
+              value === color ? 'border-black ring-2 ring-offset-1 ring-black/20' : 'border-white shadow-sm'
+            }`}
+            style={{ backgroundColor: color }}
+            data-testid={`preset-color-${color.slice(1)}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function TeamDetail() {
   const { id } = useParams();
