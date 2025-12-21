@@ -231,6 +231,18 @@ export default function LiveView() {
         </div>
       </div>
 
+      {/* Game Title Banner */}
+      <div className="bg-[#1e3a5f] text-white py-4">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-2xl md:text-3xl font-bold" data-testid="game-title">
+            {game.home_team_name} vs {game.away_team_name}
+          </h1>
+          <p className="text-white/70 mt-1">
+            {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final Score"}
+          </p>
+        </div>
+      </div>
+
       {/* Scoreboard */}
       <div className="bg-gradient-to-r from-[#1e3a5f] to-[#2d5a87] text-white">
         <div className="max-w-6xl mx-auto px-4 py-8">
