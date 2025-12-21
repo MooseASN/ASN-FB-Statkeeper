@@ -527,8 +527,8 @@ async def get_games(user: User = Depends(get_current_user)):
     return games
 
 @api_router.get("/games/{game_id}")
-async def get_game(game_id: str):
-    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+async def get_game(game_id: str, user: User = Depends(get_current_user)):
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
