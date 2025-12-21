@@ -268,7 +268,7 @@ export default function LiveView() {
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: homeColor }}></div>
                 <p className="text-lg font-semibold">{game.home_team_name}</p>
               </div>
-              <p className="text-6xl font-bold score-display mt-2" style={{ color: homeColor }} data-testid="home-score">
+              <p className="text-6xl font-bold score-display mt-2 text-white" data-testid="home-score">
                 {calculateScore("home")}
               </p>
               <p className="text-sm text-white/60 mt-1">Team Fouls: {homeTotals.pf}</p>
@@ -303,7 +303,7 @@ export default function LiveView() {
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: awayColor }}></div>
                 <p className="text-lg font-semibold">{game.away_team_name}</p>
               </div>
-              <p className="text-6xl font-bold score-display mt-2" style={{ color: awayColor }} data-testid="away-score">
+              <p className="text-6xl font-bold score-display mt-2 text-white" data-testid="away-score">
                 {calculateScore("away")}
               </p>
               <p className="text-sm text-white/60 mt-1">Team Fouls: {awayTotals.pf}</p>
