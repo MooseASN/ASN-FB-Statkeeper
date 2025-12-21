@@ -361,6 +361,7 @@ class PlayByPlayEntry(BaseModel):
 class Game(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str = ""  # Owner of this game
     home_team_id: str
     away_team_id: str
     home_team_name: str = ""
