@@ -78,6 +78,22 @@ const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
               AST {player.assists}
             </button>
             <button
+              onClick={() => onStatUpdate(player.id, "oreb")}
+              disabled={disabled}
+              className="px-2 py-1 text-xs bg-green-100 hover:bg-green-200 rounded transition-colors disabled:opacity-50"
+              data-testid={`oreb-btn-${player.id}`}
+            >
+              OREB {player.offensive_rebounds}
+            </button>
+            <button
+              onClick={() => onStatUpdate(player.id, "dreb")}
+              disabled={disabled}
+              className="px-2 py-1 text-xs bg-blue-100 hover:bg-blue-200 rounded transition-colors disabled:opacity-50"
+              data-testid={`dreb-btn-${player.id}`}
+            >
+              DREB {player.defensive_rebounds}
+            </button>
+            <button
               onClick={() => onStatUpdate(player.id, "steal")}
               disabled={disabled}
               className="px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded transition-colors disabled:opacity-50"
@@ -92,6 +108,14 @@ const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
               data-testid={`blk-btn-${player.id}`}
             >
               BLK {player.blocks}
+            </button>
+            <button
+              onClick={() => onStatUpdate(player.id, "turnover")}
+              disabled={disabled}
+              className="px-2 py-1 text-xs bg-red-50 hover:bg-red-100 text-red-600 rounded transition-colors disabled:opacity-50"
+              data-testid={`to-btn-${player.id}`}
+            >
+              TO {player.turnovers}
             </button>
           </div>
         </div>
