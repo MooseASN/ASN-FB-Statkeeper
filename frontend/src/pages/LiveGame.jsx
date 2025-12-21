@@ -788,6 +788,26 @@ export default function LiveGame() {
                   </div>
                 </div>
               </div>
+              
+              {/* Game Flow Stats */}
+              <div className="grid grid-cols-4 gap-2 mt-3 pt-3 border-t text-center">
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase">Lead Chg</p>
+                  <p className="text-sm font-bold">{game.game_stats?.lead_changes || 0}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase">Ties</p>
+                  <p className="text-sm font-bold">{game.game_stats?.ties || 0}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase" style={{ color: homeColor }}>Lead</p>
+                  <p className="text-sm font-bold" style={{ color: homeColor }}>{game.game_stats?.home_largest_lead || 0}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase" style={{ color: awayColor }}>Lead</p>
+                  <p className="text-sm font-bold" style={{ color: awayColor }}>{game.game_stats?.away_largest_lead || 0}</p>
+                </div>
+              </div>
             </div>
           </div>
 
