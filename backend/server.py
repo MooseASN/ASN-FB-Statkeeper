@@ -324,6 +324,150 @@ async def logout(request: Request, response: Response, session_token: Optional[s
     response.delete_cookie(key="session_token", path="/")
     return {"message": "Logged out successfully"}
 
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    password: str
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: Request, data: ForgotPasswordRequest):
+    """Request password reset email"""
+    email = data.email.lower()
+    
+    # Find user
+    user = await db.users.find_one({"email": email}, {"_id": 0})
+    
+    # Always return success to prevent email enumeration
+    if not user:
+        return {"message": "If an account with that email exists, a password reset link has been sent."}
+    
+    # Check if user uses Google login
+    if user.get("auth_provider") == "google":
+        return {"message": "This account uses Google login. Please sign in with Google."}
+    
+    # Generate reset token
+    reset_token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    
+    # Store reset token
+    await db.password_resets.delete_many({"user_id": user["user_id"]})  # Remove old tokens
+    await db.password_resets.insert_one({
+        "user_id": user["user_id"],
+        "token": reset_token,
+        "expires_at": expires_at,
+        "created_at": datetime.now(timezone.utc)
+    })
+    
+    # Build reset URL
+    origin = request.headers.get("origin", "http://localhost:3000")
+    reset_url = f"{origin}/reset-password?token={reset_token}"
+    
+    # Send email
+    if resend.api_key:
+        try:
+            html_content = f"""
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #000; margin: 0;">StatMoose</h1>
+                    <p style="color: #666;">Basketball Stats Tracker</p>
+                </div>
+                <h2 style="color: #333;">Reset Your Password</h2>
+                <p style="color: #555; line-height: 1.6;">
+                    Hi {user.get('name', user.get('username', 'there'))},
+                </p>
+                <p style="color: #555; line-height: 1.6;">
+                    You requested to reset your password. Click the button below to create a new password:
+                </p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="{reset_url}" style="background-color: #000; color: #fff; padding: 12px 30px; text-decoration: none; border-radius: 6px; display: inline-block;">
+                        Reset Password
+                    </a>
+                </div>
+                <p style="color: #555; line-height: 1.6;">
+                    This link will expire in 1 hour. If you didn't request this, you can safely ignore this email.
+                </p>
+                <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+                <p style="color: #999; font-size: 12px;">
+                    If the button doesn't work, copy and paste this link into your browser:<br>
+                    <a href="{reset_url}" style="color: #666;">{reset_url}</a>
+                </p>
+            </div>
+            """
+            
+            params = {
+                "from": SENDER_EMAIL,
+                "to": [email],
+                "subject": "Reset your StatMoose password",
+                "html": html_content
+            }
+            
+            await asyncio.to_thread(resend.Emails.send, params)
+        except Exception as e:
+            logging.error(f"Failed to send password reset email: {e}")
+            # Still return success to prevent enumeration
+    
+    return {"message": "If an account with that email exists, a password reset link has been sent."}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(data: ResetPasswordRequest):
+    """Reset password with token"""
+    # Find reset token
+    reset_record = await db.password_resets.find_one({"token": data.token}, {"_id": 0})
+    
+    if not reset_record:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token")
+    
+    # Check expiry
+    expires_at = reset_record["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    
+    if expires_at < datetime.now(timezone.utc):
+        await db.password_resets.delete_one({"token": data.token})
+        raise HTTPException(status_code=400, detail="Reset token has expired")
+    
+    # Validate password
+    if len(data.password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Update password
+    hashed_password = pwd_context.hash(data.password)
+    await db.users.update_one(
+        {"user_id": reset_record["user_id"]},
+        {"$set": {"password_hash": hashed_password}}
+    )
+    
+    # Delete reset token
+    await db.password_resets.delete_one({"token": data.token})
+    
+    # Invalidate all existing sessions for security
+    await db.user_sessions.delete_many({"user_id": reset_record["user_id"]})
+    
+    return {"message": "Password has been reset successfully. Please log in with your new password."}
+
+@api_router.get("/auth/verify-reset-token/{token}")
+async def verify_reset_token(token: str):
+    """Verify if a reset token is valid"""
+    reset_record = await db.password_resets.find_one({"token": token}, {"_id": 0})
+    
+    if not reset_record:
+        raise HTTPException(status_code=400, detail="Invalid reset token")
+    
+    expires_at = reset_record["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(status_code=400, detail="Reset token has expired")
+    
+    return {"valid": True}
+
 # ============ DATA MODELS ============
 
 class Player(BaseModel):
