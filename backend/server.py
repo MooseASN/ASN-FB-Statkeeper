@@ -586,9 +586,12 @@ async def generate_boxscore_pdf(game_id: str):
     def create_team_table(team_name: str, stats_list: list, team_totals: dict, team_color: str):
         elements.append(Paragraph(f"<b>{team_name}</b>", team_style))
         
+        # Sort players by jersey number
+        sorted_stats = sorted(stats_list, key=lambda x: int(x.get("player_number", "0")) if x.get("player_number", "0").isdigit() else 0)
+        
         data = [headers]
         
-        for s in stats_list:
+        for s in sorted_stats:
             totals = calculate_player_totals(s)
             # Combine made-att (pct%)
             fg_str = f"{totals['fg_made']}-{totals['fg_att']}" if totals['fg_att'] > 0 else "0-0"
