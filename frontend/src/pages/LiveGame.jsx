@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus } from "lucide-react";
+import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus, Minimize2, Maximize2 } from "lucide-react";
 import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -79,16 +79,14 @@ const sortByNumber = (players) => {
   });
 };
 
-// Player Card Component - Condensed for more players on screen
-const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
+// ============ CONDENSED PLAYER CARD ============
+const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
-  const totalReb = player.offensive_rebounds + player.defensive_rebounds;
   
   return (
     <div className="bg-white rounded-lg px-2 py-1.5 shadow-sm border" data-testid={`player-card-${player.id}`}>
       <div className="flex items-center gap-2">
-        {/* Player number badge */}
         <div 
           className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
           style={{ backgroundColor: teamColor }}
@@ -96,7 +94,6 @@ const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) 
           {player.player_number}
         </div>
         
-        {/* Name and Points */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <span className="font-medium text-sm truncate">{player.player_name}</span>
@@ -107,13 +104,11 @@ const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) 
           </div>
         </div>
         
-        {/* Shot buttons */}
         <div className="flex items-center gap-1">
           <button
             onClick={() => onShotClick(player, "ft")}
             disabled={disabled}
             className="w-8 h-8 rounded-full border border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 text-[10px] font-bold disabled:opacity-50"
-            data-testid={`ft-btn-${player.id}`}
           >
             FT
           </button>
@@ -121,7 +116,6 @@ const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) 
             onClick={() => onShotClick(player, "fg2")}
             disabled={disabled}
             className="w-8 h-8 rounded-full border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-[10px] font-bold disabled:opacity-50"
-            data-testid={`fg2-btn-${player.id}`}
           >
             2PT
           </button>
@@ -129,14 +123,12 @@ const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) 
             onClick={() => onShotClick(player, "fg3")}
             disabled={disabled}
             className="w-8 h-8 rounded-full border border-slate-300 hover:border-orange-500 hover:bg-orange-50 text-[10px] font-bold disabled:opacity-50"
-            data-testid={`fg3-btn-${player.id}`}
           >
             3PT
           </button>
         </div>
       </div>
       
-      {/* Compact stat buttons row */}
       <div className="flex items-center gap-1 mt-1 ml-9">
         <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
           className="px-1.5 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50">
@@ -165,6 +157,106 @@ const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) 
         <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
           className="px-1.5 py-0.5 text-[10px] bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50 ml-auto">
           F{player.fouls}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// ============ EXPANDED PLAYER CARD ============
+const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
+  const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
+  const stats = calcShootingStats(player);
+  const totalReb = player.offensive_rebounds + player.defensive_rebounds;
+  
+  return (
+    <div className="bg-white rounded-xl p-4 shadow-sm border" data-testid={`player-card-${player.id}`}>
+      {/* Header with player info */}
+      <div className="flex items-center gap-3 mb-4">
+        <div 
+          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
+          style={{ backgroundColor: teamColor }}
+        >
+          {player.player_number}
+        </div>
+        <div className="flex-1">
+          <h4 className="font-bold text-lg">{player.player_name}</h4>
+          <p className="text-sm text-muted-foreground">
+            {stats.fg_made}/{stats.fg_att} FG ({stats.fg_pct}%) • {totalReb} REB • {player.assists} AST
+          </p>
+        </div>
+        <div className="text-right">
+          <div className="text-3xl font-bold" style={{ color: teamColor }}>{pts}</div>
+          <div className="text-xs text-muted-foreground">PTS</div>
+        </div>
+      </div>
+
+      {/* Shot buttons - larger */}
+      <div className="grid grid-cols-3 gap-2 mb-4">
+        <button
+          onClick={() => onShotClick(player, "ft")}
+          disabled={disabled}
+          className="py-3 rounded-lg border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+        >
+          <div className="text-lg">FT</div>
+          <div className="text-xs text-muted-foreground">{player.ft_made}/{stats.ft_att}</div>
+        </button>
+        <button
+          onClick={() => onShotClick(player, "fg2")}
+          disabled={disabled}
+          className="py-3 rounded-lg border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+        >
+          <div className="text-lg">2PT</div>
+          <div className="text-xs text-muted-foreground">{player.fg2_made}/{stats.fg2_att}</div>
+        </button>
+        <button
+          onClick={() => onShotClick(player, "fg3")}
+          disabled={disabled}
+          className="py-3 rounded-lg border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+        >
+          <div className="text-lg">3PT</div>
+          <div className="text-xs text-muted-foreground">{player.fg3_made}/{stats.fg3_att}</div>
+        </button>
+      </div>
+
+      {/* Other stats - two rows */}
+      <div className="grid grid-cols-4 gap-2 mb-2">
+        <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.assists}</div>
+          <div className="text-[10px] text-muted-foreground">AST</div>
+        </button>
+        <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.offensive_rebounds}</div>
+          <div className="text-[10px] text-muted-foreground">OREB</div>
+        </button>
+        <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.defensive_rebounds}</div>
+          <div className="text-[10px] text-muted-foreground">DREB</div>
+        </button>
+        <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.steals}</div>
+          <div className="text-[10px] text-muted-foreground">STL</div>
+        </button>
+      </div>
+      <div className="grid grid-cols-3 gap-2">
+        <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.blocks}</div>
+          <div className="text-[10px] text-muted-foreground">BLK</div>
+        </button>
+        <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.turnovers}</div>
+          <div className="text-[10px] text-muted-foreground">TO</div>
+        </button>
+        <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
+          className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+          <div className="font-bold">{player.fouls}</div>
+          <div className="text-[10px] text-muted-foreground">PF</div>
         </button>
       </div>
     </div>
@@ -232,6 +324,7 @@ export default function LiveGame() {
   const [copied, setCopied] = useState(false);
   const [lastAction, setLastAction] = useState(null);
   const [showPlayByPlay, setShowPlayByPlay] = useState(false);
+  const [viewMode, setViewMode] = useState("condensed"); // "condensed" or "expanded"
   
   // Shot modal state
   const [shotModalOpen, setShotModalOpen] = useState(false);
@@ -421,6 +514,14 @@ export default function LiveGame() {
     return `OT${q - 4}`;
   };
 
+  // Toggle view mode
+  const toggleViewMode = () => {
+    setViewMode(prev => prev === "condensed" ? "expanded" : "condensed");
+  };
+
+  // Choose which PlayerCard component to use
+  const PlayerCard = viewMode === "condensed" ? CondensedPlayerCard : ExpandedPlayerCard;
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
@@ -523,6 +624,27 @@ export default function LiveGame() {
             </div>
             
             <div className="flex items-center gap-2">
+              {/* View Toggle Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={toggleViewMode}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                data-testid="view-toggle-btn"
+              >
+                {viewMode === "condensed" ? (
+                  <>
+                    <Maximize2 className="w-4 h-4 mr-1" />
+                    Expand
+                  </>
+                ) : (
+                  <>
+                    <Minimize2 className="w-4 h-4 mr-1" />
+                    Condense
+                  </>
+                )}
+              </Button>
+              
               {lastAction && isActive && (
                 <Button 
                   variant="outline" 
@@ -629,7 +751,7 @@ export default function LiveGame() {
                 </Button>
               )}
             </div>
-            <div className="space-y-1 max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
+            <div className={`space-y-${viewMode === "condensed" ? "1" : "3"} max-h-[calc(100vh-220px)] overflow-y-auto pr-2`}>
               {sortByNumber(homeStats).map(player => (
                 <PlayerCard 
                   key={player.id}
@@ -798,7 +920,7 @@ export default function LiveGame() {
                 </Button>
               )}
             </div>
-            <div className="space-y-1 max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
+            <div className={`space-y-${viewMode === "condensed" ? "1" : "3"} max-h-[calc(100vh-220px)] overflow-y-auto pr-2`}>
               {sortByNumber(awayStats).map(player => (
                 <PlayerCard 
                   key={player.id}
