@@ -232,6 +232,15 @@ export default function TeamDetail() {
                 />
               </div>
             </div>
+            <div>
+              <Label>Team Color</Label>
+              <div className="mt-2">
+                <ColorPicker 
+                  value={teamColor} 
+                  onChange={setTeamColor}
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
 
