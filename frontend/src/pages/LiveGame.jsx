@@ -629,7 +629,7 @@ export default function LiveGame() {
                 </Button>
               )}
             </div>
-            <div className="space-y-2 max-h-[calc(100vh-250px)] overflow-y-auto pr-2">
+            <div className="space-y-1 max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
               {sortByNumber(homeStats).map(player => (
                 <PlayerCard 
                   key={player.id}
@@ -798,7 +798,7 @@ export default function LiveGame() {
                 </Button>
               )}
             </div>
-            <div className="space-y-2 max-h-[calc(100vh-250px)] overflow-y-auto pr-2">
+            <div className="space-y-1 max-h-[calc(100vh-220px)] overflow-y-auto pr-2">
               {sortByNumber(awayStats).map(player => (
                 <PlayerCard 
                   key={player.id}
