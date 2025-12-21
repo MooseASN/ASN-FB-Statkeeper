@@ -38,6 +38,7 @@ class Player(BaseModel):
 class TeamCreate(BaseModel):
     name: str
     logo_url: Optional[str] = None
+    color: str = "#1e3a5f"  # Default team color
     roster: List[Player] = []
 
 class Team(BaseModel):
@@ -45,6 +46,7 @@ class Team(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     logo_url: Optional[str] = None
+    color: str = "#1e3a5f"
     roster: List[Player] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
