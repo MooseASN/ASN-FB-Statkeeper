@@ -12,18 +12,58 @@ import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-const TEAM_COLORS = [
-  { name: "Red", value: "#dc2626" },
-  { name: "Blue", value: "#2563eb" },
-  { name: "Green", value: "#16a34a" },
-  { name: "Purple", value: "#7c3aed" },
-  { name: "Orange", value: "#ea580c" },
-  { name: "Navy", value: "#1e3a5f" },
-  { name: "Teal", value: "#0d9488" },
-  { name: "Pink", value: "#db2777" },
-  { name: "Yellow", value: "#ca8a04" },
-  { name: "Gray", value: "#4b5563" },
-];
+// Color Picker Component
+const ColorPicker = ({ value, onChange }) => {
+  const presetColors = [
+    "#dc2626", "#ea580c", "#ca8a04", "#16a34a", "#0d9488",
+    "#2563eb", "#7c3aed", "#db2777", "#1e3a5f", "#4b5563"
+  ];
+  
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3">
+        <div className="relative">
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-12 h-12 rounded-lg cursor-pointer border-2 border-slate-200"
+            style={{ padding: 0 }}
+          />
+        </div>
+        <div className="flex-1">
+          <Label className="text-xs text-muted-foreground">Hex Code</Label>
+          <Input
+            value={value}
+            onChange={(e) => {
+              const hex = e.target.value;
+              if (/^#[0-9A-Fa-f]{0,6}$/.test(hex)) {
+                onChange(hex);
+              }
+            }}
+            placeholder="#000000"
+            className="font-mono text-sm"
+            data-testid="color-hex-input"
+          />
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {presetColors.map((color) => (
+          <button
+            key={color}
+            type="button"
+            onClick={() => onChange(color)}
+            className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${
+              value === color ? 'border-black ring-2 ring-offset-1 ring-black/20' : 'border-white shadow-sm'
+            }`}
+            style={{ backgroundColor: color }}
+            data-testid={`preset-color-${color.slice(1)}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export default function Teams() {
   const [teams, setTeams] = useState([]);
