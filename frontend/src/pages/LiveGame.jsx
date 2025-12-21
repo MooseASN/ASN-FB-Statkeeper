@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, Trophy, X } from "lucide-react";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, Trophy, X, Plus } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -50,9 +51,28 @@ const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss }) =>
   );
 };
 
+// Calculate shooting stats for a player
+const calcShootingStats = (player) => {
+  const ft_att = player.ft_made + player.ft_missed;
+  const ft_pct = ft_att > 0 ? Math.round((player.ft_made / ft_att) * 100) : 0;
+  
+  const fg2_att = player.fg2_made + player.fg2_missed;
+  const fg2_pct = fg2_att > 0 ? Math.round((player.fg2_made / fg2_att) * 100) : 0;
+  
+  const fg3_att = player.fg3_made + player.fg3_missed;
+  const fg3_pct = fg3_att > 0 ? Math.round((player.fg3_made / fg3_att) * 100) : 0;
+  
+  const fg_made = player.fg2_made + player.fg3_made;
+  const fg_att = fg_made + player.fg2_missed + player.fg3_missed;
+  const fg_pct = fg_att > 0 ? Math.round((fg_made / fg_att) * 100) : 0;
+  
+  return { ft_att, ft_pct, fg2_att, fg2_pct, fg3_att, fg3_pct, fg_made, fg_att, fg_pct };
+};
+
 // Player Card Component
 const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
+  const stats = calcShootingStats(player);
   
   return (
     <div className="bg-white rounded-lg p-3 mb-3 shadow-sm border" data-testid={`player-card-${player.id}`}>
@@ -66,7 +86,14 @@ const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) 
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <h4 className="font-semibold text-sm truncate">{player.player_name}</h4>
-            <span className="text-lg font-bold ml-2">{pts}</span>
+            <span className="text-lg font-bold ml-2">{pts} PTS</span>
+          </div>
+          
+          {/* Shooting Stats Line */}
+          <div className="text-xs text-muted-foreground mt-1">
+            <span className="mr-2">FG: {stats.fg_made}/{stats.fg_att} {stats.fg_pct}%</span>
+            <span className="mr-2">3PT: {player.fg3_made}/{stats.fg3_att} {stats.fg3_pct}%</span>
+            <span>FT: {player.ft_made}/{stats.ft_att} {stats.ft_pct}%</span>
           </div>
           
           {/* Stat Buttons Row */}
@@ -182,6 +209,38 @@ const SideActionButton = ({ label, onClick, color, position, disabled }) => (
   </button>
 );
 
+// Calculate team shooting stats
+const calcTeamShootingStats = (stats) => {
+  const totals = stats.reduce((acc, p) => ({
+    ft_made: acc.ft_made + p.ft_made,
+    ft_missed: acc.ft_missed + p.ft_missed,
+    fg2_made: acc.fg2_made + p.fg2_made,
+    fg2_missed: acc.fg2_missed + p.fg2_missed,
+    fg3_made: acc.fg3_made + p.fg3_made,
+    fg3_missed: acc.fg3_missed + p.fg3_missed,
+  }), { ft_made: 0, ft_missed: 0, fg2_made: 0, fg2_missed: 0, fg3_made: 0, fg3_missed: 0 });
+  
+  const ft_att = totals.ft_made + totals.ft_missed;
+  const ft_pct = ft_att > 0 ? Math.round((totals.ft_made / ft_att) * 100) : 0;
+  
+  const fg2_att = totals.fg2_made + totals.fg2_missed;
+  const fg2_pct = fg2_att > 0 ? Math.round((totals.fg2_made / fg2_att) * 100) : 0;
+  
+  const fg3_att = totals.fg3_made + totals.fg3_missed;
+  const fg3_pct = fg3_att > 0 ? Math.round((totals.fg3_made / fg3_att) * 100) : 0;
+  
+  const fg_made = totals.fg2_made + totals.fg3_made;
+  const fg_att = fg_made + totals.fg2_missed + totals.fg3_missed;
+  const fg_pct = fg_att > 0 ? Math.round((fg_made / fg_att) * 100) : 0;
+  
+  return { 
+    ft_made: totals.ft_made, ft_att, ft_pct,
+    fg2_made: totals.fg2_made, fg2_att, fg2_pct,
+    fg3_made: totals.fg3_made, fg3_att, fg3_pct,
+    fg_made, fg_att, fg_pct
+  };
+};
+
 export default function LiveGame() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -193,6 +252,7 @@ export default function LiveGame() {
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
   const [copied, setCopied] = useState(false);
   const [lastAction, setLastAction] = useState(null);
+  const [showPlayByPlay, setShowPlayByPlay] = useState(false);
   
   // Shot modal state
   const [shotModalOpen, setShotModalOpen] = useState(false);
@@ -269,6 +329,17 @@ export default function LiveGame() {
       fetchGame();
     } catch (error) {
       toast.error("Failed to update quarter");
+    }
+  };
+
+  const handleAddOvertime = async () => {
+    const currentMax = Math.max(4, game.current_quarter);
+    try {
+      await axios.put(`${API}/games/${id}`, { current_quarter: currentMax + 1 });
+      fetchGame();
+      toast.success(`Added OT${currentMax - 3}`);
+    } catch (error) {
+      toast.error("Failed to add overtime");
     }
   };
 
@@ -366,6 +437,11 @@ export default function LiveGame() {
     }), { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 });
   };
 
+  const getQuarterLabel = (q) => {
+    if (q <= 4) return `Q${q}`;
+    return `OT${q - 4}`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
@@ -383,7 +459,15 @@ export default function LiveGame() {
   const awayStats = game.away_player_stats || [];
   const homeTeamStats = calculateTeamStats(homeStats);
   const awayTeamStats = calculateTeamStats(awayStats);
+  const homeShootingStats = calcTeamShootingStats(homeStats);
+  const awayShootingStats = calcTeamShootingStats(awayStats);
   const isActive = game.status === "active";
+  const playByPlay = game.play_by_play || [];
+  
+  // Determine number of quarters to show
+  const homeScores = game.quarter_scores?.home || [0, 0, 0, 0];
+  const awayScores = game.quarter_scores?.away || [0, 0, 0, 0];
+  const totalQuarters = Math.max(4, homeScores.length, game.current_quarter);
 
   return (
     <div className="min-h-screen bg-slate-100" data-testid="live-game-page">
@@ -460,6 +544,15 @@ export default function LiveGame() {
                   Undo
                 </Button>
               )}
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setShowPlayByPlay(!showPlayByPlay)}
+                className="text-white hover:bg-white/10"
+                data-testid="play-by-play-btn"
+              >
+                Play-by-Play
+              </Button>
               <Button variant="ghost" size="sm" onClick={copyShareLink} className="text-white hover:bg-white/10" data-testid="share-btn">
                 {copied ? <Check className="w-4 h-4 mr-1" /> : <Share2 className="w-4 h-4 mr-1" />}
                 Share
@@ -477,6 +570,43 @@ export default function LiveGame() {
           </div>
         </div>
       </header>
+
+      {/* Play by Play Panel */}
+      {showPlayByPlay && (
+        <div className="fixed right-14 top-16 bottom-0 w-80 bg-white shadow-lg z-40 border-l">
+          <div className="p-4 border-b flex items-center justify-between">
+            <h3 className="font-bold">Play-by-Play</h3>
+            <button onClick={() => setShowPlayByPlay(false)} className="text-slate-400 hover:text-slate-600">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+          <ScrollArea className="h-[calc(100vh-120px)]">
+            <div className="p-4 space-y-2">
+              {playByPlay.length === 0 ? (
+                <p className="text-center text-muted-foreground py-8">No plays recorded yet</p>
+              ) : (
+                [...playByPlay].reverse().map((play, idx) => (
+                  <div 
+                    key={play.id || idx} 
+                    className={`p-2 rounded text-sm ${play.team === 'home' ? 'bg-red-50 border-l-2 border-red-500' : 'bg-purple-50 border-l-2 border-purple-500'}`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <span className="font-medium">#{play.player_number} {play.player_name}</span>
+                        <p className="text-muted-foreground">{play.action}</p>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs text-muted-foreground">{getQuarterLabel(play.quarter)}</span>
+                        <p className="font-bold text-sm">{play.home_score}-{play.away_score}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </div>
+      )}
 
       {/* Main Content - 3 Column Layout */}
       <div className="max-w-7xl mx-auto px-4 py-4 ml-14 mr-14">
@@ -540,39 +670,48 @@ export default function LiveGame() {
               </div>
               
               {/* Period Selection */}
-              <div className="flex items-center justify-center gap-2 mb-4">
+              <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
                 <span className="text-sm text-muted-foreground mr-2">Period:</span>
-                {[1, 2, 3, 4].map(q => (
+                {Array.from({ length: totalQuarters }, (_, i) => i + 1).map(q => (
                   <button
                     key={q}
                     onClick={() => isActive && handleQuarterChange(q)}
                     disabled={!isActive}
-                    className={`w-10 h-10 rounded-full font-bold transition-colors ${
+                    className={`w-10 h-10 rounded-full font-bold text-sm transition-colors ${
                       game.current_quarter === q 
                         ? "bg-orange-500 text-white" 
                         : "bg-slate-100 hover:bg-slate-200 text-slate-600"
                     } disabled:opacity-50`}
                     data-testid={`quarter-${q}-btn`}
                   >
-                    {q}
+                    {getQuarterLabel(q)}
                   </button>
                 ))}
+                {isActive && (
+                  <button
+                    onClick={handleAddOvertime}
+                    className="w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center"
+                    data-testid="add-ot-btn"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </button>
+                )}
               </div>
 
               {/* Quarter by Quarter */}
-              <div className="border-t pt-3">
-                <div className="grid grid-cols-5 gap-2 text-xs text-center">
+              <div className="border-t pt-3 overflow-x-auto">
+                <div className="grid gap-2 text-xs text-center" style={{ gridTemplateColumns: `auto repeat(${totalQuarters}, 1fr)` }}>
                   <div></div>
-                  {[1, 2, 3, 4].map(q => (
-                    <div key={q} className="text-muted-foreground">Q{q}</div>
+                  {Array.from({ length: totalQuarters }, (_, i) => i + 1).map(q => (
+                    <div key={q} className="text-muted-foreground">{getQuarterLabel(q)}</div>
                   ))}
                   <div className="text-left font-medium">Home</div>
-                  {game.quarter_scores?.home?.map((s, i) => (
-                    <div key={i} className="font-bold">{s}</div>
+                  {Array.from({ length: totalQuarters }, (_, i) => (
+                    <div key={i} className="font-bold">{homeScores[i] || 0}</div>
                   ))}
                   <div className="text-left font-medium">Away</div>
-                  {game.quarter_scores?.away?.map((s, i) => (
-                    <div key={i} className="font-bold">{s}</div>
+                  {Array.from({ length: totalQuarters }, (_, i) => (
+                    <div key={i} className="font-bold">{awayScores[i] || 0}</div>
                   ))}
                 </div>
               </div>
@@ -585,6 +724,11 @@ export default function LiveGame() {
                 <div>
                   <p className="font-semibold text-[#dc2626] mb-2">{game.home_team_name}</p>
                   <div className="space-y-1 text-muted-foreground">
+                    <p className="font-medium text-foreground">Shooting:</p>
+                    <p>FG: {homeShootingStats.fg_made}/{homeShootingStats.fg_att} <span className="font-medium text-foreground">{homeShootingStats.fg_pct}%</span></p>
+                    <p>3PT: {homeShootingStats.fg3_made}/{homeShootingStats.fg3_att} <span className="font-medium text-foreground">{homeShootingStats.fg3_pct}%</span></p>
+                    <p>FT: {homeShootingStats.ft_made}/{homeShootingStats.ft_att} <span className="font-medium text-foreground">{homeShootingStats.ft_pct}%</span></p>
+                    <p className="font-medium text-foreground mt-2">Other Stats:</p>
                     <p>Off. Rebounds: <span className="font-medium text-foreground">{homeTeamStats.oreb}</span></p>
                     <p>Def. Rebounds: <span className="font-medium text-foreground">{homeTeamStats.dreb}</span></p>
                     <p>Total Rebounds: <span className="font-medium text-foreground">{homeTeamStats.totalReb}</span></p>
@@ -598,6 +742,11 @@ export default function LiveGame() {
                 <div>
                   <p className="font-semibold text-[#7c3aed] mb-2">{game.away_team_name}</p>
                   <div className="space-y-1 text-muted-foreground">
+                    <p className="font-medium text-foreground">Shooting:</p>
+                    <p>FG: {awayShootingStats.fg_made}/{awayShootingStats.fg_att} <span className="font-medium text-foreground">{awayShootingStats.fg_pct}%</span></p>
+                    <p>3PT: {awayShootingStats.fg3_made}/{awayShootingStats.fg3_att} <span className="font-medium text-foreground">{awayShootingStats.fg3_pct}%</span></p>
+                    <p>FT: {awayShootingStats.ft_made}/{awayShootingStats.ft_att} <span className="font-medium text-foreground">{awayShootingStats.ft_pct}%</span></p>
+                    <p className="font-medium text-foreground mt-2">Other Stats:</p>
                     <p>Off. Rebounds: <span className="font-medium text-foreground">{awayTeamStats.oreb}</span></p>
                     <p>Def. Rebounds: <span className="font-medium text-foreground">{awayTeamStats.dreb}</span></p>
                     <p>Total Rebounds: <span className="font-medium text-foreground">{awayTeamStats.totalReb}</span></p>
