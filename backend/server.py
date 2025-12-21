@@ -200,7 +200,9 @@ async def create_game(game_data: GameCreate):
         home_team_name=home_team["name"],
         away_team_name=away_team["name"],
         home_team_logo=home_team.get("logo_url"),
-        away_team_logo=away_team.get("logo_url")
+        away_team_logo=away_team.get("logo_url"),
+        home_team_color=home_team.get("color", "#dc2626"),
+        away_team_color=away_team.get("color", "#7c3aed")
     )
     
     doc = game.model_dump()
