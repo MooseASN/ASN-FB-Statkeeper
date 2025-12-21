@@ -12,7 +12,6 @@ import LiveView from "@/pages/LiveView";
 import GameHistory from "@/pages/GameHistory";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
-import AuthCallback from "@/pages/AuthCallback";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 
