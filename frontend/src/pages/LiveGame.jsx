@@ -474,6 +474,10 @@ export default function LiveGame() {
   const isActive = game.status === "active";
   const playByPlay = game.play_by_play || [];
   
+  // Team colors from game data
+  const homeColor = game.home_team_color || "#dc2626";
+  const awayColor = game.away_team_color || "#7c3aed";
+  
   // Determine number of quarters to show
   const homeScores = game.quarter_scores?.home || [0, 0, 0, 0];
   const awayScores = game.quarter_scores?.away || [0, 0, 0, 0];
