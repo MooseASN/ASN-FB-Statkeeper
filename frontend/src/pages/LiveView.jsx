@@ -210,6 +210,10 @@ export default function LiveView() {
   const awayTotals = calculateTeamTotals(awayStats);
   const playByPlay = game.play_by_play || [];
   
+  // Team colors from game data
+  const homeColor = game.home_team_color || "#dc2626";
+  const awayColor = game.away_team_color || "#7c3aed";
+  
   // Determine quarters
   const homeScores = game.quarter_scores?.home || [0, 0, 0, 0];
   const awayScores = game.quarter_scores?.away || [0, 0, 0, 0];
