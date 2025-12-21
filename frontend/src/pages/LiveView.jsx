@@ -395,7 +395,12 @@ export default function LiveView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Box Score */}
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-            <h2 className="text-2xl font-bold text-[#1e3a5f] mb-6">Box Score</h2>
+            <div className="text-center mb-6 pb-4 border-b">
+              <h2 className="text-2xl font-bold text-[#1e3a5f]" data-testid="boxscore-title">
+                {game.home_team_name} vs {game.away_team_name}
+              </h2>
+              <p className="text-muted-foreground">Box Score</p>
+            </div>
             
             <TeamTable 
               teamName={game.home_team_name} 
