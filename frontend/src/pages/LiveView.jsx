@@ -320,42 +320,42 @@ export default function LiveView() {
           {/* Shooting Stats */}
           <div className="grid grid-cols-2 gap-8 mb-6">
             <div>
-              <p className="font-semibold text-[#dc2626] mb-2">{game.home_team_name} Shooting</p>
+              <p className="font-semibold mb-2" style={{ color: homeColor }}>{game.home_team_name} Shooting</p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-muted-foreground">FG</p>
                   <p className="font-bold">{homeTotals.fg_made}/{homeTotals.fg_att}</p>
-                  <p className="text-lg font-bold text-[#dc2626]">{homeTotals.fg_pct}%</p>
+                  <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.fg_pct}%</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-muted-foreground">3PT</p>
                   <p className="font-bold">{homeTotals.fg3_made}/{homeTotals.fg3_att}</p>
-                  <p className="text-lg font-bold text-[#dc2626]">{homeTotals.fg3_pct}%</p>
+                  <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.fg3_pct}%</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-muted-foreground">FT</p>
                   <p className="font-bold">{homeTotals.ft_made}/{homeTotals.ft_att}</p>
-                  <p className="text-lg font-bold text-[#dc2626]">{homeTotals.ft_pct}%</p>
+                  <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.ft_pct}%</p>
                 </div>
               </div>
             </div>
             <div>
-              <p className="font-semibold text-[#7c3aed] mb-2">{game.away_team_name} Shooting</p>
+              <p className="font-semibold mb-2" style={{ color: awayColor }}>{game.away_team_name} Shooting</p>
               <div className="grid grid-cols-3 gap-4 text-center">
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-muted-foreground">FG</p>
                   <p className="font-bold">{awayTotals.fg_made}/{awayTotals.fg_att}</p>
-                  <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.fg_pct}%</p>
+                  <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.fg_pct}%</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-muted-foreground">3PT</p>
                   <p className="font-bold">{awayTotals.fg3_made}/{awayTotals.fg3_att}</p>
-                  <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.fg3_pct}%</p>
+                  <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.fg3_pct}%</p>
                 </div>
                 <div className="bg-slate-50 rounded-lg p-3">
                   <p className="text-xs text-muted-foreground">FT</p>
                   <p className="font-bold">{awayTotals.ft_made}/{awayTotals.ft_att}</p>
-                  <p className="text-lg font-bold text-[#7c3aed]">{awayTotals.ft_pct}%</p>
+                  <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.ft_pct}%</p>
                 </div>
               </div>
             </div>
