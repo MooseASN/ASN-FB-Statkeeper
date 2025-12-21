@@ -493,13 +493,20 @@ async def generate_boxscore_pdf(game_id: str):
     home_color = game.get("home_team_color", "#dc2626")
     away_color = game.get("away_team_color", "#7c3aed")
     
+    # Get game flow stats
+    game_stats = game.get("game_stats", {})
+    home_largest_lead = game_stats.get("home_largest_lead", 0)
+    away_largest_lead = game_stats.get("away_largest_lead", 0)
+    lead_changes = game_stats.get("lead_changes", 0)
+    ties = game_stats.get("ties", 0)
+    
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=landscape(letter), topMargin=0.25*inch, bottomMargin=0.25*inch, leftMargin=0.3*inch, rightMargin=0.3*inch)
     elements = []
     styles = getSampleStyleSheet()
     
     title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=14, alignment=1, spaceAfter=2)
-    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=10, alignment=1, spaceAfter=4)
+    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=10, alignment=1, spaceAfter=6)
     team_style = ParagraphStyle('Team', parent=styles['Heading2'], fontSize=9, spaceAfter=2, spaceBefore=4)
     
     # Get quarter scores with overtime support
@@ -520,17 +527,17 @@ async def generate_boxscore_pdf(game_id: str):
     elements.append(Paragraph(f"<b>{game['home_team_name']} vs {game['away_team_name']}</b>", title_style))
     elements.append(Paragraph(f"Final: {home_total} - {away_total}", subtitle_style))
     
-    # Quarter scores and Team Stats side by side
     def get_quarter_label(q):
         return f"Q{q}" if q <= 4 else f"OT{q-4}"
     
+    # LEFT SIDE: Quarter scores stacked vertically
     quarter_headers = [""] + [get_quarter_label(i+1) for i in range(total_quarters)] + ["T"]
     quarter_data = [
         quarter_headers,
-        [game['home_team_name'][:12]] + home_scores + [home_total],
-        [game['away_team_name'][:12]] + away_scores + [away_total]
+        [game['home_team_name'][:10]] + home_scores + [home_total],
+        [game['away_team_name'][:10]] + away_scores + [away_total]
     ]
-    q_col_widths = [1*inch] + [0.35*inch] * total_quarters + [0.4*inch]
+    q_col_widths = [0.8*inch] + [0.3*inch] * total_quarters + [0.35*inch]
     quarter_table = Table(quarter_data, colWidths=q_col_widths)
     quarter_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a5f')),
@@ -543,20 +550,50 @@ async def generate_boxscore_pdf(game_id: str):
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
     ]))
     
-    # Compact team comparison
-    comp_data = [
-        [game['home_team_name'][:10], "TEAM STATS", game['away_team_name'][:10]],
-        [f"{home_totals['fg_made']}/{home_totals['fg_att']} ({home_totals['fg_pct']}%)", "FG", f"{away_totals['fg_made']}/{away_totals['fg_att']} ({away_totals['fg_pct']}%)"],
-        [f"{home_totals['fg3_made']}/{home_totals['fg3_att']} ({home_totals['fg3_pct']}%)", "3PT", f"{away_totals['fg3_made']}/{away_totals['fg3_att']} ({away_totals['fg3_pct']}%)"],
-        [f"{home_totals['ft_made']}/{home_totals['ft_att']} ({home_totals['ft_pct']}%)", "FT", f"{away_totals['ft_made']}/{away_totals['ft_att']} ({away_totals['ft_pct']}%)"],
-        [f"{home_totals['oreb']}/{home_totals['dreb']}/{home_totals['reb']}", "REB (O/D/T)", f"{away_totals['oreb']}/{away_totals['dreb']}/{away_totals['reb']}"],
-        [f"{home_totals['ast']}", "AST", f"{away_totals['ast']}"],
-        [f"{home_totals['stl']}", "STL", f"{away_totals['stl']}"],
-        [f"{home_totals['blk']}", "BLK", f"{away_totals['blk']}"],
-        [f"{home_totals['to']}", "TO", f"{away_totals['to']}"],
-        [f"{home_totals['pf']}", "PF", f"{away_totals['pf']}"],
+    # Game flow stats table (below quarter scores)
+    flow_data = [
+        ["GAME FLOW", ""],
+        ["Lead Changes", str(lead_changes)],
+        ["Times Tied", str(ties)],
+        [f"{game['home_team_name'][:8]} Lead", str(home_largest_lead)],
+        [f"{game['away_team_name'][:8]} Lead", str(away_largest_lead)],
     ]
-    comp_table = Table(comp_data, colWidths=[1.3*inch, 0.8*inch, 1.3*inch])
+    flow_table = Table(flow_data, colWidths=[1.2*inch, 0.6*inch])
+    flow_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a5f')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('SPAN', (0, 0), (1, 0)),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 7),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+        ('TOPPADDING', (0, 0), (-1, -1), 2),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    
+    # Stack quarter scores and game flow vertically
+    left_table = Table([[quarter_table], [Spacer(1, 4)], [flow_table]])
+    left_table.setStyle(TableStyle([('VALIGN', (0, 0), (-1, -1), 'TOP')]))
+    
+    # RIGHT SIDE: Team stats comparison
+    comp_data = [
+        [game['home_team_name'][:8], "STAT", game['away_team_name'][:8]],
+        [f"{home_totals['fg_made']}-{home_totals['fg_att']}", "FGM-A", f"{away_totals['fg_made']}-{away_totals['fg_att']}"],
+        [f"{home_totals['fg_pct']}%", "FG%", f"{away_totals['fg_pct']}%"],
+        [f"{home_totals['fg3_made']}-{home_totals['fg3_att']}", "3PM-A", f"{away_totals['fg3_made']}-{away_totals['fg3_att']}"],
+        [f"{home_totals['fg3_pct']}%", "3P%", f"{away_totals['fg3_pct']}%"],
+        [f"{home_totals['ft_made']}-{home_totals['ft_att']}", "FTM-A", f"{away_totals['ft_made']}-{away_totals['ft_att']}"],
+        [f"{home_totals['ft_pct']}%", "FT%", f"{away_totals['ft_pct']}%"],
+        [str(home_totals['oreb']), "OREB", str(away_totals['oreb'])],
+        [str(home_totals['dreb']), "DREB", str(away_totals['dreb'])],
+        [str(home_totals['reb']), "REB", str(away_totals['reb'])],
+        [str(home_totals['ast']), "AST", str(away_totals['ast'])],
+        [str(home_totals['stl']), "STL", str(away_totals['stl'])],
+        [str(home_totals['blk']), "BLK", str(away_totals['blk'])],
+        [str(home_totals['to']), "TO", str(away_totals['to'])],
+        [str(home_totals['pf']), "PF", str(away_totals['pf'])],
+    ]
+    comp_table = Table(comp_data, colWidths=[0.7*inch, 0.5*inch, 0.7*inch])
     comp_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e3a5f')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
@@ -570,8 +607,8 @@ async def generate_boxscore_pdf(game_id: str):
         ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
     ]))
     
-    # Put quarter scores and team stats side by side
-    top_table = Table([[quarter_table, comp_table]], colWidths=[4.5*inch, 3.6*inch])
+    # Combine left (quarter scores + game flow) and right (team stats) side by side
+    top_table = Table([[left_table, comp_table]], colWidths=[3.5*inch, 2.2*inch])
     top_table.setStyle(TableStyle([
         ('VALIGN', (0, 0), (-1, -1), 'TOP'),
         ('LEFTPADDING', (0, 0), (-1, -1), 5),
@@ -580,8 +617,8 @@ async def generate_boxscore_pdf(game_id: str):
     elements.append(top_table)
     elements.append(Spacer(1, 8))
     
-    # Condensed player stats - combine FG with %, reduce columns
-    headers = ["#", "Player", "PTS", "FG", "3PT", "FT", "REB", "AST", "STL", "BLK", "TO", "PF"]
+    # Player stats tables - NBA style columns
+    headers = ["#", "PLAYER", "PTS", "FGM-A", "3PM-A", "FTM-A", "OREB", "DREB", "REB", "AST", "STL", "BLK", "TO", "PF"]
     
     def create_team_table(team_name: str, stats_list: list, team_totals: dict, team_color: str):
         elements.append(Paragraph(f"<b>{team_name}</b>", team_style))
@@ -593,18 +630,15 @@ async def generate_boxscore_pdf(game_id: str):
         
         for s in sorted_stats:
             totals = calculate_player_totals(s)
-            # Combine made-att (pct%)
-            fg_str = f"{totals['fg_made']}-{totals['fg_att']}" if totals['fg_att'] > 0 else "0-0"
-            fg3_str = f"{s['fg3_made']}-{totals['fg3_att']}" if totals['fg3_att'] > 0 else "0-0"
-            ft_str = f"{s['ft_made']}-{totals['ft_att']}" if totals['ft_att'] > 0 else "0-0"
-            
             row = [
                 s["player_number"],
-                s["player_name"][:14],
+                s["player_name"][:12],
                 totals["pts"],
-                fg_str,
-                fg3_str,
-                ft_str,
+                f"{totals['fg_made']}-{totals['fg_att']}",
+                f"{s['fg3_made']}-{totals['fg3_att']}",
+                f"{s['ft_made']}-{totals['ft_att']}",
+                s["offensive_rebounds"],
+                s["defensive_rebounds"],
                 totals["total_reb"],
                 s["assists"],
                 s["steals"],
@@ -621,6 +655,8 @@ async def generate_boxscore_pdf(game_id: str):
             f"{team_totals['fg_made']}-{team_totals['fg_att']}",
             f"{team_totals['fg3_made']}-{team_totals['fg3_att']}",
             f"{team_totals['ft_made']}-{team_totals['ft_att']}",
+            team_totals["oreb"],
+            team_totals["dreb"],
             team_totals["reb"],
             team_totals["ast"],
             team_totals["stl"],
@@ -629,7 +665,7 @@ async def generate_boxscore_pdf(game_id: str):
             team_totals["pf"]
         ])
         
-        col_widths = [0.3*inch, 1.1*inch, 0.35*inch, 0.5*inch, 0.45*inch, 0.45*inch, 0.35*inch, 0.35*inch, 0.35*inch, 0.35*inch, 0.35*inch, 0.3*inch]
+        col_widths = [0.25*inch, 0.9*inch, 0.3*inch, 0.4*inch, 0.4*inch, 0.4*inch, 0.35*inch, 0.35*inch, 0.3*inch, 0.3*inch, 0.3*inch, 0.3*inch, 0.25*inch, 0.25*inch]
         table = Table(data, colWidths=col_widths)
         table.setStyle(TableStyle([
             ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor(team_color)),
@@ -638,7 +674,7 @@ async def generate_boxscore_pdf(game_id: str):
             ('ALIGN', (1, 1), (1, -1), 'LEFT'),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('FONTSIZE', (0, 0), (-1, -1), 6),
             ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
             ('TOPPADDING', (0, 0), (-1, -1), 2),
             ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#f0f0f0')),
