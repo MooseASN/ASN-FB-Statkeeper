@@ -752,7 +752,7 @@ export default function LiveGame() {
               <h3 className="font-bold mb-3 text-sm">Team Stats</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="font-semibold text-[#dc2626] mb-2">{game.home_team_name}</p>
+                  <p className="font-semibold mb-2" style={{ color: homeColor }}>{game.home_team_name}</p>
                   <div className="space-y-1 text-muted-foreground">
                     <p className="font-medium text-foreground">Shooting:</p>
                     <p>FG: {homeShootingStats.fg_made}/{homeShootingStats.fg_att} <span className="font-medium text-foreground">{homeShootingStats.fg_pct}%</span></p>
@@ -770,7 +770,7 @@ export default function LiveGame() {
                   </div>
                 </div>
                 <div>
-                  <p className="font-semibold text-[#7c3aed] mb-2">{game.away_team_name}</p>
+                  <p className="font-semibold mb-2" style={{ color: awayColor }}>{game.away_team_name}</p>
                   <div className="space-y-1 text-muted-foreground">
                     <p className="font-medium text-foreground">Shooting:</p>
                     <p>FG: {awayShootingStats.fg_made}/{awayShootingStats.fg_att} <span className="font-medium text-foreground">{awayShootingStats.fg_pct}%</span></p>
