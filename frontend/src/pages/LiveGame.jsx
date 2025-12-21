@@ -3,14 +3,55 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, Trophy } from "lucide-react";
+import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, Trophy, X } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Shot Selection Modal
+const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss }) => {
+  if (!isOpen) return null;
+  
+  const shotLabels = {
+    ft: "Free Throw",
+    fg2: "2-Point Shot",
+    fg3: "3-Point Shot"
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg">{shotLabels[shotType]}</h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-slate-600">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-muted-foreground mb-6">{playerName}</p>
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={onMake}
+            className="py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-xl transition-colors"
+            data-testid="shot-make-btn"
+          >
+            MAKE
+          </button>
+          <button
+            onClick={onMiss}
+            className="py-4 px-6 bg-red-500 hover:bg-red-600 text-white font-bold text-xl rounded-xl transition-colors"
+            data-testid="shot-miss-btn"
+          >
+            MISS
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Player Card Component
-const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
+const PlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   
   return (
@@ -31,7 +72,7 @@ const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
           {/* Stat Buttons Row */}
           <div className="flex items-center gap-2 mt-2">
             <button
-              onClick={() => onStatUpdate(player.id, "ft_made")}
+              onClick={() => onShotClick(player, "ft")}
               disabled={disabled}
               className="w-10 h-10 rounded-full border-2 border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 flex items-center justify-center text-xs font-bold transition-colors disabled:opacity-50"
               data-testid={`ft-btn-${player.id}`}
@@ -39,7 +80,7 @@ const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
               FT
             </button>
             <button
-              onClick={() => onStatUpdate(player.id, "fg2_made")}
+              onClick={() => onShotClick(player, "fg2")}
               disabled={disabled}
               className="w-10 h-10 rounded-full border-2 border-slate-300 hover:border-blue-500 hover:bg-blue-50 flex items-center justify-center text-xs font-bold transition-colors disabled:opacity-50"
               data-testid={`fg2-btn-${player.id}`}
@@ -47,7 +88,7 @@ const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
               2PT
             </button>
             <button
-              onClick={() => onStatUpdate(player.id, "fg3_made")}
+              onClick={() => onShotClick(player, "fg3")}
               disabled={disabled}
               className="w-10 h-10 rounded-full border-2 border-slate-300 hover:border-orange-500 hover:bg-orange-50 flex items-center justify-center text-xs font-bold transition-colors disabled:opacity-50"
               data-testid={`fg3-btn-${player.id}`}
@@ -96,7 +137,7 @@ const PlayerCard = ({ player, teamColor, onStatUpdate, disabled }) => {
             <button
               onClick={() => onStatUpdate(player.id, "steal")}
               disabled={disabled}
-              className="px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded transition-colors disabled:opacity-50"
+              className="px-2 py-1 text-xs bg-purple-100 hover:bg-purple-200 rounded transition-colors disabled:opacity-50"
               data-testid={`stl-btn-${player.id}`}
             >
               STL {player.steals}
@@ -152,6 +193,11 @@ export default function LiveGame() {
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
   const [copied, setCopied] = useState(false);
   const [lastAction, setLastAction] = useState(null);
+  
+  // Shot modal state
+  const [shotModalOpen, setShotModalOpen] = useState(false);
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
+  const [selectedShotType, setSelectedShotType] = useState(null);
 
   const fetchGame = useCallback(async () => {
     try {
@@ -183,6 +229,22 @@ export default function LiveGame() {
     } catch (error) {
       toast.error("Failed to update stat");
     }
+  };
+
+  const handleShotClick = (player, shotType) => {
+    setSelectedPlayer(player);
+    setSelectedShotType(shotType);
+    setShotModalOpen(true);
+  };
+
+  const handleShotResult = async (made) => {
+    if (!selectedPlayer || !selectedShotType) return;
+    
+    const statType = made ? `${selectedShotType}_made` : `${selectedShotType}_missed`;
+    await handleStatUpdate(selectedPlayer.id, statType);
+    setShotModalOpen(false);
+    setSelectedPlayer(null);
+    setSelectedShotType(null);
   };
 
   const handleUndo = async () => {
@@ -257,6 +319,7 @@ export default function LiveGame() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      toast.success("PDF downloaded!");
     } catch (error) {
       toast.error("Failed to download PDF");
     }
@@ -272,7 +335,6 @@ export default function LiveGame() {
 
   // Quick team stat handlers
   const handleTeamRebound = (team, type) => {
-    // Find first player of team and add rebound
     const stats = team === "home" ? game.home_player_stats : game.away_player_stats;
     if (stats && stats.length > 0) {
       handleStatUpdate(stats[0].id, type);
@@ -291,15 +353,17 @@ export default function LiveGame() {
   };
 
   const calculateTeamStats = (stats) => {
-    if (!stats) return { rebounds: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 };
+    if (!stats) return { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 };
     return stats.reduce((acc, p) => ({
-      rebounds: acc.rebounds + p.offensive_rebounds + p.defensive_rebounds,
+      oreb: acc.oreb + p.offensive_rebounds,
+      dreb: acc.dreb + p.defensive_rebounds,
+      totalReb: acc.totalReb + p.offensive_rebounds + p.defensive_rebounds,
       turnovers: acc.turnovers + p.turnovers,
       assists: acc.assists + p.assists,
       steals: acc.steals + p.steals,
       blocks: acc.blocks + p.blocks,
       fouls: acc.fouls + p.fouls
-    }), { rebounds: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 });
+    }), { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 });
   };
 
   if (loading) {
@@ -323,6 +387,16 @@ export default function LiveGame() {
 
   return (
     <div className="min-h-screen bg-slate-100" data-testid="live-game-page">
+      {/* Shot Modal */}
+      <ShotModal
+        isOpen={shotModalOpen}
+        onClose={() => setShotModalOpen(false)}
+        shotType={selectedShotType}
+        playerName={selectedPlayer?.player_name}
+        onMake={() => handleShotResult(true)}
+        onMiss={() => handleShotResult(false)}
+      />
+
       {/* Side Action Buttons */}
       <SideActionButton 
         label="Away Rebound" 
@@ -432,6 +506,7 @@ export default function LiveGame() {
                   key={player.id}
                   player={player}
                   teamColor="#dc2626"
+                  onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
                   disabled={!isActive}
                 />
@@ -504,119 +579,33 @@ export default function LiveGame() {
             </div>
 
             {/* Team Stats */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
+            <div className="bg-white rounded-xl shadow-sm p-4">
               <h3 className="font-bold mb-3 text-sm">Team Stats</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="font-semibold text-[#dc2626]">{game.home_team_name}</p>
-                  <p className="text-muted-foreground">Rebounds: {homeTeamStats.rebounds}</p>
-                  <p className="text-muted-foreground">Turnovers: {homeTeamStats.turnovers}</p>
-                  <p className="text-muted-foreground">Assists: {homeTeamStats.assists}</p>
-                  <p className="text-muted-foreground">Team Fouls: {homeTeamStats.fouls}</p>
-                </div>
-                <div>
-                  <p className="font-semibold text-[#7c3aed]">{game.away_team_name}</p>
-                  <p className="text-muted-foreground">Rebounds: {awayTeamStats.rebounds}</p>
-                  <p className="text-muted-foreground">Turnovers: {awayTeamStats.turnovers}</p>
-                  <p className="text-muted-foreground">Assists: {awayTeamStats.assists}</p>
-                  <p className="text-muted-foreground">Team Fouls: {awayTeamStats.fouls}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Miss Buttons */}
-            <div className="bg-white rounded-xl shadow-sm p-4">
-              <h3 className="font-bold mb-3 text-sm">Quick Miss</h3>
-              <p className="text-xs text-muted-foreground mb-2">Select a player first, then click miss</p>
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <p className="text-xs font-medium mb-1 text-[#dc2626]">Home</p>
-                  <select 
-                    className="w-full text-xs p-2 border rounded mb-2"
-                    id="home-miss-player"
-                    data-testid="home-miss-select"
-                  >
-                    <option value="">Select player</option>
-                    {homeStats.map(p => (
-                      <option key={p.id} value={p.id}>#{p.player_number} {p.player_name}</option>
-                    ))}
-                  </select>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('home-miss-player');
-                        if (sel.value) handleStatUpdate(sel.value, "ft_missed");
-                      }}
-                      disabled={!isActive}
-                      className="flex-1 px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50"
-                    >
-                      FT Miss
-                    </button>
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('home-miss-player');
-                        if (sel.value) handleStatUpdate(sel.value, "fg2_missed");
-                      }}
-                      disabled={!isActive}
-                      className="flex-1 px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50"
-                    >
-                      2PT Miss
-                    </button>
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('home-miss-player');
-                        if (sel.value) handleStatUpdate(sel.value, "fg3_missed");
-                      }}
-                      disabled={!isActive}
-                      className="flex-1 px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50"
-                    >
-                      3PT Miss
-                    </button>
+                  <p className="font-semibold text-[#dc2626] mb-2">{game.home_team_name}</p>
+                  <div className="space-y-1 text-muted-foreground">
+                    <p>Off. Rebounds: <span className="font-medium text-foreground">{homeTeamStats.oreb}</span></p>
+                    <p>Def. Rebounds: <span className="font-medium text-foreground">{homeTeamStats.dreb}</span></p>
+                    <p>Total Rebounds: <span className="font-medium text-foreground">{homeTeamStats.totalReb}</span></p>
+                    <p>Assists: <span className="font-medium text-foreground">{homeTeamStats.assists}</span></p>
+                    <p>Steals: <span className="font-medium text-foreground">{homeTeamStats.steals}</span></p>
+                    <p>Blocks: <span className="font-medium text-foreground">{homeTeamStats.blocks}</span></p>
+                    <p>Turnovers: <span className="font-medium text-foreground">{homeTeamStats.turnovers}</span></p>
+                    <p>Team Fouls: <span className="font-medium text-foreground">{homeTeamStats.fouls}</span></p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-xs font-medium mb-1 text-[#7c3aed]">Away</p>
-                  <select 
-                    className="w-full text-xs p-2 border rounded mb-2"
-                    id="away-miss-player"
-                    data-testid="away-miss-select"
-                  >
-                    <option value="">Select player</option>
-                    {awayStats.map(p => (
-                      <option key={p.id} value={p.id}>#{p.player_number} {p.player_name}</option>
-                    ))}
-                  </select>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('away-miss-player');
-                        if (sel.value) handleStatUpdate(sel.value, "ft_missed");
-                      }}
-                      disabled={!isActive}
-                      className="flex-1 px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50"
-                    >
-                      FT Miss
-                    </button>
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('away-miss-player');
-                        if (sel.value) handleStatUpdate(sel.value, "fg2_missed");
-                      }}
-                      disabled={!isActive}
-                      className="flex-1 px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50"
-                    >
-                      2PT Miss
-                    </button>
-                    <button
-                      onClick={() => {
-                        const sel = document.getElementById('away-miss-player');
-                        if (sel.value) handleStatUpdate(sel.value, "fg3_missed");
-                      }}
-                      disabled={!isActive}
-                      className="flex-1 px-2 py-1 text-xs bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50"
-                    >
-                      3PT Miss
-                    </button>
+                  <p className="font-semibold text-[#7c3aed] mb-2">{game.away_team_name}</p>
+                  <div className="space-y-1 text-muted-foreground">
+                    <p>Off. Rebounds: <span className="font-medium text-foreground">{awayTeamStats.oreb}</span></p>
+                    <p>Def. Rebounds: <span className="font-medium text-foreground">{awayTeamStats.dreb}</span></p>
+                    <p>Total Rebounds: <span className="font-medium text-foreground">{awayTeamStats.totalReb}</span></p>
+                    <p>Assists: <span className="font-medium text-foreground">{awayTeamStats.assists}</span></p>
+                    <p>Steals: <span className="font-medium text-foreground">{awayTeamStats.steals}</span></p>
+                    <p>Blocks: <span className="font-medium text-foreground">{awayTeamStats.blocks}</span></p>
+                    <p>Turnovers: <span className="font-medium text-foreground">{awayTeamStats.turnovers}</span></p>
+                    <p>Team Fouls: <span className="font-medium text-foreground">{awayTeamStats.fouls}</span></p>
                   </div>
                 </div>
               </div>
@@ -647,6 +636,7 @@ export default function LiveGame() {
                   key={player.id}
                   player={player}
                   teamColor="#7c3aed"
+                  onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
                   disabled={!isActive}
                 />
