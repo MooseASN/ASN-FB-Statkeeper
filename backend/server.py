@@ -724,6 +724,24 @@ async def update_game(game_id: str, update: GameUpdate, user: User = Depends(get
     updated = await db.games.find_one({"id": game_id}, {"_id": 0})
     return updated
 
+@api_router.delete("/games/{game_id}")
+async def delete_game(game_id: str, user: User = Depends(get_current_user)):
+    """Delete a game and all its associated player stats"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Delete all player stats for this game
+    await db.player_stats.delete_many({"game_id": game_id})
+    
+    # Delete the game
+    result = await db.games.delete_one({"id": game_id, "user_id": user.user_id})
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    return {"message": "Game deleted successfully"}
+
 @api_router.post("/games/{game_id}/stats")
 async def record_stat(game_id: str, stat: StatUpdate, user: User = Depends(get_current_user)):
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
