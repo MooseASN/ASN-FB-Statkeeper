@@ -169,20 +169,11 @@ export default function Teams() {
                 </div>
                 <div>
                   <Label>Team Color</Label>
-                  <div className="flex flex-wrap gap-2 mt-2">
-                    {TEAM_COLORS.map((color) => (
-                      <button
-                        key={color.value}
-                        type="button"
-                        onClick={() => setNewTeam({ ...newTeam, color: color.value })}
-                        className={`w-8 h-8 rounded-full border-2 transition-all ${
-                          newTeam.color === color.value ? 'border-black scale-110' : 'border-transparent'
-                        }`}
-                        style={{ backgroundColor: color.value }}
-                        title={color.name}
-                        data-testid={`color-${color.name.toLowerCase()}`}
-                      />
-                    ))}
+                  <div className="mt-2">
+                    <ColorPicker 
+                      value={newTeam.color} 
+                      onChange={(color) => setNewTeam({ ...newTeam, color })}
+                    />
                   </div>
                 </div>
                 <div>
