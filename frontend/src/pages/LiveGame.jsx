@@ -531,6 +531,14 @@ export default function LiveGame() {
               </div>
             </div>
             
+            {/* Game Title */}
+            <div className="absolute left-1/2 transform -translate-x-1/2 text-center hidden md:block">
+              <h1 className="text-lg font-bold">{game.home_team_name} vs {game.away_team_name}</h1>
+              <p className="text-xs text-white/70">
+                {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final"}
+              </p>
+            </div>
+            
             <div className="flex items-center gap-2">
               {lastAction && isActive && (
                 <Button 
@@ -568,6 +576,14 @@ export default function LiveGame() {
               )}
             </div>
           </div>
+        </div>
+        
+        {/* Mobile Game Title */}
+        <div className="md:hidden text-center pb-2 border-t border-white/10 pt-2">
+          <h1 className="text-base font-bold">{game.home_team_name} vs {game.away_team_name}</h1>
+          <p className="text-xs text-white/70">
+            {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final"}
+          </p>
         </div>
       </header>
 
