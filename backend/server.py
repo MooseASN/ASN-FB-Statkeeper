@@ -670,6 +670,30 @@ async def get_game_by_share_code(share_code: str):
         "away_player_stats": away_stats
     }
 
+@api_router.get("/games/latest/active/{user_id}")
+async def get_latest_active_game(user_id: str):
+    """Get the latest active game for a user (public endpoint for embed)"""
+    # Find the most recent active game for this user
+    game = await db.games.find_one(
+        {"user_id": user_id, "status": "active"},
+        {"_id": 0},
+        sort=[("created_at", -1)]
+    )
+    
+    if not game:
+        return None
+    
+    player_stats = await db.player_stats.find({"game_id": game["id"]}, {"_id": 0}).to_list(100)
+    
+    home_stats = [s for s in player_stats if s["team_id"] == game["home_team_id"]]
+    away_stats = [s for s in player_stats if s["team_id"] == game["away_team_id"]]
+    
+    return {
+        **game,
+        "home_player_stats": home_stats,
+        "away_player_stats": away_stats
+    }
+
 @api_router.put("/games/{game_id}", response_model=Game)
 async def update_game(game_id: str, update: GameUpdate, user: User = Depends(get_current_user)):
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
