@@ -1818,6 +1818,84 @@ export default function LiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Embed Size Dialog */}
+      <Dialog open={embedDialogOpen} onOpenChange={setEmbedDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Embed Code Settings</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <p className="text-sm text-muted-foreground">
+              Customize the embed size to fit your website. The embed will scale responsively.
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="embed-width">Width (px)</Label>
+                <Input
+                  id="embed-width"
+                  type="number"
+                  value={embedWidth}
+                  onChange={(e) => setEmbedWidth(e.target.value)}
+                  placeholder="1920"
+                  min="300"
+                  max="3840"
+                />
+              </div>
+              <div>
+                <Label htmlFor="embed-height">Height (px)</Label>
+                <Input
+                  id="embed-height"
+                  type="number"
+                  value={embedHeight}
+                  onChange={(e) => setEmbedHeight(e.target.value)}
+                  placeholder="300"
+                  min="100"
+                  max="1080"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setEmbedWidth("1920"); setEmbedHeight("300"); }}
+              >
+                1920×300 (Wide)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setEmbedWidth("800"); setEmbedHeight("300"); }}
+              >
+                800×300 (Medium)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => { setEmbedWidth("400"); setEmbedHeight("250"); }}
+              >
+                400×250 (Small)
+              </Button>
+            </div>
+            <div className="bg-slate-50 p-3 rounded-lg">
+              <Label className="text-xs text-muted-foreground">Preview Code</Label>
+              <code className="block mt-1 text-xs break-all">
+                {`<iframe src="${window.location.origin}/embed/${game?.share_code}" width="${embedWidth}" height="${embedHeight}" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`}
+              </code>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEmbedDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={copyEmbedCode}>
+                <Copy className="w-4 h-4 mr-1" />
+                Copy Embed Code
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
