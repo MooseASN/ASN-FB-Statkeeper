@@ -258,44 +258,56 @@ export default function GameHistory({ user, onLogout }) {
               const awayScore = calculateScore(game.quarter_scores, "away");
               const isHomeWinner = homeScore > awayScore;
               const isAwayWinner = awayScore > homeScore;
+              const statusBadge = getStatusBadge(game);
+              const isScheduled = game.status === "scheduled";
+              const scheduledInfo = isScheduled ? formatScheduledDate(game.scheduled_date, game.scheduled_time) : null;
               
               return (
                 <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid={`game-card-${game.id}`}>
+                  <Card className={`hover:shadow-md transition-shadow cursor-pointer ${isScheduled ? 'border-2 border-blue-200' : ''}`} data-testid={`game-card-${game.id}`}>
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
                           <div className="flex items-center gap-4">
-                            <div className={`flex-1 ${isHomeWinner ? 'font-bold' : ''}`}>
+                            <div className={`flex-1 ${!isScheduled && isHomeWinner ? 'font-bold' : ''}`}>
                               <span className="text-[#000000]">{game.home_team_name}</span>
-                              <span className="ml-2 text-2xl score-display">{homeScore}</span>
+                              {!isScheduled && (
+                                <span className="ml-2 text-2xl score-display">{homeScore}</span>
+                              )}
                             </div>
-                            <div className="text-slate-300">-</div>
-                            <div className={`flex-1 text-right ${isAwayWinner ? 'font-bold' : ''}`}>
-                              <span className="text-2xl score-display">{awayScore}</span>
-                              <span className="ml-2 text-orange-500">{game.away_team_name}</span>
+                            <div className="text-slate-300">{isScheduled ? 'VS' : '-'}</div>
+                            <div className={`flex-1 text-right ${!isScheduled && isAwayWinner ? 'font-bold' : ''}`}>
+                              {!isScheduled && (
+                                <span className="text-2xl score-display">{awayScore}</span>
+                              )}
+                              <span className={`${isScheduled ? '' : 'ml-2'} text-orange-500`}>{game.away_team_name}</span>
                             </div>
                           </div>
                           <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                            <span>{new Date(game.created_at).toLocaleDateString()}</span>
-                            <span className={`px-2 py-0.5 rounded-full text-xs ${
-                              game.status === "active" 
-                                ? "bg-green-100 text-green-700" 
-                                : "bg-slate-100 text-slate-600"
-                            }`}>
-                              {game.status === "active" ? "In Progress" : "Final"}
+                            {isScheduled && scheduledInfo ? (
+                              <span className="flex items-center gap-1 text-blue-600 font-medium">
+                                <Clock className="w-3 h-3" />
+                                {scheduledInfo}
+                              </span>
+                            ) : (
+                              <span>{new Date(game.created_at).toLocaleDateString()}</span>
+                            )}
+                            <span className={`px-2 py-0.5 rounded-full text-xs ${statusBadge.className}`}>
+                              {statusBadge.label}
                             </span>
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => handleDownloadPDF(game, e)}
-                            data-testid={`download-pdf-${game.id}`}
-                          >
-                            <FileDown className="w-4 h-4" />
-                          </Button>
+                          {!isScheduled && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={(e) => handleDownloadPDF(game, e)}
+                              data-testid={`download-pdf-${game.id}`}
+                            >
+                              <FileDown className="w-4 h-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="sm"
