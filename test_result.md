@@ -286,6 +286,30 @@ frontend:
         agent: "main"
         comment: "Fixed lint errors by extracting TeamTable component outside main component"
 
+  - task: "Sponsor Banner Management UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/Dashboard.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added Sponsor Banners section with Manage Banners dialog. Features: file upload, link URL input with blur-save, delete button. All tested via screenshot."
+
+  - task: "Sponsor Banner Slideshow on LiveView"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LiveView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added SponsorSlideshow component with 10-second auto-rotation, indicator dots, clickable links opening in new tab. Positioned above Team Statistics. Tested via screenshot."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
