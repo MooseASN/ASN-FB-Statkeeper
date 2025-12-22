@@ -1,28 +1,34 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User } from "lucide-react";
+import { Home, Users, History, Plus, LogOut, User, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import MooseIcon from "@/components/MooseIcon";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Layout({ children, user, onLogout }) {
   const location = useLocation();
+  const { theme, toggleTheme, isDark } = useTheme();
   
   const isActive = (path) => location.pathname === path;
   
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-slate-900' : 'bg-slate-50'}`}>
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <header className={`border-b sticky top-0 z-50 transition-colors duration-300 ${isDark ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-200'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
-              <MooseIcon className="w-8 h-8 text-[#000000]" />
-              <span className="text-xl font-bold text-[#000000] hidden sm:block">StatMoose</span>
+              <img 
+                src={isDark ? "/logo-white.png" : "/logo-black.png"} 
+                alt="StatMoose" 
+                className="w-8 h-8 object-contain"
+              />
+              <span className={`text-xl font-bold hidden sm:block ${isDark ? 'text-white' : 'text-[#000000]'}`}>StatMoose</span>
             </Link>
             
             <nav className="flex items-center gap-1 sm:gap-2">
@@ -30,7 +36,7 @@ export default function Layout({ children, user, onLogout }) {
                 <Button 
                   variant={isActive("/") ? "secondary" : "ghost"} 
                   size="sm"
-                  className="gap-2"
+                  className={`gap-2 ${isDark ? 'hover:bg-slate-700 text-slate-200' : ''}`}
                   data-testid="nav-home"
                 >
                   <Home className="w-4 h-4" />
@@ -41,7 +47,7 @@ export default function Layout({ children, user, onLogout }) {
                 <Button 
                   variant={isActive("/teams") ? "secondary" : "ghost"} 
                   size="sm"
-                  className="gap-2"
+                  className={`gap-2 ${isDark ? 'hover:bg-slate-700 text-slate-200' : ''}`}
                   data-testid="nav-teams"
                 >
                   <Users className="w-4 h-4" />
@@ -52,7 +58,7 @@ export default function Layout({ children, user, onLogout }) {
                 <Button 
                   variant={isActive("/history") ? "secondary" : "ghost"} 
                   size="sm"
-                  className="gap-2"
+                  className={`gap-2 ${isDark ? 'hover:bg-slate-700 text-slate-200' : ''}`}
                   data-testid="nav-history"
                 >
                   <History className="w-4 h-4" />
@@ -62,7 +68,7 @@ export default function Layout({ children, user, onLogout }) {
               <Link to="/new-game">
                 <Button 
                   size="sm" 
-                  className="bg-[#000000] hover:bg-gray-800 gap-2"
+                  className={`gap-2 ${isDark ? 'bg-white text-black hover:bg-slate-200' : 'bg-[#000000] hover:bg-gray-800'}`}
                   data-testid="nav-new-game"
                 >
                   <Plus className="w-4 h-4" />
@@ -70,11 +76,22 @@ export default function Layout({ children, user, onLogout }) {
                 </Button>
               </Link>
               
+              {/* Theme Toggle */}
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={toggleTheme}
+                className={`${isDark ? 'hover:bg-slate-700 text-slate-200' : ''}`}
+                title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </Button>
+              
               {/* User Menu */}
               {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2 ml-2" data-testid="user-menu">
+                    <Button variant="ghost" size="sm" className={`gap-2 ml-2 ${isDark ? 'hover:bg-slate-700 text-slate-200' : ''}`} data-testid="user-menu">
                       {user.picture ? (
                         <img src={user.picture} alt="" className="w-6 h-6 rounded-full" />
                       ) : (
@@ -83,9 +100,14 @@ export default function Layout({ children, user, onLogout }) {
                       <span className="hidden sm:inline max-w-[100px] truncate">{user.name || user.username}</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem className="text-muted-foreground text-sm">
+                  <DropdownMenuContent align="end" className={isDark ? 'bg-slate-800 border-slate-700' : ''}>
+                    <DropdownMenuItem className={`text-sm ${isDark ? 'text-slate-400' : 'text-muted-foreground'}`}>
                       {user.email}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator className={isDark ? 'bg-slate-700' : ''} />
+                    <DropdownMenuItem onClick={toggleTheme} className={`cursor-pointer ${isDark ? 'text-slate-200 hover:bg-slate-700' : ''}`}>
+                      {isDark ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+                      {isDark ? "Light Mode" : "Dark Mode"}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={onLogout} className="text-red-600 cursor-pointer">
                       <LogOut className="w-4 h-4 mr-2" />
