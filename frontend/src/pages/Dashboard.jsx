@@ -30,6 +30,11 @@ export default function Dashboard({ user, onLogout }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
+  // Embed dialog state
+  const [embedDialogOpen, setEmbedDialogOpen] = useState(false);
+  const [embedWidth, setEmbedWidth] = useState("1920");
+  const [embedHeight, setEmbedHeight] = useState("300");
+
   useEffect(() => {
     fetchData();
     fetchSponsorBanners();
