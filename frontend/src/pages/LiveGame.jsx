@@ -1245,6 +1245,10 @@ export default function LiveGame() {
                   onStatUpdate={handleStatUpdate}
                   onEditPlayer={handleEditPlayer}
                   disabled={!isActive}
+                  clockEnabled={game?.clock_enabled}
+                  isOnFloor={(game?.away_on_floor || []).includes(player.id)}
+                  onToggleFloor={(playerId) => togglePlayerOnFloor(playerId, false)}
+                  canCheckIn={(game?.away_on_floor || []).length < 5}
                 />
               ))}
               {awayStats.length === 0 && (
