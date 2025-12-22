@@ -360,6 +360,15 @@ export default function LiveGame() {
   const [shotModalOpen, setShotModalOpen] = useState(false);
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [selectedShotType, setSelectedShotType] = useState(null);
+  
+  // Reset stats state
+  const [resetStatsOpen, setResetStatsOpen] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  
+  // Edit player state
+  const [editPlayerOpen, setEditPlayerOpen] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [editPlayerData, setEditPlayerData] = useState({ number: "", name: "" });
 
   const fetchGame = useCallback(async () => {
     try {
