@@ -493,6 +493,17 @@ class Game(BaseModel):
     share_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     scheduled_date: Optional[str] = None  # ISO date string YYYY-MM-DD
     scheduled_time: Optional[str] = None  # Time string HH:MM
+    # Clock fields
+    clock_enabled: bool = False
+    period_duration: int = 720  # Duration in seconds (default 12:00)
+    period_label: str = "Quarter"  # "Quarter" or "Period"
+    clock_time: int = 720  # Current clock time in seconds
+    clock_running: bool = False
+    clock_last_started: Optional[str] = None  # ISO timestamp when clock was last started
+    is_halftime: bool = False
+    # On-floor players (player_ids)
+    home_on_floor: List[str] = []
+    away_on_floor: List[str] = []
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
