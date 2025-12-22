@@ -422,6 +422,43 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
+        {/* Sponsor Banners */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
+              <Image className="w-5 h-5 text-purple-500" />
+              Sponsor Banners
+            </h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSponsorDialogOpen(true)}
+              data-testid="manage-sponsors-btn"
+            >
+              Manage Banners
+            </Button>
+          </div>
+          <Card>
+            <CardContent className="py-4">
+              {sponsorBanners.length === 0 ? (
+                <div className="text-center text-muted-foreground py-4">
+                  <Image className="w-10 h-10 mx-auto mb-2 opacity-50" />
+                  <p>No sponsor banners uploaded yet</p>
+                  <p className="text-sm">Banners will appear as a slideshow on your live stats page</p>
+                </div>
+              ) : (
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {sponsorBanners.map((banner) => (
+                    <div key={banner.id} className="flex-shrink-0 w-24 h-16 rounded border overflow-hidden">
+                      <img src={banner.image_data} alt={banner.filename} className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Empty State */}
         {!loading && teams.length === 0 && (
           <Card className="text-center py-12">
@@ -439,6 +476,74 @@ export default function Dashboard({ user, onLogout }) {
           </Card>
         )}
       </div>
+
+      {/* Sponsor Banner Dialog */}
+      <Dialog open={sponsorDialogOpen} onOpenChange={setSponsorDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Manage Sponsor Banners</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Upload PNG or JPEG images to display as a slideshow on your live stats output page.
+            </p>
+            
+            {/* Upload Button */}
+            <div className="flex items-center gap-4">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg"
+                multiple
+                onChange={handleFileUpload}
+                className="hidden"
+              />
+              <Button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="gap-2"
+              >
+                <Upload className="w-4 h-4" />
+                {uploading ? "Uploading..." : "Upload Images"}
+              </Button>
+            </div>
+
+            {/* Banner List */}
+            {sponsorBanners.length > 0 ? (
+              <div className="grid grid-cols-2 gap-4 max-h-80 overflow-y-auto">
+                {sponsorBanners.map((banner, index) => (
+                  <div key={banner.id} className="relative group border rounded-lg overflow-hidden">
+                    <img 
+                      src={banner.image_data} 
+                      alt={banner.filename}
+                      className="w-full h-32 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeleteBanner(banner.id)}
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Delete
+                      </Button>
+                    </div>
+                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 truncate">
+                      {banner.filename}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+                <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                <p>No banners uploaded</p>
+                <p className="text-sm">Click "Upload Images" to add sponsor banners</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
