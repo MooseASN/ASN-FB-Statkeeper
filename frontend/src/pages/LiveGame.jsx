@@ -20,7 +20,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus, Minimize2, Maximize2, Code, RotateCcw, Pencil, Play, Pause, ChevronUp, ChevronDown, Coffee, SkipForward, StickyNote, Trash2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -917,7 +916,7 @@ export default function LiveGame() {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <MooseIcon className="w-12 h-12 animate-pulse mx-auto text-[#000000]" />
+          <img src="/logo-black.png" alt="StatMoose" className="w-12 h-12 animate-pulse mx-auto" />
           <p className="mt-4 text-muted-foreground">Loading game...</p>
         </div>
       </div>
@@ -1001,7 +1000,7 @@ export default function LiveGame() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
               <div className="flex items-center gap-2">
-                <MooseIcon className="w-6 h-6" />
+                <img src="/logo-white.png" alt="StatMoose" className="w-6 h-6 object-contain" />
                 <span className="font-bold hidden sm:block">StatMoose</span>
               </div>
             </div>
