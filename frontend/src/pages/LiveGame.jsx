@@ -204,7 +204,7 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
 };
 
 // ============ EXPANDED PLAYER CARD ============
-const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
+const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   const totalReb = player.offensive_rebounds + player.defensive_rebounds;
@@ -238,6 +238,13 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
               title="Edit player"
             >
               <Pencil className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => onRemovePlayer(player)}
+              className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+              title="Remove player"
+            >
+              <Trash2 className="w-4 h-4" />
             </button>
           </div>
           <p className="text-sm text-muted-foreground">
