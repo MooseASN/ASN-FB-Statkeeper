@@ -1069,6 +1069,22 @@ export default function LiveGame() {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">{game.home_team_name}</p>
+                  {/* On Floor Indicator */}
+                  {game?.clock_enabled && (
+                    <div className="flex justify-center gap-1 mt-1 mb-1">
+                      {(game?.home_on_floor || []).map(playerId => {
+                        const player = homeStats.find(p => p.id === playerId);
+                        return player ? (
+                          <span key={playerId} className="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">
+                            {player.player_number}
+                          </span>
+                        ) : null;
+                      })}
+                      {(game?.home_on_floor || []).length === 0 && (
+                        <span className="text-[10px] text-slate-400">No players on floor</span>
+                      )}
+                    </div>
+                  )}
                   <p className="text-5xl font-bold" style={{ color: homeColor }} data-testid="home-score">
                     {calculateScore("home")}
                   </p>
@@ -1089,11 +1105,118 @@ export default function LiveGame() {
                     </div>
                   </div>
                   <p className="text-sm text-muted-foreground">{game.away_team_name}</p>
+                  {/* On Floor Indicator */}
+                  {game?.clock_enabled && (
+                    <div className="flex justify-center gap-1 mt-1 mb-1">
+                      {(game?.away_on_floor || []).map(playerId => {
+                        const player = awayStats.find(p => p.id === playerId);
+                        return player ? (
+                          <span key={playerId} className="px-1.5 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">
+                            {player.player_number}
+                          </span>
+                        ) : null;
+                      })}
+                      {(game?.away_on_floor || []).length === 0 && (
+                        <span className="text-[10px] text-slate-400">No players on floor</span>
+                      )}
+                    </div>
+                  )}
                   <p className="text-5xl font-bold" style={{ color: awayColor }} data-testid="away-score">
                     {calculateScore("away")}
                   </p>
                 </div>
               </div>
+              
+              {/* Game Clock */}
+              {game?.clock_enabled && (
+                <div className="border-t pt-4 mb-4">
+                  <div className="flex items-center justify-center gap-4">
+                    {/* Decrease minute */}
+                    <button
+                      onClick={() => handleAdjustClock(-60)}
+                      disabled={clockRunning}
+                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
+                      title="-1 minute"
+                    >
+                      <ChevronDown className="w-5 h-5" />
+                    </button>
+                    {/* Decrease second */}
+                    <button
+                      onClick={() => handleAdjustClock(-1)}
+                      disabled={clockRunning}
+                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
+                      title="-1 second"
+                    >
+                      <ChevronDown className="w-4 h-4" />
+                    </button>
+                    
+                    {/* Clock Display */}
+                    <div className="text-center">
+                      <div className="text-4xl font-mono font-bold tracking-wider">
+                        {formatClockTime(clockTime)}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {game?.period_label || "Quarter"} {game.current_quarter}
+                        {game?.is_halftime && " - HALFTIME"}
+                      </div>
+                    </div>
+                    
+                    {/* Increase second */}
+                    <button
+                      onClick={() => handleAdjustClock(1)}
+                      disabled={clockRunning}
+                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
+                      title="+1 second"
+                    >
+                      <ChevronUp className="w-4 h-4" />
+                    </button>
+                    {/* Increase minute */}
+                    <button
+                      onClick={() => handleAdjustClock(60)}
+                      disabled={clockRunning}
+                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
+                      title="+1 minute"
+                    >
+                      <ChevronUp className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  {/* Clock Controls */}
+                  <div className="flex items-center justify-center gap-2 mt-3">
+                    {clockRunning ? (
+                      <Button 
+                        onClick={handleStopClock} 
+                        variant="destructive" 
+                        size="sm"
+                        className="gap-1"
+                      >
+                        <Pause className="w-4 h-4" />
+                        Stop
+                      </Button>
+                    ) : (
+                      <Button 
+                        onClick={handleStartClock} 
+                        size="sm"
+                        className="gap-1 bg-green-600 hover:bg-green-700"
+                        disabled={!isActive}
+                      >
+                        <Play className="w-4 h-4" />
+                        Start
+                      </Button>
+                    )}
+                    <Button 
+                      onClick={() => setShowPeriodEndDialog(true)} 
+                      variant="outline" 
+                      size="sm"
+                      className="gap-1"
+                      disabled={clockRunning}
+                    >
+                      <SkipForward className="w-4 h-4" />
+                      End Period
+                    </Button>
+                  </div>
+                </div>
+              )}
               
               {/* Period Selection */}
               <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
