@@ -311,6 +311,19 @@ export default function GameHistory({ user, onLogout }) {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 ml-4">
+                          {game.status === "completed" && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-green-600 border-green-200 hover:bg-green-50 hover:border-green-300"
+                              onClick={(e) => handleContinueGame(game.id, e)}
+                              data-testid={`continue-game-${game.id}`}
+                              title="Continue this game"
+                            >
+                              <PlayCircle className="w-4 h-4 mr-1" />
+                              Continue
+                            </Button>
+                          )}
                           {!isScheduled && (
                             <Button
                               variant="ghost"
