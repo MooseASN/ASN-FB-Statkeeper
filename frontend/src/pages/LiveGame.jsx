@@ -879,6 +879,7 @@ export default function LiveGame() {
                   teamColor={homeColor}
                   onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
+                  onEditPlayer={handleEditPlayer}
                   disabled={!isActive}
                 />
               ))}
