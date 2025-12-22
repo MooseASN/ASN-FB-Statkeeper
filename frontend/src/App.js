@@ -9,6 +9,7 @@ import TeamDetail from "@/pages/TeamDetail";
 import NewGame from "@/pages/NewGame";
 import LiveGame from "@/pages/LiveGame";
 import LiveView from "@/pages/LiveView";
+import EmbedLiveGame from "@/pages/EmbedLiveGame";
 import GameHistory from "@/pages/GameHistory";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
