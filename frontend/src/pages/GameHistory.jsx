@@ -79,6 +79,19 @@ export default function GameHistory({ user, onLogout }) {
     }
   };
 
+  const handleContinueGame = async (gameId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    try {
+      await axios.post(`${API}/games/${gameId}/continue`);
+      toast.success("Game continued - now active");
+      fetchGames();
+    } catch (error) {
+      toast.error("Failed to continue game");
+    }
+  };
+
   const calculateScore = (quarterScores, team) => {
     return quarterScores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
