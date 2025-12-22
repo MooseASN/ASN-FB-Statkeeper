@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -14,6 +15,7 @@ export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
@@ -22,8 +24,22 @@ export default function Login({ onLogin }) {
     
     try {
       const res = await axios.post(`${API}/auth/login`, { email, password }, { withCredentials: true });
-      localStorage.setItem("session_token", res.data.session_token);
-      localStorage.setItem("user", JSON.stringify(res.data));
+      
+      // Store based on Remember Me preference
+      const storage = rememberMe ? localStorage : sessionStorage;
+      storage.setItem("session_token", res.data.session_token);
+      storage.setItem("user", JSON.stringify(res.data));
+      
+      // Also store the preference
+      if (rememberMe) {
+        localStorage.setItem("remember_me", "true");
+      } else {
+        localStorage.removeItem("remember_me");
+        // Clear any existing localStorage auth data
+        localStorage.removeItem("session_token");
+        localStorage.removeItem("user");
+      }
+      
       onLogin(res.data);
       toast.success("Welcome back!");
       navigate("/");
