@@ -411,6 +411,88 @@ export default function TeamDetail({ user, onLogout }) {
           </Button>
         </div>
       </div>
+
+      {/* Bulk Add Dialog */}
+      <Dialog open={bulkAddOpen} onOpenChange={setBulkAddOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Bulk Add Players</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Fill in multiple players at once. Empty rows will be ignored.
+            </p>
+            
+            {/* Header */}
+            <div className="flex gap-2 items-center px-1">
+              <div className="w-20 text-sm font-medium text-muted-foreground">#</div>
+              <div className="flex-1 text-sm font-medium text-muted-foreground">Player Name</div>
+              <div className="w-10"></div>
+            </div>
+            
+            {/* Scrollable rows */}
+            <ScrollArea className="h-[400px] pr-4">
+              <div className="space-y-2">
+                {bulkPlayers.map((player, index) => (
+                  <div key={index} className="flex gap-2 items-center">
+                    <Input
+                      placeholder="#"
+                      value={player.number}
+                      onChange={(e) => handleBulkPlayerChange(index, "number", e.target.value)}
+                      className="w-20"
+                      data-testid={`bulk-number-${index}`}
+                    />
+                    <Input
+                      placeholder="Player Name"
+                      value={player.name}
+                      onChange={(e) => handleBulkPlayerChange(index, "name", e.target.value)}
+                      className="flex-1"
+                      data-testid={`bulk-name-${index}`}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-10 text-red-500 hover:text-red-600 hover:bg-red-50"
+                      onClick={() => removeBulkRow(index)}
+                      disabled={bulkPlayers.length <= 1}
+                      data-testid={`bulk-remove-${index}`}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            
+            {/* Add Row Button */}
+            <Button
+              variant="outline"
+              onClick={addBulkRow}
+              className="w-full"
+              data-testid="add-bulk-row-btn"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Row
+            </Button>
+            
+            {/* Footer with count and actions */}
+            <div className="flex items-center justify-between pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                {bulkPlayers.filter(p => p.number.trim() && p.name.trim()).length} player(s) to add
+              </p>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={() => setBulkAddOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleBulkAddPlayers} data-testid="confirm-bulk-add-btn">
+                  <Users className="w-4 h-4 mr-2" />
+                  Add All Players
+                </Button>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
