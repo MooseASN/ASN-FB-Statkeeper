@@ -403,6 +403,15 @@ export default function LiveGame() {
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [noteText, setNoteText] = useState("");
 
+  // Remove player state
+  const [removePlayerOpen, setRemovePlayerOpen] = useState(false);
+  const [playerToRemove, setPlayerToRemove] = useState(null);
+
+  // Edit play-by-play state
+  const [editPlayOpen, setEditPlayOpen] = useState(false);
+  const [editingPlay, setEditingPlay] = useState(null);
+  const [editPlayData, setEditPlayData] = useState({ player_id: "", player_number: "", player_name: "", action: "" });
+
   const fetchGame = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
