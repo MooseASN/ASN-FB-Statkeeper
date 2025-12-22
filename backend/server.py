@@ -547,6 +547,16 @@ class GameUpdate(BaseModel):
     current_quarter: Optional[int] = None
     status: Optional[str] = None
 
+# Sponsor Banner Model
+class SponsorBanner(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str = ""
+    image_data: str = ""  # Base64 encoded image
+    filename: str = ""
+    order: int = 0
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============ TEAM ENDPOINTS ============
 
 @api_router.post("/teams", response_model=Team)
