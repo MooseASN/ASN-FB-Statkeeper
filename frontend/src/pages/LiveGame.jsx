@@ -955,6 +955,10 @@ export default function LiveGame() {
                 <FileDown className="w-4 h-4 mr-1" />
                 PDF
               </Button>
+              <Button variant="ghost" size="sm" onClick={openNoteDialog} className="text-white hover:bg-white/10" data-testid="note-btn">
+                <StickyNote className="w-4 h-4 mr-1" />
+                Note
+              </Button>
               
               {isActive && (
                 <>
