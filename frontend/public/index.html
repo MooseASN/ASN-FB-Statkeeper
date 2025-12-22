@@ -63,6 +63,12 @@
                 display: none !important;
             }
         </style>
+        <script>
+            // Set body attribute immediately for embed pages
+            if (window.location.pathname.includes('/embed')) {
+                document.body.setAttribute('data-page', 'embed');
+            }
+        </script>
         <div
             id="triumph-badge"
             style="
