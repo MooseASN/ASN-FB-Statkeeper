@@ -600,6 +600,9 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     if not home_team or not away_team:
         raise HTTPException(status_code=404, detail="Team not found")
     
+    # Determine initial status
+    initial_status = "active" if game_data.start_immediately else "scheduled"
+    
     game = Game(
         home_team_id=game_data.home_team_id,
         away_team_id=game_data.away_team_id,
@@ -608,7 +611,10 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         home_team_logo=home_team.get("logo_url"),
         away_team_logo=away_team.get("logo_url"),
         home_team_color=home_team.get("color", "#dc2626"),
-        away_team_color=away_team.get("color", "#7c3aed")
+        away_team_color=away_team.get("color", "#7c3aed"),
+        status=initial_status,
+        scheduled_date=game_data.scheduled_date,
+        scheduled_time=game_data.scheduled_time
     )
     game.user_id = user.user_id
     
@@ -635,6 +641,24 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         await db.player_stats.insert_one(stats.model_dump())
     
     return game
+
+@api_router.post("/games/{game_id}/start")
+async def start_game(game_id: str, user: User = Depends(get_current_user)):
+    """Start a scheduled game"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if game["status"] != "scheduled":
+        raise HTTPException(status_code=400, detail="Game is not in scheduled status")
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {"status": "active", "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    updated = await db.games.find_one({"id": game_id}, {"_id": 0})
+    return updated
 
 @api_router.get("/games", response_model=List[Game])
 async def get_games(user: User = Depends(get_current_user)):
