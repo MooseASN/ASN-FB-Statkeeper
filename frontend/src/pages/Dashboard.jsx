@@ -577,7 +577,7 @@ export default function Dashboard({ user, onLogout }) {
               <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                 <Image className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>No banners uploaded</p>
-                <p className="text-sm">Click "Upload Images" to add sponsor banners</p>
+                <p className="text-sm">Click &quot;Upload Images&quot; to add sponsor banners</p>
               </div>
             )}
           </div>
