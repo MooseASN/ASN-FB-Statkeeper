@@ -370,11 +370,22 @@ export default function LiveView() {
             </div>
             
             <div className="px-8 text-center">
+              {/* Clock display when enabled */}
+              {game.clock_enabled && game.status === "active" && (
+                <div className="mb-3">
+                  <span className="text-3xl font-mono font-bold text-white">
+                    {formatClockTime(game.clock_time || 0)}
+                  </span>
+                </div>
+              )}
+              
               <div className="mb-4">
                 <span className={`text-xl font-bold px-4 py-2 rounded-lg ${
-                  game.status === "active" ? "bg-orange-500" : "bg-white/20"
+                  game.status === "active" ? "bg-orange-500" : 
+                  game.status === "scheduled" ? "bg-blue-500" : "bg-white/20"
                 }`}>
-                  {game.status === "active" ? getQuarterLabel(game.current_quarter) : "FINAL"}
+                  {game.status === "active" ? (game.is_halftime ? "HALFTIME" : getQuarterLabel(game.current_quarter)) : 
+                   game.status === "scheduled" ? "NOT STARTED" : "FINAL"}
                 </span>
               </div>
               <div className="grid gap-3 text-sm" style={{ gridTemplateColumns: `auto repeat(${totalQuarters}, 1fr)` }}>
