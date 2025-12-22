@@ -129,7 +129,7 @@ export default function GameHistory({ user, onLogout }) {
               data-testid="search-input"
             />
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             <Button
               variant={statusFilter === "all" ? "default" : "outline"}
               size="sm"
@@ -138,6 +138,16 @@ export default function GameHistory({ user, onLogout }) {
               data-testid="filter-all"
             >
               All
+            </Button>
+            <Button
+              variant={statusFilter === "scheduled" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setStatusFilter("scheduled")}
+              className={statusFilter === "scheduled" ? "bg-blue-600 hover:bg-blue-700" : ""}
+              data-testid="filter-scheduled"
+            >
+              <Calendar className="w-3 h-3 mr-1" />
+              Scheduled
             </Button>
             <Button
               variant={statusFilter === "active" ? "default" : "outline"}
