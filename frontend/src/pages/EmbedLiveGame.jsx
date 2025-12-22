@@ -149,12 +149,6 @@ export default function EmbedLiveGame() {
             {awayScore}
           </span>
         </div>
-
-        {/* StatMoose branding */}
-        <div className="flex items-center justify-center gap-2 mt-4 text-white/40">
-          <MooseIcon className="w-5 h-5" />
-          <span className="text-sm font-medium">StatMoose Basketball</span>
-        </div>
       </div>
 
       {/* Away Team Section */}
