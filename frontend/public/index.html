@@ -57,6 +57,12 @@
       To begin the development, run `npm start` or `yarn start`.
       To create a production bundle, use `npm run build` or `yarn build`.
     -->
+        <style>
+            /* Hide badge on embed pages */
+            body[data-page="embed"] #triumph-badge {
+                display: none !important;
+            }
+        </style>
         <div
             id="triumph-badge"
             style="
