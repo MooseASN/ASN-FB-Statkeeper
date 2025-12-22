@@ -1462,45 +1462,49 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             ])
         
         # Percentage row - aligned under the correct columns
+        # Headers: ["", "MIN", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+        # Or without clock: ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
         if clock_enabled:
+            # With clock: col 0=name, 1=MIN, 2=FG, 3=FGA, 4=3P, 5=3PA, 6=FT, 7=FTA, ...
             data.append([
-                f"{team_totals['fg_pct']}%",
-                "",
-                "",
-                f"{team_totals['fg3_pct']}%",
-                "",
-                f"{team_totals['ft_pct']}%",
-                "",
-                f"TM REB: {team_totals['reb']}",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                ""
+                "",                              # 0: name
+                "",                              # 1: MIN
+                f"{team_totals['fg_pct']}%",     # 2: FG (percentage here)
+                "",                              # 3: FGA
+                f"{team_totals['fg3_pct']}%",    # 4: 3P (percentage here)
+                "",                              # 5: 3PA
+                f"{team_totals['ft_pct']}%",     # 6: FT (percentage here)
+                "",                              # 7: FTA
+                f"TM REB: {team_totals['reb']}", # 8: OR
+                "",                              # 9: DR
+                "",                              # 10: TOT
+                "",                              # 11: A
+                "",                              # 12: PF
+                "",                              # 13: ST
+                "",                              # 14: TO
+                "",                              # 15: BLKS
+                ""                               # 16: PTS
             ])
             col_widths = [1.4*inch, 0.38*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
         else:
+            # Without clock: col 0=name, 1=FG, 2=FGA, 3=3P, 4=3PA, 5=FT, 6=FTA, ...
             data.append([
-                f"{team_totals['fg_pct']}%",
-                "",
-                f"{team_totals['fg3_pct']}%",
-                "",
-                f"{team_totals['ft_pct']}%",
-                "",
-                f"TM REB: {team_totals['reb']}",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                "",
-                ""
+                "",                              # 0: name
+                f"{team_totals['fg_pct']}%",     # 1: FG (percentage here)
+                "",                              # 2: FGA
+                f"{team_totals['fg3_pct']}%",    # 3: 3P (percentage here)
+                "",                              # 4: 3PA
+                f"{team_totals['ft_pct']}%",     # 5: FT (percentage here)
+                "",                              # 6: FTA
+                f"TM REB: {team_totals['reb']}", # 7: OR
+                "",                              # 8: DR
+                "",                              # 9: TOT
+                "",                              # 10: A
+                "",                              # 11: PF
+                "",                              # 12: ST
+                "",                              # 13: TO
+                "",                              # 14: BLKS
+                ""                               # 15: PTS
             ])
             col_widths = [1.6*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
         
