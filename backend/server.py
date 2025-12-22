@@ -1562,8 +1562,50 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     
     # Calculate final scores
     q_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
-    home_total = sum(q_scores.get("home", [0,0,0,0]))
-    away_total = sum(q_scores.get("away", [0,0,0,0]))
+    home_scores = q_scores.get("home", [0,0,0,0])
+    away_scores = q_scores.get("away", [0,0,0,0])
+    total_quarters = max(4, len(home_scores), len(away_scores))
+    
+    # Pad scores arrays if needed
+    while len(home_scores) < total_quarters:
+        home_scores.append(0)
+    while len(away_scores) < total_quarters:
+        away_scores.append(0)
+    
+    home_total = sum(home_scores)
+    away_total = sum(away_scores)
+    
+    # Quarter-by-Quarter Score Table
+    def get_quarter_label(q):
+        label = game.get("period_label", "Quarter")
+        prefix = "P" if label == "Period" else "Q"
+        if q <= 4:
+            return f"{prefix}{q}"
+        return f"OT{q-4}"
+    
+    quarter_headers = ["TEAM"] + [get_quarter_label(i+1) for i in range(total_quarters)] + ["TOTAL"]
+    quarter_data = [
+        quarter_headers,
+        [game['away_team_name']] + away_scores + [away_total],
+        [game['home_team_name']] + home_scores + [home_total]
+    ]
+    
+    q_col_widths = [1.5*inch] + [0.4*inch] * total_quarters + [0.5*inch]
+    quarter_table = Table(quarter_data, colWidths=q_col_widths)
+    quarter_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+        ('LINEBELOW', (0, -1), (-1, -1), 1, colors.black),
+        ('FONTNAME', (-1, 1), (-1, -1), 'Helvetica-Bold'),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('TOPPADDING', (0, 0), (-1, -1), 4),
+    ]))
+    
+    elements.append(quarter_table)
+    elements.append(Spacer(1, 15))
     
     # Away team (VISITOR) first
     away_table = create_team_table(game['away_team_name'], "VISITOR", away_stats, away_totals)
