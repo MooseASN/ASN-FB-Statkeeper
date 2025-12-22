@@ -1479,6 +1479,38 @@ export default function LiveGame() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Period End Dialog */}
+      <AlertDialog open={showPeriodEndDialog} onOpenChange={setShowPeriodEndDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>End of {game?.period_label || "Quarter"} {game?.current_quarter}</AlertDialogTitle>
+            <AlertDialogDescription>
+              The clock has reached 0:00. What would you like to do?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-col sm:flex-row gap-2">
+            <AlertDialogCancel>Continue Playing</AlertDialogCancel>
+            {game?.current_quarter === 2 && (
+              <Button
+                onClick={handleHalftime}
+                variant="outline"
+                className="gap-2"
+              >
+                <Coffee className="w-4 h-4" />
+                Halftime
+              </Button>
+            )}
+            <AlertDialogAction
+              onClick={handleNextPeriod}
+              className="bg-green-600 hover:bg-green-700 gap-2"
+            >
+              <SkipForward className="w-4 h-4" />
+              Next {game?.period_label || "Quarter"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
