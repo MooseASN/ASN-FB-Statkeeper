@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload } from "lucide-react";
 import Layout from "@/components/Layout";
 import MooseIcon from "@/components/MooseIcon";
 
@@ -20,10 +21,69 @@ export default function Dashboard({ user, onLogout }) {
   const [embedCopied, setEmbedCopied] = useState(false);
   const [startingGameId, setStartingGameId] = useState(null);
   const [copiedLinkId, setCopiedLinkId] = useState(null);
+  
+  // Sponsor banner state
+  const [sponsorBanners, setSponsorBanners] = useState([]);
+  const [sponsorDialogOpen, setSponsorDialogOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
+    fetchSponsorBanners();
   }, []);
+
+  const fetchSponsorBanners = async () => {
+    try {
+      const res = await axios.get(`${API}/sponsor-banners`);
+      setSponsorBanners(res.data);
+    } catch (error) {
+      console.error("Error fetching sponsor banners:", error);
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    setUploading(true);
+    
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`${file.name} is not an image`);
+        continue;
+      }
+      
+      // Convert to base64
+      const reader = new FileReader();
+      reader.onload = async () => {
+        try {
+          await axios.post(`${API}/sponsor-banners`, {
+            image_data: reader.result,
+            filename: file.name
+          });
+          fetchSponsorBanners();
+          toast.success(`Uploaded ${file.name}`);
+        } catch (error) {
+          toast.error(`Failed to upload ${file.name}`);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+    
+    setUploading(false);
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleDeleteBanner = async (bannerId) => {
+    try {
+      await axios.delete(`${API}/sponsor-banners/${bannerId}`);
+      fetchSponsorBanners();
+      toast.success("Banner deleted");
+    } catch (error) {
+      toast.error("Failed to delete banner");
+    }
+  };
 
   const fetchData = async () => {
     try {
