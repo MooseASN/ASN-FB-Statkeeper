@@ -106,34 +106,36 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
-          <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
-          <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPassword />} />
-          <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPassword />} />
-          
-          {/* Protected routes */}
-          <Route path="/" element={<ProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/teams" element={<ProtectedRoute user={user}><Teams user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/teams/:id" element={<ProtectedRoute user={user}><TeamDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/new-game" element={<ProtectedRoute user={user}><NewGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/game/:id" element={<ProtectedRoute user={user}><LiveGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          
-          {/* Live view is now protected - only owner can see */}
-          {/* Public shareable live stats view */}
-          <Route path="/live/:shareCode" element={<LiveView />} />
-          
-          {/* Embed view is public - for external embedding */}
-          <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
-          <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
-        </Routes>
-      </BrowserRouter>
-      <Toaster position="top-right" duration={2000} />
-    </div>
+    <ThemeProvider>
+      <div className="app-container">
+        <BrowserRouter>
+          <Routes>
+            {/* Public routes */}
+            <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
+            <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
+            <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPassword />} />
+            <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPassword />} />
+            
+            {/* Protected routes */}
+            <Route path="/" element={<ProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+            <Route path="/teams" element={<ProtectedRoute user={user}><Teams user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+            <Route path="/teams/:id" element={<ProtectedRoute user={user}><TeamDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+            <Route path="/new-game" element={<ProtectedRoute user={user}><NewGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+            <Route path="/game/:id" element={<ProtectedRoute user={user}><LiveGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+            <Route path="/history" element={<ProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+            
+            {/* Live view is now protected - only owner can see */}
+            {/* Public shareable live stats view */}
+            <Route path="/live/:shareCode" element={<LiveView />} />
+            
+            {/* Embed view is public - for external embedding */}
+            <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
+            <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" duration={2000} />
+      </div>
+    </ThemeProvider>
   );
 }
 
