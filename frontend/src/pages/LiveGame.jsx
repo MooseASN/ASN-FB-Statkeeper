@@ -92,18 +92,30 @@ const sortByNumber = (players) => {
 };
 
 // ============ CONDENSED PLAYER CARD ============
-const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled }) => {
+const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   
   return (
-    <div className="bg-white rounded-lg px-2 py-1.5 shadow-sm border" data-testid={`player-card-${player.id}`}>
+    <div className={`bg-white rounded-lg px-2 py-1.5 shadow-sm border ${isOnFloor ? 'ring-2 ring-green-500' : ''}`} data-testid={`player-card-${player.id}`}>
       <div className="flex items-center gap-2">
-        <div 
-          className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
-          style={{ backgroundColor: teamColor }}
-        >
-          {player.player_number}
+        {/* On-floor checkbox - below player number area */}
+        <div className="flex flex-col items-center gap-0.5">
+          <div 
+            className="w-7 h-7 rounded-full flex items-center justify-center text-white font-bold text-xs flex-shrink-0"
+            style={{ backgroundColor: teamColor }}
+          >
+            {player.player_number}
+          </div>
+          {clockEnabled && (
+            <Checkbox
+              checked={isOnFloor}
+              onCheckedChange={() => onToggleFloor(player.id)}
+              disabled={!isOnFloor && !canCheckIn}
+              className="w-4 h-4 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+              title={isOnFloor ? "On floor" : (canCheckIn ? "Check in" : "5 players max")}
+            />
+          )}
         </div>
         
         <div className="flex-1 min-w-0">
