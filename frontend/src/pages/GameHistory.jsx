@@ -83,6 +83,54 @@ export default function GameHistory({ user, onLogout }) {
     return quarterScores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
 
+  const formatScheduledDate = (dateStr, timeStr) => {
+    if (!dateStr) return null;
+    
+    const date = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    let dateText;
+    if (date.getTime() === today.getTime()) {
+      dateText = "Today";
+    } else if (date.getTime() === tomorrow.getTime()) {
+      dateText = "Tomorrow";
+    } else {
+      dateText = date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+    
+    if (timeStr) {
+      return `${dateText} at ${timeStr}`;
+    }
+    return dateText;
+  };
+
+  const getStatusBadge = (game) => {
+    if (game.status === "scheduled") {
+      return {
+        className: "bg-blue-100 text-blue-700",
+        label: "Scheduled"
+      };
+    }
+    if (game.status === "active") {
+      return {
+        className: "bg-green-100 text-green-700",
+        label: "In Progress"
+      };
+    }
+    return {
+      className: "bg-slate-100 text-slate-600",
+      label: "Final"
+    };
+  };
+
   // Filter games based on search query and status
   const filteredGames = useMemo(() => {
     return games.filter(game => {
