@@ -1544,6 +1544,39 @@ export default function LiveGame() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Note Dialog */}
+      <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Game Note</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="game-note">Add a note about this game</Label>
+              <Input
+                id="game-note"
+                value={noteText}
+                onChange={(e) => setNoteText(e.target.value)}
+                placeholder="e.g., Championship Game, Regular Season"
+                className="mt-2"
+                data-testid="note-input"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Preview: <span className="font-medium">{game?.home_team_name} vs {game?.away_team_name}{noteText && ` - ${noteText}`}</span>
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setNoteDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveNote} data-testid="save-note-btn">
+                Save Note
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
