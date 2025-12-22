@@ -287,10 +287,10 @@ export default function NewGame({ user, onLogout }) {
                           type="button"
                           variant="outline"
                           size="sm"
-                          onClick={() => { setPeriodMinutes(10); setPeriodSeconds(0); }}
+                          onClick={() => { setPeriodMinutes(8); setPeriodSeconds(0); }}
                           className="text-xs"
                         >
-                          HS (10:00)
+                          HS (8:00)
                         </Button>
                         <Button
                           type="button"
