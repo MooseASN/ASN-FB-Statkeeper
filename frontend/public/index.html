@@ -102,19 +102,17 @@
             }
             
             // Also hide badge after page loads if on embed page (for SPA routing)
-            window.addEventListener('DOMContentLoaded', function() {
+            (function checkAndRemoveBadge() {
                 if (window.location.pathname.includes('/embed')) {
                     var badge = document.getElementById('triumph-badge');
-                    if (badge) badge.parentNode.removeChild(badge);
+                    if (badge) {
+                        badge.parentNode.removeChild(badge);
+                    } else {
+                        // Badge not found yet, try again
+                        setTimeout(checkAndRemoveBadge, 10);
+                    }
                 }
-            });
-            // Double check on load event too
-            window.addEventListener('load', function() {
-                if (window.location.pathname.includes('/embed')) {
-                    var badge = document.getElementById('triumph-badge');
-                    if (badge) badge.parentNode.removeChild(badge);
-                }
-            });
+            })();
         </script>
     </body>
 </html>
