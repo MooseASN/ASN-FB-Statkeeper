@@ -110,6 +110,7 @@ function App() {
           
           {/* Embed view is public - for external embedding */}
           <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
+          <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" duration={2000} />
