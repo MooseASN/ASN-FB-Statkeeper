@@ -92,8 +92,7 @@ function App() {
     } catch (error) {
       console.error("Logout error:", error);
     }
-    localStorage.removeItem("session_token");
-    localStorage.removeItem("user");
+    clearAuth();
     setUser(null);
   };
 
