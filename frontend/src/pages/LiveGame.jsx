@@ -1130,28 +1130,26 @@ export default function LiveGame() {
               {/* Game Clock */}
               {game?.clock_enabled && (
                 <div className="border-t pt-4 mb-4">
-                  <div className="flex items-center justify-center gap-4">
+                  <div className="flex items-center justify-center gap-3">
                     {/* Decrease minute */}
                     <button
                       onClick={() => handleAdjustClock(-60)}
                       disabled={clockRunning}
-                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                      title="-1 minute"
+                      className="px-2 py-1 text-sm font-bold bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50"
                     >
-                      <ChevronDown className="w-5 h-5" />
+                      -M
                     </button>
                     {/* Decrease second */}
                     <button
                       onClick={() => handleAdjustClock(-1)}
                       disabled={clockRunning}
-                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                      title="-1 second"
+                      className="px-2 py-1 text-sm font-bold bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50"
                     >
-                      <ChevronDown className="w-4 h-4" />
+                      -S
                     </button>
                     
                     {/* Clock Display */}
-                    <div className="text-center">
+                    <div className="text-center px-4">
                       <div className="text-4xl font-mono font-bold tracking-wider">
                         {formatClockTime(clockTime)}
                       </div>
@@ -1165,19 +1163,17 @@ export default function LiveGame() {
                     <button
                       onClick={() => handleAdjustClock(1)}
                       disabled={clockRunning}
-                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                      title="+1 second"
+                      className="px-2 py-1 text-sm font-bold bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50"
                     >
-                      <ChevronUp className="w-4 h-4" />
+                      +S
                     </button>
                     {/* Increase minute */}
                     <button
                       onClick={() => handleAdjustClock(60)}
                       disabled={clockRunning}
-                      className="p-1 hover:bg-slate-100 rounded disabled:opacity-50"
-                      title="+1 minute"
+                      className="px-2 py-1 text-sm font-bold bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50"
                     >
-                      <ChevronUp className="w-5 h-5" />
+                      +M
                     </button>
                   </div>
                   
