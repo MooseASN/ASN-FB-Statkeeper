@@ -106,7 +106,8 @@ function App() {
           <Route path="/history" element={<ProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           
           {/* Live view is now protected - only owner can see */}
-          <Route path="/live/:shareCode" element={<ProtectedRoute user={user}><LiveView user={user} /></ProtectedRoute>} />
+          {/* Public shareable live stats view */}
+          <Route path="/live/:shareCode" element={<LiveView />} />
           
           {/* Embed view is public - for external embedding */}
           <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
