@@ -335,7 +335,8 @@ export default function LiveView() {
             {game.home_team_name} vs {game.away_team_name}
           </h1>
           <p className="text-white/70 mt-1">
-            {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final Score"}
+            {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : 
+             game.status === "scheduled" ? "Scheduled" : "Final Score"}
           </p>
         </div>
       </div>
