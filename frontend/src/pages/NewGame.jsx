@@ -6,7 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, PlayCircle, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, PlayCircle, Users, Calendar, Clock } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -18,6 +20,9 @@ export default function NewGame({ user, onLogout }) {
   const [awayTeamId, setAwayTeamId] = useState("");
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
+  const [gameMode, setGameMode] = useState("start"); // "start" or "schedule"
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
 
   useEffect(() => {
     fetchTeams();
@@ -49,7 +54,8 @@ export default function NewGame({ user, onLogout }) {
     try {
       const res = await axios.post(`${API}/games`, {
         home_team_id: homeTeamId,
-        away_team_id: awayTeamId
+        away_team_id: awayTeamId,
+        start_immediately: true
       });
       toast.success("Game started!");
       navigate(`/game/${res.data.id}`);
@@ -60,8 +66,45 @@ export default function NewGame({ user, onLogout }) {
     }
   };
 
+  const handleScheduleGame = async () => {
+    if (!homeTeamId || !awayTeamId) {
+      toast.error("Please select both teams");
+      return;
+    }
+
+    if (homeTeamId === awayTeamId) {
+      toast.error("Please select different teams");
+      return;
+    }
+
+    if (!scheduledDate) {
+      toast.error("Please select a date");
+      return;
+    }
+
+    setCreating(true);
+    try {
+      await axios.post(`${API}/games`, {
+        home_team_id: homeTeamId,
+        away_team_id: awayTeamId,
+        start_immediately: false,
+        scheduled_date: scheduledDate,
+        scheduled_time: scheduledTime || null
+      });
+      toast.success("Game scheduled!");
+      navigate("/");
+    } catch (error) {
+      toast.error("Failed to schedule game");
+    } finally {
+      setCreating(false);
+    }
+  };
+
   const selectedHome = teams.find(t => t.id === homeTeamId);
   const selectedAway = teams.find(t => t.id === awayTeamId);
+
+  // Get today's date in YYYY-MM-DD format for min date
+  const today = new Date().toISOString().split('T')[0];
 
   return (
     <Layout user={user} onLogout={onLogout}>
@@ -71,8 +114,8 @@ export default function NewGame({ user, onLogout }) {
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">Start New Game</h1>
-            <p className="text-muted-foreground">Select teams to begin tracking</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">New Game</h1>
+            <p className="text-muted-foreground">Start now or schedule for later</p>
           </div>
         </div>
 
@@ -159,15 +202,93 @@ export default function NewGame({ user, onLogout }) {
                 </div>
               )}
 
-              <Button 
-                onClick={handleStartGame} 
-                className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-lg"
-                disabled={!homeTeamId || !awayTeamId || creating}
-                data-testid="start-game-btn"
-              >
-                <PlayCircle className="w-5 h-5 mr-2" />
-                {creating ? "Starting..." : "Start Game"}
-              </Button>
+              {/* Start/Schedule Tabs */}
+              <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="start" className="gap-2">
+                    <PlayCircle className="w-4 h-4" />
+                    Start Now
+                  </TabsTrigger>
+                  <TabsTrigger value="schedule" className="gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="start" className="mt-4">
+                  <Button 
+                    onClick={handleStartGame} 
+                    className="w-full bg-orange-500 hover:bg-orange-600 h-12 text-lg"
+                    disabled={!homeTeamId || !awayTeamId || creating}
+                    data-testid="start-game-btn"
+                  >
+                    <PlayCircle className="w-5 h-5 mr-2" />
+                    {creating ? "Starting..." : "Start Game Now"}
+                  </Button>
+                </TabsContent>
+                
+                <TabsContent value="schedule" className="mt-4 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="schedule-date" className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4" />
+                        Date
+                      </Label>
+                      <Input
+                        id="schedule-date"
+                        type="date"
+                        min={today}
+                        value={scheduledDate}
+                        onChange={(e) => setScheduledDate(e.target.value)}
+                        className="mt-2"
+                        data-testid="schedule-date"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="schedule-time" className="flex items-center gap-2">
+                        <Clock className="w-4 h-4" />
+                        Time (optional)
+                      </Label>
+                      <Input
+                        id="schedule-time"
+                        type="time"
+                        value={scheduledTime}
+                        onChange={(e) => setScheduledTime(e.target.value)}
+                        className="mt-2"
+                        data-testid="schedule-time"
+                      />
+                    </div>
+                  </div>
+                  
+                  {scheduledDate && (
+                    <div className="p-3 bg-blue-50 rounded-lg text-sm">
+                      <p className="font-medium text-blue-800">
+                        Game will be scheduled for{" "}
+                        {new Date(scheduledDate + 'T00:00:00').toLocaleDateString('en-US', { 
+                          weekday: 'long', 
+                          year: 'numeric', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                        {scheduledTime && ` at ${scheduledTime}`}
+                      </p>
+                      <p className="text-blue-600 mt-1">
+                        You can start the game anytime from your dashboard.
+                      </p>
+                    </div>
+                  )}
+                  
+                  <Button 
+                    onClick={handleScheduleGame} 
+                    className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg"
+                    disabled={!homeTeamId || !awayTeamId || !scheduledDate || creating}
+                    data-testid="schedule-game-btn"
+                  >
+                    <Calendar className="w-5 h-5 mr-2" />
+                    {creating ? "Scheduling..." : "Schedule Game"}
+                  </Button>
+                </TabsContent>
+              </Tabs>
             </CardContent>
           </Card>
         )}
