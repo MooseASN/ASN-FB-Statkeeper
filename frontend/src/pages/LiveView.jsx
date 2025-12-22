@@ -329,58 +329,68 @@ export default function LiveView() {
       </div>
 
       {/* Game Title Banner */}
-      <div className="bg-[#000000] text-white py-4">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold" data-testid="game-title">
+      <div className="bg-[#000000] text-white py-3 md:py-4">
+        <div className="max-w-6xl mx-auto px-3 md:px-4 text-center">
+          <h1 className="text-lg sm:text-xl md:text-3xl font-bold" data-testid="game-title">
             {game.home_team_name} vs {game.away_team_name}
           </h1>
-          <p className="text-white/70 mt-1">
+          {game.note && (
+            <p className="text-white/80 text-sm mt-1">{game.note}</p>
+          )}
+          <p className="text-white/70 text-xs sm:text-sm mt-1">
             {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : 
              game.status === "scheduled" ? "Scheduled" : "Final Score"}
           </p>
         </div>
       </div>
 
-      {/* Scoreboard */}
+      {/* Scoreboard - Mobile Optimized */}
       <div className="bg-gradient-to-r from-[#000000] to-[#333333] text-white">
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          <div className="flex items-center justify-between">
-            <div className="text-center flex-1">
-              {/* Home Team Logo */}
-              <div className="flex justify-center mb-2">
+        <div className="max-w-6xl mx-auto px-2 sm:px-4 py-4 md:py-8">
+          {/* Mobile: Stack vertically, Desktop: Side by side */}
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-0">
+            
+            {/* Home Team */}
+            <div className="text-center flex-1 w-full md:w-auto">
+              <div className="flex md:flex-col items-center justify-center gap-3 md:gap-0">
+                {/* Logo */}
                 <div 
-                  className="w-20 h-20 rounded-full flex items-center justify-center border-4 overflow-hidden"
+                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center border-2 md:border-4 overflow-hidden flex-shrink-0"
                   style={{ borderColor: homeColor, backgroundColor: 'rgba(255,255,255,0.1)' }}
                 >
                   {game.home_team_logo ? (
-                    <img src={game.home_team_logo} alt={game.home_team_name} className="w-16 h-16 object-contain" />
+                    <img src={game.home_team_logo} alt={game.home_team_name} className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain" />
                   ) : (
-                    <span className="text-3xl font-bold text-white">{game.home_team_name?.charAt(0)}</span>
+                    <span className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{game.home_team_name?.charAt(0)}</span>
                   )}
                 </div>
+                {/* Team Info */}
+                <div className="md:mt-2">
+                  <div className="flex items-center justify-center gap-2 mb-1 md:mb-2">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded-full" style={{ backgroundColor: homeColor }}></div>
+                    <p className="text-sm sm:text-base md:text-lg font-semibold">{game.home_team_name}</p>
+                  </div>
+                  <p className="text-4xl sm:text-5xl md:text-6xl font-bold score-display text-white" data-testid="home-score">
+                    {calculateScore("home")}
+                  </p>
+                  <p className="text-xs md:text-sm text-white/60 mt-1">Fouls: {homeTotals.pf}</p>
+                </div>
               </div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: homeColor }}></div>
-                <p className="text-lg font-semibold">{game.home_team_name}</p>
-              </div>
-              <p className="text-6xl font-bold score-display mt-2 text-white" data-testid="home-score">
-                {calculateScore("home")}
-              </p>
-              <p className="text-sm text-white/60 mt-1">Team Fouls: {homeTotals.pf}</p>
             </div>
             
-            <div className="px-8 text-center">
+            {/* Center - Clock & Quarter Info */}
+            <div className="px-2 sm:px-4 md:px-8 text-center order-first md:order-none w-full md:w-auto">
               {/* Clock display when enabled */}
               {game.clock_enabled && game.status === "active" && (
-                <div className="mb-3">
-                  <span className="text-3xl font-mono font-bold text-white">
+                <div className="mb-2 md:mb-3">
+                  <span className="text-2xl sm:text-3xl font-mono font-bold text-white">
                     {formatClockTime(game.clock_time || 0)}
                   </span>
                 </div>
               )}
               
-              <div className="mb-4">
-                <span className={`text-xl font-bold px-4 py-2 rounded-lg ${
+              <div className="mb-3 md:mb-4">
+                <span className={`text-base sm:text-lg md:text-xl font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg ${
                   game.status === "active" ? "bg-orange-500" : 
                   game.status === "scheduled" ? "bg-blue-500" : "bg-white/20"
                 }`}>
@@ -388,44 +398,52 @@ export default function LiveView() {
                    game.status === "scheduled" ? "NOT STARTED" : "FINAL"}
                 </span>
               </div>
-              <div className="grid gap-3 text-sm" style={{ gridTemplateColumns: `auto repeat(${totalQuarters}, 1fr)` }}>
-                <div></div>
-                {Array.from({ length: totalQuarters }, (_, i) => i + 1).map(q => (
-                  <div key={q} className="text-white/60">{getQuarterLabel(q)}</div>
-                ))}
-                <div className="text-left" style={{ color: homeColor }}>{game.home_team_name}</div>
-                {Array.from({ length: totalQuarters }, (_, i) => (
-                  <div key={i} className="font-bold">{homeScores[i] || 0}</div>
-                ))}
-                <div className="text-left" style={{ color: awayColor }}>{game.away_team_name}</div>
-                {Array.from({ length: totalQuarters }, (_, i) => (
-                  <div key={i} className="font-bold">{awayScores[i] || 0}</div>
-                ))}
+              
+              {/* Quarter-by-quarter scores - horizontal scroll on mobile */}
+              <div className="overflow-x-auto pb-2">
+                <div className="grid gap-2 md:gap-3 text-xs sm:text-sm min-w-max mx-auto" style={{ gridTemplateColumns: `auto repeat(${totalQuarters}, minmax(28px, 1fr))` }}>
+                  <div></div>
+                  {Array.from({ length: totalQuarters }, (_, i) => i + 1).map(q => (
+                    <div key={q} className="text-white/60">{getQuarterLabel(q)}</div>
+                  ))}
+                  <div className="text-left pr-2" style={{ color: homeColor }}>{game.home_team_name?.substring(0, 8)}</div>
+                  {Array.from({ length: totalQuarters }, (_, i) => (
+                    <div key={i} className="font-bold">{homeScores[i] || 0}</div>
+                  ))}
+                  <div className="text-left pr-2" style={{ color: awayColor }}>{game.away_team_name?.substring(0, 8)}</div>
+                  {Array.from({ length: totalQuarters }, (_, i) => (
+                    <div key={i} className="font-bold">{awayScores[i] || 0}</div>
+                  ))}
+                </div>
               </div>
             </div>
             
-            <div className="text-center flex-1">
-              {/* Away Team Logo */}
-              <div className="flex justify-center mb-2">
+            {/* Away Team */}
+            <div className="text-center flex-1 w-full md:w-auto">
+              <div className="flex md:flex-col items-center justify-center gap-3 md:gap-0 flex-row-reverse md:flex-col">
+                {/* Logo */}
                 <div 
-                  className="w-20 h-20 rounded-full flex items-center justify-center border-4 overflow-hidden"
+                  className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center border-2 md:border-4 overflow-hidden flex-shrink-0"
                   style={{ borderColor: awayColor, backgroundColor: 'rgba(255,255,255,0.1)' }}
                 >
                   {game.away_team_logo ? (
-                    <img src={game.away_team_logo} alt={game.away_team_name} className="w-16 h-16 object-contain" />
+                    <img src={game.away_team_logo} alt={game.away_team_name} className="w-10 h-10 sm:w-12 sm:h-12 md:w-16 md:h-16 object-contain" />
                   ) : (
-                    <span className="text-3xl font-bold text-white">{game.away_team_name?.charAt(0)}</span>
+                    <span className="text-xl sm:text-2xl md:text-3xl font-bold text-white">{game.away_team_name?.charAt(0)}</span>
                   )}
                 </div>
+                {/* Team Info */}
+                <div className="md:mt-2">
+                  <div className="flex items-center justify-center gap-2 mb-1 md:mb-2">
+                    <div className="w-3 h-3 md:w-4 md:h-4 rounded-full" style={{ backgroundColor: awayColor }}></div>
+                    <p className="text-sm sm:text-base md:text-lg font-semibold">{game.away_team_name}</p>
+                  </div>
+                  <p className="text-4xl sm:text-5xl md:text-6xl font-bold score-display text-white" data-testid="away-score">
+                    {calculateScore("away")}
+                  </p>
+                  <p className="text-xs md:text-sm text-white/60 mt-1">Fouls: {awayTotals.pf}</p>
+                </div>
               </div>
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full" style={{ backgroundColor: awayColor }}></div>
-                <p className="text-lg font-semibold">{game.away_team_name}</p>
-              </div>
-              <p className="text-6xl font-bold score-display mt-2 text-white" data-testid="away-score">
-                {calculateScore("away")}
-              </p>
-              <p className="text-sm text-white/60 mt-1">Team Fouls: {awayTotals.pf}</p>
             </div>
           </div>
         </div>
