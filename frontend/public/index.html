@@ -94,5 +94,11 @@
                 </p>
             </div>
         </div>
+        <script>
+            // Hide badge on embed pages
+            if (window.location.pathname.includes('/embed')) {
+                document.getElementById('triumph-badge').style.display = 'none';
+            }
+        </script>
     </body>
 </html>
