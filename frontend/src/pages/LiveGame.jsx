@@ -1130,6 +1130,70 @@ export default function LiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Player Dialog */}
+      <Dialog open={editPlayerOpen} onOpenChange={setEditPlayerOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Player</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label htmlFor="edit-number">Jersey Number</Label>
+              <Input
+                id="edit-number"
+                placeholder="#"
+                value={editPlayerData.number}
+                onChange={(e) => setEditPlayerData({ ...editPlayerData, number: e.target.value })}
+                data-testid="edit-player-number"
+              />
+            </div>
+            <div>
+              <Label htmlFor="edit-name">Player Name</Label>
+              <Input
+                id="edit-name"
+                placeholder="Player Name"
+                value={editPlayerData.name}
+                onChange={(e) => setEditPlayerData({ ...editPlayerData, name: e.target.value })}
+                data-testid="edit-player-name"
+              />
+            </div>
+            <Button onClick={handleSavePlayerEdit} className="w-full" data-testid="save-player-edit">
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reset Stats Confirmation Dialog */}
+      <AlertDialog open={resetStatsOpen} onOpenChange={setResetStatsOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Reset All Stats?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will reset all player statistics to 0, including:
+              <ul className="list-disc list-inside mt-2 space-y-1">
+                <li>All scoring (points, free throws, field goals)</li>
+                <li>All rebounds (offensive & defensive)</li>
+                <li>Assists, steals, blocks, turnovers, fouls</li>
+                <li>Quarter scores and play-by-play log</li>
+              </ul>
+              <p className="mt-3 font-semibold">This action cannot be undone.</p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={resetting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleResetStats}
+              disabled={resetting}
+              className="bg-red-600 hover:bg-red-700"
+              data-testid="confirm-reset-stats"
+            >
+              {resetting ? "Resetting..." : "Reset All Stats"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
