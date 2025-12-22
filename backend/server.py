@@ -528,6 +528,9 @@ class PlayerStats(BaseModel):
     blocks: int = 0
     fouls: int = 0
     is_active: bool = True
+    # Minutes tracking
+    seconds_played: int = 0  # Total seconds played
+    last_check_in: Optional[str] = None  # ISO timestamp when player last checked in
 
 class StatUpdate(BaseModel):
     player_id: str
