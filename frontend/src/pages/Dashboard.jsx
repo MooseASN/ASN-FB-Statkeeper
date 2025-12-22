@@ -282,29 +282,29 @@ export default function Dashboard({ user, onLogout }) {
         {/* Scheduled Games */}
         {scheduledGames.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 dark:text-white">
               <Calendar className="w-5 h-5 text-blue-500" />
               Scheduled Games
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {scheduledGames.map(game => (
-                <Card key={game.id} className="border-2 border-blue-200" data-testid={`scheduled-game-${game.id}`}>
+                <Card key={game.id} className="border-2 border-blue-200 dark:border-blue-900 dark:bg-neutral-900" data-testid={`scheduled-game-${game.id}`}>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg">{game.home_team_name}</p>
+                        <p className="font-semibold text-lg dark:text-white">{game.home_team_name}</p>
                         <p className="text-sm text-muted-foreground">Home</p>
                       </div>
                       <div className="px-4">
                         <span className="text-lg font-bold text-slate-400">VS</span>
                       </div>
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg">{game.away_team_name}</p>
+                        <p className="font-semibold text-lg dark:text-white">{game.away_team_name}</p>
                         <p className="text-sm text-muted-foreground">Away</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t">
-                      <div className="flex items-center gap-2 text-blue-600">
+                    <div className="flex items-center justify-between pt-4 border-t dark:border-neutral-800">
+                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
                         <Clock className="w-4 h-4" />
                         <span className="text-sm font-medium">
                           {formatScheduledDate(game.scheduled_date, game.scheduled_time)}
