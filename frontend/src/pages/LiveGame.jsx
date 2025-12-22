@@ -539,6 +539,47 @@ export default function LiveGame() {
     }
   };
 
+  const handleResetStats = async () => {
+    setResetting(true);
+    try {
+      await axios.post(`${API}/games/${id}/reset-stats`);
+      toast.success("All stats have been reset to 0");
+      fetchGame();
+      setLastAction(null);
+    } catch (error) {
+      toast.error("Failed to reset stats");
+    } finally {
+      setResetting(false);
+      setResetStatsOpen(false);
+    }
+  };
+
+  const handleEditPlayer = (player) => {
+    setEditingPlayer(player);
+    setEditPlayerData({
+      number: player.player_number,
+      name: player.player_name
+    });
+    setEditPlayerOpen(true);
+  };
+
+  const handleSavePlayerEdit = async () => {
+    if (!editingPlayer) return;
+    
+    try {
+      await axios.put(`${API}/games/${id}/players/${editingPlayer.id}`, {
+        player_number: editPlayerData.number,
+        player_name: editPlayerData.name
+      });
+      toast.success("Player updated");
+      setEditPlayerOpen(false);
+      setEditingPlayer(null);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to update player");
+    }
+  };
+
   const calculateScore = (team) => {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
