@@ -63,8 +63,8 @@ function App() {
   useEffect(() => {
     // Check for existing session
     const checkAuth = async () => {
-      const token = localStorage.getItem("session_token");
-      const savedUser = localStorage.getItem("user");
+      const token = getToken();
+      const savedUser = getStoredUser();
       
       if (token && savedUser) {
         try {
@@ -73,8 +73,7 @@ function App() {
           setUser(res.data);
         } catch (error) {
           // Token invalid, clear storage
-          localStorage.removeItem("session_token");
-          localStorage.removeItem("user");
+          clearAuth();
         }
       }
       setLoading(false);
