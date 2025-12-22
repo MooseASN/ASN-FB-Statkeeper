@@ -1519,6 +1519,7 @@ export default function LiveGame() {
                   onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
                   onEditPlayer={handleEditPlayer}
+                  onRemovePlayer={handleRemovePlayer}
                   disabled={!isActive}
                   clockEnabled={game?.clock_enabled}
                   isOnFloor={(game?.away_on_floor || []).includes(player.id)}
