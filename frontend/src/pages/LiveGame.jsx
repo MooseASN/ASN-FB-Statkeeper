@@ -1716,6 +1716,98 @@ export default function LiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Remove Player Confirmation Dialog */}
+      <AlertDialog open={removePlayerOpen} onOpenChange={setRemovePlayerOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Remove Player?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to remove #{playerToRemove?.player_number} {playerToRemove?.player_name} from this game? 
+              This will also delete their statistics for this game.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setPlayerToRemove(null)}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmRemovePlayer} className="bg-red-600 hover:bg-red-700">
+              Remove Player
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Play Dialog */}
+      <Dialog open={editPlayOpen} onOpenChange={setEditPlayOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Play</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label>Player</Label>
+              <Select
+                value={editPlayData.player_id}
+                onValueChange={(value) => {
+                  const allPlayers = [...(game?.home_player_stats || []), ...(game?.away_player_stats || [])];
+                  const player = allPlayers.find(p => p.id === value);
+                  if (player) {
+                    setEditPlayData({
+                      ...editPlayData,
+                      player_id: value,
+                      player_number: player.player_number,
+                      player_name: player.player_name
+                    });
+                  }
+                }}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select player" />
+                </SelectTrigger>
+                <SelectContent>
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">{game?.home_team_name}</div>
+                  {(game?.home_player_stats || []).map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      #{p.player_number} {p.player_name}
+                    </SelectItem>
+                  ))}
+                  <div className="px-2 py-1 text-xs font-semibold text-muted-foreground border-t mt-1 pt-1">{game?.away_team_name}</div>
+                  {(game?.away_player_stats || []).map(p => (
+                    <SelectItem key={p.id} value={p.id}>
+                      #{p.player_number} {p.player_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Action</Label>
+              <Select
+                value={editPlayData.action}
+                onValueChange={(value) => setEditPlayData({ ...editPlayData, action: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select action" />
+                </SelectTrigger>
+                <SelectContent>
+                  {playActions.map(action => (
+                    <SelectItem key={action} value={action}>
+                      {action}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setEditPlayOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSavePlayEdit}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
