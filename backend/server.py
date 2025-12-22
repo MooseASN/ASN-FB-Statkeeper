@@ -1462,29 +1462,68 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             ])
         
         # Percentage row - aligned under the correct columns
-        data.append([
-            f"{team_totals['fg_pct']}%",
-            "",
-            f"{team_totals['fg3_pct']}%",
-            "",
-            f"{team_totals['ft_pct']}%",
-            "",
-            f"TM REB: {team_totals['reb']}",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            ""
-        ])
+        if clock_enabled:
+            data.append([
+                f"{team_totals['fg_pct']}%",
+                "",
+                "",
+                f"{team_totals['fg3_pct']}%",
+                "",
+                f"{team_totals['ft_pct']}%",
+                "",
+                f"TM REB: {team_totals['reb']}",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ])
+            col_widths = [1.4*inch, 0.38*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
+        else:
+            data.append([
+                f"{team_totals['fg_pct']}%",
+                "",
+                f"{team_totals['fg3_pct']}%",
+                "",
+                f"{team_totals['ft_pct']}%",
+                "",
+                f"TM REB: {team_totals['reb']}",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                ""
+            ])
+            col_widths = [1.6*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
         
-        col_widths = [1.6*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
         table = Table(data, colWidths=col_widths)
         
         num_rows = len(data)
+        
+        # Adjust span indices based on clock_enabled
+        if clock_enabled:
+            pct_spans = [
+                ('SPAN', (0, num_rows-1), (2, num_rows-1)),  # FG% spans first 3 cols
+                ('SPAN', (3, num_rows-1), (4, num_rows-1)),  # 3P% spans next 2 cols
+                ('SPAN', (5, num_rows-1), (6, num_rows-1)),  # FT% spans next 2 cols
+                ('SPAN', (7, num_rows-1), (10, num_rows-1)), # TM REB spans OR/DR/TOT/A
+            ]
+        else:
+            pct_spans = [
+                ('SPAN', (0, num_rows-1), (1, num_rows-1)),  # FG% spans first 2 cols
+                ('SPAN', (2, num_rows-1), (3, num_rows-1)),  # 3P% spans next 2 cols
+                ('SPAN', (4, num_rows-1), (5, num_rows-1)),  # FT% spans next 2 cols
+                ('SPAN', (6, num_rows-1), (9, num_rows-1)),  # TM REB spans OR/DR/TOT/A
+            ]
+        
         table.setStyle(TableStyle([
             # Team header row
             ('SPAN', (0, 0), (-1, 0)),
@@ -1509,13 +1548,10 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             ('LINEABOVE', (0, num_rows-2), (-1, num_rows-2), 1, colors.black),
             ('FONTNAME', (0, num_rows-2), (-1, num_rows-2), 'Helvetica-Bold'),
             
-            # Percentage row - span for percentages to align under FG/FGA, 3P/3PA, FT/FTA
-            ('SPAN', (0, num_rows-1), (1, num_rows-1)),  # FG% spans first 2 cols
-            ('SPAN', (2, num_rows-1), (3, num_rows-1)),  # 3P% spans next 2 cols
-            ('SPAN', (4, num_rows-1), (5, num_rows-1)),  # FT% spans next 2 cols
-            ('SPAN', (6, num_rows-1), (9, num_rows-1)),  # TM REB spans OR/DR/TOT/A
+            # Percentage row spans
+            *pct_spans,
             ('FONTSIZE', (0, num_rows-1), (-1, num_rows-1), 8),
-            ('ALIGN', (0, num_rows-1), (5, num_rows-1), 'CENTER'),
+            ('ALIGN', (0, num_rows-1), (6 if clock_enabled else 5, num_rows-1), 'CENTER'),
             
             # Padding
             ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
