@@ -184,7 +184,7 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
 };
 
 // ============ EXPANDED PLAYER CARD ============
-const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disabled }) => {
+const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   const totalReb = player.offensive_rebounds + player.defensive_rebounds;
@@ -200,7 +200,16 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disa
           {player.player_number}
         </div>
         <div className="flex-1">
-          <h4 className="font-bold text-lg">{player.player_name}</h4>
+          <div className="flex items-center gap-2">
+            <h4 className="font-bold text-lg">{player.player_name}</h4>
+            <button
+              onClick={() => onEditPlayer(player)}
+              className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
+              title="Edit player"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          </div>
           <p className="text-sm text-muted-foreground">
             {stats.fg_made}/{stats.fg_att} FG ({stats.fg_pct}%) • {totalReb} REB • {player.assists} AST
           </p>
@@ -249,12 +258,12 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disa
         <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
           className="py-2 px-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
           <div className="font-bold">{player.offensive_rebounds}</div>
-          <div className="text-[10px] text-muted-foreground">OREB</div>
+          <div className="text-[10px] text-muted-foreground">O REB</div>
         </button>
         <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
           className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
           <div className="font-bold">{player.defensive_rebounds}</div>
-          <div className="text-[10px] text-muted-foreground">DREB</div>
+          <div className="text-[10px] text-muted-foreground">D REB</div>
         </button>
         <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
           className="py-2 px-2 text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
@@ -271,7 +280,7 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, disa
         <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
           className="py-2 px-2 text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
           <div className="font-bold">{player.turnovers}</div>
-          <div className="text-[10px] text-muted-foreground">TO</div>
+          <div className="text-[10px] text-muted-foreground">TOV</div>
         </button>
         <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
           className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
