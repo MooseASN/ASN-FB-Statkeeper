@@ -480,11 +480,13 @@ class Game(BaseModel):
     away_team_logo: Optional[str] = None
     home_team_color: str = "#dc2626"
     away_team_color: str = "#7c3aed"
-    status: str = "active"  # active, completed
+    status: str = "active"  # scheduled, active, completed
     current_quarter: int = 1
     quarter_scores: QuarterScores = Field(default_factory=QuarterScores)
     play_by_play: List[PlayByPlayEntry] = []
     share_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
+    scheduled_date: Optional[str] = None  # ISO date string YYYY-MM-DD
+    scheduled_time: Optional[str] = None  # Time string HH:MM
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
