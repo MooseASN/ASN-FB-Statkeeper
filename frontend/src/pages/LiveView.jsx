@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, ExternalLink } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import MooseIcon from "@/components/MooseIcon";
@@ -30,6 +30,66 @@ const sortByNumber = (players) => {
     const numB = parseInt(b.player_number, 10) || 0;
     return numA - numB;
   });
+};
+
+// Sponsor Banner Slideshow component
+const SponsorSlideshow = ({ banners }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (banners.length <= 1) return;
+    
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % banners.length);
+    }, 10000); // 10 seconds
+    
+    return () => clearInterval(interval);
+  }, [banners.length]);
+
+  if (!banners || banners.length === 0) return null;
+
+  const currentBanner = banners[currentIndex];
+  
+  const BannerContent = () => (
+    <div className="relative w-full h-24 md:h-32 bg-slate-100 rounded-lg overflow-hidden">
+      <img 
+        src={currentBanner.image_data} 
+        alt={currentBanner.filename}
+        className="w-full h-full object-contain"
+      />
+      {currentBanner.link_url && (
+        <div className="absolute bottom-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded flex items-center gap-1">
+          <ExternalLink className="w-3 h-3" />
+          <span>Sponsor</span>
+        </div>
+      )}
+      {banners.length > 1 && (
+        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+          {banners.map((_, idx) => (
+            <div 
+              key={idx} 
+              className={`w-2 h-2 rounded-full transition-colors ${idx === currentIndex ? 'bg-white' : 'bg-white/40'}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  if (currentBanner.link_url) {
+    return (
+      <a 
+        href={currentBanner.link_url} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="block hover:opacity-90 transition-opacity"
+      >
+        <BannerContent />
+      </a>
+    );
+  }
+
+  return <BannerContent />;
 };
 
 // TeamTable component - moved outside main component to avoid re-creation on render
@@ -118,6 +178,7 @@ export default function LiveView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [sponsorBanners, setSponsorBanners] = useState([]);
 
   const fetchGame = useCallback(async () => {
     try {
@@ -125,6 +186,16 @@ export default function LiveView() {
       setGame(res.data);
       setLastUpdated(new Date());
       setError(null);
+      
+      // Fetch sponsor banners for this game's user
+      if (res.data.user_id) {
+        try {
+          const bannersRes = await axios.get(`${API}/sponsor-banners/public/${res.data.user_id}`);
+          setSponsorBanners(bannersRes.data);
+        } catch (bannerErr) {
+          console.error("Error fetching sponsor banners:", bannerErr);
+        }
+      }
     } catch (err) {
       setError("Game not found");
     } finally {
@@ -337,6 +408,13 @@ export default function LiveView() {
           </div>
         </div>
       </div>
+
+      {/* Sponsor Banner Slideshow - Above Team Statistics */}
+      {sponsorBanners.length > 0 && (
+        <div className="max-w-6xl mx-auto px-4 pt-6">
+          <SponsorSlideshow banners={sponsorBanners} />
+        </div>
+      )}
 
       {/* Team Stats Summary */}
       <div className="max-w-6xl mx-auto px-4 py-6">
