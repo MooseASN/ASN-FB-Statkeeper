@@ -1083,12 +1083,19 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     home_totals = calculate_team_totals(home_stats)
     away_totals = calculate_team_totals(away_stats)
     
+    # Get game flow stats
+    game_stats = game.get("game_stats", {})
+    home_largest_lead = game_stats.get("home_largest_lead", 0)
+    away_largest_lead = game_stats.get("away_largest_lead", 0)
+    lead_changes = game_stats.get("lead_changes", 0)
+    ties = game_stats.get("ties", 0)
+    
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.4*inch, bottomMargin=0.4*inch, leftMargin=0.4*inch, rightMargin=0.4*inch)
     elements = []
     
     # Column headers matching the college box score style
-    headers = ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BS", "PTS"]
+    headers = ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
     
     def create_team_table(team_name: str, team_label: str, stats_list: list, team_totals: dict):
         """Create a team's box score table in college style"""
@@ -1144,7 +1151,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             team_totals['pts']
         ])
         
-        # Percentage row
+        # Percentage row - aligned under the correct columns
         data.append([
             f"{team_totals['fg_pct']}%",
             "",
@@ -1152,8 +1159,8 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             "",
             f"{team_totals['ft_pct']}%",
             "",
-            "",
             f"TM REB: {team_totals['reb']}",
+            "",
             "",
             "",
             "",
@@ -1164,7 +1171,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             ""
         ])
         
-        col_widths = [1.6*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch]
+        col_widths = [1.6*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
         table = Table(data, colWidths=col_widths)
         
         num_rows = len(data)
@@ -1185,15 +1192,20 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             # Player rows
             ('FONTNAME', (0, 2), (0, num_rows-3), 'Helvetica'),
             ('FONTSIZE', (0, 2), (-1, num_rows-3), 8),
-            ('ALIGN', (1, 2), (-1, -1), 'RIGHT'),
+            ('ALIGN', (1, 1), (-1, -1), 'RIGHT'),
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             
             # Totals row
             ('LINEABOVE', (0, num_rows-2), (-1, num_rows-2), 1, colors.black),
             ('FONTNAME', (0, num_rows-2), (-1, num_rows-2), 'Helvetica-Bold'),
             
-            # Percentage row
+            # Percentage row - span for percentages to align under FG/FGA, 3P/3PA, FT/FTA
+            ('SPAN', (0, num_rows-1), (1, num_rows-1)),  # FG% spans first 2 cols
+            ('SPAN', (2, num_rows-1), (3, num_rows-1)),  # 3P% spans next 2 cols
+            ('SPAN', (4, num_rows-1), (5, num_rows-1)),  # FT% spans next 2 cols
+            ('SPAN', (6, num_rows-1), (9, num_rows-1)),  # TM REB spans OR/DR/TOT/A
             ('FONTSIZE', (0, num_rows-1), (-1, num_rows-1), 8),
+            ('ALIGN', (0, num_rows-1), (5, num_rows-1), 'CENTER'),
             
             # Padding
             ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
@@ -1217,6 +1229,13 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     # Home team
     home_table = create_team_table(game['home_team_name'], "HOME", home_stats, home_totals)
     elements.append(home_table)
+    elements.append(Spacer(1, 20))
+    
+    # Game Flow Stats
+    styles = getSampleStyleSheet()
+    flow_style = ParagraphStyle('Flow', parent=styles['Normal'], fontSize=9, spaceAfter=4)
+    elements.append(Paragraph("<b>GAME FLOW</b>", flow_style))
+    elements.append(Paragraph(f"Lead Changes: {lead_changes}  |  Times Tied: {ties}  |  {game['home_team_name']} Largest Lead: {home_largest_lead}  |  {game['away_team_name']} Largest Lead: {away_largest_lead}", flow_style))
     
     doc.build(elements)
     buffer.seek(0)
