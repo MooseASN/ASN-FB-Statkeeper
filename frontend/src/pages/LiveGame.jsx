@@ -697,18 +697,28 @@ export default function LiveGame() {
     setTimeout(() => setEmbedCopied(false), 2000);
   };
 
-  // Quick team stat handlers
-  const handleTeamRebound = (team, type) => {
-    const stats = team === "home" ? game.home_player_stats : game.away_player_stats;
-    if (stats && stats.length > 0) {
-      handleStatUpdate(stats[0].id, type);
+  // Quick team stat handlers - now use team-stats endpoint instead of individual players
+  const handleTeamRebound = async (team, type) => {
+    try {
+      await axios.post(`${API}/games/${id}/team-stats`, {
+        team,
+        stat_type: type
+      });
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to record team rebound");
     }
   };
 
-  const handleTeamTurnover = (team) => {
-    const stats = team === "home" ? game.home_player_stats : game.away_player_stats;
-    if (stats && stats.length > 0) {
-      handleStatUpdate(stats[0].id, "turnover");
+  const handleTeamTurnover = async (team) => {
+    try {
+      await axios.post(`${API}/games/${id}/team-stats`, {
+        team,
+        stat_type: "turnover"
+      });
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to record team turnover");
     }
   };
 
