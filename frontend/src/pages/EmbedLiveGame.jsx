@@ -55,7 +55,7 @@ export default function EmbedLiveGame() {
 
   if (loading) {
     return (
-      <div className="w-[1920px] h-[300px] bg-gradient-to-r from-slate-900 to-slate-800 flex items-center justify-center">
+      <div className="w-[1920px] h-[300px] bg-black flex items-center justify-center">
         <MooseIcon className="w-12 h-12 animate-pulse text-white" />
       </div>
     );
@@ -63,7 +63,7 @@ export default function EmbedLiveGame() {
 
   if (error || !game) {
     return (
-      <div className="w-[1920px] h-[300px] bg-gradient-to-r from-slate-900 to-slate-800 flex items-center justify-center">
+      <div className="w-[1920px] h-[300px] bg-black flex items-center justify-center">
         <p className="text-white text-xl">Game not available</p>
       </div>
     );
@@ -79,23 +79,23 @@ export default function EmbedLiveGame() {
 
   return (
     <div 
-      className="w-[1920px] h-[300px] bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 flex items-center justify-between px-16 relative overflow-hidden"
+      className="w-[1920px] h-[300px] bg-black flex items-center justify-between px-16 relative overflow-hidden"
       style={{ fontFamily: "'Inter', system-ui, sans-serif" }}
     >
       {/* Background decorations */}
       <div 
-        className="absolute left-0 top-0 w-1/3 h-full opacity-20"
+        className="absolute left-0 top-0 w-1/3 h-full opacity-15"
         style={{ background: `linear-gradient(135deg, ${homeColor} 0%, transparent 100%)` }}
       />
       <div 
-        className="absolute right-0 top-0 w-1/3 h-full opacity-20"
+        className="absolute right-0 top-0 w-1/3 h-full opacity-15"
         style={{ background: `linear-gradient(225deg, ${awayColor} 0%, transparent 100%)` }}
       />
 
       {/* Home Team Section */}
       <div className="flex items-center gap-8 z-10">
         {/* Team Logo */}
-        <div className="w-32 h-32 rounded-full flex items-center justify-center bg-white/10 border-4" style={{ borderColor: homeColor }}>
+        <div className="w-32 h-32 rounded-full flex items-center justify-center bg-white/5 border-4" style={{ borderColor: homeColor }}>
           {game.home_team_logo ? (
             <img src={game.home_team_logo} alt={game.home_team_name} className="w-24 h-24 object-contain" />
           ) : (
@@ -133,7 +133,7 @@ export default function EmbedLiveGame() {
               LIVE - {getQuarterLabel(game.current_quarter)}
             </span>
           ) : (
-            <span className="inline-flex items-center px-4 py-2 bg-slate-600 rounded-full text-white font-bold text-sm">
+            <span className="inline-flex items-center px-4 py-2 bg-gray-700 rounded-full text-white font-bold text-sm">
               FINAL
             </span>
           )}
@@ -144,14 +144,14 @@ export default function EmbedLiveGame() {
           <span className="text-8xl font-black text-white" style={{ textShadow: `0 0 40px ${homeColor}` }}>
             {homeScore}
           </span>
-          <span className="text-4xl text-white/50 font-light">-</span>
+          <span className="text-4xl text-white/30 font-light">-</span>
           <span className="text-8xl font-black text-white" style={{ textShadow: `0 0 40px ${awayColor}` }}>
             {awayScore}
           </span>
         </div>
 
         {/* StatMoose branding */}
-        <div className="flex items-center justify-center gap-2 mt-4 text-white/50">
+        <div className="flex items-center justify-center gap-2 mt-4 text-white/40">
           <MooseIcon className="w-5 h-5" />
           <span className="text-sm font-medium">StatMoose Basketball</span>
         </div>
@@ -179,7 +179,7 @@ export default function EmbedLiveGame() {
         </div>
 
         {/* Team Logo */}
-        <div className="w-32 h-32 rounded-full flex items-center justify-center bg-white/10 border-4" style={{ borderColor: awayColor }}>
+        <div className="w-32 h-32 rounded-full flex items-center justify-center bg-white/5 border-4" style={{ borderColor: awayColor }}>
           {game.away_team_logo ? (
             <img src={game.away_team_logo} alt={game.away_team_name} className="w-24 h-24 object-contain" />
           ) : (
@@ -193,16 +193,11 @@ export default function EmbedLiveGame() {
         href={fullViewUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute bottom-6 right-6 flex items-center gap-2 px-6 py-3 bg-white text-slate-900 font-bold rounded-full hover:bg-slate-100 transition-colors z-20"
+        className="absolute top-1/2 -translate-y-1/2 right-6 flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-colors z-20"
       >
         <span>Full Live Stats</span>
         <ExternalLink className="w-5 h-5" />
       </a>
-
-      {/* Embed code hint */}
-      <div className="absolute bottom-6 left-6 text-white/30 text-xs z-10">
-        Powered by StatMoose
-      </div>
     </div>
   );
 }
