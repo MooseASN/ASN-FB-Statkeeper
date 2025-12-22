@@ -64,6 +64,14 @@ export default function Dashboard({ user, onLogout }) {
     setTimeout(() => setEmbedCopied(false), 2000);
   };
 
+  const copyGameLink = (game) => {
+    const shareUrl = `${window.location.origin}/live/${game.share_code}`;
+    navigator.clipboard.writeText(shareUrl);
+    setCopiedLinkId(game.id);
+    toast.success("Live stat link copied!");
+    setTimeout(() => setCopiedLinkId(null), 2000);
+  };
+
   const handleStartScheduledGame = async (gameId, e) => {
     e.preventDefault();
     e.stopPropagation();
