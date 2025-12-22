@@ -35,7 +35,8 @@ export default function EmbedLiveGame() {
   };
 
   const getQuarterLabel = (q) => {
-    if (q <= 4) return `Q${q}`;
+    const label = game?.period_label === "Period" ? "P" : "Q";
+    if (q <= 4) return `${label}${q}`;
     return `OT${q - 4}`;
   };
 
