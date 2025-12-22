@@ -1201,6 +1201,16 @@ export default function LiveGame() {
                       </Button>
                     )}
                     <Button 
+                      onClick={handleHalftime}
+                      variant="outline" 
+                      size="sm"
+                      className="gap-1"
+                      disabled={clockRunning}
+                    >
+                      <Coffee className="w-4 h-4" />
+                      HT
+                    </Button>
+                    <Button 
                       onClick={() => setShowPeriodEndDialog(true)} 
                       variant="outline" 
                       size="sm"
