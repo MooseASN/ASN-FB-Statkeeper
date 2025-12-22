@@ -827,6 +827,236 @@ async def reset_game_stats(game_id: str, user: User = Depends(get_current_user))
     
     return {"message": "All stats reset successfully"}
 
+# Clock Control Endpoints
+class ClockUpdate(BaseModel):
+    time: Optional[int] = None  # Time in seconds
+    
+@api_router.post("/games/{game_id}/clock/start")
+async def start_clock(game_id: str, user: User = Depends(get_current_user)):
+    """Start the game clock"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if not game.get("clock_enabled"):
+        raise HTTPException(status_code=400, detail="Clock is not enabled for this game")
+    
+    now = datetime.now(timezone.utc).isoformat()
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {"clock_running": True, "clock_last_started": now, "updated_at": now}}
+    )
+    
+    # Update last_check_in for all players on floor
+    home_on_floor = game.get("home_on_floor", [])
+    away_on_floor = game.get("away_on_floor", [])
+    all_on_floor = home_on_floor + away_on_floor
+    
+    if all_on_floor:
+        await db.player_stats.update_many(
+            {"id": {"$in": all_on_floor}, "game_id": game_id},
+            {"$set": {"last_check_in": now}}
+        )
+    
+    return {"message": "Clock started", "clock_last_started": now}
+
+@api_router.post("/games/{game_id}/clock/stop")
+async def stop_clock(game_id: str, user: User = Depends(get_current_user)):
+    """Stop the game clock and calculate elapsed minutes for players on floor"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if not game.get("clock_enabled"):
+        raise HTTPException(status_code=400, detail="Clock is not enabled for this game")
+    
+    now = datetime.now(timezone.utc)
+    clock_last_started = game.get("clock_last_started")
+    
+    # Calculate time played for players on floor
+    if clock_last_started and game.get("clock_running"):
+        started_time = datetime.fromisoformat(clock_last_started.replace('Z', '+00:00'))
+        elapsed_seconds = int((now - started_time).total_seconds())
+        
+        # Update seconds_played for all players on floor
+        home_on_floor = game.get("home_on_floor", [])
+        away_on_floor = game.get("away_on_floor", [])
+        all_on_floor = home_on_floor + away_on_floor
+        
+        if all_on_floor:
+            await db.player_stats.update_many(
+                {"id": {"$in": all_on_floor}, "game_id": game_id},
+                {"$inc": {"seconds_played": elapsed_seconds}, "$set": {"last_check_in": None}}
+            )
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {"clock_running": False, "clock_last_started": None, "updated_at": now.isoformat()}}
+    )
+    
+    return {"message": "Clock stopped"}
+
+@api_router.post("/games/{game_id}/clock/set")
+async def set_clock(game_id: str, clock_data: ClockUpdate, user: User = Depends(get_current_user)):
+    """Set the game clock time"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if clock_data.time is not None:
+        await db.games.update_one(
+            {"id": game_id, "user_id": user.user_id},
+            {"$set": {"clock_time": clock_data.time, "updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+    
+    return {"message": "Clock time updated", "clock_time": clock_data.time}
+
+@api_router.post("/games/{game_id}/clock/next-period")
+async def next_period(game_id: str, user: User = Depends(get_current_user)):
+    """Advance to next period and reset clock"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Stop clock first if running
+    if game.get("clock_running"):
+        await stop_clock(game_id, user)
+    
+    new_quarter = game.get("current_quarter", 1) + 1
+    period_duration = game.get("period_duration", 720)
+    
+    # Add new quarter to scores if needed
+    home_scores = game.get("quarter_scores", {}).get("home", [0, 0, 0, 0])
+    away_scores = game.get("quarter_scores", {}).get("away", [0, 0, 0, 0])
+    
+    while len(home_scores) < new_quarter:
+        home_scores.append(0)
+    while len(away_scores) < new_quarter:
+        away_scores.append(0)
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {
+            "current_quarter": new_quarter,
+            "clock_time": period_duration,
+            "clock_running": False,
+            "is_halftime": False,
+            "quarter_scores.home": home_scores,
+            "quarter_scores.away": away_scores,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": f"Advanced to period {new_quarter}", "current_quarter": new_quarter}
+
+@api_router.post("/games/{game_id}/clock/halftime")
+async def go_to_halftime(game_id: str, user: User = Depends(get_current_user)):
+    """Set game to halftime"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Stop clock first if running
+    if game.get("clock_running"):
+        await stop_clock(game_id, user)
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {
+            "is_halftime": True,
+            "clock_running": False,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Halftime"}
+
+# Player On-Floor (Substitution) Endpoints
+@api_router.post("/games/{game_id}/players/{player_id}/check-in")
+async def player_check_in(game_id: str, player_id: str, user: User = Depends(get_current_user)):
+    """Check a player into the game (put them on the floor)"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
+    if not player_stat:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    team_id = player_stat["team_id"]
+    is_home = team_id == game["home_team_id"]
+    floor_key = "home_on_floor" if is_home else "away_on_floor"
+    current_on_floor = game.get(floor_key, [])
+    
+    # Check if already on floor
+    if player_id in current_on_floor:
+        return {"message": "Player already on floor"}
+    
+    # Check if team already has 5 players on floor
+    if len(current_on_floor) >= 5:
+        raise HTTPException(status_code=400, detail="Team already has 5 players on floor")
+    
+    # Add player to floor
+    current_on_floor.append(player_id)
+    
+    now = datetime.now(timezone.utc).isoformat()
+    update_data = {floor_key: current_on_floor, "updated_at": now}
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": update_data}
+    )
+    
+    # If clock is running, set last_check_in for the player
+    if game.get("clock_running"):
+        await db.player_stats.update_one(
+            {"id": player_id, "game_id": game_id},
+            {"$set": {"last_check_in": now}}
+        )
+    
+    return {"message": "Player checked in", floor_key: current_on_floor}
+
+@api_router.post("/games/{game_id}/players/{player_id}/check-out")
+async def player_check_out(game_id: str, player_id: str, user: User = Depends(get_current_user)):
+    """Check a player out of the game (take them off the floor)"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
+    if not player_stat:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    team_id = player_stat["team_id"]
+    is_home = team_id == game["home_team_id"]
+    floor_key = "home_on_floor" if is_home else "away_on_floor"
+    current_on_floor = game.get(floor_key, [])
+    
+    # Check if player is on floor
+    if player_id not in current_on_floor:
+        return {"message": "Player not on floor"}
+    
+    # Calculate time played if clock was running
+    if game.get("clock_running") and player_stat.get("last_check_in"):
+        now = datetime.now(timezone.utc)
+        check_in_time = datetime.fromisoformat(player_stat["last_check_in"].replace('Z', '+00:00'))
+        elapsed_seconds = int((now - check_in_time).total_seconds())
+        
+        await db.player_stats.update_one(
+            {"id": player_id, "game_id": game_id},
+            {"$inc": {"seconds_played": elapsed_seconds}, "$set": {"last_check_in": None}}
+        )
+    
+    # Remove player from floor
+    current_on_floor.remove(player_id)
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {floor_key: current_on_floor, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Player checked out", floor_key: current_on_floor}
+
 class PlayerUpdate(BaseModel):
     player_number: Optional[str] = None
     player_name: Optional[str] = None
