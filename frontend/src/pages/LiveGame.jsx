@@ -782,6 +782,16 @@ export default function LiveGame() {
               {isActive && (
                 <>
                   <div className="w-px h-6 bg-white/20 mx-1 hidden sm:block"></div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => setResetStatsOpen(true)}
+                    className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                    data-testid="reset-stats-btn"
+                  >
+                    <RotateCcw className="w-4 h-4 mr-1" />
+                    Reset Stats
+                  </Button>
                   <Button variant="destructive" size="sm" onClick={handleEndGame} data-testid="end-game-btn">
                     End Game
                   </Button>
