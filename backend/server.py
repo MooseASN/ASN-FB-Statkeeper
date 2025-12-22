@@ -787,6 +787,27 @@ async def delete_game(game_id: str, user: User = Depends(get_current_user)):
     
     return {"message": "Game deleted successfully"}
 
+@api_router.post("/games/{game_id}/continue")
+async def continue_game(game_id: str, user: User = Depends(get_current_user)):
+    """Continue a completed game - sets status back to active"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if game.get("status") != "completed":
+        raise HTTPException(status_code=400, detail="Only completed games can be continued")
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {
+            "status": "active",
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    updated = await db.games.find_one({"id": game_id}, {"_id": 0})
+    return updated
+
 @api_router.post("/games/{game_id}/reset-stats")
 async def reset_game_stats(game_id: str, user: User = Depends(get_current_user)):
     """Reset all player stats to 0 for a game"""
