@@ -1086,6 +1086,58 @@ async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User =
     
     return {"message": "Note updated", "note": note_data.note}
 
+# ============ SPONSOR BANNER ENDPOINTS ============
+
+class SponsorBannerCreate(BaseModel):
+    image_data: str  # Base64 encoded image
+    filename: str
+
+@api_router.get("/sponsor-banners")
+async def get_sponsor_banners(user: User = Depends(get_current_user)):
+    """Get all sponsor banners for the user"""
+    banners = await db.sponsor_banners.find({"user_id": user.user_id}, {"_id": 0}).sort("order", 1).to_list(50)
+    return banners
+
+@api_router.get("/sponsor-banners/public/{user_id}")
+async def get_public_sponsor_banners(user_id: str):
+    """Get sponsor banners for public display (no auth required)"""
+    banners = await db.sponsor_banners.find({"user_id": user_id}, {"_id": 0}).sort("order", 1).to_list(50)
+    return banners
+
+@api_router.post("/sponsor-banners")
+async def create_sponsor_banner(banner_data: SponsorBannerCreate, user: User = Depends(get_current_user)):
+    """Upload a new sponsor banner"""
+    # Get current banner count for ordering
+    count = await db.sponsor_banners.count_documents({"user_id": user.user_id})
+    
+    banner = SponsorBanner(
+        user_id=user.user_id,
+        image_data=banner_data.image_data,
+        filename=banner_data.filename,
+        order=count
+    )
+    
+    await db.sponsor_banners.insert_one(banner.model_dump())
+    return {"id": banner.id, "filename": banner.filename, "order": banner.order}
+
+@api_router.delete("/sponsor-banners/{banner_id}")
+async def delete_sponsor_banner(banner_id: str, user: User = Depends(get_current_user)):
+    """Delete a sponsor banner"""
+    result = await db.sponsor_banners.delete_one({"id": banner_id, "user_id": user.user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    return {"message": "Banner deleted"}
+
+@api_router.put("/sponsor-banners/reorder")
+async def reorder_sponsor_banners(banner_ids: List[str], user: User = Depends(get_current_user)):
+    """Reorder sponsor banners"""
+    for i, banner_id in enumerate(banner_ids):
+        await db.sponsor_banners.update_one(
+            {"id": banner_id, "user_id": user.user_id},
+            {"$set": {"order": i}}
+        )
+    return {"message": "Banners reordered"}
+
 class PlayerUpdate(BaseModel):
     player_number: Optional[str] = None
     player_name: Optional[str] = None
