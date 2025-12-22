@@ -903,8 +903,8 @@ export default function LiveGame() {
 
   const homeStats = game.home_player_stats || [];
   const awayStats = game.away_player_stats || [];
-  const homeTeamStats = calculateTeamStats(homeStats);
-  const awayTeamStats = calculateTeamStats(awayStats);
+  const homeTeamStats = calculateTeamStats(homeStats, "home");
+  const awayTeamStats = calculateTeamStats(awayStats, "away");
   const homeShootingStats = calcTeamShootingStats(homeStats);
   const awayShootingStats = calcTeamShootingStats(awayStats);
   const isActive = game.status === "active";
