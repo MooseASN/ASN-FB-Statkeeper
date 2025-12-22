@@ -192,6 +192,63 @@ export default function TeamDetail({ user, onLogout }) {
     e.target.value = "";
   };
 
+  // Bulk add handlers
+  const openBulkAdd = () => {
+    setBulkPlayers(Array.from({ length: 10 }, () => ({ number: "", name: "" })));
+    setBulkAddOpen(true);
+  };
+
+  const handleBulkPlayerChange = (index, field, value) => {
+    const updated = [...bulkPlayers];
+    updated[index] = { ...updated[index], [field]: value };
+    setBulkPlayers(updated);
+  };
+
+  const addBulkRow = () => {
+    setBulkPlayers([...bulkPlayers, { number: "", name: "" }]);
+  };
+
+  const removeBulkRow = (index) => {
+    if (bulkPlayers.length <= 1) return;
+    setBulkPlayers(bulkPlayers.filter((_, i) => i !== index));
+  };
+
+  const handleBulkAddPlayers = () => {
+    // Filter out empty rows
+    const validPlayers = bulkPlayers.filter(p => p.number.trim() && p.name.trim());
+    
+    if (validPlayers.length === 0) {
+      toast.error("Please fill in at least one player");
+      return;
+    }
+
+    // Check for duplicate numbers within bulk add
+    const numbers = validPlayers.map(p => p.number.trim());
+    const uniqueNumbers = new Set(numbers);
+    if (uniqueNumbers.size !== numbers.length) {
+      toast.error("Duplicate player numbers found in bulk add");
+      return;
+    }
+
+    // Check for conflicts with existing roster
+    const existingNumbers = roster.map(p => p.number);
+    const conflicts = validPlayers.filter(p => existingNumbers.includes(p.number.trim()));
+    if (conflicts.length > 0) {
+      toast.error(`Player number(s) already exist: ${conflicts.map(p => p.number).join(", ")}`);
+      return;
+    }
+
+    // Add all valid players to roster
+    const newPlayers = validPlayers.map(p => ({
+      number: p.number.trim(),
+      name: p.name.trim()
+    }));
+    
+    setRoster([...roster, ...newPlayers]);
+    setBulkAddOpen(false);
+    toast.success(`Added ${newPlayers.length} player(s) to roster`);
+  };
+
   if (loading) {
     return (
       <Layout user={user} onLogout={onLogout}>
