@@ -355,6 +355,10 @@ export default function TeamDetail({ user, onLogout }) {
                 <Plus className="w-4 h-4 mr-2" />
                 Add
               </Button>
+              <Button variant="outline" onClick={openBulkAdd} data-testid="bulk-add-btn">
+                <Users className="w-4 h-4 mr-2" />
+                Bulk Add
+              </Button>
             </div>
 
             {/* Players Table */}
