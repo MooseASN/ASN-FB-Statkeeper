@@ -105,7 +105,7 @@
             window.addEventListener('DOMContentLoaded', function() {
                 if (window.location.pathname.includes('/embed')) {
                     var badge = document.getElementById('triumph-badge');
-                    if (badge) badge.style.display = 'none';
+                    if (badge) badge.style.cssText = 'display: none !important;';
                 }
             });
         </script>
