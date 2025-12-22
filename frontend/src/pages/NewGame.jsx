@@ -8,7 +8,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, PlayCircle, Users, Calendar, Clock } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { ArrowLeft, PlayCircle, Users, Calendar, Clock, Timer } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -23,6 +24,12 @@ export default function NewGame({ user, onLogout }) {
   const [gameMode, setGameMode] = useState("start"); // "start" or "schedule"
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
+  
+  // Clock options
+  const [clockEnabled, setClockEnabled] = useState(false);
+  const [periodMinutes, setPeriodMinutes] = useState(12);
+  const [periodSeconds, setPeriodSeconds] = useState(0);
+  const [periodLabel, setPeriodLabel] = useState("Quarter"); // "Quarter" or "Period"
 
   useEffect(() => {
     fetchTeams();
@@ -37,6 +44,15 @@ export default function NewGame({ user, onLogout }) {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getClockSettings = () => {
+    if (!clockEnabled) return {};
+    return {
+      clock_enabled: true,
+      period_duration: (periodMinutes * 60) + periodSeconds,
+      period_label: periodLabel
+    };
   };
 
   const handleStartGame = async () => {
@@ -55,7 +71,8 @@ export default function NewGame({ user, onLogout }) {
       const res = await axios.post(`${API}/games`, {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
-        start_immediately: true
+        start_immediately: true,
+        ...getClockSettings()
       });
       toast.success("Game started!");
       navigate(`/game/${res.data.id}`);
@@ -89,7 +106,8 @@ export default function NewGame({ user, onLogout }) {
         away_team_id: awayTeamId,
         start_immediately: false,
         scheduled_date: scheduledDate,
-        scheduled_time: scheduledTime || null
+        scheduled_time: scheduledTime || null,
+        ...getClockSettings()
       });
       toast.success("Game scheduled!");
       navigate("/");
