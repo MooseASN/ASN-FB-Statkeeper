@@ -197,15 +197,25 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
 };
 
 // ============ EXPANDED PLAYER CARD ============
-const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled }) => {
+const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   const totalReb = player.offensive_rebounds + player.defensive_rebounds;
   
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm border" data-testid={`player-card-${player.id}`}>
+    <div className={`bg-white rounded-xl p-4 shadow-sm border ${isOnFloor ? 'ring-2 ring-green-500' : ''}`} data-testid={`player-card-${player.id}`}>
       {/* Header with player info */}
       <div className="flex items-center gap-3 mb-4">
+        {/* On-floor checkbox - to the left of player info */}
+        {clockEnabled && (
+          <Checkbox
+            checked={isOnFloor}
+            onCheckedChange={() => onToggleFloor(player.id)}
+            disabled={!isOnFloor && !canCheckIn}
+            className="w-5 h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+            title={isOnFloor ? "On floor" : (canCheckIn ? "Check in" : "5 players max")}
+          />
+        )}
         <div 
           className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
           style={{ backgroundColor: teamColor }}
