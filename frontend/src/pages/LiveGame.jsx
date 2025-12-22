@@ -477,6 +477,15 @@ export default function LiveGame() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const copyEmbedCode = () => {
+    const embedUrl = `${window.location.origin}/embed/${game.share_code}`;
+    const embedCode = `<iframe src="${embedUrl}" width="1920" height="300" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
+    navigator.clipboard.writeText(embedCode);
+    setEmbedCopied(true);
+    toast.success("Embed code copied!");
+    setTimeout(() => setEmbedCopied(false), 2000);
+  };
+
   // Quick team stat handlers
   const handleTeamRebound = (team, type) => {
     const stats = team === "home" ? game.home_player_stats : game.away_player_stats;
