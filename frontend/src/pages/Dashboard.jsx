@@ -15,6 +15,7 @@ export default function Dashboard({ user, onLogout }) {
   const [recentGames, setRecentGames] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [copiedGameId, setCopiedGameId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -40,6 +41,19 @@ export default function Dashboard({ user, onLogout }) {
 
   const calculateScore = (quarterScores, team) => {
     return quarterScores?.[team]?.reduce((a, b) => a + b, 0) || 0;
+  };
+
+  const copyEmbedCode = (game, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const embedUrl = `${window.location.origin}/embed/${game.share_code}`;
+    const embedCode = `<iframe src="${embedUrl}" width="1920" height="300" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
+    
+    navigator.clipboard.writeText(embedCode);
+    setCopiedGameId(game.id);
+    toast.success("Embed code copied to clipboard!");
+    setTimeout(() => setCopiedGameId(null), 2000);
   };
 
   return (
