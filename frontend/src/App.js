@@ -19,10 +19,29 @@ import ResetPassword from "@/pages/ResetPassword";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Helper to get token from either storage
+const getToken = () => {
+  return localStorage.getItem("session_token") || sessionStorage.getItem("session_token");
+};
+
+// Helper to get user from either storage
+const getStoredUser = () => {
+  return localStorage.getItem("user") || sessionStorage.getItem("user");
+};
+
+// Helper to clear auth from both storages
+const clearAuth = () => {
+  localStorage.removeItem("session_token");
+  localStorage.removeItem("user");
+  localStorage.removeItem("remember_me");
+  sessionStorage.removeItem("session_token");
+  sessionStorage.removeItem("user");
+};
+
 // Configure axios to send credentials and auth header
 axios.defaults.withCredentials = true;
 axios.interceptors.request.use((config) => {
-  const token = localStorage.getItem("session_token");
+  const token = getToken();
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
