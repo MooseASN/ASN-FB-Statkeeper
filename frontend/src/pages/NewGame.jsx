@@ -220,6 +220,129 @@ export default function NewGame({ user, onLogout }) {
                 </div>
               )}
 
+              {/* Clock Options */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-5 h-5 text-slate-600" />
+                    <Label htmlFor="clock-toggle" className="text-base font-semibold cursor-pointer">
+                      Game Clock
+                    </Label>
+                  </div>
+                  <Switch
+                    id="clock-toggle"
+                    checked={clockEnabled}
+                    onCheckedChange={setClockEnabled}
+                    data-testid="clock-toggle"
+                  />
+                </div>
+                
+                {clockEnabled && (
+                  <div className="space-y-4 pt-2 border-t">
+                    <p className="text-sm text-muted-foreground">
+                      Enable clock to track player minutes and manage game time
+                    </p>
+                    
+                    {/* Period Duration */}
+                    <div>
+                      <Label className="text-sm font-medium">Period Duration</Label>
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex-1">
+                          <Label className="text-xs text-muted-foreground">Minutes</Label>
+                          <Input
+                            type="number"
+                            min="1"
+                            max="30"
+                            value={periodMinutes}
+                            onChange={(e) => setPeriodMinutes(Math.max(0, Math.min(30, parseInt(e.target.value) || 0)))}
+                            className="mt-1"
+                            data-testid="period-minutes"
+                          />
+                        </div>
+                        <span className="text-2xl font-bold pt-5">:</span>
+                        <div className="flex-1">
+                          <Label className="text-xs text-muted-foreground">Seconds</Label>
+                          <Input
+                            type="number"
+                            min="0"
+                            max="59"
+                            value={periodSeconds}
+                            onChange={(e) => setPeriodSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                            className="mt-1"
+                            data-testid="period-seconds"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setPeriodMinutes(12); setPeriodSeconds(0); }}
+                          className="text-xs"
+                        >
+                          NBA (12:00)
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setPeriodMinutes(10); setPeriodSeconds(0); }}
+                          className="text-xs"
+                        >
+                          HS (10:00)
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => { setPeriodMinutes(20); setPeriodSeconds(0); }}
+                          className="text-xs"
+                        >
+                          College (20:00)
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Period Label */}
+                    <div>
+                      <Label className="text-sm font-medium">Period Label</Label>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          type="button"
+                          variant={periodLabel === "Quarter" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setPeriodLabel("Quarter")}
+                          className={periodLabel === "Quarter" ? "bg-black hover:bg-gray-800" : ""}
+                          data-testid="label-quarter"
+                        >
+                          Quarters (NBA/HS)
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={periodLabel === "Period" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setPeriodLabel("Period")}
+                          className={periodLabel === "Period" ? "bg-black hover:bg-gray-800" : ""}
+                          data-testid="label-period"
+                        >
+                          Periods (College)
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    <div className="p-3 bg-slate-50 rounded-lg">
+                      <p className="text-sm text-slate-600">
+                        <strong>Preview:</strong> {periodMinutes}:{periodSeconds.toString().padStart(2, '0')} per {periodLabel.toLowerCase()}
+                      </p>
+                      <p className="text-xs text-slate-500 mt-1">
+                        Player minutes will be tracked when they are checked in on the floor
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
