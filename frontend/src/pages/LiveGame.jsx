@@ -776,6 +776,19 @@ export default function LiveGame() {
             <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-center flex-1">
+                  {/* Home Team Logo */}
+                  <div className="flex justify-center mb-2">
+                    <div 
+                      className="w-16 h-16 rounded-full flex items-center justify-center border-2 overflow-hidden"
+                      style={{ borderColor: homeColor, backgroundColor: `${homeColor}10` }}
+                    >
+                      {game.home_team_logo ? (
+                        <img src={game.home_team_logo} alt={game.home_team_name} className="w-12 h-12 object-contain" />
+                      ) : (
+                        <span className="text-2xl font-bold" style={{ color: homeColor }}>{game.home_team_name?.charAt(0)}</span>
+                      )}
+                    </div>
+                  </div>
                   <p className="text-sm text-muted-foreground">{game.home_team_name}</p>
                   <p className="text-5xl font-bold" style={{ color: homeColor }} data-testid="home-score">
                     {calculateScore("home")}
