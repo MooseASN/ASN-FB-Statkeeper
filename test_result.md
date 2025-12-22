@@ -177,6 +177,18 @@ backend:
         agent: "main"
         comment: "DELETE /api/games/{game_id} endpoint deletes game and associated player stats. Verified via curl."
 
+  - task: "Sponsor Banner CRUD API"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Created SponsorBanner model with link_url field. Endpoints: POST/GET/PUT/DELETE for authenticated users, GET /public/{user_id} for public access. All tested via curl."
+
 frontend:
   - task: "Advanced Color Picker with Color Map"
     implemented: true
