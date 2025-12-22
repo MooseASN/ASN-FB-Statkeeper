@@ -715,14 +715,14 @@ export default function LiveGame() {
 
       {/* Play by Play Panel */}
       {showPlayByPlay && (
-        <div className="fixed right-14 top-16 bottom-0 w-80 bg-white shadow-lg z-40 border-l">
+        <div className="fixed right-14 top-28 bottom-0 w-80 bg-white shadow-lg z-40 border-l">
           <div className="p-4 border-b flex items-center justify-between">
             <h3 className="font-bold">Play-by-Play</h3>
             <button onClick={() => setShowPlayByPlay(false)} className="text-slate-400 hover:text-slate-600">
               <X className="w-5 h-5" />
             </button>
           </div>
-          <ScrollArea className="h-[calc(100vh-120px)]">
+          <ScrollArea className="h-[calc(100vh-160px)]">
             <div className="p-4 space-y-2">
               {playByPlay.length === 0 ? (
                 <p className="text-center text-muted-foreground py-8">No plays recorded yet</p>
