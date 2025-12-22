@@ -312,6 +312,19 @@ export default function LiveView() {
             </div>
             
             <div className="text-center flex-1">
+              {/* Away Team Logo */}
+              <div className="flex justify-center mb-2">
+                <div 
+                  className="w-20 h-20 rounded-full flex items-center justify-center border-4 overflow-hidden"
+                  style={{ borderColor: awayColor, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                >
+                  {game.away_team_logo ? (
+                    <img src={game.away_team_logo} alt={game.away_team_name} className="w-16 h-16 object-contain" />
+                  ) : (
+                    <span className="text-3xl font-bold text-white">{game.away_team_name?.charAt(0)}</span>
+                  )}
+                </div>
+              </div>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <div className="w-4 h-4 rounded-full" style={{ backgroundColor: awayColor }}></div>
                 <p className="text-lg font-semibold">{game.away_team_name}</p>
