@@ -941,8 +941,18 @@ export default function LiveGame() {
           {/* Right Column - Away Team */}
           <div className="order-2 lg:order-3">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }}></div>
+              <div className="flex items-center gap-3">
+                {/* Team Logo */}
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 overflow-hidden flex-shrink-0"
+                  style={{ borderColor: awayColor, backgroundColor: `${awayColor}10` }}
+                >
+                  {game.away_team_logo ? (
+                    <img src={game.away_team_logo} alt={game.away_team_name} className="w-7 h-7 object-contain" />
+                  ) : (
+                    <span className="text-lg font-bold" style={{ color: awayColor }}>{game.away_team_name?.charAt(0)}</span>
+                  )}
+                </div>
                 <h2 className="font-bold text-lg">{game.away_team_name}</h2>
               </div>
               {isActive && (
