@@ -427,6 +427,11 @@ export default function LiveGame() {
   const [editingPlay, setEditingPlay] = useState(null);
   const [editPlayData, setEditPlayData] = useState({ player_id: "", player_number: "", player_name: "", action: "" });
 
+  // Embed dialog state
+  const [embedDialogOpen, setEmbedDialogOpen] = useState(false);
+  const [embedWidth, setEmbedWidth] = useState("1920");
+  const [embedHeight, setEmbedHeight] = useState("300");
+
   const fetchGame = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
