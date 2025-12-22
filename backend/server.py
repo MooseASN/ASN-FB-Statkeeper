@@ -1364,6 +1364,16 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.4*inch, bottomMargin=0.4*inch, leftMargin=0.4*inch, rightMargin=0.4*inch)
     elements = []
     
+    # Game Title at the top
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle('GameTitle', parent=styles['Heading1'], fontSize=14, alignment=1, spaceAfter=12)
+    
+    game_title = f"{game['home_team_name']} vs {game['away_team_name']}"
+    if game.get('note'):
+        game_title += f" - {game['note']}"
+    
+    elements.append(Paragraph(f"<b>{game_title}</b>", title_style))
+    
     # Check if clock was enabled for this game
     clock_enabled = game.get("clock_enabled", False)
     
