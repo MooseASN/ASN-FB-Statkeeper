@@ -457,49 +457,49 @@ export default function LiveView() {
       )}
 
       {/* Team Stats Summary */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-          <h2 className="text-xl font-bold text-[#000000] mb-4">Team Statistics</h2>
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 py-4 md:py-6">
+        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6 mb-4 md:mb-6">
+          <h2 className="text-lg md:text-xl font-bold text-[#000000] mb-3 md:mb-4">Team Statistics</h2>
           
-          {/* Shooting Stats */}
-          <div className="grid grid-cols-2 gap-8 mb-6">
+          {/* Shooting Stats - Stack on mobile */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 mb-4 md:mb-6">
             <div>
-              <p className="font-semibold mb-2" style={{ color: homeColor }}>{game.home_team_name} Shooting</p>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">FG</p>
-                  <p className="font-bold">{homeTotals.fg_made}/{homeTotals.fg_att}</p>
-                  <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.fg_pct}%</p>
+              <p className="font-semibold mb-2 text-sm md:text-base" style={{ color: homeColor }}>{game.home_team_name} Shooting</p>
+              <div className="grid grid-cols-3 gap-2 md:gap-4 text-center">
+                <div className="bg-slate-50 rounded-lg p-2 md:p-3">
+                  <p className="text-[10px] md:text-xs text-muted-foreground">FG</p>
+                  <p className="font-bold text-xs md:text-sm">{homeTotals.fg_made}/{homeTotals.fg_att}</p>
+                  <p className="text-sm md:text-lg font-bold" style={{ color: homeColor }}>{homeTotals.fg_pct}%</p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">3PT</p>
-                  <p className="font-bold">{homeTotals.fg3_made}/{homeTotals.fg3_att}</p>
-                  <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.fg3_pct}%</p>
+                <div className="bg-slate-50 rounded-lg p-2 md:p-3">
+                  <p className="text-[10px] md:text-xs text-muted-foreground">3PT</p>
+                  <p className="font-bold text-xs md:text-sm">{homeTotals.fg3_made}/{homeTotals.fg3_att}</p>
+                  <p className="text-sm md:text-lg font-bold" style={{ color: homeColor }}>{homeTotals.fg3_pct}%</p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">FT</p>
-                  <p className="font-bold">{homeTotals.ft_made}/{homeTotals.ft_att}</p>
-                  <p className="text-lg font-bold" style={{ color: homeColor }}>{homeTotals.ft_pct}%</p>
+                <div className="bg-slate-50 rounded-lg p-2 md:p-3">
+                  <p className="text-[10px] md:text-xs text-muted-foreground">FT</p>
+                  <p className="font-bold text-xs md:text-sm">{homeTotals.ft_made}/{homeTotals.ft_att}</p>
+                  <p className="text-sm md:text-lg font-bold" style={{ color: homeColor }}>{homeTotals.ft_pct}%</p>
                 </div>
               </div>
             </div>
             <div>
-              <p className="font-semibold mb-2" style={{ color: awayColor }}>{game.away_team_name} Shooting</p>
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">FG</p>
-                  <p className="font-bold">{awayTotals.fg_made}/{awayTotals.fg_att}</p>
-                  <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.fg_pct}%</p>
+              <p className="font-semibold mb-2 text-sm md:text-base" style={{ color: awayColor }}>{game.away_team_name} Shooting</p>
+              <div className="grid grid-cols-3 gap-2 md:gap-4 text-center">
+                <div className="bg-slate-50 rounded-lg p-2 md:p-3">
+                  <p className="text-[10px] md:text-xs text-muted-foreground">FG</p>
+                  <p className="font-bold text-xs md:text-sm">{awayTotals.fg_made}/{awayTotals.fg_att}</p>
+                  <p className="text-sm md:text-lg font-bold" style={{ color: awayColor }}>{awayTotals.fg_pct}%</p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">3PT</p>
-                  <p className="font-bold">{awayTotals.fg3_made}/{awayTotals.fg3_att}</p>
-                  <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.fg3_pct}%</p>
+                <div className="bg-slate-50 rounded-lg p-2 md:p-3">
+                  <p className="text-[10px] md:text-xs text-muted-foreground">3PT</p>
+                  <p className="font-bold text-xs md:text-sm">{awayTotals.fg3_made}/{awayTotals.fg3_att}</p>
+                  <p className="text-sm md:text-lg font-bold" style={{ color: awayColor }}>{awayTotals.fg3_pct}%</p>
                 </div>
-                <div className="bg-slate-50 rounded-lg p-3">
-                  <p className="text-xs text-muted-foreground">FT</p>
-                  <p className="font-bold">{awayTotals.ft_made}/{awayTotals.ft_att}</p>
-                  <p className="text-lg font-bold" style={{ color: awayColor }}>{awayTotals.ft_pct}%</p>
+                <div className="bg-slate-50 rounded-lg p-2 md:p-3">
+                  <p className="text-[10px] md:text-xs text-muted-foreground">FT</p>
+                  <p className="font-bold text-xs md:text-sm">{awayTotals.ft_made}/{awayTotals.ft_att}</p>
+                  <p className="text-sm md:text-lg font-bold" style={{ color: awayColor }}>{awayTotals.ft_pct}%</p>
                 </div>
               </div>
             </div>
