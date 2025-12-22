@@ -7,7 +7,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -55,7 +54,7 @@ export default function Login({ onLogin }) {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MooseIcon className="w-16 h-16 text-black" />
+            <img src="/logo-black.png" alt="StatMoose" className="w-16 h-16 object-contain" />
           </div>
           <CardTitle className="text-2xl">Welcome to StatMoose</CardTitle>
           <CardDescription>Sign in to track your basketball stats</CardDescription>

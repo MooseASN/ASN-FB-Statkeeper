@@ -238,7 +238,7 @@ export default function Dashboard({ user, onLogout }) {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Teams</p>
-                  <p className="text-3xl font-bold text-[#000000]">{teams.length}</p>
+                  <p className="text-3xl font-bold text-[#000000] dark:text-white">{teams.length}</p>
                 </div>
                 <Users className="w-10 h-10 text-[#000000]/20" />
               </div>
@@ -386,19 +386,19 @@ export default function Dashboard({ user, onLogout }) {
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg">{game.home_team_name}</p>
-                          <p className="text-4xl font-bold score-display text-[#000000]">
+                          <p className="font-semibold text-lg dark:text-white">{game.home_team_name}</p>
+                          <p className="text-4xl font-bold score-display text-[#000000] dark:text-white">
                             {calculateScore(game.quarter_scores, "home")}
                           </p>
                         </div>
                         <div className="px-4">
-                          <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
+                          <span className="text-sm bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 px-3 py-1 rounded-full font-medium">
                             Q{game.current_quarter}
                           </span>
                         </div>
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg">{game.away_team_name}</p>
-                          <p className="text-4xl font-bold score-display text-[#000000]">
+                          <p className="font-semibold text-lg dark:text-white">{game.away_team_name}</p>
+                          <p className="text-4xl font-bold score-display text-[#000000] dark:text-white">
                             {calculateScore(game.quarter_scores, "away")}
                           </p>
                         </div>
