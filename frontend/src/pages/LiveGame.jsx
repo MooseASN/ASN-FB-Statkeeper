@@ -370,6 +370,12 @@ export default function LiveGame() {
   const [editPlayerOpen, setEditPlayerOpen] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState(null);
   const [editPlayerData, setEditPlayerData] = useState({ number: "", name: "" });
+  
+  // Clock state
+  const [clockTime, setClockTime] = useState(0);
+  const [clockRunning, setClockRunning] = useState(false);
+  const clockIntervalRef = useRef(null);
+  const [showPeriodEndDialog, setShowPeriodEndDialog] = useState(false);
 
   const fetchGame = useCallback(async () => {
     try {
