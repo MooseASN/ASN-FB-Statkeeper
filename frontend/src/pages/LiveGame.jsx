@@ -772,6 +772,77 @@ export default function LiveGame() {
     }
   };
 
+  // Remove player handlers
+  const handleRemovePlayer = (player) => {
+    setPlayerToRemove(player);
+    setRemovePlayerOpen(true);
+  };
+
+  const handleConfirmRemovePlayer = async () => {
+    if (!playerToRemove) return;
+    
+    try {
+      await axios.delete(`${API}/games/${id}/players/${playerToRemove.id}`);
+      toast.success("Player removed");
+      setRemovePlayerOpen(false);
+      setPlayerToRemove(null);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to remove player");
+    }
+  };
+
+  // Play-by-play management handlers
+  const handleDeletePlay = async (playId) => {
+    try {
+      await axios.delete(`${API}/games/${id}/play-by-play/${playId}`);
+      toast.success("Play deleted");
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to delete play");
+    }
+  };
+
+  const handleEditPlay = (play) => {
+    // Find the player for this play
+    const allPlayers = [...(game?.home_player_stats || []), ...(game?.away_player_stats || [])];
+    const player = allPlayers.find(p => p.player_number === play.player_number && p.player_name === play.player_name);
+    
+    setEditingPlay(play);
+    setEditPlayData({
+      player_id: player?.id || "",
+      player_number: play.player_number,
+      player_name: play.player_name,
+      action: play.action
+    });
+    setEditPlayOpen(true);
+  };
+
+  const handleSavePlayEdit = async () => {
+    if (!editingPlay) return;
+    
+    try {
+      await axios.put(`${API}/games/${id}/play-by-play/${editingPlay.id}`, {
+        player_id: editPlayData.player_id,
+        player_number: editPlayData.player_number,
+        player_name: editPlayData.player_name,
+        action: editPlayData.action
+      });
+      toast.success("Play updated");
+      setEditPlayOpen(false);
+      setEditingPlay(null);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to update play");
+    }
+  };
+
+  // Available actions for play-by-play editing
+  const playActions = [
+    "FT Made", "FT Missed", "2PT Made", "2PT Missed", "3PT Made", "3PT Missed",
+    "Assist", "Off. Rebound", "Def. Rebound", "Turnover", "Steal", "Block", "Foul"
+  ];
+
   const calculateScore = (team) => {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
