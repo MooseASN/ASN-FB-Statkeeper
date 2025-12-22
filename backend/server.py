@@ -725,6 +725,88 @@ async def delete_game(game_id: str, user: User = Depends(get_current_user)):
     
     return {"message": "Game deleted successfully"}
 
+@api_router.post("/games/{game_id}/reset-stats")
+async def reset_game_stats(game_id: str, user: User = Depends(get_current_user)):
+    """Reset all player stats to 0 for a game"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Reset all player stats to 0
+    reset_stats = {
+        "ft_made": 0,
+        "ft_missed": 0,
+        "fg2_made": 0,
+        "fg2_missed": 0,
+        "fg3_made": 0,
+        "fg3_missed": 0,
+        "assists": 0,
+        "offensive_rebounds": 0,
+        "defensive_rebounds": 0,
+        "turnovers": 0,
+        "steals": 0,
+        "blocks": 0,
+        "fouls": 0
+    }
+    
+    await db.player_stats.update_many(
+        {"game_id": game_id},
+        {"$set": reset_stats}
+    )
+    
+    # Reset quarter scores
+    num_quarters = len(game.get("quarter_scores", {}).get("home", [0, 0, 0, 0]))
+    reset_quarters = {
+        "quarter_scores": {
+            "home": [0] * num_quarters,
+            "away": [0] * num_quarters
+        },
+        "game_stats": {
+            "lead_changes": 0,
+            "ties": 1,
+            "home_largest_lead": 0,
+            "away_largest_lead": 0
+        },
+        "play_by_play": []
+    }
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": reset_quarters}
+    )
+    
+    return {"message": "All stats reset successfully"}
+
+class PlayerUpdate(BaseModel):
+    player_number: Optional[str] = None
+    player_name: Optional[str] = None
+
+@api_router.put("/games/{game_id}/players/{player_id}")
+async def update_player(game_id: str, player_id: str, update: PlayerUpdate, user: User = Depends(get_current_user)):
+    """Update a player's number or name"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
+    if not player_stat:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    update_data = {}
+    if update.player_number is not None:
+        update_data["player_number"] = update.player_number
+    if update.player_name is not None:
+        update_data["player_name"] = update.player_name
+    
+    if update_data:
+        await db.player_stats.update_one(
+            {"id": player_id},
+            {"$set": update_data}
+        )
+    
+    updated = await db.player_stats.find_one({"id": player_id}, {"_id": 0})
+    return updated
+
 @api_router.post("/games/{game_id}/stats")
 async def record_stat(game_id: str, stat: StatUpdate, user: User = Depends(get_current_user)):
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
