@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus, Minimize2, Maximize2 } from "lucide-react";
+import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus, Minimize2, Maximize2, Code } from "lucide-react";
 import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
