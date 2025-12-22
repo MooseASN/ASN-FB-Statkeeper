@@ -101,16 +101,14 @@
             </div>
         </div>
         <script>
-            // Hide badge on embed pages
-            function hideBadgeOnEmbed() {
+            // Hide badge on embed pages immediately
+            (function() {
                 if (window.location.pathname.includes('/embed')) {
+                    document.body.setAttribute('data-page', 'embed');
                     var badge = document.getElementById('triumph-badge');
-                    if (badge) badge.style.cssText = 'display: none !important;';
+                    if (badge) badge.remove();
                 }
-            }
-            hideBadgeOnEmbed();
-            document.addEventListener('DOMContentLoaded', hideBadgeOnEmbed);
-            window.addEventListener('load', hideBadgeOnEmbed);
+            })();
         </script>
     </body>
 </html>
