@@ -322,6 +322,7 @@ export default function LiveGame() {
   const [addPlayerTeam, setAddPlayerTeam] = useState("home");
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
   const [copied, setCopied] = useState(false);
+  const [embedCopied, setEmbedCopied] = useState(false);
   const [lastAction, setLastAction] = useState(null);
   const [showPlayByPlay, setShowPlayByPlay] = useState(false);
   const [viewMode, setViewMode] = useState("condensed"); // "condensed" or "expanded"
