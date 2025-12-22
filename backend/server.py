@@ -452,6 +452,9 @@ class Team(BaseModel):
 class GameCreate(BaseModel):
     home_team_id: str
     away_team_id: str
+    scheduled_date: Optional[str] = None  # YYYY-MM-DD
+    scheduled_time: Optional[str] = None  # HH:MM
+    start_immediately: bool = True  # If False, creates as "scheduled"
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
