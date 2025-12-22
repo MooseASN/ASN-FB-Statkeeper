@@ -207,9 +207,9 @@ export default function Dashboard({ user, onLogout }) {
     <Layout user={user} onLogout={onLogout}>
       <div className="space-y-8" data-testid="dashboard">
         {/* Hero Section */}
-        <div className="bg-gradient-to-r from-[#000000] to-[#333333] rounded-2xl p-8 text-white">
+        <div className={`bg-gradient-to-r ${isDark ? 'from-slate-800 to-slate-700' : 'from-[#000000] to-[#333333]'} rounded-2xl p-8 text-white`}>
           <div className="flex items-center gap-3 mb-4">
-            <MooseIcon className="w-10 h-10" />
+            <img src="/logo-white.png" alt="StatMoose" className="w-10 h-10 object-contain" />
             <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">StatMoose Basketball</h1>
           </div>
           <p className="text-white/80 text-lg mb-6 max-w-xl">
