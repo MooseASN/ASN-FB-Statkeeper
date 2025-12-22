@@ -14,7 +14,7 @@ export default function EmbedLiveGame() {
 
   const fetchGame = useCallback(async () => {
     try {
-      const res = await axios.get(`${API}/games/live/${shareCode}`);
+      const res = await axios.get(`${API}/games/share/${shareCode}`);
       setGame(res.data);
       setError(null);
     } catch (err) {
