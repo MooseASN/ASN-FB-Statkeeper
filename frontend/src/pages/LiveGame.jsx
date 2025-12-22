@@ -605,7 +605,7 @@ export default function LiveGame() {
         disabled={!isActive}
       />
 
-      {/* Top Navigation Bar */}
+      {/* Top Navigation Bar - Title */}
       <header className="bg-[#000000] text-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
@@ -625,15 +625,23 @@ export default function LiveGame() {
               </div>
             </div>
             
-            {/* Game Title */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 text-center hidden md:block">
+            {/* Game Title - Centered */}
+            <div className="text-center">
               <h1 className="text-lg font-bold">{game.home_team_name} vs {game.away_team_name}</h1>
               <p className="text-xs text-white/70">
                 {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final"}
               </p>
             </div>
             
-            <div className="flex items-center gap-2">
+            {/* Spacer for balance */}
+            <div className="w-24"></div>
+          </div>
+        </div>
+        
+        {/* Options Bar - Separate Row */}
+        <div className="border-t border-white/10 bg-[#1a1a1a]">
+          <div className="max-w-7xl mx-auto px-4 py-2">
+            <div className="flex items-center justify-center gap-2 flex-wrap">
               {/* View Toggle Button */}
               <Button 
                 variant="outline" 
@@ -667,6 +675,9 @@ export default function LiveGame() {
                   Undo
                 </Button>
               )}
+              
+              <div className="w-px h-6 bg-white/20 mx-1 hidden sm:block"></div>
+              
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -688,21 +699,17 @@ export default function LiveGame() {
                 <FileDown className="w-4 h-4 mr-1" />
                 PDF
               </Button>
+              
               {isActive && (
-                <Button variant="destructive" size="sm" onClick={handleEndGame} data-testid="end-game-btn">
-                  End Game
-                </Button>
+                <>
+                  <div className="w-px h-6 bg-white/20 mx-1 hidden sm:block"></div>
+                  <Button variant="destructive" size="sm" onClick={handleEndGame} data-testid="end-game-btn">
+                    End Game
+                  </Button>
+                </>
               )}
             </div>
           </div>
-        </div>
-        
-        {/* Mobile Game Title */}
-        <div className="md:hidden text-center pb-2 border-t border-white/10 pt-2">
-          <h1 className="text-base font-bold">{game.home_team_name} vs {game.away_team_name}</h1>
-          <p className="text-xs text-white/70">
-            {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final"}
-          </p>
         </div>
       </header>
 
