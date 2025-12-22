@@ -1111,65 +1111,9 @@ export default function LiveGame() {
         </div>
       </header>
 
-      {/* Play by Play Panel */}
-      {showPlayByPlay && (
-        <div className="fixed right-14 top-28 bottom-0 w-80 bg-white shadow-lg z-40 border-l">
-          <div className="p-4 border-b flex items-center justify-between">
-            <h3 className="font-bold">Play-by-Play</h3>
-            <button onClick={() => setShowPlayByPlay(false)} className="text-slate-400 hover:text-slate-600">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-          <ScrollArea className="h-[calc(100vh-160px)]">
-            <div className="p-4 space-y-2">
-              {playByPlay.length === 0 ? (
-                <p className="text-center text-muted-foreground py-8">No plays recorded yet</p>
-              ) : (
-                [...playByPlay].reverse().map((play, idx) => (
-                  <div 
-                    key={play.id || idx} 
-                    className={`p-2 rounded text-sm ${play.team === 'home' ? 'bg-red-50 border-l-2 border-red-500' : 'bg-purple-50 border-l-2 border-purple-500'} group relative`}
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1 min-w-0 pr-2">
-                        <span className="font-medium">#{play.player_number} {play.player_name}</span>
-                        <p className="text-muted-foreground">{play.action}</p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <span className="text-xs text-muted-foreground">{getQuarterLabel(play.quarter)}</span>
-                        <p className="font-bold text-sm">{play.home_score}-{play.away_score}</p>
-                      </div>
-                    </div>
-                    {/* Edit and Delete buttons */}
-                    {isActive && (
-                      <div className="flex gap-1 mt-1 pt-1 border-t border-slate-200">
-                        <button
-                          onClick={() => handleEditPlay(play)}
-                          className="flex-1 px-2 py-1 text-xs bg-slate-100 hover:bg-slate-200 rounded text-slate-600"
-                        >
-                          <Pencil className="w-3 h-3 inline mr-1" />
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDeletePlay(play.id)}
-                          className="px-2 py-1 text-xs bg-red-100 hover:bg-red-200 rounded text-red-600"
-                          title="Delete play"
-                        >
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </ScrollArea>
-        </div>
-      )}
-
-      {/* Main Content - 3 Column Layout */}
-      <div className="max-w-7xl mx-auto px-4 py-4 ml-14 mr-14">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      {/* Main Content - Dynamic Layout */}
+      <div className={`max-w-7xl mx-auto px-4 py-4 ml-14 mr-14 transition-all duration-300`}>
+        <div className={`grid grid-cols-1 gap-4 ${showPlayByPlay ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
           
           {/* Left Column - Home Team */}
           <div className="order-1 lg:order-1">
