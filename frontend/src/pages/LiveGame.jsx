@@ -395,6 +395,130 @@ export default function LiveGame() {
     return () => clearInterval(interval);
   }, [fetchGame]);
 
+  // Sync clock state from game data
+  useEffect(() => {
+    if (game?.clock_enabled) {
+      setClockTime(game.clock_time || 0);
+      setClockRunning(game.clock_running || false);
+    }
+  }, [game?.clock_time, game?.clock_running, game?.clock_enabled]);
+
+  // Clock countdown effect
+  useEffect(() => {
+    if (clockRunning && game?.clock_enabled) {
+      clockIntervalRef.current = setInterval(() => {
+        setClockTime(prev => {
+          if (prev <= 1) {
+            // Clock hit 0 - stop and show period end dialog
+            handleStopClock();
+            setShowPeriodEndDialog(true);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      if (clockIntervalRef.current) {
+        clearInterval(clockIntervalRef.current);
+      }
+    }
+    return () => {
+      if (clockIntervalRef.current) {
+        clearInterval(clockIntervalRef.current);
+      }
+    };
+  }, [clockRunning, game?.clock_enabled]);
+
+  // Clock control functions
+  const handleStartClock = async () => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/start`);
+      setClockRunning(true);
+    } catch (error) {
+      toast.error("Failed to start clock");
+    }
+  };
+
+  const handleStopClock = async () => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/stop`);
+      setClockRunning(false);
+      // Save current clock time
+      await axios.post(`${API}/games/${id}/clock/set`, { time: clockTime });
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to stop clock");
+    }
+  };
+
+  const handleAdjustClock = async (seconds) => {
+    const newTime = Math.max(0, clockTime + seconds);
+    setClockTime(newTime);
+    try {
+      await axios.post(`${API}/games/${id}/clock/set`, { time: newTime });
+    } catch (error) {
+      // Silently fail for minor adjustments
+    }
+  };
+
+  const handleNextPeriod = async () => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/next-period`);
+      setShowPeriodEndDialog(false);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to advance period");
+    }
+  };
+
+  const handleHalftime = async () => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/halftime`);
+      setShowPeriodEndDialog(false);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to go to halftime");
+    }
+  };
+
+  // Player check-in/out for minutes tracking
+  const handlePlayerCheckIn = async (playerId) => {
+    try {
+      await axios.post(`${API}/games/${id}/players/${playerId}/check-in`);
+      fetchGame();
+    } catch (error) {
+      // Silently fail if team already has 5 players
+    }
+  };
+
+  const handlePlayerCheckOut = async (playerId) => {
+    try {
+      await axios.post(`${API}/games/${id}/players/${playerId}/check-out`);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to check out player");
+    }
+  };
+
+  const togglePlayerOnFloor = (playerId, isHome) => {
+    const onFloor = isHome ? (game?.home_on_floor || []) : (game?.away_on_floor || []);
+    if (onFloor.includes(playerId)) {
+      handlePlayerCheckOut(playerId);
+    } else {
+      // Only allow if team has less than 5 on floor
+      if (onFloor.length < 5) {
+        handlePlayerCheckIn(playerId);
+      }
+    }
+  };
+
+  // Format clock time as MM:SS
+  const formatClockTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   const handleStatUpdate = async (playerId, statType, increment = 1) => {
     try {
       setLastAction({ playerId, statType, increment });
