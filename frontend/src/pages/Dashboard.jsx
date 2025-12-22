@@ -1,21 +1,24 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Users, History, PlayCircle, Code, Check } from "lucide-react";
+import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock } from "lucide-react";
 import Layout from "@/components/Layout";
 import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Dashboard({ user, onLogout }) {
+  const navigate = useNavigate();
   const [activeGames, setActiveGames] = useState([]);
+  const [scheduledGames, setScheduledGames] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [embedCopied, setEmbedCopied] = useState(false);
+  const [startingGameId, setStartingGameId] = useState(null);
 
   useEffect(() => {
     fetchData();
@@ -30,6 +33,13 @@ export default function Dashboard({ user, onLogout }) {
       
       const games = gamesRes.data;
       setActiveGames(games.filter(g => g.status === "active"));
+      setScheduledGames(games.filter(g => g.status === "scheduled").sort((a, b) => {
+        // Sort by scheduled date
+        if (a.scheduled_date && b.scheduled_date) {
+          return a.scheduled_date.localeCompare(b.scheduled_date);
+        }
+        return 0;
+      }));
       setRecentGames(games.filter(g => g.status === "completed").slice(0, 5));
       setTeams(teamsRes.data);
     } catch (error) {
@@ -44,7 +54,6 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const copyEmbedCode = () => {
-    // Use the user's ID to create an embed that always shows their latest live game
     const embedUrl = `${window.location.origin}/embed/latest/${user.user_id}`;
     const embedCode = `<iframe src="${embedUrl}" width="1920" height="300" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
     
@@ -52,6 +61,51 @@ export default function Dashboard({ user, onLogout }) {
     setEmbedCopied(true);
     toast.success("Embed code copied! It will always show your latest live game.");
     setTimeout(() => setEmbedCopied(false), 2000);
+  };
+
+  const handleStartScheduledGame = async (gameId, e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    setStartingGameId(gameId);
+    try {
+      await axios.post(`${API}/games/${gameId}/start`);
+      toast.success("Game started!");
+      navigate(`/game/${gameId}`);
+    } catch (error) {
+      toast.error("Failed to start game");
+    } finally {
+      setStartingGameId(null);
+    }
+  };
+
+  const formatScheduledDate = (dateStr, timeStr) => {
+    if (!dateStr) return "No date set";
+    
+    const date = new Date(dateStr + 'T00:00:00');
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    let dateText;
+    if (date.getTime() === today.getTime()) {
+      dateText = "Today";
+    } else if (date.getTime() === tomorrow.getTime()) {
+      dateText = "Tomorrow";
+    } else {
+      dateText = date.toLocaleDateString('en-US', { 
+        weekday: 'short', 
+        month: 'short', 
+        day: 'numeric' 
+      });
+    }
+    
+    if (timeStr) {
+      return `${dateText} at ${timeStr}`;
+    }
+    return dateText;
   };
 
   return (
@@ -70,7 +124,7 @@ export default function Dashboard({ user, onLogout }) {
             <Link to="/new-game">
               <Button size="lg" className="bg-orange-500 hover:bg-orange-600 text-white" data-testid="start-game-btn">
                 <PlayCircle className="w-5 h-5 mr-2" />
-                Start New Game
+                New Game
               </Button>
             </Link>
             <Link to="/teams">
@@ -83,7 +137,7 @@ export default function Dashboard({ user, onLogout }) {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <Card className="border-l-4 border-l-[#000000]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -95,11 +149,22 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </CardContent>
           </Card>
+          <Card className="border-l-4 border-l-blue-500">
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Scheduled</p>
+                  <p className="text-3xl font-bold text-blue-500">{scheduledGames.length}</p>
+                </div>
+                <Calendar className="w-10 h-10 text-blue-500/20" />
+              </div>
+            </CardContent>
+          </Card>
           <Card className="border-l-4 border-l-orange-500">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Active Games</p>
+                  <p className="text-sm text-muted-foreground">Live</p>
                   <p className="text-3xl font-bold text-orange-500">{activeGames.length}</p>
                 </div>
                 <PlayCircle className="w-10 h-10 text-orange-500/20" />
@@ -118,6 +183,55 @@ export default function Dashboard({ user, onLogout }) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Scheduled Games */}
+        {scheduledGames.length > 0 && (
+          <div>
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
+              <Calendar className="w-5 h-5 text-blue-500" />
+              Scheduled Games
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {scheduledGames.map(game => (
+                <Card key={game.id} className="border-2 border-blue-200" data-testid={`scheduled-game-${game.id}`}>
+                  <CardContent className="pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-center flex-1">
+                        <p className="font-semibold text-lg">{game.home_team_name}</p>
+                        <p className="text-sm text-muted-foreground">Home</p>
+                      </div>
+                      <div className="px-4">
+                        <span className="text-lg font-bold text-slate-400">VS</span>
+                      </div>
+                      <div className="text-center flex-1">
+                        <p className="font-semibold text-lg">{game.away_team_name}</p>
+                        <p className="text-sm text-muted-foreground">Away</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex items-center gap-2 text-blue-600">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-medium">
+                          {formatScheduledDate(game.scheduled_date, game.scheduled_time)}
+                        </span>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700"
+                        onClick={(e) => handleStartScheduledGame(game.id, e)}
+                        disabled={startingGameId === game.id}
+                        data-testid={`start-scheduled-${game.id}`}
+                      >
+                        <PlayCircle className="w-4 h-4 mr-1" />
+                        {startingGameId === game.id ? "Starting..." : "Start Now"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Active Games */}
         {activeGames.length > 0 && (
