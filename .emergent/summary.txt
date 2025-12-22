@@ -2,159 +2,181 @@
 The user wants to build a website for tracking basketball statistics, similar to .
 
 **PRODUCT REQUIREMENTS:**
--   **User Authentication:** Implement a full authentication system allowing users to register via email/username/password or log in with Google. All data (teams, games, stats) must be private and scoped to the logged-in user. Include a Forgot Password feature.
--   **Team Management:** Users can create teams with a name, logo, and a specific team color chosen from an advanced color picker.
--   **Statistics Tracking:**
-    -   Individual Stats: Free Throws (Made/Missed), 2-Point Field Goals (Made/Missed), 3-Point Field Goals (Made/Missed), Assists, Offensive Rebounds, Defensive Rebounds, Turnovers, Steals, Blocks, and Fouls.
-    -   Team Stats: Automatically calculate total team fouls and shooting percentages (FG%, 3P%, FT%).
-    -   Game Flow Stats: Track and display Largest Lead, Lead Changes, and Times Tied.
--   **Game Interface:**
-    -   A split-screen UI for live game stat entry, with the home team always on the left and the away team on the right.
-    -   Players must be sorted by jersey number in all views.
-    -   Make/Miss options for all scoring attempts.
-    -   A play-by-play log.
-    -   An editable game title.
--   **Output & Sharing:**
-    -   A live, shareable, view-only link for games.
-    -   Export a comprehensive, single-page PDF box score styled after NBA.com, including team colors and game flow stats.
--   **Branding:** The application should be branded as StatMoose Basketball with a custom moose icon and a black/dark theme. The browser tab title should be StatMoose BKB.
+*   **User Authentication:** Implement a full authentication system allowing users to register via email/username/password. All data (teams, games, stats) must be private and scoped to the logged-in user. Include a Forgot Password feature with security questions.
+*   **Team Management:** Users can create teams with a name, logo, and a specific team color chosen from an advanced color picker.
+*   **Statistics Tracking:**
+    *   Individual Stats: Free Throws (Made/Missed), 2-Point Field Goals (Made/Missed), 3-Point Field Goals (Made/Missed), Assists, Offensive Rebounds, Defensive Rebounds, Turnovers, Steals, Blocks, and Fouls.
+    *   Team Stats: Automatically calculate total team fouls and shooting percentages (FG%, 3P%, FT%).
+    *   Game Flow Stats: Track and display Largest Lead, Lead Changes, and Times Tied.
+*   **Game Interface:**
+    *   A split-screen UI for live game stat entry, with the home team on the left and the away team on the right.
+    *   Players must be sorted by jersey number in all views.
+    *   Make/Miss options for all scoring attempts.
+    *   A play-by-play log.
+    *   An editable game title.
+    *   Ability to edit player name/number during a game.
+    *   A Reset Stats button to reset all game data to zero.
+    *   A toggle to switch between a condensed and an expanded view of player cards.
+*   **Output & Sharing:**
+    *   A live, shareable, view-only link for games.
+    *   Export a comprehensive, single-page PDF box score styled after NBA.com.
+    *   An embeddable live game banner (1920x300px) that shows the latest live game data, including team names, scores, quarter, and leading scorers.
+*   **Game Scheduling:** Ability to schedule games for a specific date and time.
+*   **Branding:** The application should be branded as StatMoose Basketball with a custom moose icon and a black/dark theme. The browser tab title should be StatMoose BKB.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack application (FastAPI + React + MongoDB) with a complete user authentication system (email/password and backend support for Google OAuth). All data models, including teams, games, and players, are now scoped to the logged-in user. The application has been rebranded to StatMoose Basketball with a custom moose icon and a black color theme. It features an advanced color picker for teams, sorts players numerically, and tracks advanced game-flow stats (lead changes, ties, largest lead), which are displayed on the live view pages and in the NBA-style PDF box score. A Forgot Password flow using  for email is also implemented.
+A full-stack FastAPI/React/MongoDB application branded as StatMoose Basketball. It features a complete user authentication system (email/password) where all data is user-scoped. The Forgot Password flow is secured by user-selected security questions. Team and game management are implemented, including live stat tracking, player sorting, and advanced game flow stats. The UI includes a toggle for condensed/expanded player views, player editing, and a stat reset button. The application generates an NBA-style PDF box score and provides a shareable, embeddable live game banner that always shows the user's latest active game. Toast notification timers have been globally reduced.
 
 **Last working item**:
--   Last item agent was working: The user requested to make the player cards in the live stat-keeping UI more compact to fit more players on-screen without excessive scrolling. The agent has modified the  component in  to reduce padding and font sizes and has adjusted the spacing between cards.
--   Status: IN PROGRESS
--   Agent Testing Done: N
--   Which testing method agent to use? screenshot tool. The agent must log in first to access the protected game page and then take a screenshot to verify the visual changes.
--   User Testing Done: N
+*   Last item agent was working: The agent was implementing a game scheduler. This allows users to create games for a future date and time. The backend models and API endpoints have been updated to support a  and a Not Started game status. The frontend  page was updated to include date/time pickers, and the  was updated to show a Scheduled Games section. The agent was about to modify the  page to correctly handle and filter for these new Not Started games.
+*   Status: IN PROGRESS
+*   Agent Testing Done: N
+*   Which testing method agent to use? frontend testing agent. This is a multi-part feature that requires testing the creation flow ( page), visibility on the  and  pages, and the Start Game functionality which changes the game's state.
+*   User Testing Done: N
 
 **All Pending/In progress Issue list**:
--   Issue 1: The UI change to condense player cards has not been visually verified. (P0)
+*   Issue 1: The game scheduler feature is incomplete and untested. (P0)
 
-    -   **Issue Detail:**
-        -   **Attempted fixes:** The agent modified  but failed to take a verification screenshot because the route is now protected and requires authentication.
-        -   **Next debug checklist:**
-            1.  Log in to the application using the test credentials.
-            2.  Navigate to an existing live game page (e.g., ).
-            3.  Take a screenshot to confirm that the player cards are more compact.
-        -   **Why fix this issue and what will be achieved with the fix?** To fulfill the user's request for a more space-efficient UI for stat-keeping.
-        -   **Status:** IN PROGRESS
-        -   **Is recurring issue?** N
-        -   **Should Test frontend/backend/both after fix?** frontend
-        -   **Blocked on other issue:** None
+    *   **Issues Detail:**
+        *   **Attempted fixes:** The agent successfully updated the backend  model and  endpoint. On the frontend,  was updated to allow scheduling, and  was updated to display scheduled games. The work stopped before updating .
+        *   **Next debug checklist:**
+            1.  Modify  to add Not Started to the status filter and correctly display scheduled games.
+            2.  Perform a full end-to-end test:
+                *   Create a new game scheduled for a future time.
+                *   Verify it appears in the Scheduled Games section on the Dashboard.
+                *   Verify it appears in the Game History page with a Not Started status.
+                *   Click the Start Game button on the Dashboard.
+                *   Confirm the game status changes to active and it moves to the Live Games section on the Dashboard.
+        *   **Why fix this issue and what will be achieved with the fix?** This will complete the user-requested game scheduling feature.
+        *   **Status:** IN PROGRESS
+        *   **Is recurring issue?** N
+        *   **Should Test frontend/backend/both after fix?** both
+        *   **Blocked on other issue:** None
 
 **In progress Task List**:
--   Task 1: Visually verify the condensed player card UI in the live stat-keeping view. (P0)
-    -   **Where to resume:** Log in and take a screenshot of the  page. The code changes in  are already complete.
-    -   **What will be achieved with this?** Confirmation that the UI has been updated as per the user's request to show more players on the screen.
-    -   **Status:** IN PROGRESS
-    -   **Should Test frontend/backend/both after fix?** frontend
-    -   **Blocked on something:** None
+*   Task 1: Complete the Game Scheduler implementation. (P0)
+    *   **Where to resume:** The agent needs to modify the file . The last relevant action was viewing this file. The next step is to add logic to handle the Not Started game status in the filters and game list.
+    *   **What will be achieved with this?** Users will be able to schedule games in advance and see them separated from active or completed games.
+    *   **Status:** IN PROGRESS
+    *   **Should Test frontend/backend/both after fix?** both
+    *   **Blocked on something:** None
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks:**
-    -   P1: Implement roster upload via  file on the frontend. The backend API is ready, but a UI for file upload needs to be added to the  page and linked to the authenticated user.
-    -   P1: Implement the client-side logic for Google OAuth. The UI button and backend endpoints are in place, but the frontend needs to handle the redirect and token exchange.
--   **Future Tasks:**
-    -   Enhance the game history page to allow searching or filtering of saved games for the logged-in user.
+*   **Upcoming Tasks:**
+    *   P1: Implement roster upload via  file on the frontend. The backend API is ready, but a UI for file upload needs to be added to the  page.
+*   **Future Tasks:**
+    *   None identified.
 
 **Completed work in this session**
--   Recently completed:
-    -   **Authentication System:** Implemented a full user authentication system (email/password registration, login, JWT handling). All data (teams, games, stats) is now private to each user.
-    -   **Forgot Password:** Added a complete forgot/reset password flow using email.
-    -   **Branding:** Rebranded the entire app to StatMoose Basketball, replacing the name, logo, and color scheme. Changed the browser tab title to StatMoose BKB.
-    -   **Advanced Stats:** Added tracking and display for Largest Lead, Lead Changes, and Ties in the UI and PDF.
-    -   **PDF Redesign:** Restructured the PDF box score to mimic the NBA.com layout, with stacked quarter scores and dynamic team colors.
-    -   **Player Sorting:** Implemented numerical sorting for players by jersey number across all views (, , PDF).
-    -   **UI/UX Polish:** Made home team always appear on the left, applied dynamic team colors to UI elements, and corrected the layout of team-wide action buttons.
-    -   **Linting:** Resolved all outstanding frontend linting errors.
+*   Recently completed:
+    *   **CORS Fix:** Resolved a backend CORS issue that was preventing frontend login and registration.
+    *   **UI Verification:** Visually confirmed the compact player card layout in the  view.
+    *   **Game History Page:** Implemented search, status filtering (All, Active, Completed), and a Delete Game feature.
+    *   **Google Login Removal:** Completely removed Google OAuth from both the frontend and backend per user request.
+    *   **Forgot Password Rework:** Modified the forgot password flow to display the reset link directly in the UI, removing the need for an email service.
+    *   **Security Questions:** Implemented a full security question flow for password resets. Users select questions on registration and must answer one correctly to reset their password.
+    *   **Live Game View Toggle:** Added an Expand/Condense button to switch between detailed and compact player card views.
+    *   **Live Game Embed Banner:** Created an embeddable banner that shows live game data (logos, score, leading scorers) and automatically pulls the user's latest active game.
+    *   **UI Enhancements:** Added team logos to live game pages, added a Copy Embed Code button to the Dashboard, separated the live game header into two distinct bars.
+    *   **New Live Game Features:** Added a Reset Stats button with confirmation and an Edit Player (name/number) feature.
+    *   **UX Improvements:** Updated condensed view stat labels to abbreviations (AST, STL, etc.) and reduced toast notification duration to 2 seconds.
 
 **Earlier issues found/mentioned but not fixed**
--   None.
+*   None.
 
 **Known issue recurrence from previous fork**
--   N/A
+*   N/A
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend:** React, React Hooks, , TailwindCSS, .
--   **Backend:** FastAPI, Pydantic, Motor (async MongoDB driver), ,  for JWTs,  for hashing,  for emails.
--   **Database:** MongoDB.
--   **Authentication:** User-scoped data access enforced via JWT Bearer tokens.
+*   **Frontend:** React, React Hooks, , TailwindCSS, , , ,  for toasts.
+*   **Backend:** FastAPI, Pydantic, Motor (async MongoDB), ,  for JWTs, .
+*   **Database:** MongoDB.
+*   **Authentication:** User-scoped data via JWT Bearer tokens. Password resets are protected by security questions.
 
 **key DB schema**
--   **users:** 
--   **password_reset_tokens:** 
--   **teams:** 
--   **games:** 
--   **players:** 
+*   **users:** 
+*   **password_reset_tokens:** 
+*   **teams:** 
+*   **games:** 
+*   **players:** 
 
 **changes in tech stack**
--   **Backend:** Added , , , , .
--   **Frontend:** Added .
+*   **Backend:** No new libraries.  integration was removed from the password flow.
+*   **Frontend:** Added  and  for the game scheduler.
 
 **All files of reference**
--   : The monolithic backend file containing all API and auth logic.
--   : The live stat-tracking UI, modified for compactness.
--   : Main router, updated with protected routes and auth logic.
--   : The main entry point for authenticated users.
--   : Contains the updated browser tab title.
--   New Auth Files: , , , .
+*   : Heavily modified to add/remove numerous endpoints and update data models.
+*   : Updated to show scheduled games and the latest game embed button.
+*   : Needs to be updated for scheduled games.
+*   : Heavily modified with view toggle, new buttons (Reset, Edit), and UI layout changes.
+*   : Updated to support game scheduling.
+*   : Updated to include security question selection.
+*   : Reworked for the security question and direct-link flow.
+*   : Updated to remove Google login.
+*   : Updated routes and toast configuration.
+*   : New file for the game-specific embed.
+*   : New file for the user-specific latest game embed.
 
 **Areas that need refactoring**:
--    is now over 1000 lines and contains logic for data models, API routes, authentication, PDF generation, and database interactions. It should be broken down into a more modular structure (e.g., , , , ).
--    and  remain very large components and would benefit from being broken down into smaller, more manageable sub-components.
+*    has grown significantly and is now a very large monolithic file. It should be broken down into a modular structure (e.g., , , ).
+*    is extremely large and complex. It should be refactored into smaller, more manageable sub-components (e.g., Scoreboard, PlayerCard, ActionButtons).
 
 **key api endpoints**
--   :  to create a new user.
--   :  to log in and receive a JWT.
--   :  to trigger a password reset email.
--   :  to set a new password with a valid token.
--   **All data endpoints (, , etc.) are now protected and require an  header.**
+*   
+*   
+*   
+*   
+*   
+*   
+*   : **New** endpoint to get a user's latest active game.
+*   : **New** endpoint to reset game stats.
+*   : **New** endpoint to edit player details.
+*   : **New** endpoint to delete a game.
+*   All data endpoints are protected and require .
+*   Removed all  endpoints.
 
 **Critical Info for New Agent**
--   A full authentication system has been implemented. All subsequent work must be done in the context of an authenticated user. Use the provided test credentials to log in before testing any protected features.
--   The immediate task is to verify the compact player card layout by logging in and taking a screenshot.
--   The password for the test account  was changed to  during the Forgot Password feature test.
+*   **No Email Service:** The  API key is not configured. The Forgot Password feature was intentionally modified to work without sending emails by displaying the reset link directly in the UI after security question verification. Do not attempt to fix this by re-implementing an email-based flow.
+*   **No Google Login:** Google login has been completely removed from the application at the user's request.
+*   **Scheduler Implementation:** The current task is to finish the game scheduler. The backend is mostly done, but the frontend  page needs to be updated, and the entire flow needs testing.
+*   **Testing Credentials:** The previous test accounts may have inconsistent state. It is highly recommended to register a new user for testing to ensure a clean state for the security questions and game data.
 
 **documents and test_reports created in this job**
--   
+*    was updated for manual testing.
 
 **Last 10 User Messages**
--   
--   
--   
--   
--   
--   
--   
--   
--   
--   
+*   
+*   
+*   
+*   
+*   
+*   
+*   
+*   
+*   
+*   
 
 **Project Health Check:**
--   **Broken:** None.
--   **Mocked:** The  email functionality is mocked; the logic is in place, but a real API key is required to send actual emails.
+*   **Broken:** None.
+*   **Mocked:** The  email functionality is non-existent. The password reset flow works around this by showing the link in the UI.
 
 **3rd Party Integrations**
--   **Resend:** Used for the Forgot Password email feature. Requires .
--   **Emergent-managed Google Auth:** Backend is configured. Frontend client-side flow is not yet implemented.
+*   **Resend:** Logic exists in the handoff summary, but the implementation has been bypassed in favor of a UI-based password reset link. No API key is configured or needed for the current flow.
+*   **Emergent-managed Google Auth:** Removed from the application.
 
 **Testing status**
--   **Testing agent used after significant changes:** NO (Agent attempted but failed, resorted to manual testing).
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None
--   **Known regressions:** None
+*   **Testing agent used after significant changes:** NO
+*   **Troubleshoot agent used after agent stuck in loop:** NO
+*   **Test files created:** None.
+*   **Known regressions:** None.
 
 **Credentials to test flow:**
--   **Email:** 
--   **Password:** 
+*   It is recommended to register a new user to ensure a clean testing environment, especially for the security question and game scheduling features. Use the  page.
 
 **What agent forgot to execute**
--   The agent did not complete the client-side implementation of the Google login flow.
--   The agent did not visually verify the final change (compact player cards) after implementing it, as it requires authentication to view the page.</analysis>
+*   The agent was in the middle of implementing the game scheduler feature. It updated the  and  pages but did not complete the required changes to the  page to handle the Not Started status. The feature is therefore incomplete and untested.</analysis>
