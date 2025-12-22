@@ -96,9 +96,20 @@
         </div>
         <script>
             // Hide badge on embed pages
-            if (window.location.pathname.includes('/embed')) {
-                document.getElementById('triumph-badge').style.display = 'none';
+            function hideBadgeOnEmbed() {
+                if (window.location.pathname.includes('/embed')) {
+                    var badge = document.getElementById('triumph-badge');
+                    if (badge) badge.style.display = 'none';
+                }
             }
+            hideBadgeOnEmbed();
+            window.addEventListener('load', hideBadgeOnEmbed);
+            // Also check on route changes for SPA
+            var pushState = history.pushState;
+            history.pushState = function() {
+                pushState.apply(history, arguments);
+                hideBadgeOnEmbed();
+            };
         </script>
     </body>
 </html>
