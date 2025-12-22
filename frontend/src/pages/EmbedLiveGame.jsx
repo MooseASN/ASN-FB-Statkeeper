@@ -193,7 +193,7 @@ export default function EmbedLiveGame() {
         href={fullViewUrl}
         target="_blank"
         rel="noopener noreferrer"
-        className="absolute top-1/2 -translate-y-1/2 right-6 flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-colors z-20"
+        className="absolute bottom-6 right-6 flex items-center gap-2 px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-gray-100 transition-colors z-20"
       >
         <span>Full Live Stats</span>
         <ExternalLink className="w-5 h-5" />
