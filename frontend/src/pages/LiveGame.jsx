@@ -880,7 +880,10 @@ export default function LiveGame() {
             
             {/* Game Title - Centered */}
             <div className="text-center">
-              <h1 className="text-lg font-bold">{game.home_team_name} vs {game.away_team_name}</h1>
+              <h1 className="text-lg font-bold">
+                {game.home_team_name} vs {game.away_team_name}
+                {game.note && <span className="font-normal text-white/80"> - {game.note}</span>}
+              </h1>
               <p className="text-xs text-white/70">
                 {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final"}
               </p>
