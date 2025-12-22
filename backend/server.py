@@ -631,7 +631,11 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         away_team_color=away_team.get("color", "#7c3aed"),
         status=initial_status,
         scheduled_date=game_data.scheduled_date,
-        scheduled_time=game_data.scheduled_time
+        scheduled_time=game_data.scheduled_time,
+        clock_enabled=game_data.clock_enabled,
+        period_duration=game_data.period_duration,
+        period_label=game_data.period_label,
+        clock_time=game_data.period_duration  # Start at full period time
     )
     game.user_id = user.user_id
     
