@@ -238,8 +238,23 @@ export default function LiveView() {
   };
 
   const getQuarterLabel = (q) => {
-    if (q <= 4) return `Q${q}`;
+    const label = game?.period_label === "Period" ? "P" : "Q";
+    if (q <= 4) return `${label}${q}`;
     return `OT${q - 4}`;
+  };
+
+  // Get status label for game
+  const getStatusLabel = () => {
+    if (game.status === "active") return "LIVE";
+    if (game.status === "scheduled") return "NOT STARTED";
+    return "FINAL";
+  };
+
+  // Format clock time
+  const formatClockTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   if (loading) {
