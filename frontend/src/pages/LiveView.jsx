@@ -313,6 +313,11 @@ export default function LiveView() {
                   LIVE
                 </span>
               )}
+              {game.status === "scheduled" && (
+                <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                  NOT STARTED
+                </span>
+              )}
               {game.status === "completed" && (
                 <span className="ml-2 px-2 py-1 bg-slate-100 text-slate-700 rounded-full text-xs font-medium">
                   FINAL
