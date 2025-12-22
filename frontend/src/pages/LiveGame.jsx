@@ -717,13 +717,18 @@ export default function LiveGame() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const openEmbedDialog = () => {
+    setEmbedDialogOpen(true);
+  };
+
   const copyEmbedCode = () => {
     const embedUrl = `${window.location.origin}/embed/${game.share_code}`;
-    const embedCode = `<iframe src="${embedUrl}" width="1920" height="300" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
+    const embedCode = `<iframe src="${embedUrl}" width="${embedWidth}" height="${embedHeight}" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
     navigator.clipboard.writeText(embedCode);
     setEmbedCopied(true);
     toast.success("Embed code copied!");
     setTimeout(() => setEmbedCopied(false), 2000);
+    setEmbedDialogOpen(false);
   };
 
   // Quick team stat handlers - now use team-stats endpoint instead of individual players
