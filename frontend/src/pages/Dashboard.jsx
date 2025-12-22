@@ -122,15 +122,39 @@ export default function Dashboard({ user, onLogout }) {
         {/* Active Games */}
         {activeGames.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-              <PlayCircle className="w-5 h-5 text-orange-500" />
-              Live Games
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <PlayCircle className="w-5 h-5 text-orange-500" />
+                Live Games
+              </h2>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={copyEmbedCode}
+                className="gap-2"
+                data-testid="copy-embed-btn"
+              >
+                {embedCopied ? (
+                  <>
+                    <Check className="w-4 h-4 text-green-500" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Code className="w-4 h-4" />
+                    Copy Embed Code
+                  </>
+                )}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              The embed will always show your latest live game and auto-updates every 5 seconds.
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeGames.map(game => (
-                <Card key={game.id} className="border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
-                  <CardContent className="pt-6">
-                    <Link to={`/game/${game.id}`} className="block hover:opacity-80 transition-opacity">
+                <Link key={game.id} to={`/game/${game.id}`}>
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
+                    <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.home_team_name}</p>
@@ -150,33 +174,9 @@ export default function Dashboard({ user, onLogout }) {
                           </p>
                         </div>
                       </div>
-                    </Link>
-                    <div className="mt-4 pt-4 border-t flex items-center justify-between">
-                      <p className="text-xs text-muted-foreground">
-                        Embed auto-updates with live data
-                      </p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => copyEmbedCode(game, e)}
-                        className="gap-2"
-                        data-testid={`copy-embed-${game.id}`}
-                      >
-                        {copiedGameId === game.id ? (
-                          <>
-                            <Check className="w-4 h-4 text-green-500" />
-                            Copied!
-                          </>
-                        ) : (
-                          <>
-                            <Code className="w-4 h-4" />
-                            Copy Embed Code
-                          </>
-                        )}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           </div>
