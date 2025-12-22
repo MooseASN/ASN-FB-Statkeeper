@@ -1513,19 +1513,14 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         num_rows = len(data)
         
         # Adjust span indices based on clock_enabled
+        # Only span the TM REB cells, percentages stay in their own columns
         if clock_enabled:
             pct_spans = [
-                ('SPAN', (0, num_rows-1), (2, num_rows-1)),  # FG% spans first 3 cols
-                ('SPAN', (3, num_rows-1), (4, num_rows-1)),  # 3P% spans next 2 cols
-                ('SPAN', (5, num_rows-1), (6, num_rows-1)),  # FT% spans next 2 cols
-                ('SPAN', (7, num_rows-1), (10, num_rows-1)), # TM REB spans OR/DR/TOT/A
+                ('SPAN', (8, num_rows-1), (11, num_rows-1)), # TM REB spans OR/DR/TOT/A
             ]
         else:
             pct_spans = [
-                ('SPAN', (0, num_rows-1), (1, num_rows-1)),  # FG% spans first 2 cols
-                ('SPAN', (2, num_rows-1), (3, num_rows-1)),  # 3P% spans next 2 cols
-                ('SPAN', (4, num_rows-1), (5, num_rows-1)),  # FT% spans next 2 cols
-                ('SPAN', (6, num_rows-1), (9, num_rows-1)),  # TM REB spans OR/DR/TOT/A
+                ('SPAN', (7, num_rows-1), (10, num_rows-1)),  # TM REB spans OR/DR/TOT/A
             ]
         
         table.setStyle(TableStyle([
@@ -1545,7 +1540,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             # Player rows
             ('FONTNAME', (0, 2), (0, num_rows-3), 'Helvetica'),
             ('FONTSIZE', (0, 2), (-1, num_rows-3), 8),
-            ('ALIGN', (1, 1), (-1, -1), 'RIGHT'),
+            ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             
             # Totals row
@@ -1555,7 +1550,6 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             # Percentage row spans
             *pct_spans,
             ('FONTSIZE', (0, num_rows-1), (-1, num_rows-1), 8),
-            ('ALIGN', (0, num_rows-1), (6 if clock_enabled else 5, num_rows-1), 'CENTER'),
             
             # Padding
             ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
