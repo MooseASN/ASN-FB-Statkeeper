@@ -63,16 +63,6 @@ const SponsorSlideshow = ({ banners }) => {
           <span>Sponsor</span>
         </div>
       )}
-      {banners.length > 1 && (
-        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-          {banners.map((_, idx) => (
-            <div 
-              key={idx} 
-              className={`w-2 h-2 rounded-full transition-colors ${idx === currentIndex ? 'bg-white' : 'bg-white/40'}`}
-            />
-          ))}
-        </div>
-      )}
     </div>
   );
 
