@@ -85,11 +85,25 @@ export default function Login({ onLogin }) {
                 required
                 data-testid="login-password"
               />
-              <div className="flex justify-end mt-1">
-                <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-black">
-                  Forgot password?
-                </Link>
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="remember-me"
+                  checked={rememberMe}
+                  onCheckedChange={setRememberMe}
+                  data-testid="remember-me-checkbox"
+                />
+                <Label 
+                  htmlFor="remember-me" 
+                  className="text-sm font-normal cursor-pointer"
+                >
+                  Remember me
+                </Label>
               </div>
+              <Link to="/forgot-password" className="text-sm text-muted-foreground hover:text-black">
+                Forgot password?
+              </Link>
             </div>
             <Button type="submit" className="w-full bg-black hover:bg-gray-800" disabled={loading} data-testid="login-submit">
               {loading ? "Signing in..." : "Sign In"}
