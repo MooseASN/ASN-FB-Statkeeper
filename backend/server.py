@@ -1058,6 +1058,24 @@ async def player_check_out(game_id: str, player_id: str, user: User = Depends(ge
     
     return {"message": "Player checked out", floor_key: current_on_floor}
 
+# Game Note Endpoint
+class GameNoteUpdate(BaseModel):
+    note: Optional[str] = None
+
+@api_router.put("/games/{game_id}/note")
+async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User = Depends(get_current_user)):
+    """Update the game note"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {"note": note_data.note, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Note updated", "note": note_data.note}
+
 class PlayerUpdate(BaseModel):
     player_number: Optional[str] = None
     player_name: Optional[str] = None
