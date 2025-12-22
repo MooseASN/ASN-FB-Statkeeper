@@ -1356,6 +1356,316 @@ async def add_player_to_game(game_id: str, request: AddPlayerRequest, user: User
     
     return stats
 
+@api_router.delete("/games/{game_id}/players/{player_id}")
+async def remove_player_from_game(game_id: str, player_id: str, user: User = Depends(get_current_user)):
+    """Remove a player from a game"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    player = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
+    if not player:
+        raise HTTPException(status_code=404, detail="Player not found")
+    
+    # Remove player from on-floor lists if present
+    home_on_floor = game.get("home_on_floor", [])
+    away_on_floor = game.get("away_on_floor", [])
+    
+    if player_id in home_on_floor:
+        home_on_floor.remove(player_id)
+        await db.games.update_one({"id": game_id}, {"$set": {"home_on_floor": home_on_floor}})
+    if player_id in away_on_floor:
+        away_on_floor.remove(player_id)
+        await db.games.update_one({"id": game_id}, {"$set": {"away_on_floor": away_on_floor}})
+    
+    # Delete the player stats
+    await db.player_stats.delete_one({"id": player_id, "game_id": game_id})
+    
+    return {"message": "Player removed"}
+
+# Play-by-play entry management
+class PlayByPlayUpdate(BaseModel):
+    player_id: str
+    player_number: str
+    player_name: str
+    action: str
+
+@api_router.delete("/games/{game_id}/play-by-play/{play_id}")
+async def delete_play_by_play_entry(game_id: str, play_id: str, user: User = Depends(get_current_user)):
+    """Delete a play-by-play entry and reverse the stats"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    play_by_play = game.get("play_by_play", [])
+    
+    # Find the play entry
+    play_entry = None
+    play_index = -1
+    for i, play in enumerate(play_by_play):
+        if play.get("id") == play_id:
+            play_entry = play
+            play_index = i
+            break
+    
+    if not play_entry:
+        raise HTTPException(status_code=404, detail="Play not found")
+    
+    # Reverse the stat if it's a scoring play
+    action = play_entry.get("action", "")
+    points = play_entry.get("points", 0)
+    team = play_entry.get("team", "")
+    quarter = play_entry.get("quarter", 1)
+    
+    # Find the player by number and name to reverse stats
+    player_number = play_entry.get("player_number")
+    player_name = play_entry.get("player_name")
+    
+    # Find player stats by matching player_number and player_name
+    team_id = game["home_team_id"] if team == "home" else game["away_team_id"]
+    player_stat = await db.player_stats.find_one({
+        "game_id": game_id,
+        "team_id": team_id,
+        "player_number": player_number,
+        "player_name": player_name
+    })
+    
+    # Reverse the stat on the player (if not a team stat)
+    if player_stat and player_number != "TEAM":
+        stat_reversal_map = {
+            "FT Made": ("ft_made", -1),
+            "FT Missed": ("ft_missed", -1),
+            "2PT Made": ("fg2_made", -1),
+            "2PT Missed": ("fg2_missed", -1),
+            "3PT Made": ("fg3_made", -1),
+            "3PT Missed": ("fg3_missed", -1),
+            "Assist": ("assists", -1),
+            "Off. Rebound": ("offensive_rebounds", -1),
+            "Def. Rebound": ("defensive_rebounds", -1),
+            "Turnover": ("turnovers", -1),
+            "Steal": ("steals", -1),
+            "Block": ("blocks", -1),
+            "Foul": ("fouls", -1)
+        }
+        
+        if action in stat_reversal_map:
+            field, increment = stat_reversal_map[action]
+            current_value = player_stat.get(field, 0)
+            new_value = max(0, current_value + increment)
+            await db.player_stats.update_one(
+                {"id": player_stat["id"]},
+                {"$set": {field: new_value}}
+            )
+    
+    # Reverse quarter score if it was a scoring play
+    if points != 0:
+        quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
+        quarter_idx = quarter - 1
+        if quarter_idx < len(quarter_scores[team]):
+            quarter_scores[team][quarter_idx] = max(0, quarter_scores[team][quarter_idx] - points)
+    else:
+        quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
+    
+    # Remove the play from play-by-play
+    play_by_play.pop(play_index)
+    
+    # Recalculate scores for remaining plays after the deleted one
+    for i in range(play_index, len(play_by_play)):
+        play_by_play[i]["home_score"] = sum(quarter_scores["home"])
+        play_by_play[i]["away_score"] = sum(quarter_scores["away"])
+    
+    await db.games.update_one(
+        {"id": game_id},
+        {"$set": {
+            "play_by_play": play_by_play,
+            "quarter_scores": quarter_scores,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Play deleted"}
+
+@api_router.put("/games/{game_id}/play-by-play/{play_id}")
+async def update_play_by_play_entry(game_id: str, play_id: str, update: PlayByPlayUpdate, user: User = Depends(get_current_user)):
+    """Update a play-by-play entry (change player or action)"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    play_by_play = game.get("play_by_play", [])
+    
+    # Find the play entry
+    play_entry = None
+    play_index = -1
+    for i, play in enumerate(play_by_play):
+        if play.get("id") == play_id:
+            play_entry = play
+            play_index = i
+            break
+    
+    if not play_entry:
+        raise HTTPException(status_code=404, detail="Play not found")
+    
+    old_action = play_entry.get("action", "")
+    old_points = play_entry.get("points", 0)
+    old_player_number = play_entry.get("player_number")
+    old_player_name = play_entry.get("player_name")
+    team = play_entry.get("team")
+    quarter = play_entry.get("quarter", 1)
+    team_id = game["home_team_id"] if team == "home" else game["away_team_id"]
+    
+    # Get old and new player stats
+    old_player = await db.player_stats.find_one({
+        "game_id": game_id,
+        "team_id": team_id,
+        "player_number": old_player_number,
+        "player_name": old_player_name
+    })
+    
+    new_player = await db.player_stats.find_one({"id": update.player_id, "game_id": game_id})
+    
+    # Stat field mappings
+    action_to_field = {
+        "FT Made": "ft_made",
+        "FT Missed": "ft_missed",
+        "2PT Made": "fg2_made",
+        "2PT Missed": "fg2_missed",
+        "3PT Made": "fg3_made",
+        "3PT Missed": "fg3_missed",
+        "Assist": "assists",
+        "Off. Rebound": "offensive_rebounds",
+        "Def. Rebound": "defensive_rebounds",
+        "Turnover": "turnovers",
+        "Steal": "steals",
+        "Block": "blocks",
+        "Foul": "fouls"
+    }
+    
+    action_to_points = {
+        "FT Made": 1,
+        "2PT Made": 2,
+        "3PT Made": 3
+    }
+    
+    # Calculate new points
+    new_points = action_to_points.get(update.action, 0)
+    
+    # Reverse old player stat if not team stat
+    if old_player and old_player_number != "TEAM" and old_action in action_to_field:
+        field = action_to_field[old_action]
+        current_value = old_player.get(field, 0)
+        await db.player_stats.update_one(
+            {"id": old_player["id"]},
+            {"$set": {field: max(0, current_value - 1)}}
+        )
+    
+    # Apply new player stat if not team stat
+    if new_player and update.player_number != "TEAM" and update.action in action_to_field:
+        field = action_to_field[update.action]
+        current_value = new_player.get(field, 0)
+        await db.player_stats.update_one(
+            {"id": new_player["id"]},
+            {"$set": {field: current_value + 1}}
+        )
+    
+    # Update quarter scores if points changed
+    quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
+    quarter_idx = quarter - 1
+    
+    if old_points != new_points:
+        if quarter_idx < len(quarter_scores[team]):
+            quarter_scores[team][quarter_idx] = max(0, quarter_scores[team][quarter_idx] - old_points + new_points)
+    
+    # Update the play entry
+    play_by_play[play_index]["player_id"] = update.player_id
+    play_by_play[play_index]["player_number"] = update.player_number
+    play_by_play[play_index]["player_name"] = update.player_name
+    play_by_play[play_index]["action"] = update.action
+    play_by_play[play_index]["points"] = new_points
+    
+    # Recalculate running scores
+    home_score = sum(quarter_scores["home"])
+    away_score = sum(quarter_scores["away"])
+    play_by_play[play_index]["home_score"] = home_score
+    play_by_play[play_index]["away_score"] = away_score
+    
+    await db.games.update_one(
+        {"id": game_id},
+        {"$set": {
+            "play_by_play": play_by_play,
+            "quarter_scores": quarter_scores,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Play updated"}
+
+# Team stats endpoint (for team rebounds/turnovers that don't affect individual players)
+class TeamStatUpdate(BaseModel):
+    team: str  # "home" or "away"
+    stat_type: str  # "oreb", "dreb", "turnover"
+
+@api_router.post("/games/{game_id}/team-stats")
+async def record_team_stat(game_id: str, stat: TeamStatUpdate, user: User = Depends(get_current_user)):
+    """Record a team stat (rebound or turnover) without affecting individual player stats"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Initialize team_stats if not present
+    team_stats = game.get("team_stats", {
+        "home": {"oreb": 0, "dreb": 0, "turnovers": 0},
+        "away": {"oreb": 0, "dreb": 0, "turnovers": 0}
+    })
+    
+    stat_map = {
+        "oreb": "oreb",
+        "dreb": "dreb",
+        "turnover": "turnovers"
+    }
+    
+    field = stat_map.get(stat.stat_type)
+    if not field:
+        raise HTTPException(status_code=400, detail="Invalid stat type")
+    
+    team_stats[stat.team][field] = team_stats[stat.team].get(field, 0) + 1
+    
+    # Add to play-by-play
+    action_labels = {
+        "oreb": "Team Off. Rebound",
+        "dreb": "Team Def. Rebound",
+        "turnover": "Team Turnover"
+    }
+    
+    quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
+    home_score = sum(quarter_scores["home"])
+    away_score = sum(quarter_scores["away"])
+    
+    play_by_play = game.get("play_by_play", [])
+    entry = {
+        "id": str(uuid.uuid4()),
+        "quarter": game["current_quarter"],
+        "team": stat.team,
+        "player_name": "TEAM",
+        "player_number": "TEAM",
+        "action": action_labels.get(stat.stat_type, stat.stat_type),
+        "points": 0,
+        "home_score": home_score,
+        "away_score": away_score
+    }
+    play_by_play.append(entry)
+    
+    await db.games.update_one(
+        {"id": game_id},
+        {"$set": {
+            "team_stats": team_stats,
+            "play_by_play": play_by_play,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Team stat recorded", "team_stats": team_stats}
+
 # ============ PDF GENERATION ============
 
 def calculate_player_totals(stats: dict):
