@@ -130,9 +130,9 @@ export default function Dashboard({ user, onLogout }) {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeGames.map(game => (
-                <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
-                    <CardContent className="pt-6">
+                <Card key={game.id} className="border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
+                  <CardContent className="pt-6">
+                    <Link to={`/game/${game.id}`} className="block hover:opacity-80 transition-opacity">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.home_team_name}</p>
@@ -152,9 +152,33 @@ export default function Dashboard({ user, onLogout }) {
                           </p>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                    </Link>
+                    <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                      <p className="text-xs text-muted-foreground">
+                        Embed auto-updates with live data
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => copyEmbedCode(game, e)}
+                        className="gap-2"
+                        data-testid={`copy-embed-${game.id}`}
+                      >
+                        {copiedGameId === game.id ? (
+                          <>
+                            <Check className="w-4 h-4 text-green-500" />
+                            Copied!
+                          </>
+                        ) : (
+                          <>
+                            <Code className="w-4 h-4" />
+                            Copy Embed Code
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           </div>
