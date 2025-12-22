@@ -125,19 +125,14 @@ export default function EmbedLiveGame() {
 
       {/* Center Score Section */}
       <div className="text-center z-10">
-        {/* Status badge */}
-        <div className="mb-4">
-          {game.status === "active" ? (
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 rounded-full text-white font-bold text-sm">
-              <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-              LIVE - {getQuarterLabel(game.current_quarter)}
+        {/* Clock (if enabled) - above score */}
+        {game.clock_enabled && (
+          <div className="mb-2">
+            <span className="text-4xl font-mono font-bold text-white">
+              {Math.floor((game.clock_time || 0) / 60)}:{((game.clock_time || 0) % 60).toString().padStart(2, '0')}
             </span>
-          ) : (
-            <span className="inline-flex items-center px-4 py-2 bg-gray-700 rounded-full text-white font-bold text-sm">
-              FINAL
-            </span>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Score */}
         <div className="flex items-center gap-8">
@@ -148,6 +143,20 @@ export default function EmbedLiveGame() {
           <span className="text-8xl font-black text-white" style={{ textShadow: `0 0 40px ${awayColor}` }}>
             {awayScore}
           </span>
+        </div>
+
+        {/* Quarter/Period - below score */}
+        <div className="mt-4">
+          {game.status === "active" ? (
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 rounded-full text-white font-bold text-sm">
+              <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+              {game.is_halftime ? 'HALFTIME' : `LIVE - ${game.period_label === 'Period' ? 'P' : 'Q'}${game.current_quarter}`}
+            </span>
+          ) : (
+            <span className="inline-flex items-center px-4 py-2 bg-gray-700 rounded-full text-white font-bold text-sm">
+              FINAL
+            </span>
+          )}
         </div>
       </div>
 
