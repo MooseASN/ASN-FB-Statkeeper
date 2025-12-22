@@ -106,6 +106,9 @@ function App() {
           
           {/* Live view is now protected - only owner can see */}
           <Route path="/live/:shareCode" element={<ProtectedRoute user={user}><LiveView user={user} /></ProtectedRoute>} />
+          
+          {/* Embed view is public - for external embedding */}
+          <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
         </Routes>
       </BrowserRouter>
       <Toaster position="top-right" />
