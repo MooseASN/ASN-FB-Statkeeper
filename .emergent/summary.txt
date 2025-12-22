@@ -2,86 +2,95 @@
 The user wants to build a website for tracking basketball statistics, similar to .
 
 **PRODUCT REQUIREMENTS:**
-*   **User Authentication:** Implement a full authentication system allowing users to register via email/username/password. All data (teams, games, stats) must be private and scoped to the logged-in user. Include a Forgot Password feature with security questions.
-*   **Team Management:** Users can create teams with a name, logo, and a specific team color chosen from an advanced color picker.
+*   **User Authentication:** Implement a full authentication system allowing users to register via email/username/password. All data must be private and scoped to the logged-in user. Include a Forgot Password feature with security questions.
+*   **Team Management:** Users can create teams with a name, logo, and a specific team color.
 *   **Statistics Tracking:**
     *   Individual Stats: Free Throws (Made/Missed), 2-Point Field Goals (Made/Missed), 3-Point Field Goals (Made/Missed), Assists, Offensive Rebounds, Defensive Rebounds, Turnovers, Steals, Blocks, and Fouls.
     *   Team Stats: Automatically calculate total team fouls and shooting percentages (FG%, 3P%, FT%).
     *   Game Flow Stats: Track and display Largest Lead, Lead Changes, and Times Tied.
+*   **Game Clock & Substitutions:**
+    *   Optionally enable a game clock before starting a game.
+    *   Ability to set period duration (with presets) and labels (e.g., Quarters, Periods).
+    *   Live clock controls: Start/Stop, Halftime, and manual time adjustment buttons (-M, +M, -S, +S).
+    *   Calculate and display player minutes played (MIN) if the clock is used.
+    *   A substitution system using checkboxes to mark up to 5 players per team as on the floor.
+    *   Display numbers of on-floor players in the scoreboard area.
 *   **Game Interface:**
-    *   A split-screen UI for live game stat entry, with the home team on the left and the away team on the right.
-    *   Players must be sorted by jersey number in all views.
-    *   Make/Miss options for all scoring attempts.
-    *   A play-by-play log.
-    *   An editable game title.
-    *   Ability to edit player name/number during a game.
-    *   A Reset Stats button to reset all game data to zero.
-    *   A toggle to switch between a condensed and an expanded view of player cards.
+    *   A split-screen UI for live game stat entry.
+    *   Players sorted by jersey number.
+    *   Play-by-play log and an editable game title/note.
+    *   Ability to add a game note, displayed in the format: .
+    *   A Reset Stats button and player editing capabilities.
 *   **Output & Sharing:**
     *   A live, shareable, view-only link for games.
-    *   Export a comprehensive, single-page PDF box score styled after NBA.com.
-    *   An embeddable live game banner (1920x300px) that shows the latest live game data, including team names, scores, quarter, and leading scorers.
-*   **Game Scheduling:** Ability to schedule games for a specific date and time.
-*   **Branding:** The application should be branded as StatMoose Basketball with a custom moose icon and a black/dark theme. The browser tab title should be StatMoose BKB.
+    *   Export a comprehensive, single-page PDF box score styled after a simple college format. The PDF must include quarter-by-quarter scores, the game note title, and correctly aligned shooting percentages. The MIN column should only appear for clock-enabled games.
+    *   An embeddable live game banner (1920x300px) that shows the latest live game data, including the clock if enabled.
+    *   A sponsor banner creator on the home page for uploading a slideshow of images to be displayed on the live stat output page.
+*   **Game Scheduling:** Ability to schedule games for a future date and time, with a Copy Link option for scheduled games on the dashboard.
+*   **Branding:** The application is branded StatMoose Basketball but features a Triumph Visuals Platform badge in the bottom-right corner of all pages except for embeddable banners.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack FastAPI/React/MongoDB application branded as StatMoose Basketball. It features a complete user authentication system (email/password) where all data is user-scoped. The Forgot Password flow is secured by user-selected security questions. Team and game management are implemented, including live stat tracking, player sorting, and advanced game flow stats. The UI includes a toggle for condensed/expanded player views, player editing, and a stat reset button. The application generates an NBA-style PDF box score and provides a shareable, embeddable live game banner that always shows the user's latest active game. Toast notification timers have been globally reduced.
+A full-stack FastAPI/React application for basketball stat tracking. Key features include user authentication (email/password with security questions), team/game management, and live stat entry.
+
+Recently completed features include a full game scheduling system, a redesigned college-style PDF box score with conditional columns and quarter scores, and a comprehensive in-game clock and substitution system that tracks player minutes. A game notes feature has been added, and the public-facing live stat pages and embeddable banners now display team logos and the game clock. The application branding has been updated to include a Triumph Visuals badge, which is conditionally hidden on embeddable banners.
 
 **Last working item**:
-*   Last item agent was working: The agent was implementing a game scheduler. This allows users to create games for a future date and time. The backend models and API endpoints have been updated to support a  and a Not Started game status. The frontend  page was updated to include date/time pickers, and the  was updated to show a Scheduled Games section. The agent was about to modify the  page to correctly handle and filter for these new Not Started games.
+*   Last item agent was working: Implementing a Sponsor Banner creator. The user should be able to upload sponsor images (PNGs/JPEGs) on the dashboard, which will then appear as a slideshow on the public live stats page. The agent has added the backend models and API endpoints and started adding the UI to the Dashboard. The PDF title was also updated to include the game note.
 *   Status: IN PROGRESS
 *   Agent Testing Done: N
-*   Which testing method agent to use? frontend testing agent. This is a multi-part feature that requires testing the creation flow ( page), visibility on the  and  pages, and the Start Game functionality which changes the game's state.
+*   Which testing method agent to use? frontend testing agent. The full flow needs to be tested: uploading images on the Dashboard, managing them (view/delete), and verifying that the slideshow appears correctly on the public  page.
 *   User Testing Done: N
 
 **All Pending/In progress Issue list**:
-*   Issue 1: The game scheduler feature is incomplete and untested. (P0)
+*   Issue 1: The sponsor banner feature is incomplete. (P0)
 
     *   **Issues Detail:**
-        *   **Attempted fixes:** The agent successfully updated the backend  model and  endpoint. On the frontend,  was updated to allow scheduling, and  was updated to display scheduled games. The work stopped before updating .
+        *   **Attempted fixes:** The backend  model and API endpoints () for CRUD operations were created in . Work began on the frontend UI in .
         *   **Next debug checklist:**
-            1.  Modify  to add Not Started to the status filter and correctly display scheduled games.
-            2.  Perform a full end-to-end test:
-                *   Create a new game scheduled for a future time.
-                *   Verify it appears in the Scheduled Games section on the Dashboard.
-                *   Verify it appears in the Game History page with a Not Started status.
-                *   Click the Start Game button on the Dashboard.
-                *   Confirm the game status changes to active and it moves to the Live Games section on the Dashboard.
-        *   **Why fix this issue and what will be achieved with the fix?** This will complete the user-requested game scheduling feature.
+            1.  Complete the sponsor management UI in . This involves creating a dialog with a file uploader, a display area for currently uploaded banners, and functionality to delete banners.
+            2.  Modify  to fetch the user's sponsor banners.
+            3.  Implement a slideshow component within  to display the fetched banners.
+            4.  Perform end-to-end testing: upload multiple banners on the Dashboard, verify they can be deleted, and confirm the slideshow displays correctly on the public live stats page ().
+        *   **Why fix this issue and what will be achieved with the fix?** This will complete the user-requested feature for displaying sponsor advertisements on the public stat page.
         *   **Status:** IN PROGRESS
         *   **Is recurring issue?** N
         *   **Should Test frontend/backend/both after fix?** both
         *   **Blocked on other issue:** None
 
 **In progress Task List**:
-*   Task 1: Complete the Game Scheduler implementation. (P0)
-    *   **Where to resume:** The agent needs to modify the file . The last relevant action was viewing this file. The next step is to add logic to handle the Not Started game status in the filters and game list.
-    *   **What will be achieved with this?** Users will be able to schedule games in advance and see them separated from active or completed games.
+*   Task 1: Complete the Sponsor Banner implementation. (P0)
+    *   **Where to resume:** Continue building the UI in . The agent has added the basic state and function hooks; the next step is to implement the JSX for the Manage Banners button, the dialog, and the banner list.
+    *   **What will be achieved with this?** Users will have a section on their dashboard to upload and manage sponsor images for their games.
     *   **Status:** IN PROGRESS
     *   **Should Test frontend/backend/both after fix?** both
     *   **Blocked on something:** None
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   P1: Implement roster upload via  file on the frontend. The backend API is ready, but a UI for file upload needs to be added to the  page.
-*   **Future Tasks:**
-    *   None identified.
+    *   P1: Implement roster upload via  file on the frontend. The backend API () is ready, but a UI for file upload needs to be added to the  page.
 
 **Completed work in this session**
-*   Recently completed:
-    *   **CORS Fix:** Resolved a backend CORS issue that was preventing frontend login and registration.
-    *   **UI Verification:** Visually confirmed the compact player card layout in the  view.
-    *   **Game History Page:** Implemented search, status filtering (All, Active, Completed), and a Delete Game feature.
-    *   **Google Login Removal:** Completely removed Google OAuth from both the frontend and backend per user request.
-    *   **Forgot Password Rework:** Modified the forgot password flow to display the reset link directly in the UI, removing the need for an email service.
-    *   **Security Questions:** Implemented a full security question flow for password resets. Users select questions on registration and must answer one correctly to reset their password.
-    *   **Live Game View Toggle:** Added an Expand/Condense button to switch between detailed and compact player card views.
-    *   **Live Game Embed Banner:** Created an embeddable banner that shows live game data (logos, score, leading scorers) and automatically pulls the user's latest active game.
-    *   **UI Enhancements:** Added team logos to live game pages, added a Copy Embed Code button to the Dashboard, separated the live game header into two distinct bars.
-    *   **New Live Game Features:** Added a Reset Stats button with confirmation and an Edit Player (name/number) feature.
-    *   **UX Improvements:** Updated condensed view stat labels to abbreviations (AST, STL, etc.) and reduced toast notification duration to 2 seconds.
+*   **Game Scheduler:** Completed and tested the feature allowing users to schedule games for a future date/time.
+*   **PDF Box Score Overhaul:**
+    *   Redesigned to a simpler, college-style format.
+    *   Added a quarter-by-quarter score summary at the top.
+    *   Added the full game title (including the user-added note).
+    *   Fixed alignment for FG%, 3P%, and FT% columns.
+    *   The MIN column is now conditionally rendered only for games where the clock was enabled.
+*   **Game Clock & Substitutions:**
+    *   Implemented a full game clock system with options on the  page.
+    *   Added live clock controls (, , , , Start, Stop, Halftime) to the  page.
+    *   Implemented a player check-in system to track up to 5 players on the floor and calculate minutes played.
+*   **Game Notes:** Added a feature to the  page to add a custom note, which is then displayed as part of the game title.
+*   **UI/UX & Branding:**
+    *   Removed all Emergent watermarks.
+    *   Added a Triumph Visuals Platform badge, which is hidden on embeddable banners to prevent obstruction.
+    *   Added a Copy Link button for scheduled games on the Dashboard.
+    *   Updated embeddable banners to show the clock above the score.
+    *   Ensured team logos are displayed on both the live stats page () and embed banners.
+*   **Routing:** Made the live stats page () public, removing the login requirement for sharing.
 
 **Earlier issues found/mentioned but not fixed**
 *   None.
@@ -93,81 +102,71 @@ A full-stack FastAPI/React/MongoDB application branded as StatMoose Basketball. 
 
 
 **Key Technical Concepts**
-*   **Frontend:** React, React Hooks, , TailwindCSS, , , ,  for toasts.
-*   **Backend:** FastAPI, Pydantic, Motor (async MongoDB), ,  for JWTs, .
+*   **Frontend:** React, React Hooks, , TailwindCSS, ,  for toasts.
+*   **Backend:** FastAPI, Pydantic, Motor (async MongoDB),  for PDFs,  for JWTs.
 *   **Database:** MongoDB.
-*   **Authentication:** User-scoped data via JWT Bearer tokens. Password resets are protected by security questions.
+*   **Authentication:** JWT Bearer tokens with user-scoped data.
 
 **key DB schema**
 *   **users:** 
-*   **password_reset_tokens:** 
 *   **teams:** 
 *   **games:** 
 *   **players:** 
+*   **sponsor_banners:** (New) 
 
 **changes in tech stack**
-*   **Backend:** No new libraries.  integration was removed from the password flow.
-*   **Frontend:** Added  and  for the game scheduler.
+*   None.
 
 **All files of reference**
-*   : Heavily modified to add/remove numerous endpoints and update data models.
-*   : Updated to show scheduled games and the latest game embed button.
-*   : Needs to be updated for scheduled games.
-*   : Heavily modified with view toggle, new buttons (Reset, Edit), and UI layout changes.
-*   : Updated to support game scheduling.
-*   : Updated to include security question selection.
-*   : Reworked for the security question and direct-link flow.
-*   : Updated to remove Google login.
-*   : Updated routes and toast configuration.
-*   : New file for the game-specific embed.
-*   : New file for the user-specific latest game embed.
+*   : Major updates for game scheduler, PDF generation, game clock, player minutes, notes, and sponsor banners.
+*   : Updated to filter for Scheduled games.
+*   : Updated to display scheduled games, add a Copy Link button, and for the new sponsor banner UI.
+*   : Updated with UI for scheduling and enabling the game clock.
+*   : Major overhaul to add the game clock, substitution checkboxes, on-floor player indicators, and the game note dialog.
+*   : Made the route public and added team logos.
+*    & : Updated to reposition clock/quarter info and remove branding.
+*   : Contains JavaScript to conditionally hide the Triumph Visuals badge on  routes.
+*   : Updated to make the  route public.
 
 **Areas that need refactoring**:
-*    has grown significantly and is now a very large monolithic file. It should be broken down into a modular structure (e.g., , , ).
-*    is extremely large and complex. It should be refactored into smaller, more manageable sub-components (e.g., Scoreboard, PlayerCard, ActionButtons).
+*    is now extremely large and handles all API logic. It should be modularized into routers, models, and services.
+*    has become very complex with multiple features (stats, clock, subs, notes) in one file. It should be broken down into smaller components (e.g., , , ).
 
 **key api endpoints**
-*   
-*   
-*   
-*   
-*   
-*   
-*   : **New** endpoint to get a user's latest active game.
-*   : **New** endpoint to reset game stats.
-*   : **New** endpoint to edit player details.
-*   : **New** endpoint to delete a game.
-*   All data endpoints are protected and require .
-*   Removed all  endpoints.
+*   : **New** endpoint to update the game note.
+*   : **New** endpoint for clock actions (, , ).
+*   : **New** endpoint to mark a player as on the floor.
+*   : **New** endpoint to upload a sponsor banner.
+*   : **New** endpoint to get all sponsor banners for a user.
+*   : **New** endpoint to delete a sponsor banner.
 
 **Critical Info for New Agent**
-*   **No Email Service:** The  API key is not configured. The Forgot Password feature was intentionally modified to work without sending emails by displaying the reset link directly in the UI after security question verification. Do not attempt to fix this by re-implementing an email-based flow.
-*   **No Google Login:** Google login has been completely removed from the application at the user's request.
-*   **Scheduler Implementation:** The current task is to finish the game scheduler. The backend is mostly done, but the frontend  page needs to be updated, and the entire flow needs testing.
-*   **Testing Credentials:** The previous test accounts may have inconsistent state. It is highly recommended to register a new user for testing to ensure a clean state for the security questions and game data.
+*   **Conditional Badge:** The Triumph Visuals badge is rendered from . It is hidden on any route containing  using a JavaScript snippet in the same file. Be mindful of this when making changes to the global layout or embed pages.
+*   **Public Live View:** The  route has been intentionally made public to allow for easy sharing.
+*   **Complex Components:**  and  are very large. Be cautious when editing them and consider the refactoring notes.
+*   **File Uploads:** The upcoming sponsor banner feature involves file uploads. The backend uses  from FastAPI.
 
 **documents and test_reports created in this job**
-*    was updated for manual testing.
+*   : Was updated during the game scheduler implementation.
 
 **Last 10 User Messages**
-*   
-*   
-*   
-*   
-*   
-*   
-*   
-*   
-*   
-*   
+*   Add the final title result to the top of all pdf box scores. Also, create a sponsor banner button creator on the home page where users can create a slide show of uploaded files (png's and jpeg's). The banners uploaded will be put on the live stat output page.
+*   Looks good to me. On the stat menu (with expand, share, etc.), add a little button that allows me to add a note about the game. The final result should look like: {Home team name} vs. {Away team name} - {Note}
+*   Now add quarter-by-quarter score for all games' box scores, and remove the minutes section for games where the clock option is not selected
+*   on the pdf box score, line up the team FG% under FG, 3PT% under 3P, and FT% under FT. The FG% number is far off to the left and not aligned.
+*   Change the high school default time to 8 minutes instead of 10
+*   On the live banner, put the clock above the score and the quarter below. If there is no clock selected when the game is made, just keep the quarter below the score. Also, to the live stat tracker, add a HT button that represents Halftime.
+*   No that's all for now
+*   Only remove it from from the banner. Make sure the logos I add from the team pages go on the live stats output link as well as the embed banner
+*   Yes that looks good! Also, remove the Triumph Visuals watermark from the embed score banner; it's covering the live stat button
+*   I need you to add tags to the clock in the live stat tracker to show -M, +M, -S, +S, to show if people are adding or subtracting minutes or seconds. Make buttons that show -M, +M, -S, +S instead of the arrows
 
 **Project Health Check:**
 *   **Broken:** None.
-*   **Mocked:** The  email functionality is non-existent. The password reset flow works around this by showing the link in the UI.
+*   **Mocked:** None.
 
 **3rd Party Integrations**
-*   **Resend:** Logic exists in the handoff summary, but the implementation has been bypassed in favor of a UI-based password reset link. No API key is configured or needed for the current flow.
-*   **Emergent-managed Google Auth:** Removed from the application.
+*   None active.
 
 **Testing status**
 *   **Testing agent used after significant changes:** NO
@@ -176,7 +175,11 @@ A full-stack FastAPI/React/MongoDB application branded as StatMoose Basketball. 
 *   **Known regressions:** None.
 
 **Credentials to test flow:**
-*   It is recommended to register a new user to ensure a clean testing environment, especially for the security question and game scheduling features. Use the  page.
+*   Email: 
+*   Password: 
 
 **What agent forgot to execute**
-*   The agent was in the middle of implementing the game scheduler feature. It updated the  and  pages but did not complete the required changes to the  page to handle the Not Started status. The feature is therefore incomplete and untested.</analysis>
+*   The agent was in the middle of implementing the Sponsor Banner feature. While the backend API and PDF title update were completed, the frontend work is only partially done. The agent still needs to:
+    1.  Finish the banner management UI in .
+    2.  Implement the banner slideshow display on the  public page.
+    3.  Test the entire feature end-to-end.</analysis>
