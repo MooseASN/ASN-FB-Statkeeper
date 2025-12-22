@@ -293,3 +293,25 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Session 2 updates: 1) Fixed CORS issue for withCredentials by adding dynamic origin middleware, 2) Added DELETE /api/games/{game_id} endpoint for deleting games, 3) Updated GameHistory.jsx with search, filter, and delete functionality with AlertDialog confirmation, 4) Verified compact player cards in LiveGame via screenshot. Test credentials: email=newtest123@example.com, password=testpass123"
+## Game Scheduler Feature - Manual Testing Complete
+
+### Test Date: 2025-12-22
+
+### Backend Tests (via curl):
+- ✅ Create scheduled game with date/time - PASSED
+- ✅ GET /api/games returns games with "scheduled" status - PASSED
+- ✅ POST /api/games/{id}/start changes status from "scheduled" to "active" - PASSED
+
+### Frontend Tests (via screenshots):
+- ✅ Dashboard shows "Scheduled Games" section with correct count - PASSED
+- ✅ Dashboard "Start Now" button visible on scheduled game cards - PASSED
+- ✅ NewGame page has "Start Now" and "Schedule" tabs - PASSED
+- ✅ NewGame page Schedule tab shows date/time pickers - PASSED
+- ✅ GameHistory page has "Scheduled" filter button - PASSED
+- ✅ GameHistory page correctly displays scheduled games (no scores, VS, date/time) - PASSED
+- ✅ GameHistory page filter works correctly (shows 1 of 2 when Scheduled selected) - PASSED
+
+### Test Credentials:
+- Email: schedtest@test.com
+- Password: test123
+
