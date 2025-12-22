@@ -847,9 +847,8 @@ export default function LiveGame() {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
 
-  const calculateTeamStats = (stats) => {
-    if (!stats) return { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 };
-    return stats.reduce((acc, p) => ({
+  const calculateTeamStats = (stats, teamKey) => {
+    const playerStats = stats ? stats.reduce((acc, p) => ({
       oreb: acc.oreb + p.offensive_rebounds,
       dreb: acc.dreb + p.defensive_rebounds,
       totalReb: acc.totalReb + p.offensive_rebounds + p.defensive_rebounds,
@@ -858,7 +857,21 @@ export default function LiveGame() {
       steals: acc.steals + p.steals,
       blocks: acc.blocks + p.blocks,
       fouls: acc.fouls + p.fouls
-    }), { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 });
+    }), { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 }) : 
+    { oreb: 0, dreb: 0, totalReb: 0, turnovers: 0, assists: 0, steals: 0, blocks: 0, fouls: 0 };
+    
+    // Add team-only stats
+    const teamOnlyStats = game?.team_stats?.[teamKey] || { oreb: 0, dreb: 0, turnovers: 0 };
+    return {
+      oreb: playerStats.oreb + (teamOnlyStats.oreb || 0),
+      dreb: playerStats.dreb + (teamOnlyStats.dreb || 0),
+      totalReb: playerStats.totalReb + (teamOnlyStats.oreb || 0) + (teamOnlyStats.dreb || 0),
+      turnovers: playerStats.turnovers + (teamOnlyStats.turnovers || 0),
+      assists: playerStats.assists,
+      steals: playerStats.steals,
+      blocks: playerStats.blocks,
+      fouls: playerStats.fouls
+    };
   };
 
   const getQuarterLabel = (q) => {
