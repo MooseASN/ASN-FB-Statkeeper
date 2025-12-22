@@ -224,16 +224,36 @@ export default function Dashboard({ user, onLogout }) {
                           {formatScheduledDate(game.scheduled_date, game.scheduled_time)}
                         </span>
                       </div>
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700"
-                        onClick={(e) => handleStartScheduledGame(game.id, e)}
-                        disabled={startingGameId === game.id}
-                        data-testid={`start-scheduled-${game.id}`}
-                      >
-                        <PlayCircle className="w-4 h-4 mr-1" />
-                        {startingGameId === game.id ? "Starting..." : "Start Now"}
-                      </Button>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => copyGameLink(game)}
+                          data-testid={`copy-link-${game.id}`}
+                        >
+                          {copiedLinkId === game.id ? (
+                            <>
+                              <Check className="w-4 h-4 mr-1 text-green-500" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Link2 className="w-4 h-4 mr-1" />
+                              Copy Link
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700"
+                          onClick={(e) => handleStartScheduledGame(game.id, e)}
+                          disabled={startingGameId === game.id}
+                          data-testid={`start-scheduled-${game.id}`}
+                        >
+                          <PlayCircle className="w-4 h-4 mr-1" />
+                          {startingGameId === game.id ? "Starting..." : "Start Now"}
+                        </Button>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
