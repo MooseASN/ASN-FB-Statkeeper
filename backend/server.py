@@ -493,6 +493,7 @@ class Game(BaseModel):
     share_code: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     scheduled_date: Optional[str] = None  # ISO date string YYYY-MM-DD
     scheduled_time: Optional[str] = None  # Time string HH:MM
+    note: Optional[str] = None  # Game note/description
     # Clock fields
     clock_enabled: bool = False
     period_duration: int = 720  # Duration in seconds (default 12:00)
