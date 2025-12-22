@@ -680,6 +680,10 @@ export default function LiveGame() {
                 {copied ? <Check className="w-4 h-4 mr-1" /> : <Share2 className="w-4 h-4 mr-1" />}
                 Share
               </Button>
+              <Button variant="ghost" size="sm" onClick={copyEmbedCode} className="text-white hover:bg-white/10" data-testid="embed-btn">
+                {embedCopied ? <Check className="w-4 h-4 mr-1" /> : <Code className="w-4 h-4 mr-1" />}
+                Embed
+              </Button>
               <Button variant="ghost" size="sm" onClick={handleDownloadPDF} className="text-white hover:bg-white/10" data-testid="download-pdf-btn">
                 <FileDown className="w-4 h-4 mr-1" />
                 PDF
