@@ -84,80 +84,82 @@ const SponsorSlideshow = ({ banners }) => {
 
 // TeamTable component - moved outside main component to avoid re-creation on render
 const TeamTable = ({ teamName, stats, totals, teamColor }) => (
-  <div className="mb-8">
-    <h3 className="text-lg font-bold mb-3 flex items-center gap-2" style={{ color: teamColor }}>
-      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: teamColor }}></div>
+  <div className="mb-6 md:mb-8">
+    <h3 className="text-base md:text-lg font-bold mb-2 md:mb-3 flex items-center gap-2" style={{ color: teamColor }}>
+      <div className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full" style={{ backgroundColor: teamColor }}></div>
       {teamName}
     </h3>
-    <div className="overflow-x-auto">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-slate-100">
-            <TableHead className="w-12">#</TableHead>
-            <TableHead>Player</TableHead>
-            <TableHead className="text-center">PTS</TableHead>
-            <TableHead className="text-center">FG</TableHead>
-            <TableHead className="text-center">FG%</TableHead>
-            <TableHead className="text-center">3PT</TableHead>
-            <TableHead className="text-center">3P%</TableHead>
-            <TableHead className="text-center">FT</TableHead>
-            <TableHead className="text-center">FT%</TableHead>
-            <TableHead className="text-center">OREB</TableHead>
-            <TableHead className="text-center">DREB</TableHead>
-            <TableHead className="text-center">REB</TableHead>
-            <TableHead className="text-center">AST</TableHead>
-            <TableHead className="text-center">STL</TableHead>
-            <TableHead className="text-center">BLK</TableHead>
-            <TableHead className="text-center">TO</TableHead>
-            <TableHead className="text-center">PF</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {sortByNumber(stats).map(s => {
-            const calc = calculatePlayerStats(s);
-            return (
-              <TableRow key={s.id}>
-                <TableCell className="font-bold">{s.player_number}</TableCell>
-                <TableCell className="font-medium">{s.player_name}</TableCell>
-                <TableCell className="text-center font-bold">{calc.pts}</TableCell>
-                <TableCell className="text-center">{calc.fg_made}-{calc.fg_att}</TableCell>
-                <TableCell className="text-center">{calc.fg_pct}%</TableCell>
-                <TableCell className="text-center">{s.fg3_made}-{calc.fg3_att}</TableCell>
-                <TableCell className="text-center">{calc.fg3_pct}%</TableCell>
-                <TableCell className="text-center">{s.ft_made}-{calc.ft_att}</TableCell>
-                <TableCell className="text-center">{calc.ft_pct}%</TableCell>
-                <TableCell className="text-center">{s.offensive_rebounds}</TableCell>
-                <TableCell className="text-center">{s.defensive_rebounds}</TableCell>
-                <TableCell className="text-center">{calc.totalReb}</TableCell>
-                <TableCell className="text-center">{s.assists}</TableCell>
-                <TableCell className="text-center">{s.steals}</TableCell>
-                <TableCell className="text-center">{s.blocks}</TableCell>
-                <TableCell className="text-center">{s.turnovers}</TableCell>
-                <TableCell className="text-center">{s.fouls >= 5 ? <span className="text-red-500 font-bold">{s.fouls}</span> : s.fouls}</TableCell>
-              </TableRow>
-            );
-          })}
-          <TableRow className="bg-slate-100 font-bold">
-            <TableCell></TableCell>
-            <TableCell>TOTALS</TableCell>
-            <TableCell className="text-center">{totals.pts}</TableCell>
-            <TableCell className="text-center">{totals.fg_made}-{totals.fg_att}</TableCell>
-            <TableCell className="text-center">{totals.fg_pct}%</TableCell>
-            <TableCell className="text-center">{totals.fg3_made}-{totals.fg3_att}</TableCell>
-            <TableCell className="text-center">{totals.fg3_pct}%</TableCell>
-            <TableCell className="text-center">{totals.ft_made}-{totals.ft_att}</TableCell>
-            <TableCell className="text-center">{totals.ft_pct}%</TableCell>
-            <TableCell className="text-center">{totals.oreb}</TableCell>
-            <TableCell className="text-center">{totals.dreb}</TableCell>
-            <TableCell className="text-center">{totals.reb}</TableCell>
-            <TableCell className="text-center">{totals.ast}</TableCell>
-            <TableCell className="text-center">{totals.stl}</TableCell>
-            <TableCell className="text-center">{totals.blk}</TableCell>
-            <TableCell className="text-center">{totals.to}</TableCell>
-            <TableCell className="text-center">{totals.pf}</TableCell>
-          </TableRow>
-        </TableBody>
-      </Table>
+    <div className="overflow-x-auto -mx-3 sm:mx-0">
+      <div className="min-w-[800px] sm:min-w-0 px-3 sm:px-0">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-100">
+              <TableHead className="w-10 md:w-12 text-xs md:text-sm">#</TableHead>
+              <TableHead className="text-xs md:text-sm">Player</TableHead>
+              <TableHead className="text-center w-10 md:w-auto text-xs md:text-sm">PTS</TableHead>
+              <TableHead className="text-center w-12 md:w-auto text-xs md:text-sm">FG</TableHead>
+              <TableHead className="text-center w-10 md:w-auto text-xs md:text-sm">FG%</TableHead>
+              <TableHead className="text-center w-12 md:w-auto text-xs md:text-sm">3PT</TableHead>
+              <TableHead className="text-center w-10 md:w-auto text-xs md:text-sm">3P%</TableHead>
+              <TableHead className="text-center w-12 md:w-auto text-xs md:text-sm">FT</TableHead>
+              <TableHead className="text-center w-10 md:w-auto text-xs md:text-sm">FT%</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">OREB</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">DREB</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">REB</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">AST</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">STL</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">BLK</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">TO</TableHead>
+              <TableHead className="text-center w-8 md:w-auto text-xs md:text-sm">PF</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {sortByNumber(stats).map(s => {
+              const calc = calculatePlayerStats(s);
+              return (
+                <TableRow key={s.id}>
+                  <TableCell className="font-bold text-xs md:text-sm" style={{ color: teamColor }}>{s.player_number}</TableCell>
+                  <TableCell className="font-medium text-xs md:text-sm whitespace-nowrap">{s.player_name}</TableCell>
+                  <TableCell className="text-center font-bold text-xs md:text-sm">{calc.pts}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{calc.fg_made}-{calc.fg_att}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{calc.fg_pct}%</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.fg3_made}-{calc.fg3_att}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{calc.fg3_pct}%</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.ft_made}-{calc.ft_att}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{calc.ft_pct}%</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.offensive_rebounds}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.defensive_rebounds}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{calc.totalReb}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.assists}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.steals}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.blocks}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.turnovers}</TableCell>
+                  <TableCell className="text-center text-xs md:text-sm">{s.fouls >= 5 ? <span className="text-red-500 font-bold">{s.fouls}</span> : s.fouls}</TableCell>
+                </TableRow>
+              );
+            })}
+            <TableRow className="bg-slate-100 font-bold">
+              <TableCell className="text-xs md:text-sm"></TableCell>
+              <TableCell className="text-xs md:text-sm">TOTALS</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.pts}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.fg_made}-{totals.fg_att}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.fg_pct}%</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.fg3_made}-{totals.fg3_att}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.fg3_pct}%</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.ft_made}-{totals.ft_att}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.ft_pct}%</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.oreb}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.dreb}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.reb}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.ast}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.stl}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.blk}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.to}</TableCell>
+              <TableCell className="text-center text-xs md:text-sm">{totals.pf}</TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </div>
     </div>
   </div>
 );
