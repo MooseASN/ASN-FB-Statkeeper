@@ -15,7 +15,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { History, ChevronRight, FileDown, Trash2, Search, Filter, Calendar, Clock } from "lucide-react";
+import { History, ChevronRight, FileDown, Trash2, Search, Filter, Calendar, Clock, PlayCircle } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
