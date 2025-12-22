@@ -119,9 +119,9 @@ code {
 
 /* Score display */
 .score-display {
-  font-family: 'Work Sans', sans-serif;
+  font-family: var(--font-athletic);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: 0.02em;
 }
 
 /* Quarter indicator */
