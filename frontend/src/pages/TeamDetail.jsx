@@ -97,6 +97,12 @@ export default function TeamDetail({ user, onLogout }) {
   const [teamName, setTeamName] = useState("");
   const [teamLogo, setTeamLogo] = useState("");
   const [teamColor, setTeamColor] = useState("#000000");
+  
+  // Bulk add state
+  const [bulkAddOpen, setBulkAddOpen] = useState(false);
+  const [bulkPlayers, setBulkPlayers] = useState(() => 
+    Array.from({ length: 10 }, () => ({ number: "", name: "" }))
+  );
 
   useEffect(() => {
     const loadTeam = async () => {
