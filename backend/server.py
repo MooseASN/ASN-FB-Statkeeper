@@ -554,6 +554,7 @@ class SponsorBanner(BaseModel):
     user_id: str = ""
     image_data: str = ""  # Base64 encoded image
     filename: str = ""
+    link_url: Optional[str] = None  # Optional clickable link URL
     order: int = 0
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
@@ -1091,6 +1092,7 @@ async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User =
 class SponsorBannerCreate(BaseModel):
     image_data: str  # Base64 encoded image
     filename: str
+    link_url: Optional[str] = None  # Optional clickable link URL
 
 @api_router.get("/sponsor-banners")
 async def get_sponsor_banners(user: User = Depends(get_current_user)):
@@ -1114,11 +1116,26 @@ async def create_sponsor_banner(banner_data: SponsorBannerCreate, user: User = D
         user_id=user.user_id,
         image_data=banner_data.image_data,
         filename=banner_data.filename,
+        link_url=banner_data.link_url,
         order=count
     )
     
     await db.sponsor_banners.insert_one(banner.model_dump())
-    return {"id": banner.id, "filename": banner.filename, "order": banner.order}
+    return {"id": banner.id, "filename": banner.filename, "link_url": banner.link_url, "order": banner.order}
+
+class SponsorBannerUpdate(BaseModel):
+    link_url: Optional[str] = None
+
+@api_router.put("/sponsor-banners/{banner_id}")
+async def update_sponsor_banner(banner_id: str, banner_data: SponsorBannerUpdate, user: User = Depends(get_current_user)):
+    """Update a sponsor banner's link URL"""
+    result = await db.sponsor_banners.update_one(
+        {"id": banner_id, "user_id": user.user_id},
+        {"$set": {"link_url": banner_data.link_url}}
+    )
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Banner not found")
+    return {"message": "Banner updated", "link_url": banner_data.link_url}
 
 @api_router.delete("/sponsor-banners/{banner_id}")
 async def delete_sponsor_banner(banner_id: str, user: User = Depends(get_current_user)):
