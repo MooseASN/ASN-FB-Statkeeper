@@ -611,6 +611,22 @@ export default function LiveGame() {
     }
   };
 
+  const handleSaveNote = async () => {
+    try {
+      await axios.put(`${API}/games/${id}/note`, { note: noteText });
+      fetchGame();
+      setNoteDialogOpen(false);
+      toast.success("Note saved");
+    } catch (error) {
+      toast.error("Failed to save note");
+    }
+  };
+
+  const openNoteDialog = () => {
+    setNoteText(game?.note || "");
+    setNoteDialogOpen(true);
+  };
+
   const handleEndGame = async () => {
     if (!window.confirm("Are you sure you want to end this game?")) return;
     
