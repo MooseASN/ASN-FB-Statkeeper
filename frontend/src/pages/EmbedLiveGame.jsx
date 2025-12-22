@@ -151,7 +151,11 @@ export default function EmbedLiveGame() {
           {game.status === "active" ? (
             <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 rounded-full text-white font-bold text-sm">
               <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-              {game.is_halftime ? 'HALFTIME' : `LIVE - ${game.period_label === 'Period' ? 'P' : 'Q'}${game.current_quarter}`}
+              {game.is_halftime ? 'HALFTIME' : `LIVE - ${getQuarterLabel(game.current_quarter)}`}
+            </span>
+          ) : game.status === "scheduled" ? (
+            <span className="inline-flex items-center px-4 py-2 bg-blue-500 rounded-full text-white font-bold text-sm">
+              NOT STARTED
             </span>
           ) : (
             <span className="inline-flex items-center px-4 py-2 bg-gray-700 rounded-full text-white font-bold text-sm">
