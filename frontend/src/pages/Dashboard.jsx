@@ -5,7 +5,8 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload } from "lucide-react";
+import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
 import Layout from "@/components/Layout";
 import MooseIcon from "@/components/MooseIcon";
 
@@ -60,7 +61,8 @@ export default function Dashboard({ user, onLogout }) {
         try {
           await axios.post(`${API}/sponsor-banners`, {
             image_data: reader.result,
-            filename: file.name
+            filename: file.name,
+            link_url: null
           });
           fetchSponsorBanners();
           toast.success(`Uploaded ${file.name}`);
@@ -73,6 +75,18 @@ export default function Dashboard({ user, onLogout }) {
     
     setUploading(false);
     if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleUpdateBannerLink = async (bannerId, linkUrl) => {
+    try {
+      await axios.put(`${API}/sponsor-banners/${bannerId}`, {
+        link_url: linkUrl || null
+      });
+      fetchSponsorBanners();
+      toast.success("Link updated");
+    } catch (error) {
+      toast.error("Failed to update link");
+    }
   };
 
   const handleDeleteBanner = async (bannerId) => {
@@ -510,26 +524,51 @@ export default function Dashboard({ user, onLogout }) {
 
             {/* Banner List */}
             {sponsorBanners.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 max-h-80 overflow-y-auto">
-                {sponsorBanners.map((banner, index) => (
-                  <div key={banner.id} className="relative group border rounded-lg overflow-hidden">
-                    <img 
-                      src={banner.image_data} 
-                      alt={banner.filename}
-                      className="w-full h-32 object-cover"
-                    />
-                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteBanner(banner.id)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-1" />
-                        Delete
-                      </Button>
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-black/70 text-white text-xs p-1 truncate">
-                      {banner.filename}
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {sponsorBanners.map((banner) => (
+                  <div key={banner.id} className="border rounded-lg overflow-hidden">
+                    <div className="flex gap-4 p-3">
+                      <div className="flex-shrink-0 w-32 h-20 rounded border overflow-hidden">
+                        <img 
+                          src={banner.image_data} 
+                          alt={banner.filename}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate mb-2">{banner.filename}</p>
+                        <div className="flex items-center gap-2">
+                          <ExternalLink className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                          <Input
+                            placeholder="https://sponsor-website.com"
+                            defaultValue={banner.link_url || ""}
+                            className="h-8 text-sm"
+                            onBlur={(e) => {
+                              if (e.target.value !== (banner.link_url || "")) {
+                                handleUpdateBannerLink(banner.id, e.target.value);
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') {
+                                e.target.blur();
+                              }
+                            }}
+                          />
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {banner.link_url ? "Click banner to visit link" : "Add a link (optional)"}
+                        </p>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => handleDeleteBanner(banner.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </div>
                   </div>
                 ))}
