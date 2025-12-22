@@ -24,7 +24,7 @@ export default function GameHistory({ user, onLogout }) {
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); // "all", "active", "completed"
+  const [statusFilter, setStatusFilter] = useState("all"); // "all", "scheduled", "active", "completed"
   const [deleteGameId, setDeleteGameId] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
