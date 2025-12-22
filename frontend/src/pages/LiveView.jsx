@@ -50,7 +50,7 @@ const SponsorSlideshow = ({ banners }) => {
 
   const currentBanner = banners[currentIndex];
   
-  const BannerContent = () => (
+  const bannerContent = (
     <div className="relative w-full h-24 md:h-32 bg-slate-100 rounded-lg overflow-hidden">
       <img 
         src={currentBanner.image_data} 
@@ -84,12 +84,12 @@ const SponsorSlideshow = ({ banners }) => {
         rel="noopener noreferrer"
         className="block hover:opacity-90 transition-opacity"
       >
-        <BannerContent />
+        {bannerContent}
       </a>
     );
   }
 
-  return <BannerContent />;
+  return bannerContent;
 };
 
 // TeamTable component - moved outside main component to avoid re-creation on render
