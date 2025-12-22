@@ -92,7 +92,7 @@ const sortByNumber = (players) => {
 };
 
 // ============ CONDENSED PLAYER CARD ============
-const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
+const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   
@@ -128,6 +128,13 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
                 title="Edit player"
               >
                 <Pencil className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => onRemovePlayer(player)}
+                className="p-0.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                title="Remove player"
+              >
+                <Trash2 className="w-3 h-3" />
               </button>
             </div>
             <span className="text-sm font-bold ml-1">{pts}</span>
