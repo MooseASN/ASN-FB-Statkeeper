@@ -15,6 +15,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
+  const { isDark } = useTheme();
   const [activeGames, setActiveGames] = useState([]);
   const [scheduledGames, setScheduledGames] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
