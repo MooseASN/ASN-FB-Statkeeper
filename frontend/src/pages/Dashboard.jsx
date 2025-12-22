@@ -19,6 +19,7 @@ export default function Dashboard({ user, onLogout }) {
   const [loading, setLoading] = useState(true);
   const [embedCopied, setEmbedCopied] = useState(false);
   const [startingGameId, setStartingGameId] = useState(null);
+  const [copiedLinkId, setCopiedLinkId] = useState(null);
 
   useEffect(() => {
     fetchData();
