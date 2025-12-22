@@ -111,7 +111,7 @@ function App() {
           <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster position="top-right" duration={2000} />
     </div>
   );
 }
