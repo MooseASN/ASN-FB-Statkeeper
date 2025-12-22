@@ -455,6 +455,9 @@ class GameCreate(BaseModel):
     scheduled_date: Optional[str] = None  # YYYY-MM-DD
     scheduled_time: Optional[str] = None  # HH:MM
     start_immediately: bool = True  # If False, creates as "scheduled"
+    clock_enabled: bool = False  # Enable game clock
+    period_duration: int = 720  # Duration in seconds (default 12:00)
+    period_label: str = "Quarter"  # "Quarter" or "Period"
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
