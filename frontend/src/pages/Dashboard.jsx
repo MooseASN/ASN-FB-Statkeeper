@@ -358,7 +358,7 @@ export default function Dashboard({ user, onLogout }) {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={copyEmbedCode}
+                onClick={openEmbedDialog}
                 className="gap-2"
                 data-testid="copy-embed-btn"
               >
@@ -370,7 +370,7 @@ export default function Dashboard({ user, onLogout }) {
                 ) : (
                   <>
                     <Code className="w-4 h-4" />
-                    Copy Embed Code
+                    Embed Code
                   </>
                 )}
               </Button>
