@@ -399,6 +399,10 @@ export default function LiveGame() {
   const clockIntervalRef = useRef(null);
   const [showPeriodEndDialog, setShowPeriodEndDialog] = useState(false);
 
+  // Note state
+  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+  const [noteText, setNoteText] = useState("");
+
   const fetchGame = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
