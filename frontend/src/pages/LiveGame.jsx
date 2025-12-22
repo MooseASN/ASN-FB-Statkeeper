@@ -1199,7 +1199,7 @@ export default function LiveGame() {
                 </Button>
               )}
             </div>
-            <div className={`space-y-${viewMode === "condensed" ? "1" : "3"} max-h-[calc(100vh-220px)] overflow-y-auto pr-2`}>
+            <div className={`space-y-${viewMode === "condensed" ? "1" : "3"}`}>
               {sortByNumber(homeStats).map(player => (
                 <PlayerCard 
                   key={player.id}
