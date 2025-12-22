@@ -282,34 +282,36 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Game History Search and Filter"
-    - "Game Delete from History"
-    - "CSV Upload UI"
-    - "Game Delete API"
+    - "Sponsor Banner Management"
+    - "Sponsor Banner Slideshow on LiveView"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Session 2 updates: 1) Fixed CORS issue for withCredentials by adding dynamic origin middleware, 2) Added DELETE /api/games/{game_id} endpoint for deleting games, 3) Updated GameHistory.jsx with search, filter, and delete functionality with AlertDialog confirmation, 4) Verified compact player cards in LiveGame via screenshot. Test credentials: email=newtest123@example.com, password=testpass123"
-## Game Scheduler Feature - Manual Testing Complete
+    message: "Implemented Sponsor Banner feature with: 1) Backend SponsorBanner model with link_url field, 2) CRUD endpoints for banners at /api/sponsor-banners and /api/sponsor-banners/public/{user_id}, 3) Dashboard UI with Manage Banners dialog including file upload, link URL input, and delete functionality, 4) LiveView slideshow component with 10-second auto-rotation and clickable links. Test credentials: email=schedtest@test.com, password=test123"
+
+## Sponsor Banner Feature - Manual Testing Complete
 
 ### Test Date: 2025-12-22
 
 ### Backend Tests (via curl):
-- ✅ Create scheduled game with date/time - PASSED
-- ✅ GET /api/games returns games with "scheduled" status - PASSED
-- ✅ POST /api/games/{id}/start changes status from "scheduled" to "active" - PASSED
+- ✅ POST /api/sponsor-banners with image_data, filename, link_url - PASSED
+- ✅ GET /api/sponsor-banners returns all user banners - PASSED
+- ✅ PUT /api/sponsor-banners/{id} updates link_url - PASSED
+- ✅ DELETE /api/sponsor-banners/{id} removes banner - PASSED
+- ✅ GET /api/sponsor-banners/public/{user_id} (public endpoint) - PASSED
 
 ### Frontend Tests (via screenshots):
-- ✅ Dashboard shows "Scheduled Games" section with correct count - PASSED
-- ✅ Dashboard "Start Now" button visible on scheduled game cards - PASSED
-- ✅ NewGame page has "Start Now" and "Schedule" tabs - PASSED
-- ✅ NewGame page Schedule tab shows date/time pickers - PASSED
-- ✅ GameHistory page has "Scheduled" filter button - PASSED
-- ✅ GameHistory page correctly displays scheduled games (no scores, VS, date/time) - PASSED
-- ✅ GameHistory page filter works correctly (shows 1 of 2 when Scheduled selected) - PASSED
+- ✅ Dashboard shows "Sponsor Banners" section - PASSED
+- ✅ "Manage Banners" button opens dialog - PASSED
+- ✅ Dialog shows empty state when no banners - PASSED
+- ✅ Dialog shows uploaded banners with preview, filename, link input - PASSED
+- ✅ Delete button removes banner - PASSED
+- ✅ LiveView shows sponsor slideshow above Team Statistics - PASSED
+- ✅ Slideshow shows indicator dots for multiple banners - PASSED
+- ✅ Banner displays "Sponsor" badge when link_url is set - PASSED
 
 ### Test Credentials:
 - Email: schedtest@test.com
