@@ -736,8 +736,18 @@ export default function LiveGame() {
           {/* Left Column - Home Team */}
           <div className="order-1 lg:order-1">
             <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
+              <div className="flex items-center gap-3">
+                {/* Team Logo */}
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center border-2 overflow-hidden flex-shrink-0"
+                  style={{ borderColor: homeColor, backgroundColor: `${homeColor}10` }}
+                >
+                  {game.home_team_logo ? (
+                    <img src={game.home_team_logo} alt={game.home_team_name} className="w-7 h-7 object-contain" />
+                  ) : (
+                    <span className="text-lg font-bold" style={{ color: homeColor }}>{game.home_team_name?.charAt(0)}</span>
+                  )}
+                </div>
                 <h2 className="font-bold text-lg">{game.home_team_name}</h2>
               </div>
               {isActive && (
