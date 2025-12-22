@@ -134,14 +134,19 @@ export default function Dashboard({ user, onLogout }) {
     return quarterScores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
 
+  const openEmbedDialog = () => {
+    setEmbedDialogOpen(true);
+  };
+
   const copyEmbedCode = () => {
     const embedUrl = `${window.location.origin}/embed/latest/${user.user_id}`;
-    const embedCode = `<iframe src="${embedUrl}" width="1920" height="300" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
+    const embedCode = `<iframe src="${embedUrl}" width="${embedWidth}" height="${embedHeight}" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
     
     navigator.clipboard.writeText(embedCode);
     setEmbedCopied(true);
     toast.success("Embed code copied! It will always show your latest live game.");
     setTimeout(() => setEmbedCopied(false), 2000);
+    setEmbedDialogOpen(false);
   };
 
   const copyGameLink = (game) => {
