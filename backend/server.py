@@ -1345,62 +1345,121 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.4*inch, bottomMargin=0.4*inch, leftMargin=0.4*inch, rightMargin=0.4*inch)
     elements = []
     
+    # Check if clock was enabled for this game
+    clock_enabled = game.get("clock_enabled", False)
+    
     # Column headers matching the college box score style
-    headers = ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+    if clock_enabled:
+        headers = ["", "MIN", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+    else:
+        headers = ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+    
+    def format_minutes(seconds):
+        """Format seconds as MM:SS"""
+        mins = seconds // 60
+        secs = seconds % 60
+        return f"{mins}:{secs:02d}"
     
     def create_team_table(team_name: str, team_label: str, stats_list: list, team_totals: dict):
         """Create a team's box score table in college style"""
         # Sort players by jersey number
         sorted_stats = sorted(stats_list, key=lambda x: int(x.get("player_number", "0")) if x.get("player_number", "0").isdigit() else 0)
         
-        # Team header row
-        data = [[f"{team_label}: {team_name}", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]]
+        # Team header row - adjust column count based on clock
+        num_cols = 17 if clock_enabled else 16
+        data = [[f"{team_label}: {team_name}"] + [""] * (num_cols - 1)]
         # Column headers
         data.append(headers)
         
         # Player rows - format: "# Name"
+        total_team_seconds = 0
         for s in sorted_stats:
             totals = calculate_player_totals(s)
             player_label = f"{s['player_number']} {s['player_name']}"
-            row = [
-                player_label,
-                totals['fg_made'],
-                totals['fg_att'],
-                s['fg3_made'],
-                totals['fg3_att'],
-                s['ft_made'],
-                totals['ft_att'],
-                s['offensive_rebounds'],
-                s['defensive_rebounds'],
-                totals['total_reb'],
-                s['assists'],
-                s['fouls'],
-                s['steals'],
-                s['turnovers'],
-                s['blocks'],
-                totals['pts']
-            ]
+            seconds_played = s.get("seconds_played", 0)
+            total_team_seconds += seconds_played
+            
+            if clock_enabled:
+                row = [
+                    player_label,
+                    format_minutes(seconds_played),
+                    totals['fg_made'],
+                    totals['fg_att'],
+                    s['fg3_made'],
+                    totals['fg3_att'],
+                    s['ft_made'],
+                    totals['ft_att'],
+                    s['offensive_rebounds'],
+                    s['defensive_rebounds'],
+                    totals['total_reb'],
+                    s['assists'],
+                    s['fouls'],
+                    s['steals'],
+                    s['turnovers'],
+                    s['blocks'],
+                    totals['pts']
+                ]
+            else:
+                row = [
+                    player_label,
+                    totals['fg_made'],
+                    totals['fg_att'],
+                    s['fg3_made'],
+                    totals['fg3_att'],
+                    s['ft_made'],
+                    totals['ft_att'],
+                    s['offensive_rebounds'],
+                    s['defensive_rebounds'],
+                    totals['total_reb'],
+                    s['assists'],
+                    s['fouls'],
+                    s['steals'],
+                    s['turnovers'],
+                    s['blocks'],
+                    totals['pts']
+                ]
             data.append(row)
         
         # Totals row
-        data.append([
-            "",
-            team_totals['fg_made'],
-            team_totals['fg_att'],
-            team_totals['fg3_made'],
-            team_totals['fg3_att'],
-            team_totals['ft_made'],
-            team_totals['ft_att'],
-            team_totals['oreb'],
-            team_totals['dreb'],
-            team_totals['reb'],
-            team_totals['ast'],
-            team_totals['pf'],
-            team_totals['stl'],
-            team_totals['to'],
-            team_totals['blk'],
-            team_totals['pts']
-        ])
+        if clock_enabled:
+            data.append([
+                "",
+                format_minutes(total_team_seconds),
+                team_totals['fg_made'],
+                team_totals['fg_att'],
+                team_totals['fg3_made'],
+                team_totals['fg3_att'],
+                team_totals['ft_made'],
+                team_totals['ft_att'],
+                team_totals['oreb'],
+                team_totals['dreb'],
+                team_totals['reb'],
+                team_totals['ast'],
+                team_totals['pf'],
+                team_totals['stl'],
+                team_totals['to'],
+                team_totals['blk'],
+                team_totals['pts']
+            ])
+        else:
+            data.append([
+                "",
+                team_totals['fg_made'],
+                team_totals['fg_att'],
+                team_totals['fg3_made'],
+                team_totals['fg3_att'],
+                team_totals['ft_made'],
+                team_totals['ft_att'],
+                team_totals['oreb'],
+                team_totals['dreb'],
+                team_totals['reb'],
+                team_totals['ast'],
+                team_totals['pf'],
+                team_totals['stl'],
+                team_totals['to'],
+                team_totals['blk'],
+                team_totals['pts']
+            ])
         
         # Percentage row - aligned under the correct columns
         data.append([
