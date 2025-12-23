@@ -108,7 +108,12 @@ export default function NewGame({ user, onLogout }) {
         ...getPrimetimeSettings()
       });
       toast.success("Game started!");
-      navigate(`/game/${res.data.id}`);
+      // Navigate to advanced mode if enabled, otherwise regular game page
+      if (advancedMode) {
+        navigate(`/game/${res.data.id}/advanced`);
+      } else {
+        navigate(`/game/${res.data.id}`);
+      }
     } catch (error) {
       toast.error("Failed to create game");
     } finally {
