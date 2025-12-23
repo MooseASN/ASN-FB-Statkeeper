@@ -531,6 +531,12 @@ export default function LiveView() {
                     ))}
                   </div>
                   <p className="text-xs md:text-sm text-white/60 mt-1">Fouls: {homeTotals.pf}</p>
+                  {/* Bonus Status */}
+                  {game.home_bonus && (
+                    <p className="text-xs font-bold mt-1 px-2 py-0.5 bg-yellow-500 text-black rounded inline-block">
+                      {game.home_bonus === "double_bonus" ? "DOUBLE BONUS" : "BONUS"}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
