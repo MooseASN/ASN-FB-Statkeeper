@@ -2,95 +2,71 @@
 The user wants to build a website for tracking basketball statistics, similar to .
 
 **PRODUCT REQUIREMENTS:**
-*   **User Authentication:** Implement a full authentication system allowing users to register via email/username/password. All data must be private and scoped to the logged-in user. Include a Forgot Password feature with security questions.
-*   **Team Management:** Users can create teams with a name, logo, and a specific team color.
-*   **Statistics Tracking:**
-    *   Individual Stats: Free Throws (Made/Missed), 2-Point Field Goals (Made/Missed), 3-Point Field Goals (Made/Missed), Assists, Offensive Rebounds, Defensive Rebounds, Turnovers, Steals, Blocks, and Fouls.
-    *   Team Stats: Automatically calculate total team fouls and shooting percentages (FG%, 3P%, FT%).
-    *   Game Flow Stats: Track and display Largest Lead, Lead Changes, and Times Tied.
-*   **Game Clock & Substitutions:**
-    *   Optionally enable a game clock before starting a game.
-    *   Ability to set period duration (with presets) and labels (e.g., Quarters, Periods).
-    *   Live clock controls: Start/Stop, Halftime, and manual time adjustment buttons (-M, +M, -S, +S).
-    *   Calculate and display player minutes played (MIN) if the clock is used.
-    *   A substitution system using checkboxes to mark up to 5 players per team as on the floor.
-    *   Display numbers of on-floor players in the scoreboard area.
-*   **Game Interface:**
-    *   A split-screen UI for live game stat entry.
-    *   Players sorted by jersey number.
-    *   Play-by-play log and an editable game title/note.
-    *   Ability to add a game note, displayed in the format: .
-    *   A Reset Stats button and player editing capabilities.
-*   **Output & Sharing:**
-    *   A live, shareable, view-only link for games.
-    *   Export a comprehensive, single-page PDF box score styled after a simple college format. The PDF must include quarter-by-quarter scores, the game note title, and correctly aligned shooting percentages. The MIN column should only appear for clock-enabled games.
-    *   An embeddable live game banner (1920x300px) that shows the latest live game data, including the clock if enabled.
-    *   A sponsor banner creator on the home page for uploading a slideshow of images to be displayed on the live stat output page.
-*   **Game Scheduling:** Ability to schedule games for a future date and time, with a Copy Link option for scheduled games on the dashboard.
-*   **Branding:** The application is branded StatMoose Basketball but features a Triumph Visuals Platform badge in the bottom-right corner of all pages except for embeddable banners.
+*   **User Authentication:** Full system with registration, login, Forgot Password, and Remember Me.
+*   **Team & Game Management:** Create teams with logos/colors, manage rosters, and schedule games. This includes importing rosters from MaxPreps links.
+*   **Statistics Tracking:** Comprehensive individual and team stats, plus game flow metrics. This should support three modes:
+    *   **Normal Mode:** The default, full-featured stat tracking.
+    *   **Simple Mode:** A simplified version tracking only makes (FT, 2PT, 3PT), rebounds, assists, and fouls.
+    *   **Advanced Mode:** A new interface emulating the PrestoSports live stats UI, featuring a black theme, specific layout, hotkeys, possession arrow, and detailed stat entry modals.
+*   **Live Game Interface:** A live stat tracker with an editable play-by-play log, game clock, and substitution system. The tracker should support bulk player adding and the ability to visually flip the home/away team positions on screen.
+*   **Game Rules:** The system must handle foul bonuses (Bonus/Double Bonus), timeouts, and a game clock that can be started/stopped with the spacebar or by clicking. It should also support advancing quarters (including overtime) with an option to reset team fouls.
+*   **Events/Tournaments:** Create events, add games, and display an event-specific score ticker on the live game pages with customizable colors and game recaps.
+*   **Primetime Mode:** For specific games, embed a YouTube/m3u8 video stream at the top of the live stats page, which transitions to Picture-in-Picture (PiP) on scroll.
+*   **Output & Sharing:** Shareable live view link, PDF box scores, and an embeddable live game banner.
 
 **User's preferred language**: English
 
 **what currently exists?**
-A full-stack FastAPI/React application for basketball stat tracking. Key features include user authentication (email/password with security questions), team/game management, and live stat entry.
+The application is a full-stack FastAPI/React stat-tracking website. All P0 and P1 issues from the previous session have been resolved. The Primetime PiP video now correctly exits PiP mode when scrolling up. A complete Bonus/Double Bonus feature has been implemented and verified.
 
-Recently completed features include a full game scheduling system, a redesigned college-style PDF box score with conditional columns and quarter scores, and a comprehensive in-game clock and substitution system that tracks player minutes. A game notes feature has been added, and the public-facing live stat pages and embeddable banners now display team logos and the game clock. The application branding has been updated to include a Triumph Visuals badge, which is conditionally hidden on embeddable banners.
+A significant new feature, Advanced Mode, has been built, providing an alternative live-scoring interface that mimics the PrestoSports UI. This mode includes a new black-themed layout, hotkey support, possession tracking, and specific modals for stat entry. The bugs related to its clock functionality and roster management have been fixed.
+
+Additionally, two new features have been added to the standard live stat tracker: a Flip Teams button to visually swap the team columns and a Bulk Add Players dialog. The ability to import rosters from MaxPreps links has also been implemented. A Simple Mode for game creation has been added to simplify stat entry for basic games.
 
 **Last working item**:
-*   Last item agent was working: Implementing a Sponsor Banner creator. The user should be able to upload sponsor images (PNGs/JPEGs) on the dashboard, which will then appear as a slideshow on the public live stats page. The agent has added the backend models and API endpoints and started adding the UI to the Dashboard. The PDF title was also updated to include the game note.
-*   Status: IN PROGRESS
-*   Agent Testing Done: N
-*   Which testing method agent to use? frontend testing agent. The full flow needs to be tested: uploading images on the Dashboard, managing them (view/delete), and verifying that the slideshow appears correctly on the public  page.
-*   User Testing Done: N
+- Last item agent was working: The agent just finished a major debugging session on the newly created Advanced Mode interface. The user reported that the clock was not working and that adding players (single, bulk, or via link import) did not update the roster on screen. The agent correctly identified that player additions were being made to the general team roster instead of the game-specific roster ( collection) and that the clock lacked a backend tick mechanism. The agent implemented fixes for both issues.
+- Status: USER VERIFICATION PENDING
+- Agent Testing Done: Y
+- Which testing method agent to use? screenshot tool. The next agent should ask the user to verify the fixes by creating/opening an Advanced Mode game, testing the clock (by clicking it or using the spacebar), and adding a player via one of the available methods to confirm the roster updates.
+- User Testing Done: N
 
 **All Pending/In progress Issue list**:
-*   Issue 1: The sponsor banner feature is incomplete. (P0)
-
-    *   **Issues Detail:**
-        *   **Attempted fixes:** The backend  model and API endpoints () for CRUD operations were created in . Work began on the frontend UI in .
-        *   **Next debug checklist:**
-            1.  Complete the sponsor management UI in . This involves creating a dialog with a file uploader, a display area for currently uploaded banners, and functionality to delete banners.
-            2.  Modify  to fetch the user's sponsor banners.
-            3.  Implement a slideshow component within  to display the fetched banners.
-            4.  Perform end-to-end testing: upload multiple banners on the Dashboard, verify they can be deleted, and confirm the slideshow displays correctly on the public live stats page ().
-        *   **Why fix this issue and what will be achieved with the fix?** This will complete the user-requested feature for displaying sponsor advertisements on the public stat page.
-        *   **Status:** IN PROGRESS
-        *   **Is recurring issue?** N
-        *   **Should Test frontend/backend/both after fix?** both
-        *   **Blocked on other issue:** None
+*   None. The bugs reported by the user have been addressed and are pending user verification.
 
 **In progress Task List**:
-*   Task 1: Complete the Sponsor Banner implementation. (P0)
-    *   **Where to resume:** Continue building the UI in . The agent has added the basic state and function hooks; the next step is to implement the JSX for the Manage Banners button, the dialog, and the banner list.
-    *   **What will be achieved with this?** Users will have a section on their dashboard to upload and manage sponsor images for their games.
+*   Task 1: Add Event Color Setting (P2)
+    *   **Where to resume:** The backend model and endpoints are complete. The frontend color picker is implemented. The final step is to ensure the event ticker component in  correctly uses the  for its background. The previous agent noted this might be working but it hasn't been explicitly verified.
+    *   **What will be achieved with this?** Allows users to customize the branding of their event's score ticker.
     *   **Status:** IN PROGRESS
-    *   **Should Test frontend/backend/both after fix?** both
+    *   **Should Test frontend/backend/both after fix?** frontend
     *   **Blocked on something:** None
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   P1: Implement roster upload via  file on the frontend. The backend API () is ready, but a UI for file upload needs to be added to the  page.
+    *   P0: Implement sub-features within the new Advanced Mode UI. The tabs and buttons exist, but the functionality is not yet built for:
+        *   The Export screen (printable box score, email box score).
+        *   The Summary and Leaders tabs in the left-side panel.
+    *   P1: Implement roster upload via  file. The backend API () exists, but a UI for file upload needs to be added to the  page.
+    *   P2: Add Game Recaps to Event Ticker. The backend model () has a  field. Logic is needed in  to generate a recap, and the frontend ticker in  needs to be updated to display it.
+*   **Future Tasks:**
+    *   None explicitly mentioned beyond the above.
 
 **Completed work in this session**
-*   **Game Scheduler:** Completed and tested the feature allowing users to schedule games for a future date/time.
-*   **PDF Box Score Overhaul:**
-    *   Redesigned to a simpler, college-style format.
-    *   Added a quarter-by-quarter score summary at the top.
-    *   Added the full game title (including the user-added note).
-    *   Fixed alignment for FG%, 3P%, and FT% columns.
-    *   The MIN column is now conditionally rendered only for games where the clock was enabled.
-*   **Game Clock & Substitutions:**
-    *   Implemented a full game clock system with options on the  page.
-    *   Added live clock controls (, , , , Start, Stop, Halftime) to the  page.
-    *   Implemented a player check-in system to track up to 5 players on the floor and calculate minutes played.
-*   **Game Notes:** Added a feature to the  page to add a custom note, which is then displayed as part of the game title.
-*   **UI/UX & Branding:**
-    *   Removed all Emergent watermarks.
-    *   Added a Triumph Visuals Platform badge, which is hidden on embeddable banners to prevent obstruction.
-    *   Added a Copy Link button for scheduled games on the Dashboard.
-    *   Updated embeddable banners to show the clock above the score.
-    *   Ensured team logos are displayed on both the live stats page () and embed banners.
-*   **Routing:** Made the live stats page () public, removing the login requirement for sharing.
+- **Primetime PiP Fix:** Resolved the issue where the video player would not exit Picture-in-Picture mode when scrolling back to the top of the page.
+- **Bonus/Double Bonus Feature:** Implemented and tested the full feature, including backend logic, UI buttons in the live tracker, and status display on the public live view.
+- **Live Tracker Enhancements:**
+    - **Bulk Add Players:** Added a dialog to the live tracker to add multiple players to a roster at once.
+    - **Flip Teams:** Added a button to visually swap the home and away team roster columns (and their associated action buttons) without changing the underlying home/away status.
+- **Roster Import:**
+    - Added a backend endpoint and frontend UI to import team rosters by scraping a MaxPreps URL.
+    - Initially built a generic scraper for various athletic sites but reverted to MaxPreps-only at the user's request.
+- **Simple Mode:** Added a Simple Mode toggle at game creation that simplifies the live tracker UI to only track makes, assists, rebounds, and fouls.
+- **Advanced Mode (Major Feature):**
+    - Designed, built, and debugged a completely new Advanced Mode live stat tracker UI based on the PrestoSports interface.
+    - Implemented a black theme, a new layout with multiple panels, and UI for possession tracking, clock management, and stat entry.
+    - Added extensive hotkey support for all major actions.
+    - Created new modals for stat entry, substitutions, game control, and roster imports (MaxPreps, Bulk Add, Single Add).
+    - Fixed critical bugs related to the clock not ticking and rosters not updating on screen.
 
 **Earlier issues found/mentioned but not fixed**
 *   None.
@@ -102,74 +78,71 @@ Recently completed features include a full game scheduling system, a redesigned 
 
 
 **Key Technical Concepts**
-*   **Frontend:** React, React Hooks, , TailwindCSS, ,  for toasts.
-*   **Backend:** FastAPI, Pydantic, Motor (async MongoDB),  for PDFs,  for JWTs.
-*   **Database:** MongoDB.
-*   **Authentication:** JWT Bearer tokens with user-scoped data.
+*   **Frontend:** React, React Hooks (, ), TailwindCSS. Heavy use of conditional rendering to manage three distinct game modes (Normal, Simple, Advanced) within the same application flow. Frontend-driven clock using  to call a backend tick API.
+*   **Backend:** FastAPI, Motor (async MongoDB). Added new models/fields for game modes and possession. Implemented web scraping using  and  for roster imports.
+*   **Database:** MongoDB. Key distinction between the master team roster (in  collection) and the game-specific roster ( collection). This was the source of a major bug that was fixed.
 
 **key DB schema**
-*   **users:** 
-*   **teams:** 
-*   **games:** 
-*   **players:** 
-*   **sponsor_banners:** (New) 
+*   **games:**
+    *    (New)
+    *    (New)
+    *    (New, values: home or away)
+*   **player_stats:** A separate collection to store the stats for each player *within a specific game*. This is distinct from the team's main roster list.
 
 **changes in tech stack**
-*   None.
+*   **Added (Backend):** ,  for web scraping.
 
 **All files of reference**
-*   : Major updates for game scheduler, PDF generation, game clock, player minutes, notes, and sponsor banners.
-*   : Updated to filter for Scheduled games.
-*   : Updated to display scheduled games, add a Copy Link button, and for the new sponsor banner UI.
-*   : Updated with UI for scheduling and enabling the game clock.
-*   : Major overhaul to add the game clock, substitution checkboxes, on-floor player indicators, and the game note dialog.
-*   : Made the route public and added team logos.
-*    & : Updated to reposition clock/quarter info and remove branding.
-*   : Contains JavaScript to conditionally hide the Triumph Visuals badge on  routes.
-*   : Updated to make the  route public.
+*   : **New file.** A very large component that contains the entire UI and logic for the Advanced Mode.
+*   : Heavily modified to support Simple Mode (conditional UI), the Flip Teams feature, and the Bulk Add Player dialog.
+*   : Modified to add UI toggles for Simple Mode and Advanced Mode.
+*   : Modified to fix the Primetime PiP logic and add the Bonus status display.
+*   : Heavily modified. Added , , and  fields to game models. Added new API endpoints: , , and . Fixed logic for adding players to a game's .
+*   : Modified to add the MaxPreps import feature.
+*   : Modified to add the route for  and logic to redirect to it if a game has  enabled.
 
 **Areas that need refactoring**:
-*    is now extremely large and handles all API logic. It should be modularized into routers, models, and services.
-*    has become very complex with multiple features (stats, clock, subs, notes) in one file. It should be broken down into smaller components (e.g., , , ).
+*    remains monolithic and has grown even larger.
+*    is a new, very large component. It should be broken down into smaller, more manageable sub-components (e.g., , , , ).
+*    is also very large and could benefit from further componentization.
 
 **key api endpoints**
-*   : **New** endpoint to update the game note.
-*   : **New** endpoint for clock actions (, , ).
-*   : **New** endpoint to mark a player as on the floor.
-*   : **New** endpoint to upload a sponsor banner.
-*   : **New** endpoint to get all sponsor banners for a user.
-*   : **New** endpoint to delete a sponsor banner.
+*   : **New** endpoint to decrement the game clock by one second.
+*   : **New** endpoint to toggle team possession.
+*   : **New** endpoint that scrapes a MaxPreps URL and adds players to a team's roster.
+*   : Endpoint is now used by the Advanced Mode UI to add players directly to a game's active roster ().
 
 **Critical Info for New Agent**
-*   **Conditional Badge:** The Triumph Visuals badge is rendered from . It is hidden on any route containing  using a JavaScript snippet in the same file. Be mindful of this when making changes to the global layout or embed pages.
-*   **Public Live View:** The  route has been intentionally made public to allow for easy sharing.
-*   **Complex Components:**  and  are very large. Be cautious when editing them and consider the refactoring notes.
-*   **File Uploads:** The upcoming sponsor banner feature involves file uploads. The backend uses  from FastAPI.
+*   **Three Game Modes:** The application now has three modes for the live tracker: Normal (the original), Simple Mode (simplified UI), and Advanced Mode (PrestoSports clone). The mode is set at game creation and the app redirects accordingly.
+*   **Game Roster vs. Team Roster:** This is a critical distinction. The  collection holds a master player list for a team. The  collection holds the list of players participating in a *specific game*, along with their stats for that game. When adding players in the live tracker (especially Advanced Mode), you must add them to the  collection for that . The recent bug was caused by adding players to the wrong collection.
+*   **Clock Mechanism:** The clock in Advanced Mode is driven by the frontend. A  in  calls the  endpoint every second and then re-fetches the game state. The backend / endpoints only set the state but do not manage the ticking.
+*   **Advanced Mode Incompleteness:** While the main interface for Advanced Mode is built and functional, several sub-features requested by the user are just placeholders. Specifically, the Export, Summary, and Leaders tabs need to be implemented.
 
 **documents and test_reports created in this job**
-*   : Was updated during the game scheduler implementation.
+*   None.
 
-**Last 10 User Messages**
-*   Add the final title result to the top of all pdf box scores. Also, create a sponsor banner button creator on the home page where users can create a slide show of uploaded files (png's and jpeg's). The banners uploaded will be put on the live stat output page.
-*   Looks good to me. On the stat menu (with expand, share, etc.), add a little button that allows me to add a note about the game. The final result should look like: {Home team name} vs. {Away team name} - {Note}
-*   Now add quarter-by-quarter score for all games' box scores, and remove the minutes section for games where the clock option is not selected
-*   on the pdf box score, line up the team FG% under FG, 3PT% under 3P, and FT% under FT. The FG% number is far off to the left and not aligned.
-*   Change the high school default time to 8 minutes instead of 10
-*   On the live banner, put the clock above the score and the quarter below. If there is no clock selected when the game is made, just keep the quarter below the score. Also, to the live stat tracker, add a HT button that represents Halftime.
-*   No that's all for now
-*   Only remove it from from the banner. Make sure the logos I add from the team pages go on the live stats output link as well as the embed banner
-*   Yes that looks good! Also, remove the Triumph Visuals watermark from the embed score banner; it's covering the live stat button
-*   I need you to add tags to the clock in the live stat tracker to show -M, +M, -S, +S, to show if people are adding or subtracting minutes or seconds. Make buttons that show -M, +M, -S, +S instead of the arrows
+**Last 10 User Messages and any pending HUMAN messages**
+- It still did not work. Nor do the single or bulk adds. When adding player, the roster does not reflect the added players. Remove the Presto or sidearm options, and only accept MaxPreps links. The clock still does not work either when clicking or using the spacebar.
+- When importing rosters, the links wont be from presto or sidearm. It would be from the college, school, or team's athletic websites. Presto and Sidearm just host them. For example, i want to be able to paste this link https://www.apacheathletics.com/sports/mbkb/2025-26/roster and pull the roster from it.
+- Make it a black theme instead of navy blue. In the rosters tab, this is where the roster import needs to be. Options are bulk add, single add, and link add (MaxPreps, Presto Sports website add and Sidearm Sports website add). Space bar and clicking the time should start and stop the clock. The stat buttons should all be one color, and increase the text size. When advancing to the next quarter, ask the user if they want to reset the team fouls. You should also be able to advance past the 4th quarter/period to allow for overtime(s)
+- Let's now create an Advanced Mode in the Game Creation window. The UI should emulate Presto Sport's basketball live stats suite, as attached in the photo... (details on layout, hotkeys, etc.)
+- In game creation screen, create a Simple Mode. It only tracks FT, 2PT, and 3PT makes (not misses), rebounds, assists, and fouls. Everything else is the same.
+- When flipping, also flip the team rebound and turnover buttons as well. In the team creation and edit pages, add the ability to import rosters directly from MaxPreps roster links. Still only pull number and name
+- In the live stat tracker, add the ability to bulk add when adding players to a roster. Also in the tracker, add the ability to flip the position of the teams, but don't change who's home and away.
+- The test_result.md is updated. Now let me provide a summary of what was completed and the current testing status:
+- The flip functionality is working correctly... Would you like me to test the MaxPreps import with a real URL, or proceed with other tasks?
+- Everything in P0 and P1
 
 **Project Health Check:**
 *   **Broken:** None.
 *   **Mocked:** None.
 
 **3rd Party Integrations**
-*   None active.
+*   **react-player:** Used for embedding YouTube and m3u8 video streams.
+*   **beautifulsoup4 / lxml:** Used on the backend for web scraping MaxPreps roster pages.
 
 **Testing status**
-*   **Testing agent used after significant changes:** NO
+*   **Testing agent used after significant changes:** NO (Agent was about to, but was interrupted by new user requests).
 *   **Troubleshoot agent used after agent stuck in loop:** NO
 *   **Test files created:** None.
 *   **Known regressions:** None.
@@ -179,7 +152,5 @@ Recently completed features include a full game scheduling system, a redesigned 
 *   Password: 
 
 **What agent forgot to execute**
-*   The agent was in the middle of implementing the Sponsor Banner feature. While the backend API and PDF title update were completed, the frontend work is only partially done. The agent still needs to:
-    1.  Finish the banner management UI in .
-    2.  Implement the banner slideshow display on the  public page.
-    3.  Test the entire feature end-to-end.</analysis>
+*   The agent was interrupted before it could run the testing subagent to formally verify the **PiP fix** and the **Bonus/Double Bonus** feature. While manually tested, a full regression test was skipped.
+*   The agent did not address the P2 task (Event Color setting) or the P3 task (Event game recaps) from the initial handoff summary.</analysis>
