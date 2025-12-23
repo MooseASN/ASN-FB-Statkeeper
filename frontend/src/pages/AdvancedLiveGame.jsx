@@ -722,30 +722,105 @@ export default function AdvancedLiveGame() {
             
             {leftPanel === "leaders" && (
               <div className="p-3 space-y-4">
-                <div className="text-xs font-semibold text-zinc-400">Points Leaders</div>
-                {[...homeStats, ...awayStats]
-                  .map(p => ({ ...p, pts: p.ft_made + p.fg2_made * 2 + p.fg3_made * 3 }))
-                  .sort((a, b) => b.pts - a.pts)
-                  .slice(0, 5)
-                  .map(p => (
-                    <div key={p.id} className="flex justify-between text-xs py-1">
-                      <span>{p.player_name}</span>
-                      <span className="font-bold">{p.pts}</span>
+                {/* Home Team Leaders */}
+                <div>
+                  <div className="text-xs font-semibold mb-2 pb-1 border-b border-zinc-700" style={{ color: homeColor }}>
+                    {game.home_team_name}
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="text-[10px] text-zinc-500 uppercase">Points</div>
+                      {homeStats
+                        .map(p => ({ ...p, pts: p.ft_made + p.fg2_made * 2 + p.fg3_made * 3 }))
+                        .sort((a, b) => b.pts - a.pts)
+                        .slice(0, 3)
+                        .map(p => (
+                          <div key={p.id} className="flex justify-between text-xs py-0.5">
+                            <span className="truncate">{p.player_name}</span>
+                            <span className="font-bold ml-2">{p.pts}</span>
+                          </div>
+                        ))
+                      }
                     </div>
-                  ))
-                }
-                <div className="text-xs font-semibold text-zinc-400 mt-4">Rebounds Leaders</div>
-                {[...homeStats, ...awayStats]
-                  .map(p => ({ ...p, reb: p.offensive_rebounds + p.defensive_rebounds }))
-                  .sort((a, b) => b.reb - a.reb)
-                  .slice(0, 5)
-                  .map(p => (
-                    <div key={p.id} className="flex justify-between text-xs py-1">
-                      <span>{p.player_name}</span>
-                      <span className="font-bold">{p.reb}</span>
+                    <div>
+                      <div className="text-[10px] text-zinc-500 uppercase">Rebounds</div>
+                      {homeStats
+                        .map(p => ({ ...p, reb: p.offensive_rebounds + p.defensive_rebounds }))
+                        .sort((a, b) => b.reb - a.reb)
+                        .slice(0, 3)
+                        .map(p => (
+                          <div key={p.id} className="flex justify-between text-xs py-0.5">
+                            <span className="truncate">{p.player_name}</span>
+                            <span className="font-bold ml-2">{p.reb}</span>
+                          </div>
+                        ))
+                      }
                     </div>
-                  ))
-                }
+                    <div>
+                      <div className="text-[10px] text-zinc-500 uppercase">Assists</div>
+                      {homeStats
+                        .sort((a, b) => b.assists - a.assists)
+                        .slice(0, 3)
+                        .map(p => (
+                          <div key={p.id} className="flex justify-between text-xs py-0.5">
+                            <span className="truncate">{p.player_name}</span>
+                            <span className="font-bold ml-2">{p.assists}</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Away Team Leaders */}
+                <div>
+                  <div className="text-xs font-semibold mb-2 pb-1 border-b border-zinc-700" style={{ color: awayColor }}>
+                    {game.away_team_name}
+                  </div>
+                  <div className="space-y-2">
+                    <div>
+                      <div className="text-[10px] text-zinc-500 uppercase">Points</div>
+                      {awayStats
+                        .map(p => ({ ...p, pts: p.ft_made + p.fg2_made * 2 + p.fg3_made * 3 }))
+                        .sort((a, b) => b.pts - a.pts)
+                        .slice(0, 3)
+                        .map(p => (
+                          <div key={p.id} className="flex justify-between text-xs py-0.5">
+                            <span className="truncate">{p.player_name}</span>
+                            <span className="font-bold ml-2">{p.pts}</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-zinc-500 uppercase">Rebounds</div>
+                      {awayStats
+                        .map(p => ({ ...p, reb: p.offensive_rebounds + p.defensive_rebounds }))
+                        .sort((a, b) => b.reb - a.reb)
+                        .slice(0, 3)
+                        .map(p => (
+                          <div key={p.id} className="flex justify-between text-xs py-0.5">
+                            <span className="truncate">{p.player_name}</span>
+                            <span className="font-bold ml-2">{p.reb}</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                    <div>
+                      <div className="text-[10px] text-zinc-500 uppercase">Assists</div>
+                      {awayStats
+                        .sort((a, b) => b.assists - a.assists)
+                        .slice(0, 3)
+                        .map(p => (
+                          <div key={p.id} className="flex justify-between text-xs py-0.5">
+                            <span className="truncate">{p.player_name}</span>
+                            <span className="font-bold ml-2">{p.assists}</span>
+                          </div>
+                        ))
+                      }
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </ScrollArea>
