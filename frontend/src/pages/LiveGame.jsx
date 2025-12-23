@@ -436,6 +436,10 @@ export default function LiveGame() {
   const [embedWidth, setEmbedWidth] = useState("1920");
   const [embedHeight, setEmbedHeight] = useState("300");
 
+  // Timeout state
+  const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
+  const [timeoutTeam, setTimeoutTeam] = useState(null); // "home" or "away"
+
   const fetchGame = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
