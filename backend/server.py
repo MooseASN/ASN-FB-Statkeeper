@@ -1039,6 +1039,75 @@ async def exit_halftime(game_id: str, next_quarter: int, user: User = Depends(ge
     
     return {"message": f"Moved to quarter {next_quarter}"}
 
+# Timeout Endpoint
+class TimeoutRequest(BaseModel):
+    team: str  # "home" or "away"
+    timeout_type: str  # "full" or "partial"
+
+@api_router.post("/games/{game_id}/timeout")
+async def use_timeout(game_id: str, timeout_data: TimeoutRequest, user: User = Depends(get_current_user)):
+    """Use a timeout for a team"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Determine which team and check if they have timeouts remaining
+    if timeout_data.team == "home":
+        timeouts_used = game.get("home_timeouts_used", 0)
+        timeout_key = "home_timeouts_used"
+        team_name = game["home_team_name"]
+    else:
+        timeouts_used = game.get("away_timeouts_used", 0)
+        timeout_key = "away_timeouts_used"
+        team_name = game["away_team_name"]
+    
+    total_timeouts = game.get("total_timeouts", 4)
+    
+    if timeouts_used >= total_timeouts:
+        raise HTTPException(status_code=400, detail="No timeouts remaining")
+    
+    # Increment timeouts used
+    new_timeouts_used = timeouts_used + 1
+    
+    # Stop clock if running
+    if game.get("clock_running"):
+        await stop_clock(game_id, user)
+    
+    # Calculate current scores
+    home_score = sum(game.get("quarter_scores", {}).get("home", [0, 0, 0, 0]))
+    away_score = sum(game.get("quarter_scores", {}).get("away", [0, 0, 0, 0]))
+    
+    # Add to play-by-play
+    timeout_type_display = "Full" if timeout_data.timeout_type == "full" else "Partial"
+    play_entry = {
+        "id": str(uuid.uuid4()),
+        "quarter": game.get("current_quarter", 1),
+        "team": timeout_data.team,
+        "player_name": "TIMEOUT",
+        "player_number": "",
+        "action": f"{team_name} Timeout - {timeout_type_display}",
+        "points": 0,
+        "home_score": home_score,
+        "away_score": away_score
+    }
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {
+            "$set": {
+                timeout_key: new_timeouts_used,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            "$push": {"play_by_play": play_entry}
+        }
+    )
+    
+    return {
+        "message": f"Timeout used",
+        "team": timeout_data.team,
+        "timeouts_remaining": total_timeouts - new_timeouts_used
+    }
+
 # Player On-Floor (Substitution) Endpoints
 @api_router.post("/games/{game_id}/players/{player_id}/check-in")
 async def player_check_in(game_id: str, player_id: str, user: User = Depends(get_current_user)):
