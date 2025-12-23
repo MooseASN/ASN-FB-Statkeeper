@@ -120,22 +120,24 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
         
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1">
-              <span className="font-medium text-sm truncate">{player.player_name}</span>
-              <button
-                onClick={() => onEditPlayer(player)}
-                className="p-0.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
-                title="Edit player"
-              >
-                <Pencil className="w-3 h-3" />
-              </button>
-              <button
-                onClick={() => onRemovePlayer(player)}
-                className="p-0.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
-                title="Remove player"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="font-medium text-sm truncate max-w-[100px]">{player.player_name}</span>
+              <div className="flex items-center gap-0.5 flex-shrink-0">
+                <button
+                  onClick={() => onEditPlayer(player)}
+                  className="p-0.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
+                  title="Edit player"
+                >
+                  <Pencil className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => onRemovePlayer(player)}
+                  className="p-0.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                  title="Remove player"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
             </div>
             <span className="text-sm font-bold ml-1">{pts}</span>
           </div>
