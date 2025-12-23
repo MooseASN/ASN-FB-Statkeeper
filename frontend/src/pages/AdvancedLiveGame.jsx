@@ -915,7 +915,7 @@ export default function AdvancedLiveGame() {
                   variant="outline"
                   onClick={() => setShowEmailDialog(true)}
                 >
-                  <FileDown className="w-6 h-6" />
+                  <Mail className="w-6 h-6" />
                   <span>Email Box Score</span>
                 </Button>
                 <Button 
