@@ -251,6 +251,20 @@ export default function LiveView() {
           console.error("Error fetching sponsor banners:", bannerErr);
         }
       }
+      
+      // Fetch event games if this game is part of an event
+      if (res.data.event_id) {
+        try {
+          const eventRes = await axios.get(`${API}/events/${res.data.event_id}/public`);
+          setEventInfo(eventRes.data);
+          setEventGames(eventRes.data.games || []);
+        } catch (eventErr) {
+          console.error("Error fetching event:", eventErr);
+        }
+      } else {
+        setEventGames([]);
+        setEventInfo(null);
+      }
     } catch (err) {
       setError("Game not found");
     } finally {
