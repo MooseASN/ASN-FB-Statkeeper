@@ -231,23 +231,25 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
         >
           {player.player_number}
         </div>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="font-bold text-lg">{player.player_name}</h4>
-            <button
-              onClick={() => onEditPlayer(player)}
-              className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
-              title="Edit player"
-            >
-              <Pencil className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => onRemovePlayer(player)}
-              className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
-              title="Remove player"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+            <h4 className="font-bold text-lg truncate">{player.player_name}</h4>
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <button
+                onClick={() => onEditPlayer(player)}
+                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
+                title="Edit player"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => onRemovePlayer(player)}
+                className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                title="Remove player"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
+            </div>
           </div>
           <p className="text-sm text-muted-foreground">
             {stats.fg_made}/{stats.fg_att} FG ({stats.fg_pct}%) • {totalReb} REB • {player.assists} AST
