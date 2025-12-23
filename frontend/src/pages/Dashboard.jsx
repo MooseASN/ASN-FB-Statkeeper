@@ -231,18 +231,18 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="border-l-4 border-l-[#000000] dark:border-l-white dark:bg-neutral-900">
+          <Card className="border-l-4 border-l-[#000000]">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Teams</p>
-                  <p className="text-3xl font-bold text-[#000000] dark:text-white">{teams.length}</p>
+                  <p className="text-3xl font-bold text-[#000000]">{teams.length}</p>
                 </div>
-                <Users className="w-10 h-10 text-[#000000]/20 dark:text-white/20" />
+                <Users className="w-10 h-10 text-[#000000]/20" />
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-blue-500 dark:bg-neutral-900">
+          <Card className="border-l-4 border-l-blue-500">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -253,7 +253,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-orange-500 dark:bg-neutral-900">
+          <Card className="border-l-4 border-l-orange-500">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -264,7 +264,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-emerald-500 dark:bg-neutral-900">
+          <Card className="border-l-4 border-l-emerald-500">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -280,29 +280,29 @@ export default function Dashboard({ user, onLogout }) {
         {/* Scheduled Games */}
         {scheduledGames.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-black dark:text-white">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-black">
               <Calendar className="w-5 h-5 text-blue-500" />
               Scheduled Games
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {scheduledGames.map(game => (
-                <Card key={game.id} className="border-2 border-blue-200 dark:border-blue-900 dark:bg-neutral-900" data-testid={`scheduled-game-${game.id}`}>
+                <Card key={game.id} className="border-2 border-blue-200" data-testid={`scheduled-game-${game.id}`}>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg text-black dark:text-white">{game.home_team_name}</p>
+                        <p className="font-semibold text-lg text-black">{game.home_team_name}</p>
                         <p className="text-sm text-muted-foreground">Home</p>
                       </div>
                       <div className="px-4">
                         <span className="text-lg font-bold text-slate-400">VS</span>
                       </div>
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg text-black dark:text-white">{game.away_team_name}</p>
+                        <p className="font-semibold text-lg text-black">{game.away_team_name}</p>
                         <p className="text-sm text-muted-foreground">Away</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t dark:border-neutral-800">
-                      <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400">
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <div className="flex items-center gap-2 text-blue-600">
                         <Clock className="w-4 h-4" />
                         <span className="text-sm font-medium">
                           {formatScheduledDate(game.scheduled_date, game.scheduled_time)}
@@ -350,7 +350,7 @@ export default function Dashboard({ user, onLogout }) {
         {activeGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-black dark:text-white">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-black">
                 <PlayCircle className="w-5 h-5 text-orange-500" />
                 Live Games
               </h2>
@@ -380,23 +380,23 @@ export default function Dashboard({ user, onLogout }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeGames.map(game => (
                 <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200 dark:border-orange-900 dark:bg-neutral-900" data-testid={`active-game-${game.id}`}>
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg text-black dark:text-white">{game.home_team_name}</p>
-                          <p className="text-4xl font-bold score-display text-[#000000] dark:text-white">
+                          <p className="font-semibold text-lg text-black">{game.home_team_name}</p>
+                          <p className="text-4xl font-bold score-display text-[#000000]">
                             {calculateScore(game.quarter_scores, "home")}
                           </p>
                         </div>
                         <div className="px-4">
-                          <span className="text-sm bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400 px-3 py-1 rounded-full font-medium">
+                          <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
                             Q{game.current_quarter}
                           </span>
                         </div>
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg text-black dark:text-white">{game.away_team_name}</p>
-                          <p className="text-4xl font-bold score-display text-[#000000] dark:text-white">
+                          <p className="font-semibold text-lg text-black">{game.away_team_name}</p>
+                          <p className="text-4xl font-bold score-display text-[#000000]">
                             {calculateScore(game.quarter_scores, "away")}
                           </p>
                         </div>
@@ -413,8 +413,8 @@ export default function Dashboard({ user, onLogout }) {
         {recentGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-black dark:text-white">
-                <History className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-black">
+                <History className="w-5 h-5 text-slate-500" />
                 Recent Games
               </h2>
               <Link to="/history">
@@ -424,15 +424,15 @@ export default function Dashboard({ user, onLogout }) {
             <div className="space-y-3">
               {recentGames.map(game => (
                 <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer dark:bg-neutral-900" data-testid={`recent-game-${game.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid={`recent-game-${game.id}`}>
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <span className="font-medium text-black dark:text-white">{game.home_team_name}</span>
-                          <span className="text-2xl font-bold score-display text-black dark:text-white">
+                          <span className="font-medium text-black">{game.home_team_name}</span>
+                          <span className="text-2xl font-bold score-display text-black">
                             {calculateScore(game.quarter_scores, "home")} - {calculateScore(game.quarter_scores, "away")}
                           </span>
-                          <span className="font-medium text-black dark:text-white">{game.away_team_name}</span>
+                          <span className="font-medium text-black">{game.away_team_name}</span>
                         </div>
                         <span className="text-sm text-muted-foreground">
                           {new Date(game.created_at).toLocaleDateString()}
@@ -449,7 +449,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Sponsor Banners */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2 text-black dark:text-white">
+            <h2 className="text-xl font-semibold flex items-center gap-2 text-black">
               <Image className="w-5 h-5 text-purple-500" />
               Sponsor Banners
             </h2>
@@ -473,7 +473,7 @@ export default function Dashboard({ user, onLogout }) {
               ) : (
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {sponsorBanners.map((banner) => (
-                    <div key={banner.id} className="flex-shrink-0 w-24 h-16 rounded border dark:border-neutral-700 overflow-hidden">
+                    <div key={banner.id} className="flex-shrink-0 w-24 h-16 rounded border overflow-hidden">
                       <img src={banner.image_data} alt={banner.filename} className="w-full h-full object-cover" />
                     </div>
                   ))}
@@ -485,10 +485,10 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Empty State */}
         {!loading && teams.length === 0 && (
-          <Card className="text-center py-12 dark:bg-neutral-900">
+          <Card className="text-center py-12">
             <CardContent>
-              <Users className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-black dark:text-white">No Teams Yet</h3>
+              <Users className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+              <h3 className="text-xl font-semibold mb-2 text-black">No Teams Yet</h3>
               <p className="text-muted-foreground mb-4">Create your first team to start tracking games</p>
               <Link to="/teams">
                 <Button data-testid="create-first-team-btn">
