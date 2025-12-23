@@ -506,6 +506,49 @@ export default function NewGame({ user, onLogout }) {
                 )}
               </div>
 
+              {/* Advanced Mode */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Timer className="w-5 h-5 text-blue-600" />
+                    <Label className="text-base font-semibold">Advanced Mode</Label>
+                  </div>
+                  <Switch
+                    checked={advancedMode}
+                    onCheckedChange={(checked) => {
+                      setAdvancedMode(checked);
+                      if (checked) {
+                        setSimpleMode(false);
+                        setClockEnabled(true); // Advanced mode always has clock
+                      }
+                    }}
+                    data-testid="advanced-mode-toggle"
+                  />
+                </div>
+                
+                {advancedMode && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Professional stat tracking interface inspired by PrestoSports. Includes hotkeys, possession tracking, and detailed play-by-play.
+                    </p>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                      <p className="text-sm font-medium text-blue-800 mb-2">Features:</p>
+                      <ul className="text-sm text-blue-700 grid grid-cols-2 gap-x-4 gap-y-1">
+                        <li>• Possession Arrow</li>
+                        <li>• Keyboard Hotkeys</li>
+                        <li>• On-court Lineup</li>
+                        <li>• Team Foul Tracking</li>
+                        <li>• Game Control Panel</li>
+                        <li>• Quick Substitutions</li>
+                      </ul>
+                    </div>
+                    <p className="text-xs text-muted-foreground italic">
+                      Note: Clock is automatically enabled in Advanced Mode.
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
