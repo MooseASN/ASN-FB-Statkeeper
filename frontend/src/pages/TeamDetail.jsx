@@ -103,6 +103,11 @@ export default function TeamDetail({ user, onLogout }) {
   const [bulkPlayers, setBulkPlayers] = useState(() => 
     Array.from({ length: 10 }, () => ({ number: "", name: "" }))
   );
+  
+  // MaxPreps import state
+  const [maxPrepsOpen, setMaxPrepsOpen] = useState(false);
+  const [maxPrepsUrl, setMaxPrepsUrl] = useState("");
+  const [maxPrepsLoading, setMaxPrepsLoading] = useState(false);
 
   useEffect(() => {
     const loadTeam = async () => {
