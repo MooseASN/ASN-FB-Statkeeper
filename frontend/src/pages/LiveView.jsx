@@ -376,6 +376,86 @@ export default function LiveView() {
         </div>
       </div>
 
+      {/* Primetime Video Player */}
+      {game.primetime_enabled && game.video_url && (
+        <>
+          {/* Main Video Container */}
+          <div 
+            ref={videoContainerRef}
+            className={`bg-black ${isPiP ? 'h-0 overflow-hidden' : ''}`}
+          >
+            <div className="max-w-6xl mx-auto">
+              <div className="aspect-video">
+                <ReactPlayer
+                  url={game.video_url}
+                  width="100%"
+                  height="100%"
+                  controls
+                  playing={!isPiP}
+                  config={{
+                    youtube: {
+                      playerVars: { modestbranding: 1 }
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* PiP Video */}
+          {isPiP && (
+            <div
+              ref={pipRef}
+              className="fixed z-50 shadow-2xl rounded-lg overflow-hidden cursor-move"
+              style={{
+                left: pipPosition.x,
+                top: pipPosition.y,
+                width: '320px',
+                height: '180px'
+              }}
+              onMouseDown={handleMouseDown}
+            >
+              <ReactPlayer
+                url={game.video_url}
+                width="100%"
+                height="100%"
+                controls
+                playing
+                config={{
+                  youtube: {
+                    playerVars: { modestbranding: 1 }
+                  }
+                }}
+              />
+              {/* PiP Controls */}
+              <div className="absolute top-2 right-2 flex gap-1">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPiP(false);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="p-1.5 bg-black/70 hover:bg-black rounded text-white"
+                  title="Back to full size"
+                >
+                  <Maximize2 className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsPiP(false);
+                  }}
+                  className="p-1.5 bg-black/70 hover:bg-black rounded text-white"
+                  title="Close PiP"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
       {/* Game Title Banner */}
       <div className="bg-[#000000] text-white py-3 md:py-4">
         <div className="max-w-6xl mx-auto px-3 md:px-4 text-center">
