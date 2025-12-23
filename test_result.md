@@ -346,10 +346,58 @@ frontend:
         agent: "main"
         comment: "Event color already applied to ticker background via eventInfo?.color. Color picker exists in Events create/edit dialogs. Backend supports color field in Event model."
 
+  - task: "Advanced Mode Clock"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdvancedLiveGame.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Clock now works - clicking clock button or pressing spacebar toggles start/stop. Frontend setInterval calls /api/games/{id}/clock/tick every second when running. Verified via screenshot."
+
+  - task: "Advanced Mode Player Additions"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdvancedLiveGame.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Player additions (single add, bulk add, MaxPreps link import) now correctly add to game roster (player_stats collection). Roster updates on screen immediately. Verified via screenshot - added #88 Test NewPlayer successfully."
+
+  - task: "Advanced Mode Export (PDF)"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdvancedLiveGame.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Printable Box Score button now downloads PDF via /api/games/{id}/boxscore/pdf endpoint. Email Box Score copies live stats link. Verified via screenshot - PDF downloaded successfully."
+
+  - task: "Advanced Mode Summary and Leaders Tabs"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdvancedLiveGame.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Summary tab shows team comparison (PTS, REB, AST, STL, BLK, TO). Leaders tab shows top 5 points and rebounds leaders. Both verified via screenshot."
+
 metadata:
   created_by: "main_agent"
-  version: "1.1"
-  test_sequence: 2
+  version: "1.2"
+  test_sequence: 3
   run_ui: true
 
 test_plan:
