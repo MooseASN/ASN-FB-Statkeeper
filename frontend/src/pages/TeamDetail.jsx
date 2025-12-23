@@ -530,6 +530,63 @@ export default function TeamDetail({ user, onLogout }) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* MaxPreps Import Dialog */}
+      <Dialog open={maxPrepsOpen} onOpenChange={setMaxPrepsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Import from MaxPreps</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <p className="text-sm text-muted-foreground">
+              Paste a MaxPreps roster URL to import player numbers and names.
+            </p>
+            <div>
+              <Label htmlFor="maxpreps-url">MaxPreps Roster URL</Label>
+              <Input
+                id="maxpreps-url"
+                placeholder="https://www.maxpreps.com/high-schools/.../roster"
+                value={maxPrepsUrl}
+                onChange={(e) => setMaxPrepsUrl(e.target.value)}
+                className="mt-1"
+                data-testid="maxpreps-url-input"
+              />
+            </div>
+            <div className="p-3 bg-slate-50 rounded-lg text-xs text-muted-foreground space-y-1">
+              <p><strong>How to find the roster URL:</strong></p>
+              <ol className="list-decimal list-inside space-y-0.5">
+                <li>Go to MaxPreps.com</li>
+                <li>Search for your school&apos;s basketball team</li>
+                <li>Click on &quot;Roster&quot; tab</li>
+                <li>Copy the URL from your browser</li>
+              </ol>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <Button variant="outline" onClick={() => setMaxPrepsOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleMaxPrepsImport} 
+                disabled={maxPrepsLoading || !maxPrepsUrl.trim()}
+                className="flex-1"
+                data-testid="import-maxpreps-submit"
+              >
+                {maxPrepsLoading ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Importing...
+                  </>
+                ) : (
+                  <>
+                    <LinkIcon className="w-4 h-4 mr-2" />
+                    Import Roster
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
