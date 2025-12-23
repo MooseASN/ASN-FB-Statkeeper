@@ -504,6 +504,10 @@ class Game(BaseModel):
     clock_running: bool = False
     clock_last_started: Optional[str] = None  # ISO timestamp when clock was last started
     is_halftime: bool = False
+    # Timeout fields
+    total_timeouts: int = 4  # Total timeouts per team
+    home_timeouts_used: int = 0  # Timeouts used by home team
+    away_timeouts_used: int = 0  # Timeouts used by away team
     # On-floor players (player_ids)
     home_on_floor: List[str] = []
     away_on_floor: List[str] = []
