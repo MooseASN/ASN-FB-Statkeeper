@@ -35,6 +35,10 @@ export default function NewGame({ user, onLogout }) {
   const [timeoutPreset, setTimeoutPreset] = useState("college"); // "high_school", "college", "custom"
   const [customTimeouts, setCustomTimeouts] = useState(4);
 
+  // Primetime options
+  const [primetimeEnabled, setPrimetimeEnabled] = useState(false);
+  const [videoUrl, setVideoUrl] = useState("");
+
   useEffect(() => {
     fetchTeams();
   }, []);
