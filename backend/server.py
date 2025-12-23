@@ -837,8 +837,6 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
         key = (player["number"], player["name"])
         if key not in seen:
             seen.add(key)
-            unique_roster.append(player)        if key not in seen:
-            seen.add(key)
             unique_roster.append(player)
     
     # Update team roster
@@ -856,7 +854,7 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
     await db.teams.update_one({"id": team_id, "user_id": user.user_id}, {"$set": {"roster": existing_roster}})
     
     return {
-        "message": f"Imported {added} new players from MaxPreps ({len(unique_roster)} found, {len(unique_roster) - added} duplicates skipped)",
+        "message": f"Imported {added} new players ({len(unique_roster)} found, {len(unique_roster) - added} duplicates skipped)",
         "roster": existing_roster,
         "imported_count": added,
         "found_count": len(unique_roster)
