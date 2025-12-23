@@ -259,6 +259,107 @@ export default function NewGame({ user, onLogout }) {
                 </div>
               )}
 
+              {/* Game Mode Selection */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-slate-600" />
+                  <Label className="text-base font-semibold">Stat Tracking Mode</Label>
+                </div>
+                
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Simple Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setStatMode("simple")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      statMode === "simple" 
+                        ? "border-green-500 bg-green-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="font-semibold text-green-700 mb-1">Simple</div>
+                    <p className="text-xs text-slate-600">Basic stat tracking for quick games</p>
+                  </button>
+                  
+                  {/* Classic Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setStatMode("classic")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      statMode === "classic" 
+                        ? "border-black bg-slate-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="font-semibold text-slate-800 mb-1">Classic</div>
+                    <p className="text-xs text-slate-600">Full stats with traditional interface</p>
+                  </button>
+                  
+                  {/* Advanced Mode */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStatMode("advanced");
+                      setClockEnabled(true); // Advanced requires clock
+                    }}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      statMode === "advanced" 
+                        ? "border-blue-500 bg-blue-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="font-semibold text-blue-700 mb-1">Advanced</div>
+                    <p className="text-xs text-slate-600">Pro interface with hotkeys & more</p>
+                  </button>
+                </div>
+                
+                {/* Mode Details */}
+                {statMode === "simple" && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-green-800 mb-1">Simple Mode tracks:</p>
+                    <ul className="text-sm text-green-700 grid grid-cols-2 gap-x-4">
+                      <li>• FT Makes</li>
+                      <li>• 2PT Makes</li>
+                      <li>• 3PT Makes</li>
+                      <li>• Rebounds</li>
+                      <li>• Assists</li>
+                      <li>• Fouls</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {statMode === "classic" && (
+                  <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-slate-800 mb-1">Classic Mode includes:</p>
+                    <ul className="text-sm text-slate-700 grid grid-cols-2 gap-x-4">
+                      <li>• All shot tracking</li>
+                      <li>• Rebounds (O/D)</li>
+                      <li>• Assists & Steals</li>
+                      <li>• Blocks & Turnovers</li>
+                      <li>• Fouls</li>
+                      <li>• Player Minutes</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {statMode === "advanced" && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-blue-800 mb-2">Advanced Mode features:</p>
+                    <ul className="text-sm text-blue-700 grid grid-cols-2 gap-x-4 gap-y-1">
+                      <li>• Possession Arrow</li>
+                      <li>• Keyboard Hotkeys</li>
+                      <li>• On-court Lineup</li>
+                      <li>• Team Foul Tracking</li>
+                      <li>• Game Control Panel</li>
+                      <li>• Quick Substitutions</li>
+                    </ul>
+                    <p className="text-xs text-blue-600 mt-2 italic">
+                      * Clock is required for Advanced Mode
+                    </p>
+                  </div>
+                )}
+              </div>
+
               {/* Clock Options */}
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center justify-between">
@@ -272,9 +373,14 @@ export default function NewGame({ user, onLogout }) {
                     id="clock-toggle"
                     checked={clockEnabled}
                     onCheckedChange={setClockEnabled}
+                    disabled={statMode === "advanced"} // Cannot disable clock in advanced mode
                     data-testid="clock-toggle"
                   />
                 </div>
+                
+                {statMode === "advanced" && !clockEnabled && (
+                  <p className="text-xs text-amber-600">Clock is required for Advanced Mode and has been enabled.</p>
+                )}
                 
                 {clockEnabled && (
                   <div className="space-y-4 pt-2 border-t">
