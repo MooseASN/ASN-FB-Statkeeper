@@ -121,7 +121,6 @@ export default function NewGame({ user, onLogout }) {
         scheduled_time: scheduledTime || null,
         ...getClockSettings(),
         ...getTimeoutSettings()
-        ...getClockSettings()
       });
       toast.success("Game scheduled!");
       navigate("/");
