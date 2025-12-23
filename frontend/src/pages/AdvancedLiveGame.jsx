@@ -913,12 +913,7 @@ export default function AdvancedLiveGame() {
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
-                  onClick={() => {
-                    // For email, we'll show the live stats URL which can be shared
-                    const url = `${window.location.origin}/live/${game.share_code}`;
-                    navigator.clipboard.writeText(url);
-                    toast.success("Live stats link copied! Share this link via email.");
-                  }}
+                  onClick={() => setShowEmailDialog(true)}
                 >
                   <FileDown className="w-6 h-6" />
                   <span>Email Box Score</span>
