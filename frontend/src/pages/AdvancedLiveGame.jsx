@@ -112,6 +112,13 @@ export default function AdvancedLiveGame() {
   const fetchGame = useCallback(async () => {
     try {
       const gameRes = await axios.get(`${API}/games/${id}`);
+      
+      // Redirect to normal mode if not in advanced mode
+      if (!gameRes.data.advanced_mode) {
+        navigate(`/game/${id}`, { replace: true });
+        return;
+      }
+      
       setGame(gameRes.data);
       setPossession(gameRes.data.possession || "home");
       setClockRunning(gameRes.data.clock_running || false);
