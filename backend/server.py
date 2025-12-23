@@ -569,6 +569,27 @@ class SponsorBanner(BaseModel):
     order: int = 0
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+# Event/Tournament Model
+class EventCreate(BaseModel):
+    name: str
+    location: Optional[str] = None
+    start_date: str  # YYYY-MM-DD
+    end_date: Optional[str] = None  # YYYY-MM-DD, same as start_date if single day
+    logo_data: Optional[str] = None  # Base64 encoded logo image
+
+class Event(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str = ""
+    name: str
+    location: Optional[str] = None
+    start_date: str
+    end_date: Optional[str] = None
+    logo_data: Optional[str] = None
+    game_ids: List[str] = []  # List of game IDs in this event
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 # ============ TEAM ENDPOINTS ============
 
 @api_router.post("/teams", response_model=Team)
