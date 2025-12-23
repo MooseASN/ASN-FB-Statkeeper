@@ -164,6 +164,22 @@ export default function AdvancedLiveGame() {
     };
   }, [clockRunning, game?.clock_time, id, fetchGame]);
 
+  // Clock toggle - use useCallback to ensure stable reference
+  const handleToggleClock = useCallback(async () => {
+    try {
+      if (clockRunning) {
+        await axios.post(`${API}/games/${id}/clock/stop`);
+        setClockRunning(false);
+      } else {
+        await axios.post(`${API}/games/${id}/clock/start`);
+        setClockRunning(true);
+      }
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to toggle clock");
+    }
+  }, [clockRunning, id, fetchGame]);
+
   // Keyboard handler
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -202,23 +218,7 @@ export default function AdvancedLiveGame() {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [possession]);
-
-  // Clock toggle
-  const handleToggleClock = async () => {
-    try {
-      if (clockRunning) {
-        await axios.post(`${API}/games/${id}/clock/stop`);
-        setClockRunning(false);
-      } else {
-        await axios.post(`${API}/games/${id}/clock/start`);
-        setClockRunning(true);
-      }
-      fetchGame();
-    } catch (error) {
-      toast.error("Failed to toggle clock");
-    }
-  };
+  }, [possession, handleToggleClock]);
 
   // Set clock time
   const handleSetTime = async () => {
