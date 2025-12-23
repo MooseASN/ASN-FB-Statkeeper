@@ -280,7 +280,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Scheduled Games */}
         {scheduledGames.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-black">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4">
               <Calendar className="w-5 h-5 text-blue-500" />
               Scheduled Games
             </h2>
@@ -290,14 +290,14 @@ export default function Dashboard({ user, onLogout }) {
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg text-black">{game.home_team_name}</p>
+                        <p className="font-semibold text-lg">{game.home_team_name}</p>
                         <p className="text-sm text-muted-foreground">Home</p>
                       </div>
                       <div className="px-4">
                         <span className="text-lg font-bold text-slate-400">VS</span>
                       </div>
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg text-black">{game.away_team_name}</p>
+                        <p className="font-semibold text-lg">{game.away_team_name}</p>
                         <p className="text-sm text-muted-foreground">Away</p>
                       </div>
                     </div>
@@ -350,7 +350,7 @@ export default function Dashboard({ user, onLogout }) {
         {activeGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-black">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
                 <PlayCircle className="w-5 h-5 text-orange-500" />
                 Live Games
               </h2>
@@ -384,7 +384,7 @@ export default function Dashboard({ user, onLogout }) {
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg text-black">{game.home_team_name}</p>
+                          <p className="font-semibold text-lg">{game.home_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000]">
                             {calculateScore(game.quarter_scores, "home")}
                           </p>
@@ -395,7 +395,7 @@ export default function Dashboard({ user, onLogout }) {
                           </span>
                         </div>
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg text-black">{game.away_team_name}</p>
+                          <p className="font-semibold text-lg">{game.away_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000]">
                             {calculateScore(game.quarter_scores, "away")}
                           </p>
@@ -413,7 +413,7 @@ export default function Dashboard({ user, onLogout }) {
         {recentGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2 text-black">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
                 <History className="w-5 h-5 text-slate-500" />
                 Recent Games
               </h2>
@@ -428,11 +428,11 @@ export default function Dashboard({ user, onLogout }) {
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <span className="font-medium text-black">{game.home_team_name}</span>
-                          <span className="text-2xl font-bold score-display text-black">
+                          <span className="font-medium">{game.home_team_name}</span>
+                          <span className="text-2xl font-bold score-display">
                             {calculateScore(game.quarter_scores, "home")} - {calculateScore(game.quarter_scores, "away")}
                           </span>
-                          <span className="font-medium text-black">{game.away_team_name}</span>
+                          <span className="font-medium">{game.away_team_name}</span>
                         </div>
                         <span className="text-sm text-muted-foreground">
                           {new Date(game.created_at).toLocaleDateString()}
@@ -449,7 +449,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Sponsor Banners */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2 text-black">
+            <h2 className="text-xl font-semibold flex items-center gap-2">
               <Image className="w-5 h-5 text-purple-500" />
               Sponsor Banners
             </h2>
@@ -488,7 +488,7 @@ export default function Dashboard({ user, onLogout }) {
           <Card className="text-center py-12">
             <CardContent>
               <Users className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2 text-black">No Teams Yet</h3>
+              <h3 className="text-xl font-semibold mb-2">No Teams Yet</h3>
               <p className="text-muted-foreground mb-4">Create your first team to start tracking games</p>
               <Link to="/teams">
                 <Button data-testid="create-first-team-btn">
