@@ -1148,6 +1148,19 @@ export default function LiveGame() {
                 )}
               </Button>
               
+              {/* Flip Teams Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setTeamsFlipped(!teamsFlipped)}
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                data-testid="flip-teams-btn"
+                title="Flip team positions"
+              >
+                <ArrowLeftRight className="w-4 h-4 mr-1" />
+                Flip
+              </Button>
+              
               {lastAction && isActive && (
                 <Button 
                   variant="outline" 
