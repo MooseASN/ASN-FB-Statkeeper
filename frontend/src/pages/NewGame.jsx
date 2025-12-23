@@ -30,6 +30,10 @@ export default function NewGame({ user, onLogout }) {
   const [periodMinutes, setPeriodMinutes] = useState(12);
   const [periodSeconds, setPeriodSeconds] = useState(0);
   const [periodLabel, setPeriodLabel] = useState("Quarter"); // "Quarter" or "Period"
+  
+  // Timeout options
+  const [timeoutPreset, setTimeoutPreset] = useState("college"); // "high_school", "college", "custom"
+  const [customTimeouts, setCustomTimeouts] = useState(4);
 
   useEffect(() => {
     fetchTeams();
@@ -52,6 +56,13 @@ export default function NewGame({ user, onLogout }) {
       clock_enabled: true,
       period_duration: (periodMinutes * 60) + periodSeconds,
       period_label: periodLabel
+    };
+  };
+
+  const getTimeoutSettings = () => {
+    return {
+      timeout_preset: timeoutPreset,
+      custom_timeouts: timeoutPreset === "custom" ? customTimeouts : 4
     };
   };
 
