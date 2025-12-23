@@ -42,6 +42,9 @@ export default function NewGame({ user, onLogout }) {
   // Simple mode option
   const [simpleMode, setSimpleMode] = useState(false);
 
+  // Advanced mode option
+  const [advancedMode, setAdvancedMode] = useState(false);
+
   useEffect(() => {
     fetchTeams();
   }, []);
