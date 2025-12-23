@@ -29,6 +29,7 @@ export default function EventDetail({ user, onLogout }) {
   const [editEndDate, setEditEndDate] = useState("");
   const [editLogoPreview, setEditLogoPreview] = useState(null);
   const [editLogoData, setEditLogoData] = useState(null);
+  const [editColor, setEditColor] = useState("#000000");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -47,6 +48,7 @@ export default function EventDetail({ user, onLogout }) {
       setEditEndDate(res.data.end_date || "");
       setEditLogoPreview(res.data.logo_data);
       setEditLogoData(res.data.logo_data);
+      setEditColor(res.data.color || "#000000");
     } catch (error) {
       toast.error("Failed to load event");
       navigate("/events");
