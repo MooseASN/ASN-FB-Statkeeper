@@ -233,18 +233,18 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Quick Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <Card className="border-l-4 border-l-[#000000]">
+          <Card className="border-l-4 border-l-[#000000] dark:border-l-white dark:bg-neutral-900">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-muted-foreground">Teams</p>
                   <p className="text-3xl font-bold text-[#000000] dark:text-white">{teams.length}</p>
                 </div>
-                <Users className="w-10 h-10 text-[#000000]/20" />
+                <Users className="w-10 h-10 text-[#000000]/20 dark:text-white/20" />
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-blue-500">
+          <Card className="border-l-4 border-l-blue-500 dark:bg-neutral-900">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -255,7 +255,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-orange-500">
+          <Card className="border-l-4 border-l-orange-500 dark:bg-neutral-900">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -266,7 +266,7 @@ export default function Dashboard({ user, onLogout }) {
               </div>
             </CardContent>
           </Card>
-          <Card className="border-l-4 border-l-emerald-500">
+          <Card className="border-l-4 border-l-emerald-500 dark:bg-neutral-900">
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
                 <div>
