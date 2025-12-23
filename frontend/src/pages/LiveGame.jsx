@@ -1231,6 +1231,32 @@ export default function LiveGame() {
                   <p className="text-5xl font-bold" style={{ color: homeColor }} data-testid="home-score">
                     {calculateScore("home")}
                   </p>
+                  {/* Timeout Indicators */}
+                  <div className="flex justify-center gap-1 mt-2">
+                    {Array.from({ length: game?.total_timeouts || 4 }, (_, i) => (
+                      <div
+                        key={i}
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: i < (game?.home_timeouts_used || 0) ? '#d1d5db' : homeColor
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {isActive && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-2 text-xs h-7"
+                      onClick={() => {
+                        setTimeoutTeam("home");
+                        setTimeoutDialogOpen(true);
+                      }}
+                      disabled={(game?.home_timeouts_used || 0) >= (game?.total_timeouts || 4)}
+                    >
+                      Timeout
+                    </Button>
+                  )}
                 </div>
                 <div className="px-4 text-2xl text-slate-300">-</div>
                 <div className="text-center flex-1">
@@ -1267,6 +1293,32 @@ export default function LiveGame() {
                   <p className="text-5xl font-bold" style={{ color: awayColor }} data-testid="away-score">
                     {calculateScore("away")}
                   </p>
+                  {/* Timeout Indicators */}
+                  <div className="flex justify-center gap-1 mt-2">
+                    {Array.from({ length: game?.total_timeouts || 4 }, (_, i) => (
+                      <div
+                        key={i}
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: i < (game?.away_timeouts_used || 0) ? '#d1d5db' : awayColor
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {isActive && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-2 text-xs h-7"
+                      onClick={() => {
+                        setTimeoutTeam("away");
+                        setTimeoutDialogOpen(true);
+                      }}
+                      disabled={(game?.away_timeouts_used || 0) >= (game?.total_timeouts || 4)}
+                    >
+                      Timeout
+                    </Button>
+                  )}
                 </div>
               </div>
               
