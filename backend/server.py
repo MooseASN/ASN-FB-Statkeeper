@@ -522,6 +522,8 @@ class Game(BaseModel):
     # Bonus status
     home_bonus: Optional[str] = None  # null, "bonus", or "double_bonus"
     away_bonus: Optional[str] = None  # null, "bonus", or "double_bonus"
+    # Simple mode - only track makes, rebounds, assists, fouls
+    simple_mode: bool = False
     # On-floor players (player_ids)
     home_on_floor: List[str] = []
     away_on_floor: List[str] = []
