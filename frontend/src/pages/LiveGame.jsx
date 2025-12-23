@@ -580,6 +580,35 @@ export default function LiveGame() {
     }
   };
 
+  // Bonus handler - cycle through null -> bonus -> double_bonus -> null
+  const handleBonusToggle = async (team) => {
+    const currentStatus = team === "home" ? game?.home_bonus : game?.away_bonus;
+    let newStatus = null;
+    
+    if (!currentStatus) {
+      newStatus = "bonus";
+    } else if (currentStatus === "bonus") {
+      newStatus = "double_bonus";
+    } else {
+      newStatus = null;
+    }
+    
+    try {
+      await axios.post(`${API}/games/${id}/bonus`, {
+        team: team,
+        bonus_status: newStatus
+      });
+      fetchGame();
+      if (newStatus) {
+        toast.success(`${team === 'home' ? game.home_team_name : game.away_team_name} is in ${newStatus === 'double_bonus' ? 'Double Bonus' : 'Bonus'}`);
+      } else {
+        toast.success(`Bonus cleared`);
+      }
+    } catch (error) {
+      toast.error("Failed to update bonus");
+    }
+  };
+
   // Player check-in/out for minutes tracking
   const handlePlayerCheckIn = async (playerId) => {
     try {
