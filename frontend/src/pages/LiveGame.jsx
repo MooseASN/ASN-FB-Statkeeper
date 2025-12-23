@@ -569,17 +569,17 @@ export default function LiveGame() {
     };
   }, [clockRunning, game?.clock_enabled]);
 
-  // Clock control functions
-  const handleStartClock = async () => {
+  // Clock control functions - use useCallback for stable references
+  const handleStartClock = useCallback(async () => {
     try {
       await axios.post(`${API}/games/${id}/clock/start`);
       setClockRunning(true);
     } catch (error) {
       toast.error("Failed to start clock");
     }
-  };
+  }, [id]);
 
-  const handleStopClock = async () => {
+  const handleStopClock = useCallback(async () => {
     try {
       await axios.post(`${API}/games/${id}/clock/stop`);
       setClockRunning(false);
@@ -589,7 +589,7 @@ export default function LiveGame() {
     } catch (error) {
       toast.error("Failed to stop clock");
     }
-  };
+  }, [id, clockTime, fetchGame]);
 
   const handleAdjustClock = async (seconds) => {
     const newTime = Math.max(0, clockTime + seconds);
