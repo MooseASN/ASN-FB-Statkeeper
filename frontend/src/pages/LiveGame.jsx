@@ -531,11 +531,29 @@ export default function LiveGame() {
 
   const handleHalftime = async () => {
     try {
-      await axios.post(`${API}/games/${id}/clock/halftime`);
-      setShowPeriodEndDialog(false);
+      if (game?.is_halftime) {
+        // Already at halftime - show dialog to select next period
+        setShowHalftimeExitDialog(true);
+      } else {
+        // Enter halftime
+        await axios.post(`${API}/games/${id}/clock/halftime`);
+        setShowPeriodEndDialog(false);
+        fetchGame();
+      }
+    } catch (error) {
+      toast.error("Failed to toggle halftime");
+    }
+  };
+
+  const handleExitHalftime = async (nextQuarter) => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/exit-halftime`, null, {
+        params: { next_quarter: nextQuarter }
+      });
+      setShowHalftimeExitDialog(false);
       fetchGame();
     } catch (error) {
-      toast.error("Failed to go to halftime");
+      toast.error("Failed to exit halftime");
     }
   };
 
