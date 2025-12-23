@@ -514,14 +514,14 @@ export default function LiveGame() {
     return () => clearInterval(interval);
   }, [fetchGame]);
 
-  // Spacebar keyboard handler for clock toggle
+  // Backslash keyboard handler for clock toggle
   useEffect(() => {
     const handleKeyDown = (e) => {
       // Ignore if typing in input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       
-      // Spacebar toggles clock when enabled
-      if (e.key === ' ' && game?.clock_enabled) {
+      // Backslash (\) toggles clock when enabled
+      if (e.key === '\\' && game?.clock_enabled) {
         e.preventDefault();
         if (clockRunning) {
           handleStopClock();
