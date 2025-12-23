@@ -184,6 +184,8 @@ export default function AdvancedLiveGame() {
         setShowReboundDialog(true);
       } else if (action === 'turnover') {
         setShowTurnoverDialog(true);
+      } else if (action === 'foul') {
+        setShowFoulDialog(true);
       } else if (action === 'ft' || action === '2pt' || action === '3pt' || 
                  action === 'steal' || action === 'assist' || action === 'block') {
         setActiveAction(action);
