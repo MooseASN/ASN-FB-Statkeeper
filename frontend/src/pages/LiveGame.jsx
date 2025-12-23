@@ -1365,6 +1365,26 @@ export default function LiveGame() {
                   </div>
                 </div>
               )}
+
+              {/* Halftime Control for games without clock */}
+              {!game?.clock_enabled && isActive && (
+                <div className="border-t pt-4 mb-4">
+                  <div className="flex items-center justify-center gap-3">
+                    <Button 
+                      onClick={handleHalftime}
+                      variant={game?.is_halftime ? "default" : "outline"}
+                      size="sm"
+                      className={`gap-1 ${game?.is_halftime ? "bg-orange-500 hover:bg-orange-600" : ""}`}
+                    >
+                      <Coffee className="w-4 h-4" />
+                      {game?.is_halftime ? "Exit Halftime" : "Halftime"}
+                    </Button>
+                  </div>
+                  {game?.is_halftime && (
+                    <p className="text-center text-sm text-muted-foreground mt-2">HALFTIME</p>
+                  )}
+                </div>
+              )}
               
               {/* Period Selection */}
               <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
