@@ -133,7 +133,8 @@ export default function NewGame({ user, onLogout }) {
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime || null,
         ...getClockSettings(),
-        ...getTimeoutSettings()
+        ...getTimeoutSettings(),
+        ...getPrimetimeSettings()
       });
       toast.success("Game scheduled!");
       navigate("/");
