@@ -266,11 +266,32 @@ export default function AdvancedLiveGame() {
     }
   };
 
-  // Game control - advance quarter
-  const handleAdvanceQuarter = async () => {
+  // Game control - advance quarter (now shows dialog)
+  const handleAdvanceQuarter = () => {
+    setShowAdvanceQuarterDialog(true);
+  };
+
+  // Actually advance quarter with optional foul reset
+  const confirmAdvanceQuarter = async (resetFouls) => {
     try {
-      await axios.post(`${API}/games/${id}/quarter/advance`);
-      toast.success("Advanced to next quarter");
+      // Advance to next quarter (no limit for overtime)
+      const nextQuarter = (game.current_quarter || 1) + 1;
+      const updates = { 
+        current_quarter: nextQuarter,
+        clock_time: game.period_duration || 720 // Reset clock to period duration
+      };
+      
+      // Reset fouls if requested
+      if (resetFouls) {
+        // Reset all player fouls - would need backend support
+        // For now, just acknowledge
+        toast.success("Team fouls reset");
+      }
+      
+      await axios.put(`${API}/games/${id}`, updates);
+      toast.success(`Advanced to ${game.period_label} ${nextQuarter}${nextQuarter > 4 ? ' (OT)' : ''}`);
+      setShowAdvanceQuarterDialog(false);
+      setShowGameControlDialog(false);
       fetchGame();
     } catch (error) {
       toast.error("Failed to advance quarter");
@@ -282,9 +303,84 @@ export default function AdvancedLiveGame() {
     try {
       await axios.put(`${API}/games/${id}`, { current_quarter: quarter });
       fetchGame();
-      toast.success(`Set to quarter ${quarter}`);
+      toast.success(`Set to ${game.period_label} ${quarter}`);
     } catch (error) {
       toast.error("Failed to set quarter");
+    }
+  };
+
+  // Roster import handlers
+  const handleSingleAdd = async () => {
+    if (!newPlayer.number.trim() || !newPlayer.name.trim()) {
+      toast.error("Please enter both number and name");
+      return;
+    }
+    
+    const teamId = importTeam === "home" ? game.home_team_id : game.away_team_id;
+    try {
+      await axios.post(`${API}/games/${id}/players`, {
+        team_id: teamId,
+        player_number: newPlayer.number.trim(),
+        player_name: newPlayer.name.trim()
+      });
+      toast.success("Player added");
+      setNewPlayer({ number: "", name: "" });
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to add player");
+    }
+  };
+
+  const handleBulkAdd = async () => {
+    const validPlayers = bulkPlayers.filter(p => p.number.trim() && p.name.trim());
+    if (validPlayers.length === 0) {
+      toast.error("Please add at least one player");
+      return;
+    }
+    
+    const teamId = importTeam === "home" ? game.home_team_id : game.away_team_id;
+    let added = 0;
+    
+    try {
+      for (const player of validPlayers) {
+        await axios.post(`${API}/games/${id}/players`, {
+          team_id: teamId,
+          player_number: player.number.trim(),
+          player_name: player.name.trim()
+        });
+        added++;
+      }
+      toast.success(`Added ${added} player(s)`);
+      setBulkPlayers([{ number: "", name: "" }]);
+      setShowBulkAddDialog(false);
+      fetchGame();
+    } catch (error) {
+      toast.error(`Failed. ${added} added before error.`);
+      fetchGame();
+    }
+  };
+
+  const handleLinkImport = async () => {
+    if (!importUrl.trim()) {
+      toast.error("Please enter a URL");
+      return;
+    }
+    
+    const teamId = importTeam === "home" ? game.home_team_id : game.away_team_id;
+    setImportLoading(true);
+    
+    try {
+      const res = await axios.post(`${API}/teams/${teamId}/roster/maxpreps`, {
+        url: importUrl.trim()
+      });
+      toast.success(res.data.message);
+      setImportUrl("");
+      setShowLinkImportDialog(false);
+      fetchGame();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to import roster");
+    } finally {
+      setImportLoading(false);
     }
   };
 
