@@ -1439,28 +1439,30 @@ export default function AdvancedLiveGame() {
       <Dialog open={showLinkImportDialog} onOpenChange={setShowLinkImportDialog}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
-            <DialogTitle>Import Roster from Link</DialogTitle>
+            <DialogTitle>Import Roster from Website</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-sm text-zinc-400">
-              Import roster from MaxPreps, PrestoSports, or Sidearm Sports roster pages.
+              Paste a roster page URL from any athletic website (school, college, or team sites).
             </p>
             <div>
-              <Label className="text-xs text-zinc-400">Roster URL</Label>
+              <Label className="text-xs text-zinc-400">Roster Page URL</Label>
               <Input
-                placeholder="https://www.maxpreps.com/.../roster"
+                placeholder="https://www.schoolathletics.com/sports/mbkb/roster"
                 value={importUrl}
                 onChange={(e) => setImportUrl(e.target.value)}
                 className="bg-zinc-800 border-zinc-700"
               />
             </div>
             <div className="bg-zinc-800 rounded-lg p-3 text-xs text-zinc-400">
-              <p className="font-medium text-zinc-300 mb-1">Supported Sources:</p>
+              <p className="font-medium text-zinc-300 mb-1">Works with sites powered by:</p>
               <ul className="space-y-1">
-                <li>• MaxPreps - maxpreps.com/...roster</li>
-                <li>• PrestoSports - prestosports.com/...roster</li>
-                <li>• Sidearm Sports - sidearmstats.com/...roster</li>
+                <li>• PrestoSports (college athletic sites)</li>
+                <li>• Sidearm Sports (college athletic sites)</li>
+                <li>• MaxPreps (high school)</li>
+                <li>• Most athletic website roster pages</li>
               </ul>
+              <p className="mt-2 text-zinc-500">Example: apacheathletics.com/sports/mbkb/2025-26/roster</p>
             </div>
             <Button 
               onClick={handleLinkImport} 
