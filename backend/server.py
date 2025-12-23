@@ -1409,6 +1409,27 @@ async def remove_game_from_event(event_id: str, game_id: str, user: User = Depen
     
     return {"message": "Game removed from event"}
 
+# Bonus endpoint
+class BonusUpdate(BaseModel):
+    team: str  # "home" or "away"
+    bonus_status: Optional[str] = None  # null, "bonus", or "double_bonus"
+
+@api_router.post("/games/{game_id}/bonus")
+async def update_bonus(game_id: str, bonus_data: BonusUpdate, user: User = Depends(get_current_user)):
+    """Update bonus status for a team"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    field = "home_bonus" if bonus_data.team == "home" else "away_bonus"
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {field: bonus_data.bonus_status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Bonus updated", "team": bonus_data.team, "status": bonus_data.bonus_status}
+
 # ============ SPONSOR BANNER ENDPOINTS ============
 
 class SponsorBannerCreate(BaseModel):
