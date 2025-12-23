@@ -125,6 +125,7 @@ function App() {
           <Route path="/teams/:id" element={<ProtectedRoute user={user}><TeamDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           <Route path="/new-game" element={<ProtectedRoute user={user}><NewGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           <Route path="/game/:id" element={<ProtectedRoute user={user}><LiveGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+          <Route path="/game/:id/advanced" element={<ProtectedRoute user={user}><AdvancedLiveGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           <Route path="/history" element={<ProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           
           {/* Live view is now protected - only owner can see */}
