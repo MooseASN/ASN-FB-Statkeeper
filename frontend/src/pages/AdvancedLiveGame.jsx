@@ -1028,7 +1028,7 @@ export default function AdvancedLiveGame() {
       <Dialog open={showPlayerSelect} onOpenChange={setShowPlayerSelect}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
           <DialogHeader>
-            <DialogTitle>Select Player - {activeAction?.toUpperCase()}</DialogTitle>
+            <DialogTitle>Select Player - {activeAction?.toUpperCase().replace('_', ' ')}</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-5 gap-2 mt-4">
             {currentTeamStats.map(player => (
@@ -1042,7 +1042,7 @@ export default function AdvancedLiveGame() {
                     setShowPlayerSelect(false);
                     setShowShotResultDialog(true);
                   } else {
-                    // For other stats (steal, assist, block), record directly
+                    // For other stats (steal, assist, block, foul, etc.), record directly
                     handleStatAction(player.id, activeAction);
                     setShowPlayerSelect(false);
                   }
