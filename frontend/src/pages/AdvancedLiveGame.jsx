@@ -1035,8 +1035,17 @@ export default function AdvancedLiveGame() {
               <button
                 key={player.id}
                 onClick={() => {
-                  handleStatAction(player.id, activeAction);
-                  setShowPlayerSelect(false);
+                  // For shots (ft, 2pt, 3pt), show make/miss dialog
+                  if (activeAction === 'ft' || activeAction === '2pt' || activeAction === '3pt') {
+                    setPendingShotPlayer(player);
+                    setPendingShotType(activeAction);
+                    setShowPlayerSelect(false);
+                    setShowShotResultDialog(true);
+                  } else {
+                    // For other stats (steal, assist, block), record directly
+                    handleStatAction(player.id, activeAction);
+                    setShowPlayerSelect(false);
+                  }
                 }}
                 className="aspect-square rounded-lg font-bold text-xl hover:ring-2 ring-white transition-all"
                 style={{ backgroundColor: currentTeamColor }}
@@ -1044,6 +1053,43 @@ export default function AdvancedLiveGame() {
                 {player.player_number}
               </button>
             ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Shot Result Dialog (Make/Miss) */}
+      <Dialog open={showShotResultDialog} onOpenChange={setShowShotResultDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingShotPlayer?.player_name} #{pendingShotPlayer?.player_number} - {pendingShotType?.toUpperCase()}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-4 mt-4">
+            <Button
+              onClick={() => {
+                const statType = pendingShotType === 'ft' ? 'ft_made' : pendingShotType === '2pt' ? 'fg2_made' : 'fg3_made';
+                handleStatAction(pendingShotPlayer.id, statType);
+                setShowShotResultDialog(false);
+                setPendingShotPlayer(null);
+                setPendingShotType(null);
+              }}
+              className="h-20 text-xl bg-green-600 hover:bg-green-700"
+            >
+              MADE
+            </Button>
+            <Button
+              onClick={() => {
+                const statType = pendingShotType === 'ft' ? 'ft_missed' : pendingShotType === '2pt' ? 'fg2_missed' : 'fg3_missed';
+                handleStatAction(pendingShotPlayer.id, statType);
+                setShowShotResultDialog(false);
+                setPendingShotPlayer(null);
+                setPendingShotType(null);
+              }}
+              className="h-20 text-xl bg-red-600 hover:bg-red-700"
+            >
+              MISSED
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
