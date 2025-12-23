@@ -1462,34 +1462,33 @@ export default function AdvancedLiveGame() {
         </DialogContent>
       </Dialog>
 
-      {/* Link Import Dialog */}
+      {/* Link Import Dialog - MaxPreps Only */}
       <Dialog open={showLinkImportDialog} onOpenChange={setShowLinkImportDialog}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
-            <DialogTitle>Import Roster from Website</DialogTitle>
+            <DialogTitle>Import from MaxPreps</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-sm text-zinc-400">
-              Paste a roster page URL from any athletic website (school, college, or team sites).
+              Paste a MaxPreps roster page URL to import player numbers and names.
             </p>
             <div>
-              <Label className="text-xs text-zinc-400">Roster Page URL</Label>
+              <Label className="text-xs text-zinc-400">MaxPreps Roster URL</Label>
               <Input
-                placeholder="https://www.schoolathletics.com/sports/mbkb/roster"
+                placeholder="https://www.maxpreps.com/high-schools/.../roster"
                 value={importUrl}
                 onChange={(e) => setImportUrl(e.target.value)}
                 className="bg-zinc-800 border-zinc-700"
               />
             </div>
             <div className="bg-zinc-800 rounded-lg p-3 text-xs text-zinc-400">
-              <p className="font-medium text-zinc-300 mb-1">Works with sites powered by:</p>
-              <ul className="space-y-1">
-                <li>• PrestoSports (college athletic sites)</li>
-                <li>• Sidearm Sports (college athletic sites)</li>
-                <li>• MaxPreps (high school)</li>
-                <li>• Most athletic website roster pages</li>
-              </ul>
-              <p className="mt-2 text-zinc-500">Example: apacheathletics.com/sports/mbkb/2025-26/roster</p>
+              <p className="font-medium text-zinc-300 mb-1">How to find the roster URL:</p>
+              <ol className="list-decimal list-inside space-y-0.5">
+                <li>Go to MaxPreps.com</li>
+                <li>Search for the school&apos;s basketball team</li>
+                <li>Click on the &quot;Roster&quot; tab</li>
+                <li>Copy the URL from your browser</li>
+              </ol>
             </div>
             <Button 
               onClick={handleLinkImport} 
