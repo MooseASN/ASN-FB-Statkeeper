@@ -458,6 +458,8 @@ class GameCreate(BaseModel):
     clock_enabled: bool = False  # Enable game clock
     period_duration: int = 720  # Duration in seconds (default 12:00)
     period_label: str = "Quarter"  # "Quarter" or "Period"
+    timeout_preset: str = "college"  # "high_school", "college", or "custom"
+    custom_timeouts: int = 4  # Used when timeout_preset is "custom"
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
