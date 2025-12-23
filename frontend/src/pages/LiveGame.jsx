@@ -943,8 +943,22 @@ export default function LiveGame() {
   const awayScores = game.quarter_scores?.away || [0, 0, 0, 0];
   const totalQuarters = Math.max(4, homeScores.length, game.current_quarter);
 
+  // Force light mode colors for this page (stat tracker always has light background)
+  const lightModeVars = {
+    '--background': '210 20% 98%',
+    '--foreground': '215 25% 15%',
+    '--card': '0 0% 100%',
+    '--card-foreground': '215 25% 15%',
+    '--popover': '0 0% 100%',
+    '--popover-foreground': '215 25% 15%',
+    '--muted': '210 15% 93%',
+    '--muted-foreground': '215 15% 45%',
+    '--border': '210 15% 88%',
+    '--input': '210 15% 88%',
+  };
+
   return (
-    <div className="min-h-screen bg-slate-100 light" data-testid="live-game-page" style={{ colorScheme: 'light' }}>
+    <div className="min-h-screen bg-slate-100" data-testid="live-game-page" style={lightModeVars}>
       {/* Shot Modal */}
       <ShotModal
         isOpen={shotModalOpen}
