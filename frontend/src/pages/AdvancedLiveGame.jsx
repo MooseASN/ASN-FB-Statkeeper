@@ -326,9 +326,10 @@ export default function AdvancedLiveGame() {
       });
       toast.success("Player added");
       setNewPlayer({ number: "", name: "" });
+      setShowSingleAddDialog(false);
       fetchGame();
     } catch (error) {
-      toast.error("Failed to add player");
+      toast.error(error.response?.data?.detail || "Failed to add player");
     }
   };
 
