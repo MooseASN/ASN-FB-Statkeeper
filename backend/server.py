@@ -1201,6 +1201,28 @@ async def set_clock(game_id: str, clock_data: ClockUpdate, user: User = Depends(
     
     return {"message": "Clock time updated", "clock_time": clock_data.time}
 
+
+@api_router.post("/games/{game_id}/clock/tick")
+async def tick_clock(game_id: str, user: User = Depends(get_current_user)):
+    """Decrement the game clock by 1 second"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if not game.get("clock_running"):
+        return {"message": "Clock not running", "clock_time": game.get("clock_time", 0)}
+    
+    current_time = game.get("clock_time", 0)
+    new_time = max(0, current_time - 1)  # Don't go below 0
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {"clock_time": new_time}}
+    )
+    
+    return {"clock_time": new_time}
+
+
 @api_router.post("/games/{game_id}/clock/next-period")
 async def next_period(game_id: str, user: User = Depends(get_current_user)):
     """Advance to next period and reset clock"""
