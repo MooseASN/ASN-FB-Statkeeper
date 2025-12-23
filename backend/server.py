@@ -465,6 +465,7 @@ class GameCreate(BaseModel):
     custom_timeouts: int = 4  # Used when timeout_preset is "custom"
     primetime_enabled: bool = False  # Enable primetime mode with video
     video_url: Optional[str] = None  # YouTube or m3u8 video URL
+    simple_mode: bool = False  # Simple mode: only track makes, rebounds, assists, fouls
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
