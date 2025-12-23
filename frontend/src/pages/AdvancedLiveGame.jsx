@@ -60,6 +60,17 @@ export default function AdvancedLiveGame() {
   const [showFoulDialog, setShowFoulDialog] = useState(false);
   const [showSetTimeDialog, setShowSetTimeDialog] = useState(false);
   const [showHelpDialog, setShowHelpDialog] = useState(false);
+  const [showAdvanceQuarterDialog, setShowAdvanceQuarterDialog] = useState(false);
+  
+  // Roster import state
+  const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
+  const [showSingleAddDialog, setShowSingleAddDialog] = useState(false);
+  const [showLinkImportDialog, setShowLinkImportDialog] = useState(false);
+  const [importTeam, setImportTeam] = useState("home");
+  const [importUrl, setImportUrl] = useState("");
+  const [importLoading, setImportLoading] = useState(false);
+  const [bulkPlayers, setBulkPlayers] = useState([{ number: "", name: "" }]);
+  const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
   
   // Time editing
   const [editMinutes, setEditMinutes] = useState(0);
