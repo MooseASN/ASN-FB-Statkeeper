@@ -535,17 +535,17 @@ export default function TeamDetail({ user, onLogout }) {
       <Dialog open={maxPrepsOpen} onOpenChange={setMaxPrepsOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Import from MaxPreps</DialogTitle>
+            <DialogTitle>Import Roster from Website</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 pt-2">
             <p className="text-sm text-muted-foreground">
-              Paste a MaxPreps roster URL to import player numbers and names.
+              Paste a roster page URL from any athletic website (school, college, or team sites).
             </p>
             <div>
-              <Label htmlFor="maxpreps-url">MaxPreps Roster URL</Label>
+              <Label htmlFor="maxpreps-url">Roster Page URL</Label>
               <Input
                 id="maxpreps-url"
-                placeholder="https://www.maxpreps.com/high-schools/.../roster"
+                placeholder="https://www.schoolathletics.com/sports/mbkb/roster"
                 value={maxPrepsUrl}
                 onChange={(e) => setMaxPrepsUrl(e.target.value)}
                 className="mt-1"
@@ -553,13 +553,14 @@ export default function TeamDetail({ user, onLogout }) {
               />
             </div>
             <div className="p-3 bg-slate-50 rounded-lg text-xs text-muted-foreground space-y-1">
-              <p><strong>How to find the roster URL:</strong></p>
-              <ol className="list-decimal list-inside space-y-0.5">
-                <li>Go to MaxPreps.com</li>
-                <li>Search for your school&apos;s basketball team</li>
-                <li>Click on &quot;Roster&quot; tab</li>
-                <li>Copy the URL from your browser</li>
-              </ol>
+              <p><strong>Works with sites powered by:</strong></p>
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>PrestoSports (college athletic sites)</li>
+                <li>Sidearm Sports (college athletic sites)</li>
+                <li>MaxPreps (high school)</li>
+                <li>Most athletic website roster pages</li>
+              </ul>
+              <p className="mt-2 text-xs text-slate-400">Example: apacheathletics.com/sports/mbkb/2025-26/roster</p>
             </div>
             <div className="flex gap-2 pt-2">
               <Button variant="outline" onClick={() => setMaxPrepsOpen(false)} className="flex-1">
