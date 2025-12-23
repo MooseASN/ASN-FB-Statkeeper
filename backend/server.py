@@ -2097,6 +2097,11 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
 async def root():
     return {"message": "Basketball Stats API"}
 
+# Health check endpoint for Kubernetes
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
+
 app.include_router(api_router)
 
 # Dynamic CORS handling for credentials
