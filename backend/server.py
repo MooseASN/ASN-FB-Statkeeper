@@ -13,6 +13,9 @@ import secrets
 from datetime import datetime, timezone, timedelta
 import csv
 import io
+import httpx
+from bs4 import BeautifulSoup
+import re
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, landscape
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
