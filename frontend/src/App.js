@@ -12,6 +12,8 @@ import LiveView from "@/pages/LiveView";
 import EmbedLiveGame from "@/pages/EmbedLiveGame";
 import EmbedLatestGame from "@/pages/EmbedLatestGame";
 import GameHistory from "@/pages/GameHistory";
+import Events from "@/pages/Events";
+import EventDetail from "@/pages/EventDetail";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
