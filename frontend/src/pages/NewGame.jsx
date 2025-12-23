@@ -141,6 +141,7 @@ export default function NewGame({ user, onLogout }) {
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime || null,
         simple_mode: simpleMode,
+        advanced_mode: advancedMode,
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
