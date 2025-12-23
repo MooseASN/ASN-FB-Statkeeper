@@ -1725,6 +1725,36 @@ export default function LiveGame() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Halftime Exit Dialog */}
+      <AlertDialog open={showHalftimeExitDialog} onOpenChange={setShowHalftimeExitDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Exit Halftime</AlertDialogTitle>
+            <AlertDialogDescription>
+              Select which {game?.period_label?.toLowerCase() || "quarter"} to start.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex flex-wrap gap-2 py-4 justify-center">
+            {Array.from({ length: totalQuarters + 2 }, (_, i) => i + 1).map(q => (
+              <Button
+                key={q}
+                onClick={() => handleExitHalftime(q)}
+                variant={q === 3 ? "default" : "outline"}
+                className="w-16 h-12"
+              >
+                {q <= totalQuarters 
+                  ? `${game?.period_label === "Period" ? "P" : "Q"}${q}`
+                  : `OT${q - totalQuarters}`
+                }
+              </Button>
+            ))}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Note Dialog */}
       <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
         <DialogContent>
