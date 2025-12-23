@@ -573,6 +573,11 @@ class AddPlayerRequest(BaseModel):
 class GameUpdate(BaseModel):
     current_quarter: Optional[int] = None
     status: Optional[str] = None
+    home_on_floor: Optional[List[str]] = None
+    away_on_floor: Optional[List[str]] = None
+    clock_time: Optional[int] = None
+    home_bonus: Optional[str] = None
+    away_bonus: Optional[str] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
