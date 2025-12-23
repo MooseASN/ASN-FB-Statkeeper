@@ -1525,42 +1525,49 @@ export default function LiveGame() {
                   {playByPlay.length === 0 ? (
                     <p className="text-center text-muted-foreground py-8 text-sm">No plays recorded yet</p>
                   ) : (
-                    [...playByPlay].reverse().map((play, idx) => (
-                      <div 
-                        key={play.id || idx} 
-                        className={`p-2 rounded text-xs ${play.team === 'home' ? 'bg-red-50 border-l-2 border-red-500' : 'bg-purple-50 border-l-2 border-purple-500'}`}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1 min-w-0 pr-2">
-                            <span className="font-medium">#{play.player_number} {play.player_name}</span>
-                            <p className="text-muted-foreground">{play.action}</p>
+                    [...playByPlay].reverse().map((play, idx) => {
+                      const playTeamColor = play.team === 'home' ? homeColor : awayColor;
+                      return (
+                        <div 
+                          key={play.id || idx} 
+                          className="p-2 rounded text-xs border-l-2"
+                          style={{ 
+                            borderLeftColor: playTeamColor,
+                            backgroundColor: `${playTeamColor}10`
+                          }}
+                        >
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1 min-w-0 pr-2">
+                              <span className="font-medium">#{play.player_number} {play.player_name}</span>
+                              <p className="text-muted-foreground">{play.action}</p>
+                            </div>
+                            <div className="text-right flex-shrink-0">
+                              <span className="text-[10px] text-muted-foreground">{getQuarterLabel(play.quarter)}</span>
+                              <p className="font-bold text-xs">{play.home_score}-{play.away_score}</p>
+                            </div>
                           </div>
-                          <div className="text-right flex-shrink-0">
-                            <span className="text-[10px] text-muted-foreground">{getQuarterLabel(play.quarter)}</span>
-                            <p className="font-bold text-xs">{play.home_score}-{play.away_score}</p>
-                          </div>
+                          {/* Edit and Delete buttons */}
+                          {isActive && (
+                            <div className="flex gap-1 mt-1 pt-1 border-t border-slate-200">
+                              <button
+                                onClick={() => handleEditPlay(play)}
+                                className="flex-1 px-2 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded text-slate-600"
+                              >
+                                <Pencil className="w-2.5 h-2.5 inline mr-0.5" />
+                                Edit
+                              </button>
+                              <button
+                                onClick={() => handleDeletePlay(play.id)}
+                                className="px-2 py-0.5 text-[10px] bg-red-100 hover:bg-red-200 rounded text-red-600"
+                                title="Delete play"
+                              >
+                                <X className="w-2.5 h-2.5" />
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        {/* Edit and Delete buttons */}
-                        {isActive && (
-                          <div className="flex gap-1 mt-1 pt-1 border-t border-slate-200">
-                            <button
-                              onClick={() => handleEditPlay(play)}
-                              className="flex-1 px-2 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded text-slate-600"
-                            >
-                              <Pencil className="w-2.5 h-2.5 inline mr-0.5" />
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDeletePlay(play.id)}
-                              className="px-2 py-0.5 text-[10px] bg-red-100 hover:bg-red-200 rounded text-red-600"
-                              title="Delete play"
-                            >
-                              <X className="w-2.5 h-2.5" />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </ScrollArea>
