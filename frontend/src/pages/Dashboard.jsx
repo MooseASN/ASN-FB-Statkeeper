@@ -352,7 +352,7 @@ export default function Dashboard({ user, onLogout }) {
         {activeGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
+              <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
                 <PlayCircle className="w-5 h-5 text-orange-500" />
                 Live Games
               </h2>
@@ -382,7 +382,7 @@ export default function Dashboard({ user, onLogout }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeGames.map(game => (
                 <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
+                  <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200 dark:border-orange-900 dark:bg-neutral-900" data-testid={`active-game-${game.id}`}>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
@@ -415,8 +415,8 @@ export default function Dashboard({ user, onLogout }) {
         {recentGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2">
-                <History className="w-5 h-5 text-slate-500" />
+              <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
+                <History className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                 Recent Games
               </h2>
               <Link to="/history">
@@ -426,15 +426,15 @@ export default function Dashboard({ user, onLogout }) {
             <div className="space-y-3">
               {recentGames.map(game => (
                 <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid={`recent-game-${game.id}`}>
+                  <Card className="hover:shadow-md transition-shadow cursor-pointer dark:bg-neutral-900" data-testid={`recent-game-${game.id}`}>
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <span className="font-medium">{game.home_team_name}</span>
-                          <span className="text-2xl font-bold score-display">
+                          <span className="font-medium dark:text-white">{game.home_team_name}</span>
+                          <span className="text-2xl font-bold score-display dark:text-white">
                             {calculateScore(game.quarter_scores, "home")} - {calculateScore(game.quarter_scores, "away")}
                           </span>
-                          <span className="font-medium">{game.away_team_name}</span>
+                          <span className="font-medium dark:text-white">{game.away_team_name}</span>
                         </div>
                         <span className="text-sm text-muted-foreground">
                           {new Date(game.created_at).toLocaleDateString()}
