@@ -1767,33 +1767,58 @@ export default function LiveGame() {
         </div>
       </div>
 
-      {/* Add Player Dialog */}
-      <Dialog open={addPlayerOpen} onOpenChange={setAddPlayerOpen}>
-        <DialogContent>
+      {/* Add Player Dialog - Bulk Add Support */}
+      <Dialog open={addPlayerOpen} onOpenChange={(open) => {
+        setAddPlayerOpen(open);
+        if (!open) setBulkPlayers([{ number: "", name: "" }]);
+      }}>
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>
-              Add Player to {addPlayerTeam === "home" ? game.home_team_name : game.away_team_name}
+              Add Players to {addPlayerTeam === "home" ? game.home_team_name : game.away_team_name}
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder="#"
-                value={newPlayer.number}
-                onChange={(e) => setNewPlayer({ ...newPlayer, number: e.target.value })}
-                className="w-20"
-                data-testid="new-player-number"
-              />
-              <Input
-                placeholder="Player Name"
-                value={newPlayer.name}
-                onChange={(e) => setNewPlayer({ ...newPlayer, name: e.target.value })}
-                className="flex-1"
-                data-testid="new-player-name"
-              />
-            </div>
-            <Button onClick={handleAddPlayer} className="w-full" data-testid="confirm-add-player">
-              Add Player
+          <div className="space-y-3 pt-4 max-h-[400px] overflow-y-auto">
+            {bulkPlayers.map((player, index) => (
+              <div key={index} className="flex gap-2 items-center">
+                <Input
+                  placeholder="#"
+                  value={player.number}
+                  onChange={(e) => updateBulkPlayer(index, "number", e.target.value)}
+                  className="w-16"
+                  data-testid={`new-player-number-${index}`}
+                />
+                <Input
+                  placeholder="Player Name"
+                  value={player.name}
+                  onChange={(e) => updateBulkPlayer(index, "name", e.target.value)}
+                  className="flex-1"
+                  data-testid={`new-player-name-${index}`}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && player.number && player.name) {
+                      addBulkPlayerRow();
+                    }
+                  }}
+                />
+                {bulkPlayers.length > 1 && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => removeBulkPlayerRow(index)}
+                    className="px-2 text-red-500 hover:text-red-700"
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="flex gap-2 pt-2">
+            <Button variant="outline" onClick={addBulkPlayerRow} className="flex-1 gap-1">
+              <Plus className="w-4 h-4" /> Add Row
+            </Button>
+            <Button onClick={handleAddPlayer} className="flex-1" data-testid="confirm-add-player">
+              Add {bulkPlayers.filter(p => p.number && p.name).length || ""} Player{bulkPlayers.filter(p => p.number && p.name).length !== 1 ? 's' : ''}
             </Button>
           </div>
         </DialogContent>
