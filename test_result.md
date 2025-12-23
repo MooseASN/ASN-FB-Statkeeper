@@ -318,15 +318,16 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Sponsor Banner Management"
-    - "Sponsor Banner Slideshow on LiveView"
+    - "Bonus/Double Bonus Feature"
+    - "Primetime PiP Exit Fix"
+    - "Event Color in Ticker"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "Implemented Sponsor Banner feature with: 1) Backend SponsorBanner model with link_url field, 2) CRUD endpoints for banners at /api/sponsor-banners and /api/sponsor-banners/public/{user_id}, 3) Dashboard UI with Manage Banners dialog including file upload, link URL input, and delete functionality, 4) LiveView slideshow component with 10-second auto-rotation and clickable links. Test credentials: email=schedtest@test.com, password=test123"
+    message: "Implemented P0/P1 features: 1) Fixed Primetime PiP exit bug - video now returns to embedded position when scrolling back up, 2) Added Bonus/Double Bonus feature with buttons in LiveGame tracker and status display in LiveView output, 3) Event color was already applied to ticker. Test credentials: email=schedtest@test.com, password=test123. Active game with bonus: share_code=b77c6b66"
 
 ## Sponsor Banner Feature - Manual Testing Complete
 
