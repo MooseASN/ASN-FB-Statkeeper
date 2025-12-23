@@ -26,6 +26,7 @@ export default function Events({ user, onLogout }) {
   const [endDate, setEndDate] = useState("");
   const [logoPreview, setLogoPreview] = useState(null);
   const [logoData, setLogoData] = useState(null);
+  const [eventColor, setEventColor] = useState("#000000");
   const fileInputRef = useRef(null);
 
   useEffect(() => {
