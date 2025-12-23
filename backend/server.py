@@ -525,6 +525,10 @@ class Game(BaseModel):
     away_bonus: Optional[str] = None  # null, "bonus", or "double_bonus"
     # Simple mode - only track makes, rebounds, assists, fouls
     simple_mode: bool = False
+    # Advanced mode - PrestoSports-style interface
+    advanced_mode: bool = False
+    # Current possession - "home" or "away"
+    possession: Optional[str] = None
     # On-floor players (player_ids)
     home_on_floor: List[str] = []
     away_on_floor: List[str] = []
