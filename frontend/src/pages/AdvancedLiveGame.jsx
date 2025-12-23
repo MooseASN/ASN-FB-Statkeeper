@@ -1650,6 +1650,173 @@ export default function AdvancedLiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Play Dialog */}
+      <Dialog open={showEditPlayDialog} onOpenChange={setShowEditPlayDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>Edit Play</DialogTitle>
+          </DialogHeader>
+          {editingPlay && (
+            <div className="space-y-4 mt-4">
+              <div>
+                <Label className="text-zinc-400">Quarter</Label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={editingPlay.quarter || 1}
+                  onChange={(e) => setEditingPlay({ ...editingPlay, quarter: parseInt(e.target.value) || 1 })}
+                  className="bg-zinc-800 border-zinc-700"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-400">Player Name</Label>
+                <Input
+                  value={editingPlay.player_name || ""}
+                  onChange={(e) => setEditingPlay({ ...editingPlay, player_name: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-400">Player Number</Label>
+                <Input
+                  value={editingPlay.player_number || ""}
+                  onChange={(e) => setEditingPlay({ ...editingPlay, player_number: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-400">Action/Play</Label>
+                <Input
+                  value={editingPlay.action || ""}
+                  onChange={(e) => setEditingPlay({ ...editingPlay, action: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700"
+                />
+              </div>
+              <div>
+                <Label className="text-zinc-400">Team</Label>
+                <Select value={editingPlay.team || "home"} onValueChange={(v) => setEditingPlay({ ...editingPlay, team: v })}>
+                  <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="home">{game?.home_team_name}</SelectItem>
+                    <SelectItem value="away">{game?.away_team_name}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={async () => {
+                    try {
+                      // Update play in backend
+                      const updatedPlays = [...playByPlay];
+                      updatedPlays[editingPlay.index] = {
+                        ...editingPlay,
+                        index: undefined // Remove index before sending
+                      };
+                      // Reverse back since playByPlay is reversed for display
+                      await axios.put(`${API}/games/${id}`, {
+                        play_by_play: updatedPlays.slice().reverse()
+                      });
+                      toast.success("Play updated");
+                      setShowEditPlayDialog(false);
+                      setEditingPlay(null);
+                      fetchGame();
+                    } catch (error) {
+                      toast.error("Failed to update play");
+                    }
+                  }}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  Save
+                </Button>
+                <Button
+                  onClick={async () => {
+                    try {
+                      // Delete play from backend
+                      const updatedPlays = playByPlay.filter((_, i) => i !== editingPlay.index);
+                      await axios.put(`${API}/games/${id}`, {
+                        play_by_play: updatedPlays.slice().reverse()
+                      });
+                      toast.success("Play deleted");
+                      setShowEditPlayDialog(false);
+                      setEditingPlay(null);
+                      fetchGame();
+                    } catch (error) {
+                      toast.error("Failed to delete play");
+                    }
+                  }}
+                  variant="destructive"
+                  className="flex-1"
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Email Box Score Dialog */}
+      <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>Email Box Score</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label className="text-zinc-400">Email Address(es)</Label>
+              <p className="text-xs text-zinc-500 mb-2">Separate multiple addresses with commas</p>
+              <Input
+                value={emailAddresses}
+                onChange={(e) => setEmailAddresses(e.target.value)}
+                placeholder="email@example.com, another@example.com"
+                className="bg-zinc-800 border-zinc-700"
+              />
+            </div>
+            <Button
+              onClick={async () => {
+                if (!emailAddresses.trim()) {
+                  toast.error("Please enter at least one email address");
+                  return;
+                }
+                
+                setEmailSending(true);
+                try {
+                  // Parse email addresses
+                  const emails = emailAddresses.split(',').map(e => e.trim()).filter(e => e);
+                  
+                  // Send email with box score link
+                  const liveUrl = `${window.location.origin}/live/${game.share_code}`;
+                  
+                  // For now, copy link and show instructions since email requires backend setup
+                  navigator.clipboard.writeText(liveUrl);
+                  toast.success(`Live stats link copied! Send to: ${emails.join(', ')}`);
+                  
+                  setShowEmailDialog(false);
+                  setEmailAddresses("");
+                } catch (error) {
+                  toast.error("Failed to send email");
+                } finally {
+                  setEmailSending(false);
+                }
+              }}
+              disabled={emailSending}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              {emailSending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                "Send Box Score"
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
