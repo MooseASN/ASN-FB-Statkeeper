@@ -133,7 +133,8 @@ export default function EventDetail({ user, onLogout }) {
         location: editLocation.trim() || null,
         start_date: editStartDate,
         end_date: editEndDate || editStartDate,
-        logo_data: editLogoData
+        logo_data: editLogoData,
+        color: editColor
       });
       
       toast.success("Event updated!");
