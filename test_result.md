@@ -310,6 +310,42 @@ frontend:
         agent: "main"
         comment: "Added SponsorSlideshow component with 10-second auto-rotation, indicator dots, clickable links opening in new tab. Positioned above Team Statistics. Tested via screenshot."
 
+  - task: "Bonus/Double Bonus Feature"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LiveGame.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Added Bonus buttons to LiveGame tracker that cycle through null->bonus->double_bonus->null. Bonus status displayed as yellow badge (BONUS) or DOUBLE BONUS under team fouls in LiveView. Backend API at POST /api/games/{id}/bonus. Tested via curl and screenshot - both BONUS and DOUBLE BONUS display correctly."
+
+  - task: "Primetime PiP Exit Fix"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LiveView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Fixed scroll handling logic - PiP enters when rect.bottom < 100, exits when rect.top > -50 (video container back in viewport). Logic corrected from single condition to dual enter/exit conditions."
+
+  - task: "Event Color in Ticker"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/LiveView.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Event color already applied to ticker background via eventInfo?.color. Color picker exists in Events create/edit dialogs. Backend supports color field in Event model."
+
 metadata:
   created_by: "main_agent"
   version: "1.1"
