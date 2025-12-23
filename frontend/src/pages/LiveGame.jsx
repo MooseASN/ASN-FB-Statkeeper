@@ -92,9 +92,10 @@ const sortByNumber = (players) => {
 };
 
 // ============ CONDENSED PLAYER CARD ============
-const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
+const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn, simpleMode }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
+  const totalReb = player.offensive_rebounds + player.defensive_rebounds;
   
   return (
     <div className={`bg-white rounded-lg px-2 py-1.5 shadow-sm border ${isOnFloor ? 'ring-2 ring-green-500' : ''}`} data-testid={`player-card-${player.id}`}>
@@ -142,7 +143,10 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
             <span className="text-sm font-bold ml-1">{pts}</span>
           </div>
           <div className="text-[10px] text-muted-foreground">
-            {stats.fg_made}/{stats.fg_att} FG • {player.fg3_made}/{stats.fg3_att} 3P • {player.ft_made}/{stats.ft_att} FT
+            {simpleMode 
+              ? `${player.ft_made} FT • ${player.fg2_made} 2P • ${player.fg3_made} 3P`
+              : `${stats.fg_made}/${stats.fg_att} FG • ${player.fg3_made}/${stats.fg3_att} 3P • ${player.ft_made}/${stats.ft_att} FT`
+            }
           </div>
         </div>
         
@@ -176,26 +180,35 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
           className="px-1.5 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50">
           AST {player.assists}
         </button>
-        <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-green-100 hover:bg-green-200 rounded disabled:opacity-50">
-          O REB {player.offensive_rebounds}
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-blue-100 hover:bg-blue-200 rounded disabled:opacity-50">
-          D REB {player.defensive_rebounds}
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-purple-100 hover:bg-purple-200 rounded disabled:opacity-50">
-          STL {player.steals}
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50">
-          BLK {player.blocks}
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-red-50 hover:bg-red-100 text-red-600 rounded disabled:opacity-50">
-          TOV {player.turnovers}
-        </button>
+        {simpleMode ? (
+          <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
+            className="px-1.5 py-0.5 text-[10px] bg-blue-100 hover:bg-blue-200 rounded disabled:opacity-50">
+            REB {totalReb}
+          </button>
+        ) : (
+          <>
+            <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
+              className="px-1.5 py-0.5 text-[10px] bg-green-100 hover:bg-green-200 rounded disabled:opacity-50">
+              O REB {player.offensive_rebounds}
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
+              className="px-1.5 py-0.5 text-[10px] bg-blue-100 hover:bg-blue-200 rounded disabled:opacity-50">
+              D REB {player.defensive_rebounds}
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
+              className="px-1.5 py-0.5 text-[10px] bg-purple-100 hover:bg-purple-200 rounded disabled:opacity-50">
+              STL {player.steals}
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
+              className="px-1.5 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50">
+              BLK {player.blocks}
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
+              className="px-1.5 py-0.5 text-[10px] bg-red-50 hover:bg-red-100 text-red-600 rounded disabled:opacity-50">
+              TOV {player.turnovers}
+            </button>
+          </>
+        )}
         <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
           className="px-1.5 py-0.5 text-[10px] bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50 ml-auto">
           PF {player.fouls}
