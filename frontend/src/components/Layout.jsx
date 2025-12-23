@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User } from "lucide-react";
+import { Home, Users, History, Plus, LogOut, User, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -12,7 +12,7 @@ import {
 export default function Layout({ children, user, onLogout }) {
   const location = useLocation();
   
-  const isActive = (path) => location.pathname === path;
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/");
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -32,13 +32,24 @@ export default function Layout({ children, user, onLogout }) {
             <nav className="flex items-center gap-1 sm:gap-2">
               <Link to="/">
                 <Button 
-                  variant={isActive("/") ? "secondary" : "ghost"} 
+                  variant={isActive("/") && !isActive("/events") && !isActive("/teams") && !isActive("/history") ? "secondary" : "ghost"} 
                   size="sm"
                   className="gap-2"
                   data-testid="nav-home"
                 >
                   <Home className="w-4 h-4" />
                   <span className="hidden sm:inline">Home</span>
+                </Button>
+              </Link>
+              <Link to="/events">
+                <Button 
+                  variant={isActive("/events") ? "secondary" : "ghost"} 
+                  size="sm"
+                  className="gap-2"
+                  data-testid="nav-events"
+                >
+                  <Calendar className="w-4 h-4" />
+                  <span className="hidden sm:inline">Events</span>
                 </Button>
               </Link>
               <Link to="/teams">
