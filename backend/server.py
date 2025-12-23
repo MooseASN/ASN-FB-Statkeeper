@@ -1339,6 +1339,7 @@ async def update_event(event_id: str, event_data: EventCreate, user: User = Depe
             "start_date": event_data.start_date,
             "end_date": event_data.end_date or event_data.start_date,
             "logo_data": event_data.logo_data,
+            "color": event_data.color,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }}
     )
