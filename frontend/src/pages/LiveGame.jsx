@@ -1143,7 +1143,7 @@ export default function LiveGame() {
                     <span className="text-lg font-bold" style={{ color: homeColor }}>{game.home_team_name?.charAt(0)}</span>
                   )}
                 </div>
-                <h2 className="font-bold text-lg">{game.home_team_name}</h2>
+                <h2 className="font-bold text-lg text-slate-900">{game.home_team_name}</h2>
               </div>
               {isActive && (
                 <Button 
