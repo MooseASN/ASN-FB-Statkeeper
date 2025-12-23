@@ -744,25 +744,49 @@ export default function LiveGame() {
   };
 
   const handleAddPlayer = async () => {
-    if (!newPlayer.number.trim() || !newPlayer.name.trim()) {
-      toast.error("Both number and name are required");
+    // Filter out empty rows
+    const validPlayers = bulkPlayers.filter(p => p.number.trim() && p.name.trim());
+    
+    if (validPlayers.length === 0) {
+      toast.error("Please add at least one player with number and name");
       return;
     }
 
     const teamId = addPlayerTeam === "home" ? game.home_team_id : game.away_team_id;
+    let addedCount = 0;
 
     try {
-      await axios.post(`${API}/games/${id}/players`, {
-        team_id: teamId,
-        player_number: newPlayer.number.trim(),
-        player_name: newPlayer.name.trim()
-      });
-      toast.success("Player added");
-      setNewPlayer({ number: "", name: "" });
+      for (const player of validPlayers) {
+        await axios.post(`${API}/games/${id}/players`, {
+          team_id: teamId,
+          player_number: player.number.trim(),
+          player_name: player.name.trim()
+        });
+        addedCount++;
+      }
+      toast.success(`${addedCount} player${addedCount > 1 ? 's' : ''} added`);
+      setBulkPlayers([{ number: "", name: "" }]);
       setAddPlayerOpen(false);
       fetchGame();
     } catch (error) {
-      toast.error("Failed to add player");
+      toast.error(`Failed to add players. ${addedCount} added before error.`);
+      fetchGame();
+    }
+  };
+
+  const addBulkPlayerRow = () => {
+    setBulkPlayers([...bulkPlayers, { number: "", name: "" }]);
+  };
+
+  const updateBulkPlayer = (index, field, value) => {
+    const updated = [...bulkPlayers];
+    updated[index][field] = value;
+    setBulkPlayers(updated);
+  };
+
+  const removeBulkPlayerRow = (index) => {
+    if (bulkPlayers.length > 1) {
+      setBulkPlayers(bulkPlayers.filter((_, i) => i !== index));
     }
   };
 
