@@ -24,7 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Shot Selection Modal
-const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss }) => {
+const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss, simpleMode }) => {
   if (!isOpen) return null;
   
   const shotLabels = {
@@ -43,22 +43,32 @@ const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss }) =>
           </button>
         </div>
         <p className="text-muted-foreground mb-6">{playerName}</p>
-        <div className="grid grid-cols-2 gap-4">
+        {simpleMode ? (
           <button
             onClick={onMake}
-            className="py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-xl transition-colors"
+            className="w-full py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-xl transition-colors"
             data-testid="shot-make-btn"
           >
             MAKE
           </button>
-          <button
-            onClick={onMiss}
-            className="py-4 px-6 bg-red-500 hover:bg-red-600 text-white font-bold text-xl rounded-xl transition-colors"
-            data-testid="shot-miss-btn"
-          >
-            MISS
-          </button>
-        </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={onMake}
+              className="py-4 px-6 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xl rounded-xl transition-colors"
+              data-testid="shot-make-btn"
+            >
+              MAKE
+            </button>
+            <button
+              onClick={onMiss}
+              className="py-4 px-6 bg-red-500 hover:bg-red-600 text-white font-bold text-xl rounded-xl transition-colors"
+              data-testid="shot-miss-btn"
+            >
+              MISS
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
