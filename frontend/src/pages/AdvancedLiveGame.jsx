@@ -820,27 +820,90 @@ export default function AdvancedLiveGame() {
 
           {activeTab === "rosters" && (
             <div className="space-y-4">
-              <h2 className="text-xl font-bold">Roster Management</h2>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-zinc-900 rounded-lg p-4">
-                  <h3 className="font-bold mb-3" style={{ color: homeColor }}>{game.home_team_name}</h3>
-                  <div className="space-y-2">
-                    {homeStats.map(p => (
-                      <div key={p.id} className="flex items-center justify-between text-sm py-1 border-b border-zinc-800">
-                        <span>#{p.player_number} {p.player_name}</span>
-                      </div>
-                    ))}
-                  </div>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-bold">Roster Management</h2>
+                <div className="flex gap-2">
+                  <Select value={importTeam} onValueChange={setImportTeam}>
+                    <SelectTrigger className="w-40 bg-zinc-800 border-zinc-700">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="home">{game.home_team_name}</SelectItem>
+                      <SelectItem value="away">{game.away_team_name}</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="bg-zinc-900 rounded-lg p-4">
-                  <h3 className="font-bold mb-3" style={{ color: awayColor }}>{game.away_team_name}</h3>
-                  <div className="space-y-2">
-                    {awayStats.map(p => (
-                      <div key={p.id} className="flex items-center justify-between text-sm py-1 border-b border-zinc-800">
-                        <span>#{p.player_number} {p.player_name}</span>
-                      </div>
-                    ))}
-                  </div>
+              </div>
+              
+              {/* Import Options */}
+              <div className="grid grid-cols-3 gap-3">
+                <Button 
+                  onClick={() => setShowSingleAddDialog(true)}
+                  variant="outline"
+                  className="h-16 flex-col gap-1 border-zinc-700 hover:bg-zinc-800"
+                >
+                  <UserPlus className="w-5 h-5" />
+                  <span className="text-sm">Single Add</span>
+                </Button>
+                <Button 
+                  onClick={() => setShowBulkAddDialog(true)}
+                  variant="outline"
+                  className="h-16 flex-col gap-1 border-zinc-700 hover:bg-zinc-800"
+                >
+                  <Users className="w-5 h-5" />
+                  <span className="text-sm">Bulk Add</span>
+                </Button>
+                <Button 
+                  onClick={() => setShowLinkImportDialog(true)}
+                  variant="outline"
+                  className="h-16 flex-col gap-1 border-zinc-700 hover:bg-zinc-800"
+                >
+                  <LinkIcon className="w-5 h-5" />
+                  <span className="text-sm">Import from Link</span>
+                </Button>
+              </div>
+
+              {/* Team Rosters */}
+              <div className="grid grid-cols-2 gap-6">
+                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+                  <h3 className="font-bold mb-3 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
+                    {game.home_team_name} ({homeStats.length})
+                  </h3>
+                  <ScrollArea className="h-[300px]">
+                    <div className="space-y-1">
+                      {homeStats.length === 0 ? (
+                        <p className="text-zinc-500 text-sm py-4 text-center">No players</p>
+                      ) : (
+                        homeStats.map(p => (
+                          <div key={p.id} className="flex items-center justify-between text-sm py-2 px-2 rounded hover:bg-zinc-800">
+                            <span className="font-mono">#{p.player_number}</span>
+                            <span className="flex-1 ml-3">{p.player_name}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
+                </div>
+                <div className="bg-zinc-900 rounded-lg p-4 border border-zinc-800">
+                  <h3 className="font-bold mb-3 flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }}></div>
+                    {game.away_team_name} ({awayStats.length})
+                  </h3>
+                  <ScrollArea className="h-[300px]">
+                    <div className="space-y-1">
+                      {awayStats.length === 0 ? (
+                        <p className="text-zinc-500 text-sm py-4 text-center">No players</p>
+                      ) : (
+                        awayStats.map(p => (
+                          <div key={p.id} className="flex items-center justify-between text-sm py-2 px-2 rounded hover:bg-zinc-800">
+                            <span className="font-mono">#{p.player_number}</span>
+                            <span className="flex-1 ml-3">{p.player_name}</span>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </ScrollArea>
                 </div>
               </div>
             </div>
