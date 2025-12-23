@@ -391,6 +391,8 @@ export default function LiveGame() {
   const [addPlayerOpen, setAddPlayerOpen] = useState(false);
   const [addPlayerTeam, setAddPlayerTeam] = useState("home");
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
+  const [bulkPlayers, setBulkPlayers] = useState([{ number: "", name: "" }]); // For bulk add
+  const [teamsFlipped, setTeamsFlipped] = useState(false); // For flipping team positions
   const [copied, setCopied] = useState(false);
   const [embedCopied, setEmbedCopied] = useState(false);
   const [lastAction, setLastAction] = useState(null);
