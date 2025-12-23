@@ -1242,6 +1242,168 @@ async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User =
     
     return {"message": "Note updated", "note": note_data.note}
 
+# ============ EVENT/TOURNAMENT ENDPOINTS ============
+
+@api_router.get("/events")
+async def get_events(user: User = Depends(get_current_user)):
+    """Get all events for the current user"""
+    events = await db.events.find({"user_id": user.user_id}, {"_id": 0}).to_list(100)
+    return events
+
+@api_router.get("/events/{event_id}")
+async def get_event(event_id: str, user: User = Depends(get_current_user)):
+    """Get a single event with its games"""
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id}, {"_id": 0})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Get all games for this event
+    games = []
+    for game_id in event.get("game_ids", []):
+        game = await db.games.find_one({"id": game_id}, {"_id": 0})
+        if game:
+            games.append(game)
+    
+    return {**event, "games": games}
+
+@api_router.get("/events/{event_id}/public")
+async def get_event_public(event_id: str):
+    """Get event info and games for public display (ticker)"""
+    event = await db.events.find_one({"id": event_id}, {"_id": 0})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Get all games for this event with their scores
+    games = []
+    for game_id in event.get("game_ids", []):
+        game = await db.games.find_one({"id": game_id}, {"_id": 0})
+        if game:
+            # Calculate scores
+            home_score = sum(game.get("quarter_scores", {}).get("home", [0, 0, 0, 0]))
+            away_score = sum(game.get("quarter_scores", {}).get("away", [0, 0, 0, 0]))
+            games.append({
+                "id": game["id"],
+                "home_team_name": game["home_team_name"],
+                "away_team_name": game["away_team_name"],
+                "home_score": home_score,
+                "away_score": away_score,
+                "status": game["status"],
+                "scheduled_date": game.get("scheduled_date"),
+                "scheduled_time": game.get("scheduled_time"),
+                "share_code": game.get("share_code"),
+                "current_quarter": game.get("current_quarter", 1),
+                "is_halftime": game.get("is_halftime", False)
+            })
+    
+    return {
+        "id": event["id"],
+        "name": event["name"],
+        "location": event.get("location"),
+        "logo_data": event.get("logo_data"),
+        "games": games
+    }
+
+@api_router.post("/events")
+async def create_event(event_data: EventCreate, user: User = Depends(get_current_user)):
+    """Create a new event"""
+    event = Event(
+        name=event_data.name,
+        location=event_data.location,
+        start_date=event_data.start_date,
+        end_date=event_data.end_date or event_data.start_date,
+        logo_data=event_data.logo_data
+    )
+    event.user_id = user.user_id
+    
+    doc = event.model_dump()
+    await db.events.insert_one(doc)
+    return event
+
+@api_router.put("/events/{event_id}")
+async def update_event(event_id: str, event_data: EventCreate, user: User = Depends(get_current_user)):
+    """Update an event"""
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    await db.events.update_one(
+        {"id": event_id, "user_id": user.user_id},
+        {"$set": {
+            "name": event_data.name,
+            "location": event_data.location,
+            "start_date": event_data.start_date,
+            "end_date": event_data.end_date or event_data.start_date,
+            "logo_data": event_data.logo_data,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": "Event updated"}
+
+@api_router.delete("/events/{event_id}")
+async def delete_event(event_id: str, user: User = Depends(get_current_user)):
+    """Delete an event (does not delete the games, just removes them from event)"""
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Remove event_id from all games in this event
+    for game_id in event.get("game_ids", []):
+        await db.games.update_one(
+            {"id": game_id},
+            {"$set": {"event_id": None}}
+        )
+    
+    await db.events.delete_one({"id": event_id, "user_id": user.user_id})
+    return {"message": "Event deleted"}
+
+@api_router.post("/events/{event_id}/games/{game_id}")
+async def add_game_to_event(event_id: str, game_id: str, user: User = Depends(get_current_user)):
+    """Add a game to an event"""
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Add game to event if not already there
+    if game_id not in event.get("game_ids", []):
+        await db.events.update_one(
+            {"id": event_id, "user_id": user.user_id},
+            {"$push": {"game_ids": game_id}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
+        )
+    
+    # Update game with event_id
+    await db.games.update_one(
+        {"id": game_id},
+        {"$set": {"event_id": event_id}}
+    )
+    
+    return {"message": "Game added to event"}
+
+@api_router.delete("/events/{event_id}/games/{game_id}")
+async def remove_game_from_event(event_id: str, game_id: str, user: User = Depends(get_current_user)):
+    """Remove a game from an event (does not delete the game)"""
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Remove game from event
+    await db.events.update_one(
+        {"id": event_id, "user_id": user.user_id},
+        {"$pull": {"game_ids": game_id}, "$set": {"updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    # Remove event_id from game
+    await db.games.update_one(
+        {"id": game_id},
+        {"$set": {"event_id": None}}
+    )
+    
+    return {"message": "Game removed from event"}
+
 # ============ SPONSOR BANNER ENDPOINTS ============
 
 class SponsorBannerCreate(BaseModel):
