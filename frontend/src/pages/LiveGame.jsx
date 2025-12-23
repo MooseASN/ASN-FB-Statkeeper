@@ -533,7 +533,7 @@ export default function LiveGame() {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [game?.clock_enabled, clockRunning]);
+  }, [game?.clock_enabled, clockRunning, handleStartClock, handleStopClock]);
 
   // Sync clock state from game data
   useEffect(() => {
