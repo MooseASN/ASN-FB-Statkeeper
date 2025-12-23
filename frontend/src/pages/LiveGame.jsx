@@ -416,6 +416,7 @@ export default function LiveGame() {
   const [clockRunning, setClockRunning] = useState(false);
   const clockIntervalRef = useRef(null);
   const [showPeriodEndDialog, setShowPeriodEndDialog] = useState(false);
+  const [showHalftimeExitDialog, setShowHalftimeExitDialog] = useState(false);
 
   // Note state
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
