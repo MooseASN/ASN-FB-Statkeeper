@@ -64,6 +64,28 @@ export default function AdvancedLiveGame() {
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   const [showAdvanceQuarterDialog, setShowAdvanceQuarterDialog] = useState(false);
   
+  // Shot make/miss dialog
+  const [showShotResultDialog, setShowShotResultDialog] = useState(false);
+  const [pendingShotPlayer, setPendingShotPlayer] = useState(null);
+  const [pendingShotType, setPendingShotType] = useState(null);
+  
+  // Rebound type dialog (after player select)
+  const [showReboundTypeDialog, setShowReboundTypeDialog] = useState(false);
+  const [pendingReboundPlayer, setPendingReboundPlayer] = useState(null);
+  
+  // Foul type dialog
+  const [showFoulTypeDialog, setShowFoulTypeDialog] = useState(false);
+  const [pendingFoulPlayer, setPendingFoulPlayer] = useState(null);
+  
+  // Email box score dialog
+  const [showEmailDialog, setShowEmailDialog] = useState(false);
+  const [emailAddresses, setEmailAddresses] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  
+  // Edit play dialog
+  const [showEditPlayDialog, setShowEditPlayDialog] = useState(false);
+  const [editingPlay, setEditingPlay] = useState(null);
+  
   // Roster import state
   const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
   const [showSingleAddDialog, setShowSingleAddDialog] = useState(false);
