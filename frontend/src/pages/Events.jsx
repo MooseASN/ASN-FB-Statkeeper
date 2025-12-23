@@ -68,6 +68,7 @@ export default function Events({ user, onLogout }) {
     setEndDate("");
     setLogoPreview(null);
     setLogoData(null);
+    setEventColor("#000000");
   };
 
   const handleCreateEvent = async () => {
