@@ -363,7 +363,13 @@ export default function AdvancedLiveGame() {
 
   const handleLinkImport = async () => {
     if (!importUrl.trim()) {
-      toast.error("Please enter a URL");
+      toast.error("Please enter a MaxPreps roster URL");
+      return;
+    }
+    
+    // Validate MaxPreps URL
+    if (!importUrl.toLowerCase().includes('maxpreps.com')) {
+      toast.error("Please enter a valid MaxPreps roster URL");
       return;
     }
     
@@ -371,10 +377,29 @@ export default function AdvancedLiveGame() {
     setImportLoading(true);
     
     try {
+      // First import to team roster
       const res = await axios.post(`${API}/teams/${teamId}/roster/maxpreps`, {
         url: importUrl.trim()
       });
-      toast.success(res.data.message);
+      
+      // Now add each player to the game
+      const roster = res.data.roster || [];
+      let addedToGame = 0;
+      
+      for (const player of roster) {
+        try {
+          await axios.post(`${API}/games/${id}/players`, {
+            team_id: teamId,
+            player_number: player.number,
+            player_name: player.name
+          });
+          addedToGame++;
+        } catch (e) {
+          // Player might already exist in game, skip
+        }
+      }
+      
+      toast.success(`Imported ${addedToGame} players to game`);
       setImportUrl("");
       setShowLinkImportDialog(false);
       fetchGame();
