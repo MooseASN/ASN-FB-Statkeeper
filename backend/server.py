@@ -845,7 +845,9 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         away_timeouts_used=0,
         primetime_enabled=game_data.primetime_enabled,
         video_url=game_data.video_url,
-        simple_mode=game_data.simple_mode
+        simple_mode=game_data.simple_mode,
+        advanced_mode=game_data.advanced_mode,
+        possession="home"  # Default possession to home team
     )
     game.user_id = user.user_id
     
