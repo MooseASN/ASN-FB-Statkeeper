@@ -676,102 +676,159 @@ class MaxPrepsImportRequest(BaseModel):
 
 @api_router.post("/teams/{team_id}/roster/maxpreps")
 async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, user: User = Depends(get_current_user)):
-    """Import roster from MaxPreps roster URL. Only extracts player number and name."""
+    """Import roster from any athletic website roster URL (MaxPreps, PrestoSports, Sidearm, etc.). Only extracts player number and name."""
     team = await db.teams.find_one({"id": team_id, "user_id": user.user_id})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     
     url = request.url.strip()
     
-    # Validate URL is from MaxPreps
-    if not url or "maxpreps.com" not in url.lower():
-        raise HTTPException(status_code=400, detail="Please provide a valid MaxPreps roster URL")
+    if not url:
+        raise HTTPException(status_code=400, detail="Please provide a roster URL")
     
-    # Ensure it's a roster URL
-    if "/roster" not in url.lower():
-        # Try to convert to roster URL
-        if "/basketball/" in url.lower():
-            url = re.sub(r'/home/?$', '/roster', url, flags=re.IGNORECASE)
-            if "/roster" not in url:
-                url = url.rstrip('/') + '/roster'
+    # Ensure URL has protocol
+    if not url.startswith('http'):
+        url = 'https://' + url
     
     try:
         async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                "Accept-Language": "en-US,en;q=0.5"
+                "Accept-Language": "en-US,en;q=0.5",
+                "Accept-Encoding": "gzip, deflate, br"
             }
             response = await client.get(url, headers=headers)
             response.raise_for_status()
     except httpx.HTTPStatusError as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch MaxPreps page: {e.response.status_code}")
+        raise HTTPException(status_code=400, detail=f"Failed to fetch page: HTTP {e.response.status_code}")
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Failed to fetch MaxPreps page: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Failed to fetch page: {str(e)}")
     
     soup = BeautifulSoup(response.text, 'lxml')
     
     roster = []
     
-    # Try multiple selectors for MaxPreps roster tables
-    # Method 1: Look for roster table rows
-    roster_rows = soup.select('table.roster-table tbody tr, table[class*="roster"] tbody tr, .roster-container tr')
+    # PrestoSports/Sidearm specific selectors (common on college athletic sites)
+    # These platforms use specific class patterns
     
-    if roster_rows:
-        for row in roster_rows:
-            cells = row.find_all(['td', 'th'])
-            if len(cells) >= 2:
-                # Try to find number and name
-                number = ""
-                name = ""
-                
-                for cell in cells:
-                    text = cell.get_text(strip=True)
-                    # Check if this looks like a jersey number (1-2 digits, possibly with leading 0)
-                    if re.match(r'^\d{1,2}$', text) and not number:
-                        number = text
-                    # Check if this looks like a name (contains letters, possibly spaces)
-                    elif re.match(r'^[A-Za-z][\w\s\.\'-]+$', text) and not name and len(text) > 2:
-                        name = text
-                
-                if number and name:
-                    roster.append({"number": number, "name": name})
+    # Method 1: PrestoSports roster table (common structure)
+    # Look for roster tables with specific PrestoSports/Sidearm patterns
+    presto_rows = soup.select('.sidearm-roster-player, .roster-player, [class*="roster"] tr, .s-person-card')
     
-    # Method 2: Look for player cards/divs
-    if not roster:
-        player_elements = soup.select('[class*="player"], [class*="roster-player"], .athlete-row')
-        for elem in player_elements:
-            number_elem = elem.select_one('[class*="number"], [class*="jersey"], .roster-number')
-            name_elem = elem.select_one('[class*="name"], [class*="player-name"], a[href*="/athlete/"]')
-            
-            if number_elem and name_elem:
-                number = number_elem.get_text(strip=True)
-                name = name_elem.get_text(strip=True)
-                if number and name and re.match(r'^\d{1,2}$', number):
-                    roster.append({"number": number, "name": name})
+    for row in presto_rows:
+        number = ""
+        name = ""
+        
+        # Try PrestoSports/Sidearm specific selectors
+        num_elem = row.select_one('.sidearm-roster-player-jersey-number, .roster-player-jersey, [class*="jersey"], [class*="number"]:not([class*="phone"])')
+        name_elem = row.select_one('.sidearm-roster-player-name a, .roster-player-name a, [class*="player-name"], .s-person-details__personal-single-line a')
+        
+        if num_elem:
+            number = num_elem.get_text(strip=True).replace('#', '')
+        if name_elem:
+            name = name_elem.get_text(strip=True)
+        
+        # Validate and add
+        if number and name and re.match(r'^\d{1,3}$', number):
+            roster.append({"number": number, "name": name})
     
-    # Method 3: Generic table parsing
+    # Method 2: Standard roster table parsing
     if not roster:
         tables = soup.find_all('table')
         for table in tables:
-            headers = [th.get_text(strip=True).lower() for th in table.find_all('th')]
-            if any('name' in h or 'player' in h for h in headers) and any('#' in h or 'no' in h or 'jersey' in h for h in headers):
-                # Find column indices
-                name_idx = next((i for i, h in enumerate(headers) if 'name' in h or 'player' in h), -1)
-                num_idx = next((i for i, h in enumerate(headers) if '#' in h or 'no' in h or 'jersey' in h), -1)
+            # Get headers
+            header_row = table.find('tr')
+            if not header_row:
+                continue
+            headers = [th.get_text(strip=True).lower() for th in header_row.find_all(['th', 'td'])]
+            
+            # Look for number/jersey and name columns
+            num_idx = -1
+            name_idx = -1
+            
+            for i, h in enumerate(headers):
+                h_clean = h.lower()
+                if num_idx < 0 and ('#' in h_clean or 'no' == h_clean or 'jersey' in h_clean or h_clean == 'number'):
+                    num_idx = i
+                if name_idx < 0 and ('name' in h_clean or 'player' in h_clean or 'athlete' in h_clean):
+                    name_idx = i
+            
+            if num_idx >= 0 and name_idx >= 0:
+                rows = table.find_all('tr')[1:]  # Skip header
+                for row in rows:
+                    cells = row.find_all(['td', 'th'])
+                    if len(cells) > max(num_idx, name_idx):
+                        number = cells[num_idx].get_text(strip=True).replace('#', '')
+                        name_cell = cells[name_idx]
+                        # Try to get name from link first, then text
+                        name_link = name_cell.find('a')
+                        name = name_link.get_text(strip=True) if name_link else name_cell.get_text(strip=True)
+                        
+                        if number and name and re.match(r'^\d{1,3}$', number):
+                            roster.append({"number": number, "name": name})
                 
-                if name_idx >= 0 and num_idx >= 0:
-                    for row in table.find_all('tr')[1:]:  # Skip header
-                        cells = row.find_all('td')
-                        if len(cells) > max(name_idx, num_idx):
-                            number = cells[num_idx].get_text(strip=True)
-                            name = cells[name_idx].get_text(strip=True)
-                            if number and name and re.match(r'^\d{1,2}$', number):
-                                roster.append({"number": number, "name": name})
-                break
+                if roster:
+                    break
+    
+    # Method 3: Look for any table with player-like data
+    if not roster:
+        for table in soup.find_all('table'):
+            rows = table.find_all('tr')
+            for row in rows:
+                cells = row.find_all(['td', 'th'])
+                if len(cells) >= 2:
+                    # Try to find a number in first few cells
+                    number = ""
+                    name = ""
+                    
+                    for i, cell in enumerate(cells[:5]):  # Check first 5 cells
+                        text = cell.get_text(strip=True).replace('#', '')
+                        # Check if it looks like a jersey number
+                        if not number and re.match(r'^\d{1,3}$', text):
+                            number = text
+                        # Check if it looks like a name (has letters, spaces)
+                        elif not name and re.match(r'^[A-Za-z][A-Za-z\s\.\'\-]+$', text) and len(text) > 3:
+                            # Prefer names from links
+                            link = cell.find('a')
+                            if link:
+                                name = link.get_text(strip=True)
+                            else:
+                                name = text
+                    
+                    if number and name:
+                        roster.append({"number": number, "name": name})
+    
+    # Method 4: Look for player cards/list items
+    if not roster:
+        player_cards = soup.select('[class*="player"], [class*="roster-item"], [class*="athlete"], li[class*="person"]')
+        for card in player_cards:
+            number = ""
+            name = ""
+            
+            # Look for number
+            for selector in ['[class*="number"]', '[class*="jersey"]', '.num', 'span:first-child']:
+                elem = card.select_one(selector)
+                if elem:
+                    text = elem.get_text(strip=True).replace('#', '')
+                    if re.match(r'^\d{1,3}$', text):
+                        number = text
+                        break
+            
+            # Look for name
+            for selector in ['[class*="name"] a', '[class*="name"]', 'a[href*="bio"], a[href*="player"], h3, h4']:
+                elem = card.select_one(selector)
+                if elem:
+                    text = elem.get_text(strip=True)
+                    if len(text) > 2 and re.match(r'^[A-Za-z]', text):
+                        name = text
+                        break
+            
+            if number and name:
+                roster.append({"number": number, "name": name})
     
     if not roster:
-        raise HTTPException(status_code=400, detail="Could not find roster data on the MaxPreps page. Please ensure you're using a direct roster URL.")
+        raise HTTPException(status_code=400, detail="Could not find roster data. Please ensure you're using a direct roster page URL.")
     
     # Remove duplicates
     seen = set()
@@ -779,6 +836,8 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
     for player in roster:
         key = (player["number"], player["name"])
         if key not in seen:
+            seen.add(key)
+            unique_roster.append(player)        if key not in seen:
             seen.add(key)
             unique_roster.append(player)
     
