@@ -494,6 +494,12 @@ export default function LiveGame() {
     try {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
+      
+      // Redirect to advanced mode if enabled
+      if (res.data.advanced_mode) {
+        navigate(`/game/${id}/advanced`, { replace: true });
+        return;
+      }
     } catch (error) {
       toast.error("Failed to load game");
       navigate("/");
@@ -507,6 +513,27 @@ export default function LiveGame() {
     const interval = setInterval(fetchGame, 5000);
     return () => clearInterval(interval);
   }, [fetchGame]);
+
+  // Spacebar keyboard handler for clock toggle
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore if typing in input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      // Spacebar toggles clock when enabled
+      if (e.key === ' ' && game?.clock_enabled) {
+        e.preventDefault();
+        if (clockRunning) {
+          handleStopClock();
+        } else {
+          handleStartClock();
+        }
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [game?.clock_enabled, clockRunning]);
 
   // Sync clock state from game data
   useEffect(() => {
