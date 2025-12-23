@@ -1004,6 +1004,24 @@ async def go_to_halftime(game_id: str, user: User = Depends(get_current_user)):
     
     return {"message": "Halftime"}
 
+@api_router.post("/games/{game_id}/clock/exit-halftime")
+async def exit_halftime(game_id: str, next_quarter: int, user: User = Depends(get_current_user)):
+    """Exit halftime and move to specified quarter"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {
+            "is_halftime": False,
+            "current_quarter": next_quarter,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }}
+    )
+    
+    return {"message": f"Moved to quarter {next_quarter}"}
+
 # Player On-Floor (Substitution) Endpoints
 @api_router.post("/games/{game_id}/players/{player_id}/check-in")
 async def player_check_in(game_id: str, player_id: str, user: User = Depends(get_current_user)):
