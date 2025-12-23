@@ -744,7 +744,7 @@ export default function LiveGame() {
   };
 
   const copyEmbedCode = () => {
-    const embedUrl = `${window.location.origin}/embed/${game.share_code}`;
+    const embedUrl = `${window.location.origin}/embed/${game.share_code}?w=${embedWidth}&h=${embedHeight}`;
     const embedCode = `<iframe src="${embedUrl}" width="${embedWidth}" height="${embedHeight}" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
     navigator.clipboard.writeText(embedCode);
     setEmbedCopied(true);
