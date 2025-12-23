@@ -671,7 +671,15 @@ export default function AdvancedLiveGame() {
                   <p className="text-zinc-500 text-sm text-center py-4">No plays yet</p>
                 ) : (
                   playByPlay.map((play, i) => (
-                    <div key={play.id || i} className="text-xs p-2 bg-zinc-850 rounded border-l-2" style={{ borderColor: play.team === "home" ? homeColor : awayColor }}>
+                    <div 
+                      key={play.id || i} 
+                      className="text-xs p-2 bg-zinc-850 rounded border-l-2 cursor-pointer hover:bg-zinc-800 transition-colors" 
+                      style={{ borderColor: play.team === "home" ? homeColor : awayColor }}
+                      onClick={() => {
+                        setEditingPlay({ ...play, index: i });
+                        setShowEditPlayDialog(true);
+                      }}
+                    >
                       <div className="text-zinc-400">Q{play.quarter}</div>
                       <div className="font-semibold">{play.player_name} #{play.player_number}</div>
                       <div>{play.action}</div>
