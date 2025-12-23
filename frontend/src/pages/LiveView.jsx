@@ -171,6 +171,8 @@ export default function LiveView() {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(new Date());
   const [sponsorBanners, setSponsorBanners] = useState([]);
+  const [eventGames, setEventGames] = useState([]);
+  const [eventInfo, setEventInfo] = useState(null);
   
   // Primetime video state
   const [isPiP, setIsPiP] = useState(false);
