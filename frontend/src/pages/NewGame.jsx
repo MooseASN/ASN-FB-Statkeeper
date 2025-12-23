@@ -98,15 +98,15 @@ export default function NewGame({ user, onLogout }) {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
         start_immediately: true,
-        simple_mode: simpleMode,
-        advanced_mode: advancedMode,
+        simple_mode: statMode === "simple",
+        advanced_mode: statMode === "advanced",
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
       });
       toast.success("Game started!");
       // Navigate to advanced mode if enabled, otherwise regular game page
-      if (advancedMode) {
+      if (statMode === "advanced") {
         navigate(`/game/${res.data.id}/advanced`);
       } else {
         navigate(`/game/${res.data.id}`);
