@@ -354,9 +354,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Bonus/Double Bonus Feature"
-    - "Primetime PiP Exit Fix"
-    - "Event Color in Ticker"
+    - "Advanced Mode Clock"
+    - "Advanced Mode Player Additions"
+    - "Advanced Mode Export (PDF)"
+    - "Advanced Mode Summary Tab"
+    - "Advanced Mode Leaders Tab"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -364,6 +366,8 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Implemented P0/P1 features: 1) Fixed Primetime PiP exit bug - video now returns to embedded position when scrolling back up, 2) Added Bonus/Double Bonus feature with buttons in LiveGame tracker and status display in LiveView output, 3) Event color was already applied to ticker. Test credentials: email=schedtest@test.com, password=test123. Active game with bonus: share_code=b77c6b66"
+  - agent: "main"
+    message: "Fork P1/P3 verification complete. P1 VERIFIED: 1) Advanced Mode clock works (click/spacebar toggles start/stop), 2) Player additions (single, bulk, link import) now correctly update the game roster on screen. P3 IMPLEMENTED: 1) Summary tab - working with team comparison stats, 2) Leaders tab - working with points/rebounds leaders, 3) Printable Box Score - now downloads PDF via backend API. P3 ALREADY EXISTED: CSV roster upload already on TeamDetail page, Game Recaps already in backend event ticker. Test credentials: email=schedtest@test.com, password=test123. Advanced mode game for testing: /game/425f43c2-51f5-4b25-820a-1ba02235f19e/advanced"
 
 ## Sponsor Banner Feature - Manual Testing Complete
 
