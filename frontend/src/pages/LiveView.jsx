@@ -191,10 +191,15 @@ export default function LiveView() {
       if (!videoContainer) return;
       
       const rect = videoContainer.getBoundingClientRect();
-      const shouldBePiP = rect.bottom < 100;
+      // Enter PiP when video container scrolls out of view (bottom < 100px from top of viewport)
+      // Exit PiP when video container is back in view (top > -50px, meaning it's visible)
+      const shouldEnterPiP = rect.bottom < 100;
+      const shouldExitPiP = rect.top > -50;
       
-      if (shouldBePiP !== isPiP) {
-        setIsPiP(shouldBePiP);
+      if (shouldEnterPiP && !isPiP) {
+        setIsPiP(true);
+      } else if (shouldExitPiP && isPiP) {
+        setIsPiP(false);
       }
     };
 
