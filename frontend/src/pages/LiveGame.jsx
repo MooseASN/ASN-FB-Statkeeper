@@ -1055,32 +1055,32 @@ export default function LiveGame() {
         onMiss={() => handleShotResult(false)}
       />
 
-      {/* Side Action Buttons - Home on Left, Away on Right */}
+      {/* Side Action Buttons - Flippable with teams */}
       <SideActionButton 
-        label="Home Rebound" 
-        onClick={() => handleTeamRebound("home", "dreb")} 
-        color={homeColor} 
+        label={teamsFlipped ? "Away Rebound" : "Home Rebound"} 
+        onClick={() => handleTeamRebound(teamsFlipped ? "away" : "home", "dreb")} 
+        color={teamsFlipped ? awayColor : homeColor} 
         position="left-0 top-1/4"
         disabled={!isActive}
       />
       <SideActionButton 
-        label="Home Turnover" 
-        onClick={() => handleTeamTurnover("home")} 
-        color={homeColor} 
+        label={teamsFlipped ? "Away Turnover" : "Home Turnover"} 
+        onClick={() => handleTeamTurnover(teamsFlipped ? "away" : "home")} 
+        color={teamsFlipped ? awayColor : homeColor} 
         position="left-0 top-1/2"
         disabled={!isActive}
       />
       <SideActionButton 
-        label="Away Rebound" 
-        onClick={() => handleTeamRebound("away", "dreb")} 
-        color={awayColor} 
+        label={teamsFlipped ? "Home Rebound" : "Away Rebound"} 
+        onClick={() => handleTeamRebound(teamsFlipped ? "home" : "away", "dreb")} 
+        color={teamsFlipped ? homeColor : awayColor} 
         position="right-0 top-1/4"
         disabled={!isActive}
       />
       <SideActionButton 
-        label="Away Turnover" 
-        onClick={() => handleTeamTurnover("away")} 
-        color={awayColor} 
+        label={teamsFlipped ? "Home Turnover" : "Away Turnover"} 
+        onClick={() => handleTeamTurnover(teamsFlipped ? "home" : "away")} 
+        color={teamsFlipped ? homeColor : awayColor} 
         position="right-0 top-1/2"
         disabled={!isActive}
       />
