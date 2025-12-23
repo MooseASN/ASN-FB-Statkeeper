@@ -435,6 +435,18 @@ export default function LiveView() {
                   <p className="text-4xl sm:text-5xl md:text-6xl font-bold score-display text-white" data-testid="away-score">
                     {calculateScore("away")}
                   </p>
+                  {/* Timeout Indicators */}
+                  <div className="flex justify-center gap-1 mt-2">
+                    {Array.from({ length: game.total_timeouts || 4 }, (_, i) => (
+                      <div
+                        key={i}
+                        className="w-2.5 h-2.5 md:w-3 md:h-3 rounded-full"
+                        style={{
+                          backgroundColor: i < (game.away_timeouts_used || 0) ? '#9ca3af' : awayColor
+                        }}
+                      />
+                    ))}
+                  </div>
                   <p className="text-xs md:text-sm text-white/60 mt-1">Fouls: {awayTotals.pf}</p>
                 </div>
               </div>
