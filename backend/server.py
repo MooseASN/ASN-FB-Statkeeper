@@ -510,6 +510,9 @@ class Game(BaseModel):
     total_timeouts: int = 4  # Total timeouts per team
     home_timeouts_used: int = 0  # Timeouts used by home team
     away_timeouts_used: int = 0  # Timeouts used by away team
+    # Primetime fields
+    primetime_enabled: bool = False  # Enable primetime mode with video
+    video_url: Optional[str] = None  # YouTube or m3u8 video URL
     # On-floor players (player_ids)
     home_on_floor: List[str] = []
     away_on_floor: List[str] = []
