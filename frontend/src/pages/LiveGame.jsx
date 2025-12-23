@@ -1308,6 +1308,17 @@ export default function LiveGame() {
                       Timeout
                     </Button>
                   )}
+                  {/* Bonus Button */}
+                  {isActive && (
+                    <Button
+                      size="sm"
+                      variant={game?.home_bonus ? "default" : "outline"}
+                      className={`mt-2 ml-1 text-xs h-7 ${game?.home_bonus === "double_bonus" ? "bg-red-500 hover:bg-red-600" : game?.home_bonus === "bonus" ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}`}
+                      onClick={() => handleBonusToggle("home")}
+                    >
+                      {game?.home_bonus === "double_bonus" ? "2x Bonus" : game?.home_bonus === "bonus" ? "Bonus" : "Bonus"}
+                    </Button>
+                  )}
                 </div>
                 <div className="px-4 text-2xl text-slate-300">-</div>
                 <div className="text-center flex-1">
