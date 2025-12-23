@@ -170,17 +170,18 @@ export default function AdvancedLiveGame() {
     
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [possession, clockRunning]);
+  }, [possession]);
 
   // Clock toggle
   const handleToggleClock = async () => {
     try {
       if (clockRunning) {
         await axios.post(`${API}/games/${id}/clock/stop`);
+        setClockRunning(false);
       } else {
         await axios.post(`${API}/games/${id}/clock/start`);
+        setClockRunning(true);
       }
-      setClockRunning(!clockRunning);
       fetchGame();
     } catch (error) {
       toast.error("Failed to toggle clock");
