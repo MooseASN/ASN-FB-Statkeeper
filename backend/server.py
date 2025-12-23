@@ -1635,6 +1635,29 @@ async def update_bonus(game_id: str, bonus_data: BonusUpdate, user: User = Depen
     
     return {"message": "Bonus updated", "team": bonus_data.team, "status": bonus_data.bonus_status}
 
+
+class PossessionUpdate(BaseModel):
+    possession: str  # "home" or "away"
+
+
+@api_router.post("/games/{game_id}/possession")
+async def update_possession(game_id: str, data: PossessionUpdate, user: User = Depends(get_current_user)):
+    """Update possession for advanced mode"""
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    if data.possession not in ["home", "away"]:
+        raise HTTPException(status_code=400, detail="Possession must be 'home' or 'away'")
+    
+    await db.games.update_one(
+        {"id": game_id, "user_id": user.user_id},
+        {"$set": {"possession": data.possession, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Possession updated", "possession": data.possession}
+
+
 # ============ SPONSOR BANNER ENDPOINTS ============
 
 class SponsorBannerCreate(BaseModel):
