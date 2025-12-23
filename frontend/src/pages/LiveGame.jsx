@@ -944,7 +944,7 @@ export default function LiveGame() {
   const totalQuarters = Math.max(4, homeScores.length, game.current_quarter);
 
   return (
-    <div className="min-h-screen bg-slate-100" data-testid="live-game-page">
+    <div className="min-h-screen bg-slate-100 text-black [&_*]:text-inherit" data-testid="live-game-page">
       {/* Shot Modal */}
       <ShotModal
         isOpen={shotModalOpen}
