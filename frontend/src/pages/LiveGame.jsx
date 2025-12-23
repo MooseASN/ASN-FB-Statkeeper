@@ -1744,6 +1744,7 @@ export default function LiveGame() {
                   isOnFloor={((teamsFlipped ? game?.home_on_floor : game?.away_on_floor) || []).includes(player.id)}
                   onToggleFloor={(playerId) => togglePlayerOnFloor(playerId, teamsFlipped)}
                   canCheckIn={((teamsFlipped ? game?.home_on_floor : game?.away_on_floor) || []).length < 5}
+                  simpleMode={game?.simple_mode}
                 />
               ))}
               {(teamsFlipped ? homeStats : awayStats).length === 0 && (
