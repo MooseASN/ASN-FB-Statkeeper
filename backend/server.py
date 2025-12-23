@@ -578,6 +578,7 @@ class GameUpdate(BaseModel):
     clock_time: Optional[int] = None
     home_bonus: Optional[str] = None
     away_bonus: Optional[str] = None
+    play_by_play: Optional[List[dict]] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
