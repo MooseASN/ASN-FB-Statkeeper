@@ -578,6 +578,7 @@ class EventCreate(BaseModel):
     start_date: str  # YYYY-MM-DD
     end_date: Optional[str] = None  # YYYY-MM-DD, same as start_date if single day
     logo_data: Optional[str] = None  # Base64 encoded logo image
+    color: str = "#000000"  # Ticker background color
 
 class Event(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -588,6 +589,7 @@ class Event(BaseModel):
     start_date: str
     end_date: Optional[str] = None
     logo_data: Optional[str] = None
+    color: str = "#000000"  # Ticker background color
     game_ids: List[str] = []  # List of game IDs in this event
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
