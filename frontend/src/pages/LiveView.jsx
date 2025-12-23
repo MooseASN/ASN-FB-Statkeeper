@@ -806,16 +806,19 @@ export default function LiveView() {
 
       {/* Event Games Ticker */}
       {eventGames.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 bg-black text-white z-40 overflow-hidden">
+        <div 
+          className="fixed bottom-0 left-0 right-0 text-white z-40 overflow-hidden"
+          style={{ backgroundColor: eventInfo?.color || '#000000' }}
+        >
           {/* Event Header */}
           {eventInfo && (
-            <div className="bg-slate-900 px-4 py-1 flex items-center gap-2 border-b border-slate-800">
+            <div className="px-4 py-1 flex items-center gap-2 border-b border-white/20" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }}>
               {eventInfo.logo_data && (
                 <img src={eventInfo.logo_data} alt={eventInfo.name} className="w-5 h-5 object-contain" />
               )}
               <span className="text-sm font-semibold">{eventInfo.name}</span>
               {eventInfo.location && (
-                <span className="text-xs text-slate-400">• {eventInfo.location}</span>
+                <span className="text-xs text-white/60">• {eventInfo.location}</span>
               )}
             </div>
           )}
@@ -827,38 +830,48 @@ export default function LiveView() {
                 <a
                   key={g.id}
                   href={`/live/${g.share_code}`}
-                  className="inline-flex items-center gap-3 hover:text-yellow-400 transition-colors"
+                  className="inline-flex items-center gap-3 hover:text-yellow-300 transition-colors"
                 >
                   {/* Status */}
                   {g.status === "active" ? (
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      <span className="text-green-400 text-xs font-bold">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                      <span className="text-green-300 text-xs font-bold">
                         {g.is_halftime ? 'HALF' : `Q${g.current_quarter}`}
                       </span>
                     </span>
                   ) : g.status === "scheduled" ? (
-                    <span className="text-blue-400 text-xs">
+                    <span className="text-blue-300 text-xs">
                       {g.scheduled_time || 'TBD'}
                     </span>
                   ) : (
-                    <span className="text-slate-500 text-xs">FINAL</span>
+                    <span className="text-white/50 text-xs">FINAL</span>
                   )}
                   
                   {/* Teams & Score */}
                   <span className="font-semibold">{g.home_team_name}</span>
                   {g.status !== "scheduled" ? (
-                    <span className="text-lg font-bold text-yellow-400">
+                    <span className="text-lg font-bold text-yellow-300">
                       {g.home_score} - {g.away_score}
                     </span>
                   ) : (
-                    <span className="text-slate-500">vs</span>
+                    <span className="text-white/50">vs</span>
                   )}
                   <span className="font-semibold">{g.away_team_name}</span>
                   
+                  {/* Leading Scorers & Recap */}
+                  {g.status !== "scheduled" && (g.home_leader || g.away_leader || g.recap) && (
+                    <span className="text-xs text-white/70 ml-2 max-w-[200px] truncate">
+                      {g.home_leader && `${g.home_leader.name} ${g.home_leader.points}pts`}
+                      {g.home_leader && g.away_leader && ' | '}
+                      {g.away_leader && `${g.away_leader.name} ${g.away_leader.points}pts`}
+                      {g.recap && ` • ${g.recap}`}
+                    </span>
+                  )}
+                  
                   {/* Separator */}
                   {idx < eventGames.length - 1 && (
-                    <span className="text-slate-600 ml-4">|</span>
+                    <span className="text-white/30 ml-4">|</span>
                   )}
                 </a>
               ))}
@@ -868,35 +881,44 @@ export default function LiveView() {
                 <a
                   key={`dup-${g.id}`}
                   href={`/live/${g.share_code}`}
-                  className="inline-flex items-center gap-3 hover:text-yellow-400 transition-colors"
+                  className="inline-flex items-center gap-3 hover:text-yellow-300 transition-colors"
                 >
                   {g.status === "active" ? (
                     <span className="flex items-center gap-1">
-                      <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                      <span className="text-green-400 text-xs font-bold">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                      <span className="text-green-300 text-xs font-bold">
                         {g.is_halftime ? 'HALF' : `Q${g.current_quarter}`}
                       </span>
                     </span>
                   ) : g.status === "scheduled" ? (
-                    <span className="text-blue-400 text-xs">
+                    <span className="text-blue-300 text-xs">
                       {g.scheduled_time || 'TBD'}
                     </span>
                   ) : (
-                    <span className="text-slate-500 text-xs">FINAL</span>
+                    <span className="text-white/50 text-xs">FINAL</span>
                   )}
                   
                   <span className="font-semibold">{g.home_team_name}</span>
                   {g.status !== "scheduled" ? (
-                    <span className="text-lg font-bold text-yellow-400">
+                    <span className="text-lg font-bold text-yellow-300">
                       {g.home_score} - {g.away_score}
                     </span>
                   ) : (
-                    <span className="text-slate-500">vs</span>
+                    <span className="text-white/50">vs</span>
                   )}
                   <span className="font-semibold">{g.away_team_name}</span>
                   
+                  {g.status !== "scheduled" && (g.home_leader || g.away_leader || g.recap) && (
+                    <span className="text-xs text-white/70 ml-2 max-w-[200px] truncate">
+                      {g.home_leader && `${g.home_leader.name} ${g.home_leader.points}pts`}
+                      {g.home_leader && g.away_leader && ' | '}
+                      {g.away_leader && `${g.away_leader.name} ${g.away_leader.points}pts`}
+                      {g.recap && ` • ${g.recap}`}
+                    </span>
+                  )}
+                  
                   {idx < eventGames.length - 1 && (
-                    <span className="text-slate-600 ml-4">|</span>
+                    <span className="text-white/30 ml-4">|</span>
                   )}
                 </a>
               ))}
