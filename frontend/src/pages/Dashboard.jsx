@@ -352,7 +352,7 @@ export default function Dashboard({ user, onLogout }) {
         {activeGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-black dark:text-white">
                 <PlayCircle className="w-5 h-5 text-orange-500" />
                 Live Games
               </h2>
@@ -451,7 +451,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Sponsor Banners */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
+            <h2 className="text-xl font-semibold flex items-center gap-2 text-black dark:text-white">
               <Image className="w-5 h-5 text-purple-500" />
               Sponsor Banners
             </h2>
