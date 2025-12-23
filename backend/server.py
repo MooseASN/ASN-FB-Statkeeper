@@ -460,6 +460,8 @@ class GameCreate(BaseModel):
     period_label: str = "Quarter"  # "Quarter" or "Period"
     timeout_preset: str = "college"  # "high_school", "college", or "custom"
     custom_timeouts: int = 4  # Used when timeout_preset is "custom"
+    primetime_enabled: bool = False  # Enable primetime mode with video
+    video_url: Optional[str] = None  # YouTube or m3u8 video URL
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
