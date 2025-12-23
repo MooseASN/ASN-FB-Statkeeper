@@ -83,7 +83,8 @@ export default function NewGame({ user, onLogout }) {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
         start_immediately: true,
-        ...getClockSettings()
+        ...getClockSettings(),
+        ...getTimeoutSettings()
       });
       toast.success("Game started!");
       navigate(`/game/${res.data.id}`);
@@ -118,6 +119,8 @@ export default function NewGame({ user, onLogout }) {
         start_immediately: false,
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime || null,
+        ...getClockSettings(),
+        ...getTimeoutSettings()
         ...getClockSettings()
       });
       toast.success("Game scheduled!");
