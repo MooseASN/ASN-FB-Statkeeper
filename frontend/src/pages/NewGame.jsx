@@ -580,8 +580,6 @@ export default function NewGame({ user, onLogout }) {
                 )}
               </div>
 
-              {/* Primetime Mode */}
-
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
