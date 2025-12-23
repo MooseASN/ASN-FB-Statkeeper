@@ -548,6 +548,7 @@ export default function AdvancedLiveGame() {
 
           {/* Center: Clock and Quarter */}
           <div className="flex items-center gap-4">
+            <span className="text-xs text-zinc-500">[\] toggle</span>
             <button
               onClick={handleToggleClock}
               className={`px-4 py-2 rounded-lg font-bold text-xl transition-colors ${
