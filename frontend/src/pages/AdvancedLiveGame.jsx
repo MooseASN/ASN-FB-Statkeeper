@@ -579,20 +579,20 @@ export default function AdvancedLiveGame() {
 
               {/* Main Stat Buttons Grid */}
               <div className="grid grid-cols-4 gap-3">
-                <StatButton label="2PT Shot" hotkey="J" onClick={() => { setActiveAction('2pt'); setShowPlayerSelect(true); }} color="blue" />
-                <StatButton label="3PT Shot" hotkey="L" onClick={() => { setActiveAction('3pt'); setShowPlayerSelect(true); }} color="purple" />
-                <StatButton label="Free Throw" hotkey="F" onClick={() => { setActiveAction('ft'); setShowPlayerSelect(true); }} color="green" />
-                <StatButton label="Steal" hotkey="S" onClick={() => { setActiveAction('steal'); setShowPlayerSelect(true); }} color="teal" />
+                <StatButton label="2PT Shot" hotkey="J" onClick={() => { setActiveAction('2pt'); setShowPlayerSelect(true); }}  />
+                <StatButton label="3PT Shot" hotkey="L" onClick={() => { setActiveAction('3pt'); setShowPlayerSelect(true); }}  />
+                <StatButton label="Free Throw" hotkey="F" onClick={() => { setActiveAction('ft'); setShowPlayerSelect(true); }}  />
+                <StatButton label="Steal" hotkey="S" onClick={() => { setActiveAction('steal'); setShowPlayerSelect(true); }}  />
                 
-                <StatButton label="Turnover" hotkey="T" onClick={() => setShowTurnoverDialog(true)} color="red" />
-                <StatButton label="Foul" hotkey="P" onClick={() => setShowFoulDialog(true)} color="orange" />
-                <StatButton label="Assist" hotkey="A" onClick={() => { setActiveAction('assist'); setShowPlayerSelect(true); }} color="indigo" />
-                <StatButton label="Rebound" hotkey="R" onClick={() => setShowReboundDialog(true)} color="emerald" />
+                <StatButton label="Turnover" hotkey="T" onClick={() => setShowTurnoverDialog(true)}  />
+                <StatButton label="Foul" hotkey="P" onClick={() => setShowFoulDialog(true)}  />
+                <StatButton label="Assist" hotkey="A" onClick={() => { setActiveAction('assist'); setShowPlayerSelect(true); }}  />
+                <StatButton label="Rebound" hotkey="R" onClick={() => setShowReboundDialog(true)}  />
                 
-                <StatButton label="Block" hotkey="B" onClick={() => { setActiveAction('block'); setShowPlayerSelect(true); }} color="slate" />
-                <StatButton label="Substitution" hotkey="U" onClick={() => setShowSubstitutionDialog(true)} color="yellow" />
-                <StatButton label="Timeout" hotkey="O" onClick={() => setShowTimeoutDialog(true)} color="pink" />
-                <StatButton label="Game Ctrl" hotkey="G" onClick={() => setShowGameControlDialog(true)} color="cyan" />
+                <StatButton label="Block" hotkey="B" onClick={() => { setActiveAction('block'); setShowPlayerSelect(true); }}  />
+                <StatButton label="Substitution" hotkey="U" onClick={() => setShowSubstitutionDialog(true)}  />
+                <StatButton label="Timeout" hotkey="O" onClick={() => setShowTimeoutDialog(true)}  />
+                <StatButton label="Game Ctrl" hotkey="G" onClick={() => setShowGameControlDialog(true)}  />
               </div>
 
               {/* Players On Court Section */}
