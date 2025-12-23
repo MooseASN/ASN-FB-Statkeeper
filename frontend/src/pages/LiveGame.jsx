@@ -1663,7 +1663,7 @@ export default function LiveGame() {
           </div>
 
           {/* Right Column - Team (flippable) */}
-          <div className={`order-2 ${teamsFlipped ? 'lg:order-1' : 'lg:order-3'}`}>
+          <div className="order-2 lg:order-3">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 {/* Team Logo */}
