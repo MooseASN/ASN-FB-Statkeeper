@@ -356,6 +356,64 @@ export default function NewGame({ user, onLogout }) {
                 )}
               </div>
 
+              {/* Timeout Options */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-slate-600" />
+                  <Label className="text-base font-semibold">Timeouts</Label>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={timeoutPreset === "high_school" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTimeoutPreset("high_school")}
+                      className={timeoutPreset === "high_school" ? "bg-black hover:bg-gray-800" : ""}
+                    >
+                      High School (5)
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={timeoutPreset === "college" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTimeoutPreset("college")}
+                      className={timeoutPreset === "college" ? "bg-black hover:bg-gray-800" : ""}
+                    >
+                      College (4)
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={timeoutPreset === "custom" ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setTimeoutPreset("custom")}
+                      className={timeoutPreset === "custom" ? "bg-black hover:bg-gray-800" : ""}
+                    >
+                      Custom
+                    </Button>
+                  </div>
+                  
+                  {timeoutPreset === "custom" && (
+                    <div className="flex items-center gap-3">
+                      <Label className="text-sm">Timeouts per team:</Label>
+                      <Input
+                        type="number"
+                        min="1"
+                        max="10"
+                        value={customTimeouts}
+                        onChange={(e) => setCustomTimeouts(Math.max(1, Math.min(10, parseInt(e.target.value) || 4)))}
+                        className="w-20"
+                      />
+                    </div>
+                  )}
+                  
+                  <p className="text-sm text-muted-foreground">
+                    Each team will have {timeoutPreset === "high_school" ? 5 : timeoutPreset === "college" ? 4 : customTimeouts} timeouts
+                  </p>
+                </div>
+              </div>
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
