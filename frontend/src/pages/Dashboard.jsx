@@ -138,7 +138,7 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const copyEmbedCode = () => {
-    const embedUrl = `${window.location.origin}/embed/latest/${user.user_id}`;
+    const embedUrl = `${window.location.origin}/embed/latest/${user.user_id}?w=${embedWidth}&h=${embedHeight}`;
     const embedCode = `<iframe src="${embedUrl}" width="${embedWidth}" height="${embedHeight}" frameborder="0" style="max-width:100%;" allowfullscreen></iframe>`;
     
     navigator.clipboard.writeText(embedCode);
