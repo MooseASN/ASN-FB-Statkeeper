@@ -1367,7 +1367,7 @@ export default function AdvancedLiveGame() {
             </Button>
             <Button 
               onClick={() => {
-                setActiveAction('technical');
+                setActiveAction('tech_foul');
                 setShowFoulDialog(false);
                 setShowPlayerSelect(true);
               }}
