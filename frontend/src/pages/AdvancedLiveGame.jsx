@@ -1304,6 +1304,184 @@ export default function AdvancedLiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Advance Quarter Confirmation Dialog */}
+      <Dialog open={showAdvanceQuarterDialog} onOpenChange={setShowAdvanceQuarterDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Advance to {game?.period_label} {(game?.current_quarter || 1) + 1}{(game?.current_quarter || 1) >= 4 ? ' (Overtime)' : ''}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <p className="text-zinc-400">
+              The clock will reset to {formatTime(game?.period_duration || 720)}.
+            </p>
+            <p className="text-zinc-300 font-medium">
+              Would you like to reset team fouls?
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                onClick={() => confirmAdvanceQuarter(true)}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                Yes, Reset Fouls
+              </Button>
+              <Button 
+                onClick={() => confirmAdvanceQuarter(false)}
+                variant="outline"
+                className="border-zinc-700"
+              >
+                No, Keep Fouls
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Single Add Player Dialog */}
+      <Dialog open={showSingleAddDialog} onOpenChange={setShowSingleAddDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Add Player to {importTeam === "home" ? game?.home_team_name : game?.away_team_name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="flex gap-2">
+              <div>
+                <Label className="text-xs text-zinc-400">#</Label>
+                <Input
+                  placeholder="00"
+                  value={newPlayer.number}
+                  onChange={(e) => setNewPlayer({ ...newPlayer, number: e.target.value })}
+                  className="w-20 bg-zinc-800 border-zinc-700"
+                />
+              </div>
+              <div className="flex-1">
+                <Label className="text-xs text-zinc-400">Name</Label>
+                <Input
+                  placeholder="Player Name"
+                  value={newPlayer.name}
+                  onChange={(e) => setNewPlayer({ ...newPlayer, name: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700"
+                />
+              </div>
+            </div>
+            <Button onClick={handleSingleAdd} className="w-full bg-blue-600 hover:bg-blue-700">
+              Add Player
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Add Dialog */}
+      <Dialog open={showBulkAddDialog} onOpenChange={setShowBulkAddDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>Bulk Add to {importTeam === "home" ? game?.home_team_name : game?.away_team_name}</DialogTitle>
+          </DialogHeader>
+          <ScrollArea className="h-[300px] mt-4">
+            <div className="space-y-2 pr-4">
+              {bulkPlayers.map((player, i) => (
+                <div key={i} className="flex gap-2 items-center">
+                  <Input
+                    placeholder="#"
+                    value={player.number}
+                    onChange={(e) => {
+                      const updated = [...bulkPlayers];
+                      updated[i].number = e.target.value;
+                      setBulkPlayers(updated);
+                    }}
+                    className="w-16 bg-zinc-800 border-zinc-700"
+                  />
+                  <Input
+                    placeholder="Player Name"
+                    value={player.name}
+                    onChange={(e) => {
+                      const updated = [...bulkPlayers];
+                      updated[i].name = e.target.value;
+                      setBulkPlayers(updated);
+                    }}
+                    className="flex-1 bg-zinc-800 border-zinc-700"
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && player.number && player.name) {
+                        setBulkPlayers([...bulkPlayers, { number: "", name: "" }]);
+                      }
+                    }}
+                  />
+                  {bulkPlayers.length > 1 && (
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setBulkPlayers(bulkPlayers.filter((_, idx) => idx !== i))}
+                      className="px-2 text-red-500 hover:text-red-400"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </ScrollArea>
+          <div className="flex gap-2 mt-4">
+            <Button 
+              variant="outline" 
+              onClick={() => setBulkPlayers([...bulkPlayers, { number: "", name: "" }])}
+              className="flex-1 border-zinc-700"
+            >
+              <Plus className="w-4 h-4 mr-1" /> Add Row
+            </Button>
+            <Button onClick={handleBulkAdd} className="flex-1 bg-blue-600 hover:bg-blue-700">
+              Add {bulkPlayers.filter(p => p.number && p.name).length} Players
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Link Import Dialog */}
+      <Dialog open={showLinkImportDialog} onOpenChange={setShowLinkImportDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
+          <DialogHeader>
+            <DialogTitle>Import Roster from Link</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <p className="text-sm text-zinc-400">
+              Import roster from MaxPreps, PrestoSports, or Sidearm Sports roster pages.
+            </p>
+            <div>
+              <Label className="text-xs text-zinc-400">Roster URL</Label>
+              <Input
+                placeholder="https://www.maxpreps.com/.../roster"
+                value={importUrl}
+                onChange={(e) => setImportUrl(e.target.value)}
+                className="bg-zinc-800 border-zinc-700"
+              />
+            </div>
+            <div className="bg-zinc-800 rounded-lg p-3 text-xs text-zinc-400">
+              <p className="font-medium text-zinc-300 mb-1">Supported Sources:</p>
+              <ul className="space-y-1">
+                <li>• MaxPreps - maxpreps.com/...roster</li>
+                <li>• PrestoSports - prestosports.com/...roster</li>
+                <li>• Sidearm Sports - sidearmstats.com/...roster</li>
+              </ul>
+            </div>
+            <Button 
+              onClick={handleLinkImport} 
+              disabled={importLoading || !importUrl.trim()}
+              className="w-full bg-blue-600 hover:bg-blue-700"
+            >
+              {importLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Importing...
+                </>
+              ) : (
+                <>
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                  Import Roster
+                </>
+              )}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
