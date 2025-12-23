@@ -1748,32 +1748,11 @@ export default function AdvancedLiveGame() {
                 />
               </div>
               <div>
-                <Label className="text-zinc-400">Player Name</Label>
-                <Input
-                  value={editingPlay.player_name || ""}
-                  onChange={(e) => setEditingPlay({ ...editingPlay, player_name: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700"
-                />
-              </div>
-              <div>
-                <Label className="text-zinc-400">Player Number</Label>
-                <Input
-                  value={editingPlay.player_number || ""}
-                  onChange={(e) => setEditingPlay({ ...editingPlay, player_number: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700"
-                />
-              </div>
-              <div>
-                <Label className="text-zinc-400">Action/Play</Label>
-                <Input
-                  value={editingPlay.action || ""}
-                  onChange={(e) => setEditingPlay({ ...editingPlay, action: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700"
-                />
-              </div>
-              <div>
                 <Label className="text-zinc-400">Team</Label>
-                <Select value={editingPlay.team || "home"} onValueChange={(v) => setEditingPlay({ ...editingPlay, team: v })}>
+                <Select 
+                  value={editingPlay.team || "home"} 
+                  onValueChange={(v) => setEditingPlay({ ...editingPlay, team: v, player_id: "", player_name: "", player_number: "" })}
+                >
                   <SelectTrigger className="bg-zinc-800 border-zinc-700">
                     <SelectValue />
                   </SelectTrigger>
@@ -1782,6 +1761,43 @@ export default function AdvancedLiveGame() {
                     <SelectItem value="away">{game?.away_team_name}</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div>
+                <Label className="text-zinc-400">Player</Label>
+                <Select 
+                  value={editingPlay.player_id || ""} 
+                  onValueChange={(v) => {
+                    const players = editingPlay.team === "home" ? homeStats : awayStats;
+                    const player = players.find(p => p.id === v);
+                    if (player) {
+                      setEditingPlay({ 
+                        ...editingPlay, 
+                        player_id: v,
+                        player_name: player.player_name,
+                        player_number: player.player_number
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                    <SelectValue placeholder="Select player" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(editingPlay.team === "home" ? homeStats : awayStats).map(player => (
+                      <SelectItem key={player.id} value={player.id}>
+                        #{player.player_number} {player.player_name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label className="text-zinc-400">Action/Play</Label>
+                <Input
+                  value={editingPlay.action || ""}
+                  onChange={(e) => setEditingPlay({ ...editingPlay, action: e.target.value })}
+                  className="bg-zinc-800 border-zinc-700"
+                />
               </div>
               <div className="flex gap-2">
                 <Button
