@@ -93,9 +93,9 @@ export default function AdvancedLiveGame() {
       setPossession(gameRes.data.possession || "home");
       setClockRunning(gameRes.data.clock_running || false);
       
-      // Stats are embedded in home_stats and away_stats
-      setHomeStats(gameRes.data.home_stats || []);
-      setAwayStats(gameRes.data.away_stats || []);
+      // Stats are embedded in home_player_stats and away_player_stats
+      setHomeStats(gameRes.data.home_player_stats || []);
+      setAwayStats(gameRes.data.away_player_stats || []);
       setPlayByPlay((gameRes.data.play_by_play || []).slice().reverse());
     } catch (error) {
       toast.error("Failed to load game");
