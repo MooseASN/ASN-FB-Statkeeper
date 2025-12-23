@@ -1297,8 +1297,7 @@ export default function LiveGame() {
                         {formatClockTime(clockTime)}
                       </div>
                       <div className="text-xs text-muted-foreground">
-                        {game?.period_label || "Quarter"} {game.current_quarter}
-                        {game?.is_halftime && " - HALFTIME"}
+                        {game?.is_halftime ? "HALFTIME" : `${game?.period_label || "Quarter"} ${game.current_quarter}`}
                       </div>
                     </div>
                     
