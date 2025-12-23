@@ -1150,29 +1150,14 @@ export default function AdvancedLiveGame() {
 }
 
 // Stat Button Component
-const StatButton = ({ label, hotkey, onClick, color }) => {
-  const colorClasses = {
-    blue: "bg-blue-600 hover:bg-blue-700",
-    purple: "bg-purple-600 hover:bg-purple-700",
-    green: "bg-green-600 hover:bg-green-700",
-    teal: "bg-teal-600 hover:bg-teal-700",
-    red: "bg-red-600 hover:bg-red-700",
-    orange: "bg-orange-600 hover:bg-orange-700",
-    indigo: "bg-indigo-600 hover:bg-indigo-700",
-    emerald: "bg-emerald-600 hover:bg-emerald-700",
-    slate: "bg-slate-600 hover:bg-zinc-800",
-    yellow: "bg-yellow-600 hover:bg-yellow-700 text-black",
-    pink: "bg-pink-600 hover:bg-pink-700",
-    cyan: "bg-cyan-600 hover:bg-cyan-700",
-  };
-
+const StatButton = ({ label, hotkey, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className={`${colorClasses[color]} px-4 py-3 rounded-lg font-semibold transition-colors flex flex-col items-center justify-center gap-1`}
+      className="bg-zinc-700 hover:bg-zinc-600 px-4 py-4 rounded-lg font-bold transition-colors flex flex-col items-center justify-center gap-1 text-white"
     >
-      <span>{label}</span>
-      <span className="text-xs opacity-70">({hotkey})</span>
+      <span className="text-lg">{label}</span>
+      <span className="text-sm opacity-70">({hotkey})</span>
     </button>
   );
 };
