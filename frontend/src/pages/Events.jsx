@@ -88,7 +88,8 @@ export default function Events({ user, onLogout }) {
         location: eventLocation.trim() || null,
         start_date: startDate,
         end_date: endDate || startDate,
-        logo_data: logoData
+        logo_data: logoData,
+        color: eventColor
       });
       
       toast.success("Event created!");
