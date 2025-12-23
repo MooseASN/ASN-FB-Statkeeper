@@ -467,6 +467,40 @@ export default function NewGame({ user, onLogout }) {
                 )}
               </div>
 
+              {/* Simple Mode */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-5 h-5 text-green-600" />
+                    <Label className="text-base font-semibold">Simple Mode</Label>
+                  </div>
+                  <Switch
+                    checked={simpleMode}
+                    onCheckedChange={setSimpleMode}
+                    data-testid="simple-mode-toggle"
+                  />
+                </div>
+                
+                {simpleMode && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Simplified stat tracking - perfect for quick games or youth leagues.
+                    </p>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-sm font-medium text-green-800 mb-1">Tracks only:</p>
+                      <ul className="text-sm text-green-700 grid grid-cols-2 gap-x-4">
+                        <li>• FT Makes</li>
+                        <li>• 2PT Makes</li>
+                        <li>• 3PT Makes</li>
+                        <li>• Rebounds</li>
+                        <li>• Assists</li>
+                        <li>• Fouls</li>
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
