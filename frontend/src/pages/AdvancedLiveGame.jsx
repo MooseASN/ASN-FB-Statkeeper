@@ -342,7 +342,7 @@ export default function AdvancedLiveGame() {
         <div className="flex items-center justify-between px-4 py-2">
           {/* Left: Running Score */}
           <div className="flex items-center gap-6">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-white hover:bg-slate-700">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-white hover:bg-zinc-800">
               <ArrowLeft className="w-4 h-4 mr-1" />
               Exit
             </Button>
@@ -352,7 +352,7 @@ export default function AdvancedLiveGame() {
                 <span className="font-bold">{game.home_team_name}</span>
                 <span className="text-2xl font-bold" style={{ color: homeColor }}>{homeTotals.pts}</span>
               </div>
-              <span className="text-slate-500">-</span>
+              <span className="text-zinc-500">-</span>
               <div className="flex items-center gap-2">
                 <span className="text-2xl font-bold" style={{ color: awayColor }}>{awayTotals.pts}</span>
                 <span className="font-bold">{game.away_team_name}</span>
@@ -374,7 +374,7 @@ export default function AdvancedLiveGame() {
               {clockRunning ? <Play className="w-5 h-5 inline mr-2" /> : <Pause className="w-5 h-5 inline mr-2" />}
               {formatTime(game.clock_time || 0)}
             </button>
-            <div className="text-lg font-semibold bg-slate-700 px-3 py-2 rounded">
+            <div className="text-lg font-semibold bg-zinc-800 px-3 py-2 rounded">
               {game.period_label} {game.current_quarter}
             </div>
             <Button 
@@ -385,7 +385,7 @@ export default function AdvancedLiveGame() {
                 setEditSeconds((game.clock_time || 0) % 60);
                 setShowSetTimeDialog(true);
               }}
-              className="border-slate-600 text-white hover:bg-slate-700"
+              className="border-zinc-700 text-white hover:bg-zinc-800"
             >
               Set
             </Button>
@@ -397,7 +397,7 @@ export default function AdvancedLiveGame() {
               variant={activeTab === "addplay" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("addplay")}
-              className={activeTab === "addplay" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-slate-700"}
+              className={activeTab === "addplay" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-zinc-800"}
             >
               Add Play
             </Button>
@@ -405,7 +405,7 @@ export default function AdvancedLiveGame() {
               variant={activeTab === "export" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("export")}
-              className={activeTab === "export" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-slate-700"}
+              className={activeTab === "export" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-zinc-800"}
             >
               <FileDown className="w-4 h-4 mr-1" />
               Export
@@ -414,7 +414,7 @@ export default function AdvancedLiveGame() {
               variant={activeTab === "rosters" ? "default" : "ghost"}
               size="sm"
               onClick={() => setActiveTab("rosters")}
-              className={activeTab === "rosters" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-slate-700"}
+              className={activeTab === "rosters" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-zinc-800"}
             >
               <Users className="w-4 h-4 mr-1" />
               Rosters
@@ -423,7 +423,7 @@ export default function AdvancedLiveGame() {
               variant="ghost" 
               size="sm" 
               onClick={() => setShowHelpDialog(true)}
-              className="text-white hover:bg-slate-700"
+              className="text-white hover:bg-zinc-800"
             >
               <HelpCircle className="w-4 h-4" />
             </Button>
@@ -432,9 +432,9 @@ export default function AdvancedLiveGame() {
       </div>
 
       {/* Possession Bar */}
-      <div className="bg-slate-800 border-b border-slate-700 px-4 py-2">
+      <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2">
         <div className="flex items-center gap-4">
-          <span className="text-sm text-slate-400">Possession:</span>
+          <span className="text-sm text-zinc-400">Possession:</span>
           <button
             onClick={() => handlePossessionChange("home")}
             className={`px-4 py-2 rounded transition-all ${
@@ -457,30 +457,30 @@ export default function AdvancedLiveGame() {
           >
             {game.away_team_name} (V)
           </button>
-          <span className="text-xs text-slate-500 ml-4">Press H or V to change</span>
+          <span className="text-xs text-zinc-500 ml-4">Press H or V to change</span>
         </div>
       </div>
 
       {/* Main Content */}
       <div className="flex">
         {/* Left Panel - Play by Play / Summary / Leaders */}
-        <div className="w-64 bg-slate-800 border-r border-slate-700 h-[calc(100vh-120px)]">
-          <div className="flex border-b border-slate-700">
+        <div className="w-64 bg-zinc-900 border-r border-zinc-800 h-[calc(100vh-120px)]">
+          <div className="flex border-b border-zinc-800">
             <button
               onClick={() => setLeftPanel("plays")}
-              className={`flex-1 px-3 py-2 text-xs font-semibold ${leftPanel === "plays" ? "bg-slate-700 text-white" : "text-slate-400 hover:bg-slate-750"}`}
+              className={`flex-1 px-3 py-2 text-xs font-semibold ${leftPanel === "plays" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-850"}`}
             >
               Recent Plays
             </button>
             <button
               onClick={() => setLeftPanel("summary")}
-              className={`flex-1 px-3 py-2 text-xs font-semibold ${leftPanel === "summary" ? "bg-slate-700 text-white" : "text-slate-400 hover:bg-slate-750"}`}
+              className={`flex-1 px-3 py-2 text-xs font-semibold ${leftPanel === "summary" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-850"}`}
             >
               Summary
             </button>
             <button
               onClick={() => setLeftPanel("leaders")}
-              className={`flex-1 px-3 py-2 text-xs font-semibold ${leftPanel === "leaders" ? "bg-slate-700 text-white" : "text-slate-400 hover:bg-slate-750"}`}
+              className={`flex-1 px-3 py-2 text-xs font-semibold ${leftPanel === "leaders" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:bg-zinc-850"}`}
             >
               Leaders
             </button>
@@ -490,11 +490,11 @@ export default function AdvancedLiveGame() {
             {leftPanel === "plays" && (
               <div className="p-2 space-y-1">
                 {playByPlay.length === 0 ? (
-                  <p className="text-slate-500 text-sm text-center py-4">No plays yet</p>
+                  <p className="text-zinc-500 text-sm text-center py-4">No plays yet</p>
                 ) : (
                   playByPlay.map((play, i) => (
-                    <div key={play.id || i} className="text-xs p-2 bg-slate-750 rounded border-l-2" style={{ borderColor: play.team === "home" ? homeColor : awayColor }}>
-                      <div className="text-slate-400">Q{play.quarter}</div>
+                    <div key={play.id || i} className="text-xs p-2 bg-zinc-850 rounded border-l-2" style={{ borderColor: play.team === "home" ? homeColor : awayColor }}>
+                      <div className="text-zinc-400">Q{play.quarter}</div>
                       <div className="font-semibold">{play.player_name} #{play.player_number}</div>
                       <div>{play.action}</div>
                     </div>
@@ -505,10 +505,10 @@ export default function AdvancedLiveGame() {
             
             {leftPanel === "summary" && (
               <div className="p-3 space-y-4">
-                <div className="text-xs font-semibold text-slate-400 mb-2">Team Comparison</div>
+                <div className="text-xs font-semibold text-zinc-400 mb-2">Team Comparison</div>
                 <table className="w-full text-xs">
                   <thead>
-                    <tr className="text-slate-400">
+                    <tr className="text-zinc-400">
                       <th className="text-left">{game.home_team_name}</th>
                       <th></th>
                       <th className="text-right">{game.away_team_name}</th>
@@ -523,9 +523,9 @@ export default function AdvancedLiveGame() {
                       ['BLK', homeTotals.blk, awayTotals.blk],
                       ['TO', homeTotals.to, awayTotals.to],
                     ].map(([label, home, away]) => (
-                      <tr key={label} className="border-b border-slate-700">
+                      <tr key={label} className="border-b border-zinc-800">
                         <td className="py-1 font-semibold" style={{ color: homeColor }}>{home}</td>
-                        <td className="text-center text-slate-500">{label}</td>
+                        <td className="text-center text-zinc-500">{label}</td>
                         <td className="py-1 text-right font-semibold" style={{ color: awayColor }}>{away}</td>
                       </tr>
                     ))}
@@ -536,7 +536,7 @@ export default function AdvancedLiveGame() {
             
             {leftPanel === "leaders" && (
               <div className="p-3 space-y-4">
-                <div className="text-xs font-semibold text-slate-400">Points Leaders</div>
+                <div className="text-xs font-semibold text-zinc-400">Points Leaders</div>
                 {[...homeStats, ...awayStats]
                   .map(p => ({ ...p, pts: p.ft_made + p.fg2_made * 2 + p.fg3_made * 3 }))
                   .sort((a, b) => b.pts - a.pts)
@@ -548,7 +548,7 @@ export default function AdvancedLiveGame() {
                     </div>
                   ))
                 }
-                <div className="text-xs font-semibold text-slate-400 mt-4">Rebounds Leaders</div>
+                <div className="text-xs font-semibold text-zinc-400 mt-4">Rebounds Leaders</div>
                 {[...homeStats, ...awayStats]
                   .map(p => ({ ...p, reb: p.offensive_rebounds + p.defensive_rebounds }))
                   .sort((a, b) => b.reb - a.reb)
@@ -571,7 +571,7 @@ export default function AdvancedLiveGame() {
             <div className="space-y-4">
               {/* Adding Play For */}
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-slate-400">Adding play for:</span>
+                <span className="text-zinc-400">Adding play for:</span>
                 <span className="px-3 py-1 rounded font-bold" style={{ backgroundColor: currentTeamColor }}>
                   {currentTeamName}
                 </span>
@@ -598,14 +598,14 @@ export default function AdvancedLiveGame() {
               {/* Players On Court Section */}
               <div className="mt-6 grid grid-cols-2 gap-4">
                 {/* Home Team On Court */}
-                <div className="bg-slate-800 rounded-lg p-3">
+                <div className="bg-zinc-900 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
                     <span className="font-semibold text-sm">{game.home_team_name} On Court ({homeOnFloor.length}/5)</span>
                   </div>
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="text-slate-400 border-b border-slate-700">
+                      <tr className="text-zinc-400 border-b border-zinc-800">
                         <th className="py-1 text-left">#</th>
                         <th className="py-1 text-left">Name</th>
                         <th className="py-1 text-center">FG</th>
@@ -619,7 +619,7 @@ export default function AdvancedLiveGame() {
                     </thead>
                     <tbody>
                       {homeOnFloor.map(p => (
-                        <tr key={p.id} className="border-b border-slate-700/50">
+                        <tr key={p.id} className="border-b border-zinc-800/50">
                           <td className="py-1 font-bold">{p.player_number}</td>
                           <td className="py-1 truncate max-w-[80px]">{p.player_name}</td>
                           <td className="py-1 text-center">{p.fg2_made + p.fg3_made}-{p.fg2_made + p.fg2_missed + p.fg3_made + p.fg3_missed}</td>
@@ -632,11 +632,11 @@ export default function AdvancedLiveGame() {
                         </tr>
                       ))}
                       {homeOnFloor.length === 0 && (
-                        <tr><td colSpan={9} className="py-2 text-center text-slate-500">No players on court</td></tr>
+                        <tr><td colSpan={9} className="py-2 text-center text-zinc-500">No players on court</td></tr>
                       )}
                     </tbody>
                   </table>
-                  <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+                  <div className="mt-2 flex items-center justify-between text-xs text-zinc-400">
                     <span>Team Fouls: {homeTotals.pf}</span>
                     <span>FG%: {homeTotals.fg_att > 0 ? Math.round(homeTotals.fg_made / homeTotals.fg_att * 100) : 0}%</span>
                     <span>3P%: {homeTotals.fg3_att > 0 ? Math.round(homeTotals.fg3_made / homeTotals.fg3_att * 100) : 0}%</span>
@@ -645,14 +645,14 @@ export default function AdvancedLiveGame() {
                 </div>
 
                 {/* Away Team On Court */}
-                <div className="bg-slate-800 rounded-lg p-3">
+                <div className="bg-zinc-900 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }}></div>
                     <span className="font-semibold text-sm">{game.away_team_name} On Court ({awayOnFloor.length}/5)</span>
                   </div>
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="text-slate-400 border-b border-slate-700">
+                      <tr className="text-zinc-400 border-b border-zinc-800">
                         <th className="py-1 text-left">#</th>
                         <th className="py-1 text-left">Name</th>
                         <th className="py-1 text-center">FG</th>
@@ -666,7 +666,7 @@ export default function AdvancedLiveGame() {
                     </thead>
                     <tbody>
                       {awayOnFloor.map(p => (
-                        <tr key={p.id} className="border-b border-slate-700/50">
+                        <tr key={p.id} className="border-b border-zinc-800/50">
                           <td className="py-1 font-bold">{p.player_number}</td>
                           <td className="py-1 truncate max-w-[80px]">{p.player_name}</td>
                           <td className="py-1 text-center">{p.fg2_made + p.fg3_made}-{p.fg2_made + p.fg2_missed + p.fg3_made + p.fg3_missed}</td>
@@ -679,11 +679,11 @@ export default function AdvancedLiveGame() {
                         </tr>
                       ))}
                       {awayOnFloor.length === 0 && (
-                        <tr><td colSpan={9} className="py-2 text-center text-slate-500">No players on court</td></tr>
+                        <tr><td colSpan={9} className="py-2 text-center text-zinc-500">No players on court</td></tr>
                       )}
                     </tbody>
                   </table>
-                  <div className="mt-2 flex items-center justify-between text-xs text-slate-400">
+                  <div className="mt-2 flex items-center justify-between text-xs text-zinc-400">
                     <span>Team Fouls: {awayTotals.pf}</span>
                     <span>FG%: {awayTotals.fg_att > 0 ? Math.round(awayTotals.fg_made / awayTotals.fg_att * 100) : 0}%</span>
                     <span>3P%: {awayTotals.fg3_att > 0 ? Math.round(awayTotals.fg3_made / awayTotals.fg3_att * 100) : 0}%</span>
@@ -726,21 +726,21 @@ export default function AdvancedLiveGame() {
             <div className="space-y-4">
               <h2 className="text-xl font-bold">Roster Management</h2>
               <div className="grid grid-cols-2 gap-6">
-                <div className="bg-slate-800 rounded-lg p-4">
+                <div className="bg-zinc-900 rounded-lg p-4">
                   <h3 className="font-bold mb-3" style={{ color: homeColor }}>{game.home_team_name}</h3>
                   <div className="space-y-2">
                     {homeStats.map(p => (
-                      <div key={p.id} className="flex items-center justify-between text-sm py-1 border-b border-slate-700">
+                      <div key={p.id} className="flex items-center justify-between text-sm py-1 border-b border-zinc-800">
                         <span>#{p.player_number} {p.player_name}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <div className="bg-slate-800 rounded-lg p-4">
+                <div className="bg-zinc-900 rounded-lg p-4">
                   <h3 className="font-bold mb-3" style={{ color: awayColor }}>{game.away_team_name}</h3>
                   <div className="space-y-2">
                     {awayStats.map(p => (
-                      <div key={p.id} className="flex items-center justify-between text-sm py-1 border-b border-slate-700">
+                      <div key={p.id} className="flex items-center justify-between text-sm py-1 border-b border-zinc-800">
                         <span>#{p.player_number} {p.player_name}</span>
                       </div>
                     ))}
@@ -754,7 +754,7 @@ export default function AdvancedLiveGame() {
 
       {/* Player Select Dialog */}
       <Dialog open={showPlayerSelect} onOpenChange={setShowPlayerSelect}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
           <DialogHeader>
             <DialogTitle>Select Player - {activeAction?.toUpperCase()}</DialogTitle>
           </DialogHeader>
@@ -778,7 +778,7 @@ export default function AdvancedLiveGame() {
 
       {/* Timeout Dialog */}
       <Dialog open={showTimeoutDialog} onOpenChange={setShowTimeoutDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle>Timeout</DialogTitle>
           </DialogHeader>
@@ -795,10 +795,10 @@ export default function AdvancedLiveGame() {
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              <Button onClick={() => handleTimeout("home", "partial")} variant="outline" className="border-slate-600">
+              <Button onClick={() => handleTimeout("home", "partial")} variant="outline" className="border-zinc-700">
                 {game.home_team_name} Partial
               </Button>
-              <Button onClick={() => handleTimeout("away", "partial")} variant="outline" className="border-slate-600">
+              <Button onClick={() => handleTimeout("away", "partial")} variant="outline" className="border-zinc-700">
                 {game.away_team_name} Partial
               </Button>
             </div>
@@ -808,7 +808,7 @@ export default function AdvancedLiveGame() {
 
       {/* Game Control Dialog */}
       <Dialog open={showGameControlDialog} onOpenChange={setShowGameControlDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle>Game Control</DialogTitle>
           </DialogHeader>
@@ -820,7 +820,7 @@ export default function AdvancedLiveGame() {
               <Button onClick={() => {
                 handleResetQuarter(1);
                 setShowGameControlDialog(false);
-              }} variant="outline" className="border-slate-600">
+              }} variant="outline" className="border-zinc-700">
                 Reset to 1st
               </Button>
             </div>
@@ -833,7 +833,7 @@ export default function AdvancedLiveGame() {
                     setShowGameControlDialog(false);
                   }} 
                   variant={game.current_quarter === q ? "default" : "outline"}
-                  className={game.current_quarter === q ? "bg-orange-500" : "border-slate-600"}
+                  className={game.current_quarter === q ? "bg-orange-500" : "border-zinc-700"}
                 >
                   {game.period_label} {q}
                 </Button>
@@ -846,7 +846,7 @@ export default function AdvancedLiveGame() {
                 setShowGameControlDialog(false);
               }}
               variant="outline"
-              className="w-full border-slate-600"
+              className="w-full border-zinc-700"
             >
               <RotateCcw className="w-4 h-4 mr-2" />
               Reset Team Fouls
@@ -857,14 +857,14 @@ export default function AdvancedLiveGame() {
 
       {/* Substitution Dialog */}
       <Dialog open={showSubstitutionDialog} onOpenChange={setShowSubstitutionDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-2xl">
           <DialogHeader>
             <DialogTitle>Substitutions</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-6 mt-4">
             <div>
               <h3 className="font-bold mb-2" style={{ color: homeColor }}>{game.home_team_name}</h3>
-              <p className="text-xs text-slate-400 mb-2">Click to toggle on/off court ({(game.home_on_floor || []).length}/5)</p>
+              <p className="text-xs text-zinc-400 mb-2">Click to toggle on/off court ({(game.home_on_floor || []).length}/5)</p>
               <div className="grid grid-cols-5 gap-2">
                 {homeStats.map(p => (
                   <button
@@ -898,7 +898,7 @@ export default function AdvancedLiveGame() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="mt-2 border-slate-600"
+                className="mt-2 border-zinc-700"
                 onClick={async () => {
                   await axios.put(`${API}/games/${id}`, { home_on_floor: [] });
                   fetchGame();
@@ -909,7 +909,7 @@ export default function AdvancedLiveGame() {
             </div>
             <div>
               <h3 className="font-bold mb-2" style={{ color: awayColor }}>{game.away_team_name}</h3>
-              <p className="text-xs text-slate-400 mb-2">Click to toggle on/off court ({(game.away_on_floor || []).length}/5)</p>
+              <p className="text-xs text-zinc-400 mb-2">Click to toggle on/off court ({(game.away_on_floor || []).length}/5)</p>
               <div className="grid grid-cols-5 gap-2">
                 {awayStats.map(p => (
                   <button
@@ -943,7 +943,7 @@ export default function AdvancedLiveGame() {
               <Button 
                 variant="outline" 
                 size="sm" 
-                className="mt-2 border-slate-600"
+                className="mt-2 border-zinc-700"
                 onClick={async () => {
                   await axios.put(`${API}/games/${id}`, { away_on_floor: [] });
                   fetchGame();
@@ -958,7 +958,7 @@ export default function AdvancedLiveGame() {
 
       {/* Rebound Dialog */}
       <Dialog open={showReboundDialog} onOpenChange={setShowReboundDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle>Rebound</DialogTitle>
           </DialogHeader>
@@ -991,7 +991,7 @@ export default function AdvancedLiveGame() {
                 setShowReboundDialog(false);
               }}
               variant="outline"
-              className="w-full border-slate-600"
+              className="w-full border-zinc-700"
             >
               Team Rebound
             </Button>
@@ -1001,7 +1001,7 @@ export default function AdvancedLiveGame() {
 
       {/* Turnover Dialog */}
       <Dialog open={showTurnoverDialog} onOpenChange={setShowTurnoverDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle>Turnover</DialogTitle>
           </DialogHeader>
@@ -1022,7 +1022,7 @@ export default function AdvancedLiveGame() {
                 setShowTurnoverDialog(false);
               }}
               variant="outline"
-              className="w-full border-slate-600"
+              className="w-full border-zinc-700"
             >
               Team Turnover
             </Button>
@@ -1032,7 +1032,7 @@ export default function AdvancedLiveGame() {
 
       {/* Foul Dialog */}
       <Dialog open={showFoulDialog} onOpenChange={setShowFoulDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle>Foul</DialogTitle>
           </DialogHeader>
@@ -1054,7 +1054,7 @@ export default function AdvancedLiveGame() {
                 setShowPlayerSelect(true);
               }}
               variant="outline"
-              className="w-full border-slate-600"
+              className="w-full border-zinc-700"
             >
               Technical Foul
             </Button>
@@ -1064,7 +1064,7 @@ export default function AdvancedLiveGame() {
 
       {/* Set Time Dialog */}
       <Dialog open={showSetTimeDialog} onOpenChange={setShowSetTimeDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white">
           <DialogHeader>
             <DialogTitle>Set Clock Time</DialogTitle>
           </DialogHeader>
@@ -1075,7 +1075,7 @@ export default function AdvancedLiveGame() {
               max="59"
               value={editMinutes}
               onChange={(e) => setEditMinutes(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-              className="w-20 text-center bg-slate-700 border-slate-600"
+              className="w-20 text-center bg-zinc-800 border-zinc-700"
             />
             <span className="text-2xl">:</span>
             <Input
@@ -1084,7 +1084,7 @@ export default function AdvancedLiveGame() {
               max="59"
               value={editSeconds}
               onChange={(e) => setEditSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
-              className="w-20 text-center bg-slate-700 border-slate-600"
+              className="w-20 text-center bg-zinc-800 border-zinc-700"
             />
           </div>
           <Button onClick={handleSetTime} className="w-full mt-4 bg-blue-600 hover:bg-blue-700">
@@ -1095,52 +1095,52 @@ export default function AdvancedLiveGame() {
 
       {/* Help Dialog */}
       <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
           <DialogHeader>
             <DialogTitle>Keyboard Shortcuts</DialogTitle>
           </DialogHeader>
           <div className="grid grid-cols-2 gap-2 mt-4 text-sm">
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>2PT Shot</span><span className="font-mono bg-slate-700 px-2 rounded">J</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>2PT Shot</span><span className="font-mono bg-zinc-800 px-2 rounded">J</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>3PT Shot</span><span className="font-mono bg-slate-700 px-2 rounded">L</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>3PT Shot</span><span className="font-mono bg-zinc-800 px-2 rounded">L</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Free Throw</span><span className="font-mono bg-slate-700 px-2 rounded">F</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Free Throw</span><span className="font-mono bg-zinc-800 px-2 rounded">F</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Steal</span><span className="font-mono bg-slate-700 px-2 rounded">S</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Steal</span><span className="font-mono bg-zinc-800 px-2 rounded">S</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Turnover</span><span className="font-mono bg-slate-700 px-2 rounded">T</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Turnover</span><span className="font-mono bg-zinc-800 px-2 rounded">T</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Assist</span><span className="font-mono bg-slate-700 px-2 rounded">A</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Assist</span><span className="font-mono bg-zinc-800 px-2 rounded">A</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Rebound</span><span className="font-mono bg-slate-700 px-2 rounded">R</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Rebound</span><span className="font-mono bg-zinc-800 px-2 rounded">R</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Block</span><span className="font-mono bg-slate-700 px-2 rounded">B</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Block</span><span className="font-mono bg-zinc-800 px-2 rounded">B</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Substitution</span><span className="font-mono bg-slate-700 px-2 rounded">U</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Substitution</span><span className="font-mono bg-zinc-800 px-2 rounded">U</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Timeout</span><span className="font-mono bg-slate-700 px-2 rounded">O</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Timeout</span><span className="font-mono bg-zinc-800 px-2 rounded">O</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Game Control</span><span className="font-mono bg-slate-700 px-2 rounded">G</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Game Control</span><span className="font-mono bg-zinc-800 px-2 rounded">G</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Home Possession</span><span className="font-mono bg-slate-700 px-2 rounded">H</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Home Possession</span><span className="font-mono bg-zinc-800 px-2 rounded">H</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700">
-              <span>Away Possession</span><span className="font-mono bg-slate-700 px-2 rounded">V</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800">
+              <span>Away Possession</span><span className="font-mono bg-zinc-800 px-2 rounded">V</span>
             </div>
-            <div className="flex justify-between py-1 border-b border-slate-700 col-span-2">
-              <span>Start/Stop Clock</span><span className="font-mono bg-slate-700 px-2 rounded">Space</span>
+            <div className="flex justify-between py-1 border-b border-zinc-800 col-span-2">
+              <span>Start/Stop Clock</span><span className="font-mono bg-zinc-800 px-2 rounded">Space</span>
             </div>
           </div>
         </DialogContent>
@@ -1160,7 +1160,7 @@ const StatButton = ({ label, hotkey, onClick, color }) => {
     orange: "bg-orange-600 hover:bg-orange-700",
     indigo: "bg-indigo-600 hover:bg-indigo-700",
     emerald: "bg-emerald-600 hover:bg-emerald-700",
-    slate: "bg-slate-600 hover:bg-slate-700",
+    slate: "bg-slate-600 hover:bg-zinc-800",
     yellow: "bg-yellow-600 hover:bg-yellow-700 text-black",
     pink: "bg-pink-600 hover:bg-pink-700",
     cyan: "bg-cyan-600 hover:bg-cyan-700",
