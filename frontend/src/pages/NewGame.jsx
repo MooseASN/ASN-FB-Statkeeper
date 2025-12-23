@@ -70,6 +70,14 @@ export default function NewGame({ user, onLogout }) {
     };
   };
 
+  const getPrimetimeSettings = () => {
+    if (!primetimeEnabled) return {};
+    return {
+      primetime_enabled: true,
+      video_url: videoUrl || null
+    };
+  };
+
   const handleStartGame = async () => {
     if (!homeTeamId || !awayTeamId) {
       toast.error("Please select both teams");
@@ -88,7 +96,8 @@ export default function NewGame({ user, onLogout }) {
         away_team_id: awayTeamId,
         start_immediately: true,
         ...getClockSettings(),
-        ...getTimeoutSettings()
+        ...getTimeoutSettings(),
+        ...getPrimetimeSettings()
       });
       toast.success("Game started!");
       navigate(`/game/${res.data.id}`);
