@@ -323,10 +323,6 @@ export default function LiveView() {
           {game.note && (
             <p className="text-white/80 text-sm mt-1">{game.note}</p>
           )}
-          <p className="text-white/70 text-xs sm:text-sm mt-1">
-            {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : 
-             game.status === "scheduled" ? "Scheduled" : "Final Score"}
-          </p>
         </div>
       </div>
 
