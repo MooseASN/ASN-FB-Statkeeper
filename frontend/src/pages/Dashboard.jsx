@@ -451,7 +451,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Sponsor Banners */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold flex items-center gap-2">
+            <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
               <Image className="w-5 h-5 text-purple-500" />
               Sponsor Banners
             </h2>
@@ -464,7 +464,7 @@ export default function Dashboard({ user, onLogout }) {
               Manage Banners
             </Button>
           </div>
-          <Card>
+          <Card className="dark:bg-neutral-900">
             <CardContent className="py-4">
               {sponsorBanners.length === 0 ? (
                 <div className="text-center text-muted-foreground py-4">
@@ -475,7 +475,7 @@ export default function Dashboard({ user, onLogout }) {
               ) : (
                 <div className="flex gap-2 overflow-x-auto pb-2">
                   {sponsorBanners.map((banner) => (
-                    <div key={banner.id} className="flex-shrink-0 w-24 h-16 rounded border overflow-hidden">
+                    <div key={banner.id} className="flex-shrink-0 w-24 h-16 rounded border dark:border-neutral-700 overflow-hidden">
                       <img src={banner.image_data} alt={banner.filename} className="w-full h-full object-cover" />
                     </div>
                   ))}
@@ -487,10 +487,10 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Empty State */}
         {!loading && teams.length === 0 && (
-          <Card className="text-center py-12">
+          <Card className="text-center py-12 dark:bg-neutral-900">
             <CardContent>
-              <Users className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Teams Yet</h3>
+              <Users className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
+              <h3 className="text-xl font-semibold mb-2 dark:text-white">No Teams Yet</h3>
               <p className="text-muted-foreground mb-4">Create your first team to start tracking games</p>
               <Link to="/teams">
                 <Button data-testid="create-first-team-btn">
