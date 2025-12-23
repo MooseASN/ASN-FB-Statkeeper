@@ -282,7 +282,7 @@ export default function Dashboard({ user, onLogout }) {
         {/* Scheduled Games */}
         {scheduledGames.length > 0 && (
           <div>
-            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 dark:text-white">
+            <h2 className="text-xl font-semibold flex items-center gap-2 mb-4 text-black dark:text-white">
               <Calendar className="w-5 h-5 text-blue-500" />
               Scheduled Games
             </h2>
@@ -415,7 +415,7 @@ export default function Dashboard({ user, onLogout }) {
         {recentGames.length > 0 && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold flex items-center gap-2 dark:text-white">
+              <h2 className="text-xl font-semibold flex items-center gap-2 text-black dark:text-white">
                 <History className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                 Recent Games
               </h2>
@@ -490,7 +490,7 @@ export default function Dashboard({ user, onLogout }) {
           <Card className="text-center py-12 dark:bg-neutral-900">
             <CardContent>
               <Users className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
-              <h3 className="text-xl font-semibold mb-2 dark:text-white">No Teams Yet</h3>
+              <h3 className="text-xl font-semibold mb-2 text-black dark:text-white">No Teams Yet</h3>
               <p className="text-muted-foreground mb-4">Create your first team to start tracking games</p>
               <Link to="/teams">
                 <Button data-testid="create-first-team-btn">
