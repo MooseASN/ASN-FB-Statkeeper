@@ -39,11 +39,8 @@ export default function NewGame({ user, onLogout }) {
   const [primetimeEnabled, setPrimetimeEnabled] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
 
-  // Simple mode option
-  const [simpleMode, setSimpleMode] = useState(false);
-
-  // Advanced mode option
-  const [advancedMode, setAdvancedMode] = useState(false);
+  // Game mode option: "simple", "classic", "advanced"
+  const [statMode, setStatMode] = useState("classic");
 
   useEffect(() => {
     fetchTeams();
