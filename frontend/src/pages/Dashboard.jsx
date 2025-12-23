@@ -292,14 +292,14 @@ export default function Dashboard({ user, onLogout }) {
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg dark:text-white">{game.home_team_name}</p>
+                        <p className="font-semibold text-lg text-black dark:text-white">{game.home_team_name}</p>
                         <p className="text-sm text-muted-foreground">Home</p>
                       </div>
                       <div className="px-4">
                         <span className="text-lg font-bold text-slate-400">VS</span>
                       </div>
                       <div className="text-center flex-1">
-                        <p className="font-semibold text-lg dark:text-white">{game.away_team_name}</p>
+                        <p className="font-semibold text-lg text-black dark:text-white">{game.away_team_name}</p>
                         <p className="text-sm text-muted-foreground">Away</p>
                       </div>
                     </div>
@@ -386,7 +386,7 @@ export default function Dashboard({ user, onLogout }) {
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg dark:text-white">{game.home_team_name}</p>
+                          <p className="font-semibold text-lg text-black dark:text-white">{game.home_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000] dark:text-white">
                             {calculateScore(game.quarter_scores, "home")}
                           </p>
@@ -397,7 +397,7 @@ export default function Dashboard({ user, onLogout }) {
                           </span>
                         </div>
                         <div className="text-center flex-1">
-                          <p className="font-semibold text-lg dark:text-white">{game.away_team_name}</p>
+                          <p className="font-semibold text-lg text-black dark:text-white">{game.away_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000] dark:text-white">
                             {calculateScore(game.quarter_scores, "away")}
                           </p>
@@ -430,11 +430,11 @@ export default function Dashboard({ user, onLogout }) {
                     <CardContent className="py-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-4">
-                          <span className="font-medium dark:text-white">{game.home_team_name}</span>
-                          <span className="text-2xl font-bold score-display dark:text-white">
+                          <span className="font-medium text-black dark:text-white">{game.home_team_name}</span>
+                          <span className="text-2xl font-bold score-display text-black dark:text-white">
                             {calculateScore(game.quarter_scores, "home")} - {calculateScore(game.quarter_scores, "away")}
                           </span>
-                          <span className="font-medium dark:text-white">{game.away_team_name}</span>
+                          <span className="font-medium text-black dark:text-white">{game.away_team_name}</span>
                         </div>
                         <span className="text-sm text-muted-foreground">
                           {new Date(game.created_at).toLocaleDateString()}
