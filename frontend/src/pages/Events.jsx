@@ -311,6 +311,27 @@ export default function Events({ user, onLogout }) {
               </div>
             </div>
             <p className="text-xs text-muted-foreground">Leave end date empty for single-day events</p>
+
+            {/* Event Color */}
+            <div>
+              <Label htmlFor="event-color">Ticker Color</Label>
+              <div className="flex items-center gap-3 mt-1">
+                <input
+                  id="event-color"
+                  type="color"
+                  value={eventColor}
+                  onChange={(e) => setEventColor(e.target.value)}
+                  className="w-12 h-10 rounded cursor-pointer border"
+                />
+                <div 
+                  className="flex-1 h-10 rounded flex items-center justify-center text-white text-sm font-medium"
+                  style={{ backgroundColor: eventColor }}
+                >
+                  Ticker Preview
+                </div>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">This color will be used for the live stats ticker</p>
+            </div>
           </div>
 
           <DialogFooter>
