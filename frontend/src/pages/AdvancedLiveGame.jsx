@@ -75,17 +75,14 @@ export default function AdvancedLiveGame() {
   // Fetch game data
   const fetchGame = useCallback(async () => {
     try {
-      const [gameRes, statsRes] = await Promise.all([
-        axios.get(`${API}/games/${id}`),
-        axios.get(`${API}/games/${id}/stats`)
-      ]);
+      const gameRes = await axios.get(`${API}/games/${id}`);
       setGame(gameRes.data);
       setPossession(gameRes.data.possession || "home");
       setClockRunning(gameRes.data.clock_running || false);
       
-      const stats = statsRes.data;
-      setHomeStats(stats.filter(s => s.team_id === gameRes.data.home_team_id));
-      setAwayStats(stats.filter(s => s.team_id === gameRes.data.away_team_id));
+      // Stats are embedded in home_stats and away_stats
+      setHomeStats(gameRes.data.home_stats || []);
+      setAwayStats(gameRes.data.away_stats || []);
       setPlayByPlay((gameRes.data.play_by_play || []).slice().reverse());
     } catch (error) {
       toast.error("Failed to load game");
