@@ -219,7 +219,7 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
 };
 
 // ============ EXPANDED PLAYER CARD ============
-const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn }) => {
+const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn, simpleMode }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   const totalReb = player.offensive_rebounds + player.defensive_rebounds;
@@ -265,7 +265,10 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
             </div>
           </div>
           <p className="text-sm text-muted-foreground">
-            {stats.fg_made}/{stats.fg_att} FG ({stats.fg_pct}%) • {totalReb} REB • {player.assists} AST
+            {simpleMode 
+              ? `${player.ft_made} FT • ${player.fg2_made} 2P • ${player.fg3_made} 3P • ${totalReb} REB • ${player.assists} AST`
+              : `${stats.fg_made}/${stats.fg_att} FG (${stats.fg_pct}%) • ${totalReb} REB • ${player.assists} AST`
+            }
           </p>
         </div>
         <div className="text-right">
@@ -282,7 +285,7 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
           className="py-3 rounded-lg border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
         >
           <div className="text-lg">FT</div>
-          <div className="text-xs text-muted-foreground">{player.ft_made}/{stats.ft_att}</div>
+          <div className="text-xs text-muted-foreground">{simpleMode ? player.ft_made : `${player.ft_made}/${stats.ft_att}`}</div>
         </button>
         <button
           onClick={() => onShotClick(player, "fg2")}
@@ -290,7 +293,7 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
           className="py-3 rounded-lg border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
         >
           <div className="text-lg">2PT</div>
-          <div className="text-xs text-muted-foreground">{player.fg2_made}/{stats.fg2_att}</div>
+          <div className="text-xs text-muted-foreground">{simpleMode ? player.fg2_made : `${player.fg2_made}/${stats.fg2_att}`}</div>
         </button>
         <button
           onClick={() => onShotClick(player, "fg3")}
@@ -298,50 +301,72 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
           className="py-3 rounded-lg border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
         >
           <div className="text-lg">3PT</div>
-          <div className="text-xs text-muted-foreground">{player.fg3_made}/{stats.fg3_att}</div>
+          <div className="text-xs text-muted-foreground">{simpleMode ? player.fg3_made : `${player.fg3_made}/${stats.fg3_att}`}</div>
         </button>
       </div>
 
-      {/* Other stats - two rows */}
-      <div className="grid grid-cols-4 gap-2 mb-2">
-        <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.assists}</div>
-          <div className="text-[10px] text-muted-foreground">AST</div>
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.offensive_rebounds}</div>
-          <div className="text-[10px] text-muted-foreground">O REB</div>
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.defensive_rebounds}</div>
-          <div className="text-[10px] text-muted-foreground">D REB</div>
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.steals}</div>
-          <div className="text-[10px] text-muted-foreground">STL</div>
-        </button>
-      </div>
-      <div className="grid grid-cols-3 gap-2">
-        <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.blocks}</div>
-          <div className="text-[10px] text-muted-foreground">BLK</div>
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.turnovers}</div>
-          <div className="text-[10px] text-muted-foreground">TOV</div>
-        </button>
-        <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-          className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
-          <div className="font-bold">{player.fouls}</div>
-          <div className="text-[10px] text-muted-foreground">PF</div>
-        </button>
-      </div>
+      {/* Other stats - simplified or full */}
+      {simpleMode ? (
+        <div className="grid grid-cols-3 gap-2">
+          <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
+            className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+            <div className="font-bold">{player.assists}</div>
+            <div className="text-[10px] text-muted-foreground">AST</div>
+          </button>
+          <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
+            className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
+            <div className="font-bold">{totalReb}</div>
+            <div className="text-[10px] text-muted-foreground">REB</div>
+          </button>
+          <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
+            className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+            <div className="font-bold">{player.fouls}</div>
+            <div className="text-[10px] text-muted-foreground">PF</div>
+          </button>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-4 gap-2 mb-2">
+            <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.assists}</div>
+              <div className="text-[10px] text-muted-foreground">AST</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.offensive_rebounds}</div>
+              <div className="text-[10px] text-muted-foreground">O REB</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.defensive_rebounds}</div>
+              <div className="text-[10px] text-muted-foreground">D REB</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.steals}</div>
+              <div className="text-[10px] text-muted-foreground">STL</div>
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.blocks}</div>
+              <div className="text-[10px] text-muted-foreground">BLK</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.turnovers}</div>
+              <div className="text-[10px] text-muted-foreground">TOV</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
+              className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+              <div className="font-bold">{player.fouls}</div>
+              <div className="text-[10px] text-muted-foreground">PF</div>
+            </button>
+          </div>
+        </>
+      )}
     </div>
   );
 };
