@@ -4,12 +4,14 @@ import axios from "axios";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { 
   ArrowLeft, Play, Pause, Settings, HelpCircle, FileDown, Users, 
-  RotateCcw, ChevronRight, AlertCircle, X
+  RotateCcw, ChevronRight, AlertCircle, X, Plus, Link as LinkIcon, 
+  UserPlus, Trash2, Loader2
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
