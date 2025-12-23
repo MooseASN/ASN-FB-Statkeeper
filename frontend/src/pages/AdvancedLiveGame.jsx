@@ -821,11 +821,42 @@ export default function AdvancedLiveGame() {
             <div className="space-y-4">
               <h2 className="text-xl font-bold">Export Options</h2>
               <div className="grid grid-cols-3 gap-4">
-                <Button className="h-20 flex-col gap-2" variant="outline">
+                <Button 
+                  className="h-20 flex-col gap-2" 
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      const response = await axios.get(`${API}/games/${id}/boxscore/pdf`, {
+                        responseType: 'blob'
+                      });
+                      const blob = new Blob([response.data], { type: 'application/pdf' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `boxscore_${game.home_team_name}_vs_${game.away_team_name}.pdf`.replace(/ /g, '_');
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      window.URL.revokeObjectURL(url);
+                      toast.success("Box score PDF downloaded!");
+                    } catch (error) {
+                      toast.error("Failed to generate box score PDF");
+                    }
+                  }}
+                >
                   <FileDown className="w-6 h-6" />
                   <span>Printable Box Score</span>
                 </Button>
-                <Button className="h-20 flex-col gap-2" variant="outline">
+                <Button 
+                  className="h-20 flex-col gap-2" 
+                  variant="outline"
+                  onClick={() => {
+                    // For email, we'll show the live stats URL which can be shared
+                    const url = `${window.location.origin}/live/${game.share_code}`;
+                    navigator.clipboard.writeText(url);
+                    toast.success("Live stats link copied! Share this link via email.");
+                  }}
+                >
                   <FileDown className="w-6 h-6" />
                   <span>Email Box Score</span>
                 </Button>
