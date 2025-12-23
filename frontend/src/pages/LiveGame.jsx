@@ -1848,6 +1848,39 @@ export default function LiveGame() {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Timeout Dialog */}
+      <AlertDialog open={timeoutDialogOpen} onOpenChange={setTimeoutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {timeoutTeam === "home" ? game?.home_team_name : game?.away_team_name} Timeout
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Select timeout type
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-4 py-4 justify-center">
+            <Button
+              onClick={() => handleTimeout("full")}
+              className="flex-1 h-16"
+              variant="default"
+            >
+              Full Timeout
+            </Button>
+            <Button
+              onClick={() => handleTimeout("partial")}
+              className="flex-1 h-16"
+              variant="outline"
+            >
+              Partial Timeout
+            </Button>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setTimeoutTeam(null)}>Cancel</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Note Dialog */}
       <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
         <DialogContent>
