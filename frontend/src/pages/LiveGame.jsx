@@ -1101,6 +1101,7 @@ export default function LiveGame() {
         playerName={selectedPlayer?.player_name}
         onMake={() => handleShotResult(true)}
         onMiss={() => handleShotResult(false)}
+        simpleMode={game?.simple_mode}
       />
 
       {/* Side Action Buttons - Flippable with teams */}
