@@ -1662,28 +1662,28 @@ export default function LiveGame() {
             </div>
           </div>
 
-          {/* Right Column - Away Team */}
-          <div className="order-2 lg:order-3">
+          {/* Right Column - Team (flippable) */}
+          <div className={`order-2 ${teamsFlipped ? 'lg:order-1' : 'lg:order-3'}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 {/* Team Logo */}
                 <div 
                   className="w-10 h-10 rounded-full flex items-center justify-center border-2 overflow-hidden flex-shrink-0"
-                  style={{ borderColor: awayColor, backgroundColor: `${awayColor}10` }}
+                  style={{ borderColor: teamsFlipped ? homeColor : awayColor, backgroundColor: `${teamsFlipped ? homeColor : awayColor}10` }}
                 >
-                  {game.away_team_logo ? (
-                    <img src={game.away_team_logo} alt={game.away_team_name} className="w-7 h-7 object-contain" />
+                  {(teamsFlipped ? game.home_team_logo : game.away_team_logo) ? (
+                    <img src={teamsFlipped ? game.home_team_logo : game.away_team_logo} alt={teamsFlipped ? game.home_team_name : game.away_team_name} className="w-7 h-7 object-contain" />
                   ) : (
-                    <span className="text-lg font-bold" style={{ color: awayColor }}>{game.away_team_name?.charAt(0)}</span>
+                    <span className="text-lg font-bold" style={{ color: teamsFlipped ? homeColor : awayColor }}>{(teamsFlipped ? game.home_team_name : game.away_team_name)?.charAt(0)}</span>
                   )}
                 </div>
-                <h2 className="font-bold text-lg">{game.away_team_name}</h2>
+                <h2 className="font-bold text-lg">{teamsFlipped ? game.home_team_name : game.away_team_name}</h2>
               </div>
               {isActive && (
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => { setAddPlayerTeam("away"); setAddPlayerOpen(true); }}
+                  onClick={() => { setAddPlayerTeam(teamsFlipped ? "home" : "away"); setAddPlayerOpen(true); }}
                   data-testid="add-away-player-btn"
                 >
                   <UserPlus className="w-4 h-4" />
@@ -1691,23 +1691,23 @@ export default function LiveGame() {
               )}
             </div>
             <div className={`space-y-${viewMode === "condensed" ? "1" : "3"}`}>
-              {sortByNumber(awayStats).map(player => (
+              {sortByNumber(teamsFlipped ? homeStats : awayStats).map(player => (
                 <PlayerCard 
                   key={player.id}
                   player={player}
-                  teamColor={awayColor}
+                  teamColor={teamsFlipped ? homeColor : awayColor}
                   onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
                   onEditPlayer={handleEditPlayer}
                   onRemovePlayer={handleRemovePlayer}
                   disabled={!isActive}
                   clockEnabled={game?.clock_enabled}
-                  isOnFloor={(game?.away_on_floor || []).includes(player.id)}
-                  onToggleFloor={(playerId) => togglePlayerOnFloor(playerId, false)}
-                  canCheckIn={(game?.away_on_floor || []).length < 5}
+                  isOnFloor={((teamsFlipped ? game?.home_on_floor : game?.away_on_floor) || []).includes(player.id)}
+                  onToggleFloor={(playerId) => togglePlayerOnFloor(playerId, teamsFlipped)}
+                  canCheckIn={((teamsFlipped ? game?.home_on_floor : game?.away_on_floor) || []).length < 5}
                 />
               ))}
-              {awayStats.length === 0 && (
+              {(teamsFlipped ? homeStats : awayStats).length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   No players in roster
                 </div>
