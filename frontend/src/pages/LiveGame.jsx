@@ -1514,6 +1514,7 @@ export default function LiveGame() {
               {/* Game Clock */}
               {game?.clock_enabled && (
                 <div className="border-t pt-4 mb-4">
+                  <p className="text-xs text-center text-muted-foreground mb-2">Press <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-slate-700 font-mono">\</kbd> to start/stop clock</p>
                   <div className="flex items-center justify-center gap-3">
                     {/* Decrease minute */}
                     <button
