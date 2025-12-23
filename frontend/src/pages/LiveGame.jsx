@@ -562,6 +562,24 @@ export default function LiveGame() {
     }
   };
 
+  // Timeout handler
+  const handleTimeout = async (timeoutType) => {
+    if (!timeoutTeam) return;
+    
+    try {
+      await axios.post(`${API}/games/${id}/timeout`, {
+        team: timeoutTeam,
+        timeout_type: timeoutType
+      });
+      setTimeoutDialogOpen(false);
+      setTimeoutTeam(null);
+      fetchGame();
+      toast.success(`${timeoutType === 'full' ? 'Full' : 'Partial'} timeout used`);
+    } catch (error) {
+      toast.error("Failed to use timeout");
+    }
+  };
+
   // Player check-in/out for minutes tracking
   const handlePlayerCheckIn = async (playerId) => {
     try {
