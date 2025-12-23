@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User, Sun, Moon } from "lucide-react";
+import { Home, Users, History, Plus, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,27 +8,25 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useTheme } from "@/context/ThemeContext";
 
 export default function Layout({ children, user, onLogout }) {
   const location = useLocation();
-  const { theme, toggleTheme, isDark } = useTheme();
   
   const isActive = (path) => location.pathname === path;
   
   return (
-    <div className={`min-h-screen transition-colors duration-300 ${isDark ? 'bg-black' : 'bg-slate-50'}`}>
+    <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className={`border-b sticky top-0 z-50 transition-colors duration-300 ${isDark ? 'bg-neutral-900 border-neutral-800' : 'bg-white border-slate-200'}`}>
+      <header className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center gap-2">
               <img 
-                src={isDark ? "/logo-white.png" : "/logo-black.png"} 
+                src="/logo-black.png" 
                 alt="StatMoose" 
                 className="w-8 h-8 object-contain"
               />
-              <span className={`text-xl font-bold hidden sm:block ${isDark ? 'text-white' : 'text-[#000000]'}`}>StatMoose</span>
+              <span className="text-xl font-bold text-[#000000] hidden sm:block">StatMoose</span>
             </Link>
             
             <nav className="flex items-center gap-1 sm:gap-2">
@@ -36,7 +34,7 @@ export default function Layout({ children, user, onLogout }) {
                 <Button 
                   variant={isActive("/") ? "secondary" : "ghost"} 
                   size="sm"
-                  className={`gap-2 ${isDark ? 'hover:bg-neutral-800 text-neutral-200' : ''}`}
+                  className="gap-2"
                   data-testid="nav-home"
                 >
                   <Home className="w-4 h-4" />
@@ -47,7 +45,7 @@ export default function Layout({ children, user, onLogout }) {
                 <Button 
                   variant={isActive("/teams") ? "secondary" : "ghost"} 
                   size="sm"
-                  className={`gap-2 ${isDark ? 'hover:bg-neutral-800 text-neutral-200' : ''}`}
+                  className="gap-2"
                   data-testid="nav-teams"
                 >
                   <Users className="w-4 h-4" />
@@ -58,7 +56,7 @@ export default function Layout({ children, user, onLogout }) {
                 <Button 
                   variant={isActive("/history") ? "secondary" : "ghost"} 
                   size="sm"
-                  className={`gap-2 ${isDark ? 'hover:bg-neutral-800 text-neutral-200' : ''}`}
+                  className="gap-2"
                   data-testid="nav-history"
                 >
                   <History className="w-4 h-4" />
@@ -68,7 +66,7 @@ export default function Layout({ children, user, onLogout }) {
               <Link to="/new-game">
                 <Button 
                   size="sm" 
-                  className={`gap-2 ${isDark ? 'bg-white text-black hover:bg-neutral-200' : 'bg-[#000000] hover:bg-gray-800'}`}
+                  className="gap-2 bg-[#000000] hover:bg-gray-800"
                   data-testid="nav-new-game"
                 >
                   <Plus className="w-4 h-4" />
@@ -76,22 +74,11 @@ export default function Layout({ children, user, onLogout }) {
                 </Button>
               </Link>
               
-              {/* Theme Toggle */}
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={toggleTheme}
-                className={`${isDark ? 'hover:bg-neutral-800 text-neutral-200' : ''}`}
-                title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-              >
-                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-              </Button>
-              
               {/* User Menu */}
               {user && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className={`gap-2 ml-2 ${isDark ? 'hover:bg-neutral-800 text-neutral-200' : ''}`} data-testid="user-menu">
+                    <Button variant="ghost" size="sm" className="gap-2 ml-2" data-testid="user-menu">
                       {user.picture ? (
                         <img src={user.picture} alt="" className="w-6 h-6 rounded-full" />
                       ) : (
@@ -100,15 +87,11 @@ export default function Layout({ children, user, onLogout }) {
                       <span className="hidden sm:inline max-w-[100px] truncate">{user.name || user.username}</span>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className={isDark ? 'bg-neutral-900 border-neutral-800' : ''}>
-                    <DropdownMenuItem className={`text-sm ${isDark ? 'text-neutral-400' : 'text-muted-foreground'}`}>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem className="text-sm text-muted-foreground">
                       {user.email}
                     </DropdownMenuItem>
-                    <DropdownMenuSeparator className={isDark ? 'bg-neutral-800' : ''} />
-                    <DropdownMenuItem onClick={toggleTheme} className={`cursor-pointer ${isDark ? 'text-neutral-200 hover:bg-neutral-800' : ''}`}>
-                      {isDark ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
-                      {isDark ? "Light Mode" : "Dark Mode"}
-                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={onLogout} className="text-red-600 cursor-pointer">
                       <LogOut className="w-4 h-4 mr-2" />
                       Sign out
