@@ -1014,7 +1014,9 @@ export default function LiveGame() {
                 {game.note && <span className="font-normal text-white/80"> - {game.note}</span>}
               </h1>
               <p className="text-xs text-white/70">
-                {game.status === "active" ? `Live - ${getQuarterLabel(game.current_quarter)}` : "Final"}
+                {game.status === "active" 
+                  ? (game.is_halftime ? "HALF" : `Live - ${getQuarterLabel(game.current_quarter)}`)
+                  : "Final"}
               </p>
             </div>
             
