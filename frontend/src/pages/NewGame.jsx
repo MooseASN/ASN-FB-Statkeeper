@@ -98,6 +98,7 @@ export default function NewGame({ user, onLogout }) {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
         start_immediately: true,
+        simple_mode: simpleMode,
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
