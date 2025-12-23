@@ -31,6 +31,7 @@ const HOTKEYS = {
   'g': 'gamecontrol', 'G': 'gamecontrol',
   'h': 'home_possession', 'H': 'home_possession',
   'v': 'away_possession', 'V': 'away_possession',
+  'p': 'foul', 'P': 'foul',
   ' ': 'toggle_clock',
 };
 
