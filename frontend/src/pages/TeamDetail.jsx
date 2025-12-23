@@ -359,6 +359,15 @@ export default function TeamDetail({ user, onLogout }) {
                   <Upload className="w-4 h-4 mr-2" />
                   Upload CSV
                 </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setMaxPrepsOpen(true)}
+                  data-testid="import-maxpreps-btn"
+                >
+                  <LinkIcon className="w-4 h-4 mr-2" />
+                  MaxPreps
+                </Button>
               </div>
             </div>
           </CardHeader>
