@@ -669,7 +669,9 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         clock_time=game_data.period_duration,  # Start at full period time
         total_timeouts=total_timeouts,
         home_timeouts_used=0,
-        away_timeouts_used=0
+        away_timeouts_used=0,
+        primetime_enabled=game_data.primetime_enabled,
+        video_url=game_data.video_url
     )
     game.user_id = user.user_id
     
