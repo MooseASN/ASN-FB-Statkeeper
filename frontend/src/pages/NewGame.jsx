@@ -428,6 +428,40 @@ export default function NewGame({ user, onLogout }) {
                 </div>
               </div>
 
+              {/* Primetime Mode */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <PlayCircle className="w-5 h-5 text-purple-600" />
+                    <Label className="text-base font-semibold">Primetime Mode</Label>
+                  </div>
+                  <Switch
+                    checked={primetimeEnabled}
+                    onCheckedChange={setPrimetimeEnabled}
+                    data-testid="primetime-toggle"
+                  />
+                </div>
+                
+                {primetimeEnabled && (
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      Add a video stream that will be displayed on the live stats page. Supports YouTube and m3u8 streams.
+                    </p>
+                    <div>
+                      <Label htmlFor="video-url">Video URL</Label>
+                      <Input
+                        id="video-url"
+                        placeholder="https://youtube.com/watch?v=... or https://example.com/stream.m3u8"
+                        value={videoUrl}
+                        onChange={(e) => setVideoUrl(e.target.value)}
+                        className="mt-1"
+                        data-testid="video-url-input"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
