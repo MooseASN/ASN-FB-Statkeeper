@@ -118,6 +118,8 @@ function App() {
           
           {/* Protected routes */}
           <Route path="/" element={<ProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+          <Route path="/events" element={<ProtectedRoute user={user}><Events user={user} onLogout={handleLogout} /></ProtectedRoute>} />
+          <Route path="/events/:id" element={<ProtectedRoute user={user}><EventDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           <Route path="/teams" element={<ProtectedRoute user={user}><Teams user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           <Route path="/teams/:id" element={<ProtectedRoute user={user}><TeamDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
           <Route path="/new-game" element={<ProtectedRoute user={user}><NewGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
