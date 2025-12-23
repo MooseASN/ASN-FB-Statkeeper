@@ -1278,7 +1278,7 @@ async def get_event_public(event_id: str):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    # Get all games for this event with their scores
+    # Get all games for this event with their scores and recaps
     games = []
     for game_id in event.get("game_ids", []):
         game = await db.games.find_one({"id": game_id}, {"_id": 0})
@@ -1286,6 +1286,58 @@ async def get_event_public(event_id: str):
             # Calculate scores
             home_score = sum(game.get("quarter_scores", {}).get("home", [0, 0, 0, 0]))
             away_score = sum(game.get("quarter_scores", {}).get("away", [0, 0, 0, 0]))
+            
+            # Calculate leading scorers from player stats
+            home_leader = None
+            away_leader = None
+            home_stats = game.get("home_player_stats", [])
+            away_stats = game.get("away_player_stats", [])
+            
+            if home_stats:
+                home_sorted = sorted(home_stats, key=lambda p: p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3, reverse=True)
+                if home_sorted:
+                    p = home_sorted[0]
+                    pts = p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3
+                    if pts > 0:
+                        home_leader = {"name": p.get("player_name", ""), "points": pts}
+            
+            if away_stats:
+                away_sorted = sorted(away_stats, key=lambda p: p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3, reverse=True)
+                if away_sorted:
+                    p = away_sorted[0]
+                    pts = p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3
+                    if pts > 0:
+                        away_leader = {"name": p.get("player_name", ""), "points": pts}
+            
+            # Generate quick recap from play-by-play
+            recap = None
+            play_by_play = game.get("play_by_play", [])
+            if play_by_play and game.get("status") != "scheduled":
+                # Analyze runs - find largest scoring run
+                quarter_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
+                home_qs = quarter_scores.get("home", [0,0,0,0])
+                away_qs = quarter_scores.get("away", [0,0,0,0])
+                
+                # Find best quarter differential
+                best_q = 0
+                best_diff = 0
+                best_team = ""
+                for q in range(min(len(home_qs), len(away_qs))):
+                    diff = home_qs[q] - away_qs[q]
+                    if abs(diff) > abs(best_diff):
+                        best_diff = diff
+                        best_q = q + 1
+                        best_team = game["home_team_name"] if diff > 0 else game["away_team_name"]
+                
+                if abs(best_diff) >= 8:
+                    recap = f"{best_team} dominated Q{best_q} by {abs(best_diff)} points"
+                elif abs(home_score - away_score) <= 5 and game.get("status") == "active":
+                    recap = "Close game! Back and forth action"
+                elif home_score > away_score + 15:
+                    recap = f"{game['home_team_name']} in control"
+                elif away_score > home_score + 15:
+                    recap = f"{game['away_team_name']} in control"
+            
             games.append({
                 "id": game["id"],
                 "home_team_name": game["home_team_name"],
@@ -1297,7 +1349,10 @@ async def get_event_public(event_id: str):
                 "scheduled_time": game.get("scheduled_time"),
                 "share_code": game.get("share_code"),
                 "current_quarter": game.get("current_quarter", 1),
-                "is_halftime": game.get("is_halftime", False)
+                "is_halftime": game.get("is_halftime", False),
+                "home_leader": home_leader,
+                "away_leader": away_leader,
+                "recap": recap
             })
     
     return {
@@ -1305,6 +1360,7 @@ async def get_event_public(event_id: str):
         "name": event["name"],
         "location": event.get("location"),
         "logo_data": event.get("logo_data"),
+        "color": event.get("color", "#000000"),
         "games": games
     }
 
