@@ -638,6 +638,14 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     # Determine initial status
     initial_status = "active" if game_data.start_immediately else "scheduled"
     
+    # Determine total timeouts based on preset
+    if game_data.timeout_preset == "high_school":
+        total_timeouts = 5
+    elif game_data.timeout_preset == "college":
+        total_timeouts = 4
+    else:  # custom
+        total_timeouts = game_data.custom_timeouts
+    
     game = Game(
         home_team_id=game_data.home_team_id,
         away_team_id=game_data.away_team_id,
@@ -653,7 +661,10 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         clock_enabled=game_data.clock_enabled,
         period_duration=game_data.period_duration,
         period_label=game_data.period_label,
-        clock_time=game_data.period_duration  # Start at full period time
+        clock_time=game_data.period_duration,  # Start at full period time
+        total_timeouts=total_timeouts,
+        home_timeouts_used=0,
+        away_timeouts_used=0
     )
     game.user_id = user.user_id
     
