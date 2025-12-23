@@ -254,6 +254,29 @@ export default function TeamDetail({ user, onLogout }) {
     toast.success(`Added ${newPlayers.length} player(s) to roster`);
   };
 
+  // MaxPreps import handler
+  const handleMaxPrepsImport = async () => {
+    if (!maxPrepsUrl.trim()) {
+      toast.error("Please enter a MaxPreps roster URL");
+      return;
+    }
+    
+    setMaxPrepsLoading(true);
+    try {
+      const res = await axios.post(`${API}/teams/${id}/roster/maxpreps`, {
+        url: maxPrepsUrl.trim()
+      });
+      setRoster(res.data.roster);
+      toast.success(res.data.message);
+      setMaxPrepsOpen(false);
+      setMaxPrepsUrl("");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to import from MaxPreps");
+    } finally {
+      setMaxPrepsLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <Layout user={user} onLogout={onLogout}>
