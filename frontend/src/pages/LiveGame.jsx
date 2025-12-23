@@ -1229,28 +1229,28 @@ export default function LiveGame() {
       <div className={`max-w-7xl mx-auto px-4 py-4 ml-14 mr-14 transition-all duration-300`}>
         <div className={`grid grid-cols-1 gap-4 ${showPlayByPlay ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
           
-          {/* Left Column - Home Team */}
-          <div className="order-1 lg:order-1">
+          {/* Left Column - Team (flippable) */}
+          <div className={`order-1 ${teamsFlipped ? 'lg:order-3' : 'lg:order-1'}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
                 {/* Team Logo */}
                 <div 
                   className="w-10 h-10 rounded-full flex items-center justify-center border-2 overflow-hidden flex-shrink-0"
-                  style={{ borderColor: homeColor, backgroundColor: `${homeColor}10` }}
+                  style={{ borderColor: teamsFlipped ? awayColor : homeColor, backgroundColor: `${teamsFlipped ? awayColor : homeColor}10` }}
                 >
-                  {game.home_team_logo ? (
-                    <img src={game.home_team_logo} alt={game.home_team_name} className="w-7 h-7 object-contain" />
+                  {(teamsFlipped ? game.away_team_logo : game.home_team_logo) ? (
+                    <img src={teamsFlipped ? game.away_team_logo : game.home_team_logo} alt={teamsFlipped ? game.away_team_name : game.home_team_name} className="w-7 h-7 object-contain" />
                   ) : (
-                    <span className="text-lg font-bold" style={{ color: homeColor }}>{game.home_team_name?.charAt(0)}</span>
+                    <span className="text-lg font-bold" style={{ color: teamsFlipped ? awayColor : homeColor }}>{(teamsFlipped ? game.away_team_name : game.home_team_name)?.charAt(0)}</span>
                   )}
                 </div>
-                <h2 className="font-bold text-lg">{game.home_team_name}</h2>
+                <h2 className="font-bold text-lg">{teamsFlipped ? game.away_team_name : game.home_team_name}</h2>
               </div>
               {isActive && (
                 <Button 
                   variant="ghost" 
                   size="sm"
-                  onClick={() => { setAddPlayerTeam("home"); setAddPlayerOpen(true); }}
+                  onClick={() => { setAddPlayerTeam(teamsFlipped ? "away" : "home"); setAddPlayerOpen(true); }}
                   data-testid="add-home-player-btn"
                 >
                   <UserPlus className="w-4 h-4" />
@@ -1258,23 +1258,23 @@ export default function LiveGame() {
               )}
             </div>
             <div className={`space-y-${viewMode === "condensed" ? "1" : "3"}`}>
-              {sortByNumber(homeStats).map(player => (
+              {sortByNumber(teamsFlipped ? awayStats : homeStats).map(player => (
                 <PlayerCard 
                   key={player.id}
                   player={player}
-                  teamColor={homeColor}
+                  teamColor={teamsFlipped ? awayColor : homeColor}
                   onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
                   onEditPlayer={handleEditPlayer}
                   onRemovePlayer={handleRemovePlayer}
                   disabled={!isActive}
                   clockEnabled={game?.clock_enabled}
-                  isOnFloor={(game?.home_on_floor || []).includes(player.id)}
-                  onToggleFloor={(playerId) => togglePlayerOnFloor(playerId, true)}
-                  canCheckIn={(game?.home_on_floor || []).length < 5}
+                  isOnFloor={((teamsFlipped ? game?.away_on_floor : game?.home_on_floor) || []).includes(player.id)}
+                  onToggleFloor={(playerId) => togglePlayerOnFloor(playerId, !teamsFlipped)}
+                  canCheckIn={((teamsFlipped ? game?.away_on_floor : game?.home_on_floor) || []).length < 5}
                 />
               ))}
-              {homeStats.length === 0 && (
+              {(teamsFlipped ? awayStats : homeStats).length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
                   No players in roster
                 </div>
