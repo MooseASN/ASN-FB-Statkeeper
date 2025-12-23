@@ -239,23 +239,53 @@ export default function AdvancedLiveGame() {
     if (!player) return;
     
     try {
-      if (action === '2pt' || action === '3pt' || action === 'ft') {
-        await axios.post(`${API}/games/${id}/shot`, {
-          player_id: playerId,
-          shot_type: action === 'ft' ? 'ft' : action === '2pt' ? 'fg2' : 'fg3',
-          made: true
-        });
-        toast.success(`${player.player_name} - ${action.toUpperCase()} Made`);
-      } else {
-        await axios.post(`${API}/games/${id}/stat`, {
-          player_id: playerId,
-          stat_type: action,
-          ...extra
-        });
-        toast.success(`${player.player_name} - ${action.toUpperCase()}`);
-      }
+      // Map frontend action names to backend stat_type
+      const statTypeMap = {
+        'steal': 'steal',
+        'assist': 'assist',
+        'block': 'block',
+        'turnover': 'turnover',
+        'ft_made': 'ft_made',
+        'ft_missed': 'ft_missed',
+        'fg2_made': 'fg2_made',
+        'fg2_missed': 'fg2_missed',
+        'fg3_made': 'fg3_made',
+        'fg3_missed': 'fg3_missed',
+        'oreb': 'oreb',
+        'dreb': 'dreb',
+        'foul': 'foul',
+        'tech_foul': 'foul' // Technical fouls also count as fouls
+      };
+      
+      const statType = statTypeMap[action] || action;
+      
+      await axios.post(`${API}/games/${id}/stats`, {
+        player_id: playerId,
+        stat_type: statType,
+        increment: extra.increment || 1
+      });
+      
+      const actionLabels = {
+        'steal': 'Steal',
+        'assist': 'Assist', 
+        'block': 'Block',
+        'turnover': 'Turnover',
+        'ft_made': 'FT Made',
+        'ft_missed': 'FT Missed',
+        'fg2_made': '2PT Made',
+        'fg2_missed': '2PT Missed',
+        'fg3_made': '3PT Made',
+        'fg3_missed': '3PT Missed',
+        'oreb': 'Off. Rebound',
+        'dreb': 'Def. Rebound',
+        'foul': 'Foul',
+        'tech_foul': 'Technical Foul'
+      };
+      
+      toast.success(`${player.player_name} - ${actionLabels[action] || action.toUpperCase()}`);
       fetchGame();
     } catch (error) {
+      console.error("Stat error:", error.response?.data || error);
       toast.error("Failed to record stat");
     }
   };
@@ -263,7 +293,7 @@ export default function AdvancedLiveGame() {
   // Team rebound/turnover
   const handleTeamStat = async (team, statType) => {
     try {
-      await axios.post(`${API}/games/${id}/team-stat`, {
+      await axios.post(`${API}/games/${id}/team-stats`, {
         team,
         stat_type: statType
       });
