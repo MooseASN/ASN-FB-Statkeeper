@@ -513,6 +513,8 @@ class Game(BaseModel):
     # Primetime fields
     primetime_enabled: bool = False  # Enable primetime mode with video
     video_url: Optional[str] = None  # YouTube or m3u8 video URL
+    # Event/Tournament association
+    event_id: Optional[str] = None  # ID of event this game belongs to
     # On-floor players (player_ids)
     home_on_floor: List[str] = []
     away_on_floor: List[str] = []
