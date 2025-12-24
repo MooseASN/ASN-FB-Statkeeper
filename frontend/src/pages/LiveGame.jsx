@@ -1396,8 +1396,8 @@ export default function LiveGame() {
       </header>
 
       {/* Main Content - Dynamic Layout */}
-      <div className={`max-w-7xl mx-auto px-4 py-4 ml-14 mr-14 transition-all duration-300`}>
-        <div className={`grid grid-cols-1 gap-4 ${showPlayByPlay ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}>
+      <div className={`max-w-7xl mx-auto px-2 sm:px-4 py-4 ml-10 sm:ml-14 mr-10 sm:mr-14 transition-all duration-300`}>
+        <div className={`grid grid-cols-1 gap-4 ${showPlayByPlay ? 'md:grid-cols-2 lg:grid-cols-4' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
           
           {/* Left Column - Team (flippable) */}
           <div className="order-1 lg:order-1">
