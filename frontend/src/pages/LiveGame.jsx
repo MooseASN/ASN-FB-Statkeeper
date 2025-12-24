@@ -354,68 +354,68 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
 
       {/* Shot buttons - in order: 2PT, 3PT, FT for Simple Mode */}
       {simpleMode ? (
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
           <button
             onClick={() => onShotClick(player, "fg2")}
             disabled={disabled}
-            className="py-4 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+            className="py-3 sm:py-4 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
           >
-            <div className="text-xl">2PT</div>
-            <div className="text-sm text-muted-foreground">{player.fg2_made}</div>
+            <div className="text-lg sm:text-xl">2PT</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">{player.fg2_made}</div>
           </button>
           <button
             onClick={() => onShotClick(player, "fg3")}
             disabled={disabled}
-            className="py-4 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+            className="py-3 sm:py-4 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
           >
-            <div className="text-xl">3PT</div>
-            <div className="text-sm text-muted-foreground">{player.fg3_made}</div>
+            <div className="text-lg sm:text-xl">3PT</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">{player.fg3_made}</div>
           </button>
           <button
             onClick={() => onShotClick(player, "ft")}
             disabled={disabled}
-            className="py-4 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+            className="py-3 sm:py-4 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
           >
-            <div className="text-xl">FT</div>
-            <div className="text-sm text-muted-foreground">{player.ft_made}</div>
+            <div className="text-lg sm:text-xl">FT</div>
+            <div className="text-xs sm:text-sm text-muted-foreground">{player.ft_made}</div>
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4">
           <button
             onClick={() => onShotClick(player, "ft")}
             disabled={disabled}
-            className="py-3 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+            className="py-2 sm:py-3 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
           >
-            <div className="text-lg">FT</div>
-            <div className="text-xs text-muted-foreground">{player.ft_made}/{stats.ft_att}</div>
+            <div className="text-base sm:text-lg">FT</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground">{player.ft_made}/{stats.ft_att}</div>
           </button>
           <button
             onClick={() => onShotClick(player, "fg2")}
             disabled={disabled}
-            className="py-3 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+            className="py-2 sm:py-3 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
           >
-            <div className="text-lg">2PT</div>
-            <div className="text-xs text-muted-foreground">{player.fg2_made}/{stats.fg2_att}</div>
+            <div className="text-base sm:text-lg">2PT</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground">{player.fg2_made}/{stats.fg2_att}</div>
           </button>
           <button
             onClick={() => onShotClick(player, "fg3")}
             disabled={disabled}
-            className="py-3 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+            className="py-2 sm:py-3 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
           >
-            <div className="text-lg">3PT</div>
-            <div className="text-xs text-muted-foreground">{player.fg3_made}/{stats.fg3_att}</div>
+            <div className="text-base sm:text-lg">3PT</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground">{player.fg3_made}/{stats.fg3_att}</div>
           </button>
         </div>
       )}
 
       {/* Other stats - simplified or full */}
       {simpleMode ? (
-        <div className="grid grid-cols-3 gap-3 mt-2">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-2">
           <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-            className="py-4 px-3 text-base bg-cyan-50 hover:bg-cyan-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-cyan-300 hover:border-cyan-500">
-            <div className="text-2xl font-bold">{totalReb}</div>
-            <div className="text-xs text-muted-foreground font-medium">REB</div>
+            className="py-3 sm:py-4 px-2 sm:px-3 text-sm sm:text-base bg-cyan-50 hover:bg-cyan-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-cyan-300 hover:border-cyan-500">
+            <div className="text-xl sm:text-2xl font-bold">{totalReb}</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">REB</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
             className="py-4 px-3 text-base bg-purple-50 hover:bg-purple-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-purple-300 hover:border-purple-500">
