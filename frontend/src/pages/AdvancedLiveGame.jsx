@@ -576,41 +576,97 @@ export default function AdvancedLiveGame() {
             >
               Set
             </Button>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={async () => {
+                // Undo last play
+                if (playByPlay.length === 0) {
+                  toast.error("No plays to undo");
+                  return;
+                }
+                const lastPlay = playByPlay[0]; // Most recent play (reversed list)
+                
+                // Map action names to stat fields for reversing
+                const actionToStat = {
+                  "FT Made": "ft_made",
+                  "FT Missed": "ft_missed",
+                  "2PT Made": "fg2_made",
+                  "2PT Missed": "fg2_missed",
+                  "3PT Made": "fg3_made",
+                  "3PT Missed": "fg3_missed",
+                  "Off. Rebound": "offensive_rebounds",
+                  "Def. Rebound": "defensive_rebounds",
+                  "Assist": "assists",
+                  "Steal": "steals",
+                  "Block": "blocks",
+                  "Turnover": "turnovers",
+                  "Foul": "fouls",
+                  "Technical Foul": "fouls"
+                };
+                
+                try {
+                  // Reverse the stat
+                  if (lastPlay.player_id && actionToStat[lastPlay.action]) {
+                    await axios.post(`${API}/games/${id}/stats`, {
+                      player_id: lastPlay.player_id,
+                      stat_type: actionToStat[lastPlay.action],
+                      increment: -1
+                    });
+                  }
+                  
+                  // Remove the play from play-by-play
+                  const updatedPlays = playByPlay.slice(1); // Remove first (most recent)
+                  await axios.put(`${API}/games/${id}`, {
+                    play_by_play: updatedPlays.slice().reverse()
+                  });
+                  
+                  toast.success("Last play undone");
+                  fetchGame();
+                } catch (error) {
+                  toast.error("Failed to undo play");
+                }
+              }}
+              className="border-zinc-700 text-white hover:bg-zinc-800"
+            >
+              <RotateCcw className="w-4 h-4 mr-1" />
+              Undo
+            </Button>
           </div>
 
           {/* Right: Menu Tabs */}
           <div className="flex items-center gap-2">
             <Button 
-              variant={activeTab === "addplay" ? "default" : "ghost"}
+              variant={activeTab === "addplay" ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveTab("addplay")}
-              className={activeTab === "addplay" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-zinc-800"}
+              className={activeTab === "addplay" ? "bg-orange-500 hover:bg-orange-600" : "text-white border-white/50 hover:bg-zinc-800"}
             >
               Add Play
             </Button>
             <Button 
-              variant={activeTab === "export" ? "default" : "ghost"}
+              variant={activeTab === "export" ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveTab("export")}
-              className={activeTab === "export" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-zinc-800"}
+              className={activeTab === "export" ? "bg-orange-500 hover:bg-orange-600" : "text-white border-white/50 hover:bg-zinc-800"}
             >
               <FileDown className="w-4 h-4 mr-1" />
               Export
             </Button>
             <Button 
-              variant={activeTab === "rosters" ? "default" : "ghost"}
+              variant={activeTab === "rosters" ? "default" : "outline"}
               size="sm"
               onClick={() => setActiveTab("rosters")}
-              className={activeTab === "rosters" ? "bg-orange-500 hover:bg-orange-600" : "text-white hover:bg-zinc-800"}
+              className={activeTab === "rosters" ? "bg-orange-500 hover:bg-orange-600" : "text-white border-white/50 hover:bg-zinc-800"}
             >
               <Users className="w-4 h-4 mr-1" />
               Rosters
             </Button>
             <Button 
-              variant="ghost" 
+              variant="outline" 
               size="sm" 
               onClick={() => setShowHelpDialog(true)}
-              className="text-white hover:bg-zinc-800"
+              className="text-white border-white/50 hover:bg-zinc-800"
             >
               <HelpCircle className="w-4 h-4" />
             </Button>
