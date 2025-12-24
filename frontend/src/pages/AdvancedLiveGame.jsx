@@ -1812,25 +1812,25 @@ export default function AdvancedLiveGame() {
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-sm text-zinc-400">
-              Paste a MaxPreps roster page URL to import player numbers and names.
+              Paste a roster page URL from any athletic website to import player numbers and names.
             </p>
             <div>
-              <Label className="text-xs text-zinc-400">MaxPreps Roster URL</Label>
+              <Label className="text-xs text-zinc-400">Roster Page URL</Label>
               <Input
-                placeholder="https://www.maxpreps.com/high-schools/.../roster"
+                placeholder="https://athletics.school.edu/sports/mbkb/roster"
                 value={importUrl}
                 onChange={(e) => setImportUrl(e.target.value)}
                 className="bg-zinc-800 border-zinc-700"
               />
             </div>
             <div className="bg-zinc-800 rounded-lg p-3 text-xs text-zinc-400">
-              <p className="font-medium text-zinc-300 mb-1">How to find the roster URL:</p>
-              <ol className="list-decimal list-inside space-y-0.5">
-                <li>Go to MaxPreps.com</li>
-                <li>Search for the school&apos;s basketball team</li>
-                <li>Click on the &quot;Roster&quot; tab</li>
-                <li>Copy the URL from your browser</li>
-              </ol>
+              <p className="font-medium text-zinc-300 mb-1">Works with roster pages from:</p>
+              <ul className="list-disc list-inside space-y-0.5">
+                <li>MaxPreps (high school)</li>
+                <li>PrestoSports (college athletic sites)</li>
+                <li>Sidearm Sports (college athletic sites)</li>
+                <li>Most school/team athletic websites</li>
+              </ul>
             </div>
             <Button 
               onClick={handleLinkImport} 
