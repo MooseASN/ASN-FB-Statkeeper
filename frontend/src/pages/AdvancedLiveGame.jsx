@@ -1889,7 +1889,7 @@ export default function AdvancedLiveGame() {
                       // Get the original play to know what stat to reverse
                       const originalPlay = playByPlay[editingPlay.index];
                       
-                      // Map action names to stat fields
+                      // Map action names to backend stat_type (must match backend stat_map)
                       const actionToStat = {
                         "FT Made": { field: "ft_made", points: 1 },
                         "FT Missed": { field: "ft_missed", points: 0 },
@@ -1897,14 +1897,14 @@ export default function AdvancedLiveGame() {
                         "2PT Missed": { field: "fg2_missed", points: 0 },
                         "3PT Made": { field: "fg3_made", points: 3 },
                         "3PT Missed": { field: "fg3_missed", points: 0 },
-                        "Off. Rebound": { field: "offensive_rebounds", points: 0 },
-                        "Def. Rebound": { field: "defensive_rebounds", points: 0 },
-                        "Assist": { field: "assists", points: 0 },
-                        "Steal": { field: "steals", points: 0 },
-                        "Block": { field: "blocks", points: 0 },
-                        "Turnover": { field: "turnovers", points: 0 },
-                        "Foul": { field: "fouls", points: 0 },
-                        "Technical Foul": { field: "fouls", points: 0 }
+                        "Off. Rebound": { field: "oreb", points: 0 },
+                        "Def. Rebound": { field: "dreb", points: 0 },
+                        "Assist": { field: "assist", points: 0 },
+                        "Steal": { field: "steal", points: 0 },
+                        "Block": { field: "block", points: 0 },
+                        "Turnover": { field: "turnover", points: 0 },
+                        "Foul": { field: "foul", points: 0 },
+                        "Technical Foul": { field: "foul", points: 0 }
                       };
 
                       // Check what changed
