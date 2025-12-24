@@ -603,6 +603,24 @@ export default function NewGame({ user, onLogout }) {
                 )}
               </div>
 
+              {/* Game Notes */}
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-slate-600" />
+                  <Label className="text-base font-semibold">Game Notes</Label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Add any notes or additional information about this game. These notes will be visible in the stat tracker.
+                </p>
+                <Textarea
+                  placeholder="e.g., Tournament semifinal, Home team missing key player, etc."
+                  value={gameNote}
+                  onChange={(e) => setGameNote(e.target.value)}
+                  className="min-h-[80px]"
+                  data-testid="game-note-input"
+                />
+              </div>
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
