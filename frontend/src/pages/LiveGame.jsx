@@ -576,6 +576,10 @@ export default function LiveGame() {
   const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [selectedShotType, setSelectedShotType] = useState(null);
   
+  // Rebound modal state (for Classic mode)
+  const [reboundModalOpen, setReboundModalOpen] = useState(false);
+  const [reboundPlayer, setReboundPlayer] = useState(null);
+  
   // Reset stats state
   const [resetStatsOpen, setResetStatsOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
