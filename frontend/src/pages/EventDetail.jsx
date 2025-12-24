@@ -30,7 +30,16 @@ export default function EventDetail({ user, onLogout }) {
   const [editLogoPreview, setEditLogoPreview] = useState(null);
   const [editLogoData, setEditLogoData] = useState(null);
   const [editColor, setEditColor] = useState("#000000");
+  const [linkCopied, setLinkCopied] = useState(false);
   const fileInputRef = useRef(null);
+
+  const copyEventLink = () => {
+    const url = `${window.location.origin}/event/${id}/live`;
+    navigator.clipboard.writeText(url);
+    setLinkCopied(true);
+    toast.success("Event live link copied!");
+    setTimeout(() => setLinkCopied(false), 2000);
+  };
 
   useEffect(() => {
     fetchEvent();
