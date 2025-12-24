@@ -165,15 +165,39 @@ export default function Dashboard({ user, onLogout }) {
     e.preventDefault();
     e.stopPropagation();
     
-    setStartingGameId(gameId);
+    // Find the game to get its info for the dialog
+    const game = scheduledGames.find(g => g.id === gameId);
+    setSelectedGameToStart(game);
+    setSelectedStartMode("classic"); // Reset to default
+    setStartModeDialogOpen(true);
+  };
+
+  const confirmStartGame = async () => {
+    if (!selectedGameToStart) return;
+    
+    setStartingGameId(selectedGameToStart.id);
+    setStartModeDialogOpen(false);
+    
     try {
-      await axios.post(`${API}/games/${gameId}/start`);
+      // Start the game with the selected mode
+      await axios.post(`${API}/games/${selectedGameToStart.id}/start`, {
+        simple_mode: selectedStartMode === "simple",
+        advanced_mode: selectedStartMode === "advanced",
+        clock_enabled: selectedStartMode === "advanced" // Advanced requires clock
+      });
       toast.success("Game started!");
-      navigate(`/game/${gameId}`);
+      
+      // Navigate to appropriate interface based on mode
+      if (selectedStartMode === "advanced") {
+        navigate(`/game/${selectedGameToStart.id}/advanced`);
+      } else {
+        navigate(`/game/${selectedGameToStart.id}`);
+      }
     } catch (error) {
       toast.error("Failed to start game");
     } finally {
       setStartingGameId(null);
+      setSelectedGameToStart(null);
     }
   };
 
