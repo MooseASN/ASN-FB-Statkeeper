@@ -2716,6 +2716,192 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+# ============ XML BOX SCORE EXPORT ============
+@api_router.get("/games/{game_id}/boxscore/xml")
+async def get_game_boxscore_xml(game_id: str):
+    """Generate SportsML-format XML box score"""
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Get player stats
+    home_stats = await db.player_stats.find({"game_id": game_id, "team_id": game["home_team_id"]}, {"_id": 0}).to_list(100)
+    away_stats = await db.player_stats.find({"game_id": game_id, "team_id": game["away_team_id"]}, {"_id": 0}).to_list(100)
+    
+    # Calculate totals
+    def calc_totals(stats):
+        return {
+            "pts": sum(p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3 for p in stats),
+            "fg_made": sum(p.get("fg2_made", 0) + p.get("fg3_made", 0) for p in stats),
+            "fg_att": sum(p.get("fg2_made", 0) + p.get("fg2_missed", 0) + p.get("fg3_made", 0) + p.get("fg3_missed", 0) for p in stats),
+            "fg3_made": sum(p.get("fg3_made", 0) for p in stats),
+            "fg3_att": sum(p.get("fg3_made", 0) + p.get("fg3_missed", 0) for p in stats),
+            "ft_made": sum(p.get("ft_made", 0) for p in stats),
+            "ft_att": sum(p.get("ft_made", 0) + p.get("ft_missed", 0) for p in stats),
+            "oreb": sum(p.get("offensive_rebounds", 0) for p in stats),
+            "dreb": sum(p.get("defensive_rebounds", 0) for p in stats),
+            "reb": sum(p.get("offensive_rebounds", 0) + p.get("defensive_rebounds", 0) for p in stats),
+            "ast": sum(p.get("assists", 0) for p in stats),
+            "stl": sum(p.get("steals", 0) for p in stats),
+            "blk": sum(p.get("blocks", 0) for p in stats),
+            "to": sum(p.get("turnovers", 0) for p in stats),
+            "pf": sum(p.get("fouls", 0) for p in stats),
+        }
+    
+    home_totals = calc_totals(home_stats)
+    away_totals = calc_totals(away_stats)
+    
+    # Get starters
+    home_starters = game.get("home_starters", [])
+    away_starters = game.get("away_starters", [])
+    
+    # Build XML
+    from xml.etree.ElementTree import Element, SubElement, tostring
+    from xml.dom import minidom
+    
+    # Root element
+    root = Element("sports-content")
+    root.set("xmlns", "http://iptc.org/std/SportsML/2008-04-01/")
+    
+    # Sports metadata
+    sports_meta = SubElement(root, "sports-metadata")
+    sports_meta.set("doc-id", game_id)
+    sports_meta.set("document-class", "event-statistics")
+    sports_title = SubElement(sports_meta, "sports-title")
+    sports_title.text = f"Basketball Box Score: {game['home_team_name']} vs {game['away_team_name']}"
+    
+    # Sports event
+    sports_event = SubElement(root, "sports-event")
+    sports_event.set("id", game_id)
+    
+    # Event metadata
+    event_meta = SubElement(sports_event, "event-metadata")
+    event_meta.set("event-status", game.get("status", "active"))
+    event_meta.set("period-value", str(game.get("current_quarter", 1)))
+    event_meta.set("stats-coverage", "box-score")
+    
+    # Event metadata basketball specific
+    event_meta_bball = SubElement(event_meta, "event-metadata-basketball")
+    event_meta_bball.set("period-time-remaining", str(game.get("clock_time", 0)))
+    event_meta_bball.set("period-minutes-elapsed", str((game.get("period_duration", 720) - game.get("clock_time", 0)) // 60))
+    
+    def add_team_element(parent, team_name, alignment, stats_list, totals, starters):
+        team_elem = SubElement(parent, "team")
+        team_elem.set("alignment", alignment)
+        
+        # Team metadata
+        team_meta = SubElement(team_elem, "team-metadata")
+        name_elem = SubElement(team_meta, "name")
+        name_elem.set("full", team_name)
+        
+        # Team stats
+        team_stats = SubElement(team_elem, "team-stats")
+        team_stats.set("score", str(totals["pts"]))
+        
+        # Team stat properties
+        for stat_name, stat_value in [
+            ("field-goals-made", totals["fg_made"]),
+            ("field-goals-attempted", totals["fg_att"]),
+            ("field-goals-percentage", round(totals["fg_made"] / totals["fg_att"] * 100, 1) if totals["fg_att"] > 0 else 0),
+            ("three-pointers-made", totals["fg3_made"]),
+            ("three-pointers-attempted", totals["fg3_att"]),
+            ("three-pointers-percentage", round(totals["fg3_made"] / totals["fg3_att"] * 100, 1) if totals["fg3_att"] > 0 else 0),
+            ("free-throws-made", totals["ft_made"]),
+            ("free-throws-attempted", totals["ft_att"]),
+            ("free-throws-percentage", round(totals["ft_made"] / totals["ft_att"] * 100, 1) if totals["ft_att"] > 0 else 0),
+            ("rebounds-offensive", totals["oreb"]),
+            ("rebounds-defensive", totals["dreb"]),
+            ("rebounds-total", totals["reb"]),
+            ("assists", totals["ast"]),
+            ("steals", totals["stl"]),
+            ("blocks", totals["blk"]),
+            ("turnovers", totals["to"]),
+            ("personal-fouls", totals["pf"]),
+        ]:
+            prop = SubElement(team_stats, "sports-property")
+            prop.set("formal-name", stat_name)
+            prop.set("value", str(stat_value))
+        
+        # Player stats
+        for player in stats_list:
+            player_elem = SubElement(team_elem, "player")
+            is_starter = player.get("id") in starters
+            player_elem.set("starter", "true" if is_starter else "false")
+            
+            # Player metadata
+            player_meta = SubElement(player_elem, "player-metadata")
+            player_meta.set("uniform-number", str(player.get("player_number", "")))
+            player_name = SubElement(player_meta, "name")
+            player_name.set("full", player.get("player_name", ""))
+            
+            # Player stats
+            p_stats = SubElement(player_elem, "player-stats")
+            pts = player.get("ft_made", 0) + player.get("fg2_made", 0) * 2 + player.get("fg3_made", 0) * 3
+            p_stats.set("score", str(pts))
+            
+            fg_made = player.get("fg2_made", 0) + player.get("fg3_made", 0)
+            fg_att = player.get("fg2_made", 0) + player.get("fg2_missed", 0) + player.get("fg3_made", 0) + player.get("fg3_missed", 0)
+            fg3_att = player.get("fg3_made", 0) + player.get("fg3_missed", 0)
+            ft_att = player.get("ft_made", 0) + player.get("ft_missed", 0)
+            reb = player.get("offensive_rebounds", 0) + player.get("defensive_rebounds", 0)
+            
+            for stat_name, stat_value in [
+                ("field-goals-made", fg_made),
+                ("field-goals-attempted", fg_att),
+                ("three-pointers-made", player.get("fg3_made", 0)),
+                ("three-pointers-attempted", fg3_att),
+                ("free-throws-made", player.get("ft_made", 0)),
+                ("free-throws-attempted", ft_att),
+                ("rebounds-offensive", player.get("offensive_rebounds", 0)),
+                ("rebounds-defensive", player.get("defensive_rebounds", 0)),
+                ("rebounds-total", reb),
+                ("assists", player.get("assists", 0)),
+                ("steals", player.get("steals", 0)),
+                ("blocks", player.get("blocks", 0)),
+                ("turnovers", player.get("turnovers", 0)),
+                ("personal-fouls", player.get("fouls", 0)),
+                ("points", pts),
+            ]:
+                prop = SubElement(p_stats, "sports-property")
+                prop.set("formal-name", stat_name)
+                prop.set("value", str(stat_value))
+        
+        return team_elem
+    
+    # Add home team
+    add_team_element(sports_event, game["home_team_name"], "home", home_stats, home_totals, home_starters)
+    
+    # Add away team
+    add_team_element(sports_event, game["away_team_name"], "away", away_stats, away_totals, away_starters)
+    
+    # Play by play
+    play_by_play = game.get("play_by_play", [])
+    if play_by_play:
+        pbp_elem = SubElement(sports_event, "play-by-play")
+        for play in play_by_play:
+            action = SubElement(pbp_elem, "action")
+            action.set("id", play.get("id", ""))
+            action.set("period", str(play.get("quarter", 1)))
+            action.set("team", play.get("team", ""))
+            action.set("player-number", str(play.get("player_number", "")))
+            action.set("player-name", play.get("player_name", ""))
+            action.set("type", play.get("action", ""))
+            action.set("home-score", str(play.get("home_score", 0)))
+            action.set("away-score", str(play.get("away_score", 0)))
+    
+    # Convert to pretty XML string
+    xml_str = tostring(root, encoding='unicode')
+    dom = minidom.parseString(xml_str)
+    pretty_xml = dom.toprettyxml(indent="  ")
+    
+    filename = f"boxscore_{game['home_team_name']}_vs_{game['away_team_name']}.xml".replace(" ", "_")
+    
+    return StreamingResponse(
+        iter([pretty_xml]),
+        media_type="application/xml",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # ============ UTILITY ENDPOINTS ============
 
 @api_router.get("/")
