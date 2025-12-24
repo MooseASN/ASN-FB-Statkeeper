@@ -882,6 +882,20 @@ export default function LiveGame() {
     setSelectedShotType(null);
   };
 
+  // Rebound click handler for Classic mode
+  const handleReboundClick = (player) => {
+    setReboundPlayer(player);
+    setReboundModalOpen(true);
+  };
+
+  const handleReboundResult = async (type) => {
+    if (!reboundPlayer) return;
+    const statType = type === 'offensive' ? 'oreb' : 'dreb';
+    await handleStatUpdate(reboundPlayer.id, statType);
+    setReboundModalOpen(false);
+    setReboundPlayer(null);
+  };
+
   const handleUndo = async () => {
     if (!lastAction) return;
     try {
