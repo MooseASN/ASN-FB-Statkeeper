@@ -2124,17 +2124,29 @@ export default function AdvancedLiveGame() {
                   // Parse email addresses
                   const emails = emailAddresses.split(',').map(e => e.trim()).filter(e => e);
                   
-                  // Send email with box score link
+                  // Validate email format
+                  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                  const invalidEmails = emails.filter(e => !emailRegex.test(e));
+                  if (invalidEmails.length > 0) {
+                    toast.error(`Invalid email format: ${invalidEmails.join(', ')}`);
+                    return;
+                  }
+                  
+                  // Send email via backend
                   const liveUrl = `${window.location.origin}/live/${game.share_code}`;
                   
-                  // For now, copy link and show instructions since email requires backend setup
-                  navigator.clipboard.writeText(liveUrl);
-                  toast.success(`Live stats link copied! Send to: ${emails.join(', ')}`);
+                  await axios.post(`${API}/games/${id}/email-boxscore`, {
+                    emails: emails,
+                    live_url: liveUrl
+                  });
                   
+                  toast.success(`Box score sent to ${emails.length} recipient(s)!`);
                   setShowEmailDialog(false);
                   setEmailAddresses("");
                 } catch (error) {
-                  toast.error("Failed to send email");
+                  console.error("Email error:", error);
+                  const errorMsg = error.response?.data?.detail || "Failed to send email";
+                  toast.error(errorMsg);
                 } finally {
                   setEmailSending(false);
                 }
