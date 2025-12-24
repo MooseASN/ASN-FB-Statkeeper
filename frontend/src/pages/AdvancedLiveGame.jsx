@@ -929,8 +929,8 @@ export default function AdvancedLiveGame() {
                 <StatButton label="Game Ctrl" hotkey="G" onClick={() => setShowGameControlDialog(true)}  />
               </div>
 
-              {/* Players On Court Section */}
-              <div className="mt-6 grid grid-cols-2 gap-4">
+              {/* Players On Court Section - Responsive */}
+              <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {/* Home Team On Court */}
                 <div className="bg-zinc-900 rounded-lg p-3">
                   <div className="flex items-center gap-2 mb-2">
