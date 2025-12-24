@@ -418,55 +418,55 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
             <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">REB</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-            className="py-4 px-3 text-base bg-purple-50 hover:bg-purple-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-purple-300 hover:border-purple-500">
-            <div className="text-2xl font-bold">{player.assists}</div>
-            <div className="text-xs text-muted-foreground font-medium">AST</div>
+            className="py-3 sm:py-4 px-2 sm:px-3 text-sm sm:text-base bg-purple-50 hover:bg-purple-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-purple-300 hover:border-purple-500">
+            <div className="text-xl sm:text-2xl font-bold">{player.assists}</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">AST</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-            className="py-4 px-3 text-base bg-red-50 hover:bg-red-100 text-red-600 rounded-xl disabled:opacity-50 transition-colors border-2 border-red-300 hover:border-red-500">
-            <div className="text-2xl font-bold">{player.fouls}</div>
-            <div className="text-xs text-muted-foreground font-medium">PF</div>
+            className="py-3 sm:py-4 px-2 sm:px-3 text-sm sm:text-base bg-red-50 hover:bg-red-100 text-red-600 rounded-xl disabled:opacity-50 transition-colors border-2 border-red-300 hover:border-red-500">
+            <div className="text-xl sm:text-2xl font-bold">{player.fouls}</div>
+            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">PF</div>
           </button>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-4 gap-2 mb-2">
+          <div className="grid grid-cols-4 gap-1.5 sm:gap-2 mb-2">
             <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.assists}</div>
-              <div className="text-[10px] text-muted-foreground">AST</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">AST</div>
             </button>
             <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.offensive_rebounds}</div>
-              <div className="text-[10px] text-muted-foreground">O REB</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">OREB</div>
             </button>
             <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.defensive_rebounds}</div>
-              <div className="text-[10px] text-muted-foreground">D REB</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">DREB</div>
             </button>
             <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.steals}</div>
-              <div className="text-[10px] text-muted-foreground">STL</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">STL</div>
             </button>
           </div>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
             <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.blocks}</div>
-              <div className="text-[10px] text-muted-foreground">BLK</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">BLK</div>
             </button>
             <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.turnovers}</div>
-              <div className="text-[10px] text-muted-foreground">TOV</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">TOV</div>
             </button>
             <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-              className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
+              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
               <div className="font-bold">{player.fouls}</div>
-              <div className="text-[10px] text-muted-foreground">PF</div>
+              <div className="text-[8px] sm:text-[10px] text-muted-foreground">PF</div>
             </button>
           </div>
         </>
@@ -475,12 +475,12 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
   );
 };
 
-// Side Action Button
+// Side Action Button - Responsive
 const SideActionButton = ({ label, onClick, color, position, disabled }) => (
   <button
     onClick={onClick}
     disabled={disabled}
-    className={`fixed ${position} w-12 py-8 text-white text-xs font-bold writing-mode-vertical flex items-center justify-center transition-opacity hover:opacity-90 disabled:opacity-50 z-40`}
+    className={`fixed ${position} w-10 sm:w-12 py-6 sm:py-8 text-white text-[10px] sm:text-xs font-bold writing-mode-vertical flex items-center justify-center transition-opacity hover:opacity-90 disabled:opacity-50 z-40`}
     style={{ 
       backgroundColor: color,
       writingMode: "vertical-rl",
