@@ -765,13 +765,13 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
         if num_elem:
             number = num_elem.get_text(strip=True).replace('#', '')
         if name_elem:
-            name = name_elem.get_text(strip=True)
+            name = clean_name(name_elem.get_text())
         
         # If name not found, try broader selectors
         if not name:
             name_elem = row.select_one('a[href*="bio"], a[href*="player"], a[href*="roster"], h3, h4, .name')
             if name_elem:
-                name = name_elem.get_text(strip=True)
+                name = clean_name(name_elem.get_text())
         
         # Validate and add
         if number and name and re.match(r'^\d{1,3}$', number):
