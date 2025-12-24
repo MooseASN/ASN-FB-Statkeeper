@@ -467,6 +467,7 @@ class GameCreate(BaseModel):
     video_url: Optional[str] = None  # YouTube or m3u8 video URL
     simple_mode: bool = False  # Simple mode: only track makes, rebounds, assists, fouls
     advanced_mode: bool = False  # Advanced mode: PrestoSports-style interface
+    note: Optional[str] = None  # Game note/description
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
