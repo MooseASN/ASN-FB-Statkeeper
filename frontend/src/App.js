@@ -7,6 +7,7 @@ import Dashboard from "@/pages/Dashboard";
 import Teams from "@/pages/Teams";
 import TeamDetail from "@/pages/TeamDetail";
 import NewGame from "@/pages/NewGame";
+import EditGame from "@/pages/EditGame";
 import LiveGame from "@/pages/LiveGame";
 import AdvancedLiveGame from "@/pages/AdvancedLiveGame";
 import LiveView from "@/pages/LiveView";
