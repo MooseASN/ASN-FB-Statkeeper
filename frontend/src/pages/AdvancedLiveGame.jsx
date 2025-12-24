@@ -440,13 +440,7 @@ export default function AdvancedLiveGame() {
 
   const handleLinkImport = async () => {
     if (!importUrl.trim()) {
-      toast.error("Please enter a MaxPreps roster URL");
-      return;
-    }
-    
-    // Validate MaxPreps URL
-    if (!importUrl.toLowerCase().includes('maxpreps.com')) {
-      toast.error("Please enter a valid MaxPreps roster URL");
+      toast.error("Please enter a roster page URL");
       return;
     }
     
