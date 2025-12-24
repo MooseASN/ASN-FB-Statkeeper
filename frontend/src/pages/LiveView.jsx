@@ -341,6 +341,16 @@ export default function LiveView() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Format scheduled time to 12-hour format
+  const formatScheduledTime = (timeStr) => {
+    if (!timeStr) return 'TBD';
+    const [hours, minutes] = timeStr.split(':');
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? 'PM' : 'AM';
+    const hour12 = hour % 12 || 12;
+    return `${hour12}:${minutes} ${ampm}`;
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
