@@ -1382,7 +1382,7 @@ async def use_timeout(game_id: str, timeout_data: TimeoutRequest, user: User = D
     )
     
     return {
-        "message": f"Timeout used",
+        "message": "Timeout used",
         "team": timeout_data.team,
         "timeouts_remaining": total_timeouts - new_timeouts_used
     }
