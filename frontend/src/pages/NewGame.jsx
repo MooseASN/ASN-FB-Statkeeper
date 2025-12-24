@@ -648,7 +648,13 @@ export default function NewGame({ user, onLogout }) {
                           month: 'long', 
                           day: 'numeric' 
                         })}
-                        {scheduledTime && ` at ${scheduledTime}`}
+                        {scheduledTime && (() => {
+                          const [hours, minutes] = scheduledTime.split(':');
+                          const hour = parseInt(hours, 10);
+                          const ampm = hour >= 12 ? 'PM' : 'AM';
+                          const hour12 = hour % 12 || 12;
+                          return ` at ${hour12}:${minutes} ${ampm}`;
+                        })()}
                       </p>
                       <p className="text-blue-600 mt-1">
                         You can start the game anytime from your dashboard.
