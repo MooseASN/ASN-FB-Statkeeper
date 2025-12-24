@@ -112,11 +112,12 @@ export default function Teams({ user, onLogout }) {
     }
 
     try {
-      await axios.post(`${API}/teams`, newTeam);
+      const res = await axios.post(`${API}/teams`, newTeam);
       toast.success("Team created successfully");
       setNewTeam({ name: "", logo_url: "", color: "#dc2626" });
       setIsDialogOpen(false);
-      fetchTeams();
+      // Navigate directly to the new team's detail page
+      navigate(`/teams/${res.data.id}`);
     } catch (error) {
       toast.error("Failed to create team");
     }
