@@ -74,6 +74,41 @@ const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss, simp
   );
 };
 
+// Rebound Selection Modal for Classic Mode
+const ReboundModal = ({ isOpen, onClose, playerName, onOffensive, onDefensive }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg">Rebound Type</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-muted-foreground mb-4">{playerName}</p>
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            onClick={onOffensive}
+            className="py-6 rounded-xl bg-green-100 hover:bg-green-200 border-2 border-green-300 hover:border-green-500 font-bold text-green-700 transition-colors"
+          >
+            <div className="text-xl">OREB</div>
+            <div className="text-xs text-green-600">Offensive</div>
+          </button>
+          <button
+            onClick={onDefensive}
+            className="py-6 rounded-xl bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 hover:border-blue-500 font-bold text-blue-700 transition-colors"
+          >
+            <div className="text-xl">DREB</div>
+            <div className="text-xs text-blue-600">Defensive</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Calculate shooting stats for a player
 const calcShootingStats = (player) => {
   const ft_att = player.ft_made + player.ft_missed;
