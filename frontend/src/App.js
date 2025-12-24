@@ -134,6 +134,7 @@ function App() {
           {/* Live view is now protected - only owner can see */}
           {/* Public shareable live stats view */}
           <Route path="/live/:shareCode" element={<LiveView />} />
+          <Route path="/event/:eventId/live" element={<EventLive />} />
           
           {/* Embed view is public - for external embedding */}
           <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
