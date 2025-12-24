@@ -1072,40 +1072,6 @@ export default function AdvancedLiveGame() {
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
-                  onClick={async () => {
-                    try {
-                      const response = await axios.get(`${API}/games/${id}/boxscore/xml`, {
-                        responseType: 'blob'
-                      });
-                      const blob = new Blob([response.data], { type: 'application/xml' });
-                      const url = window.URL.createObjectURL(blob);
-                      const a = document.createElement('a');
-                      a.href = url;
-                      a.download = `boxscore_${game.home_team_name}_vs_${game.away_team_name}.xml`.replace(/ /g, '_');
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      window.URL.revokeObjectURL(url);
-                      toast.success("Box score XML downloaded!");
-                    } catch (error) {
-                      toast.error("Failed to generate box score XML");
-                    }
-                  }}
-                >
-                  <FileDown className="w-6 h-6" />
-                  <span>XML Box Score</span>
-                </Button>
-                <Button 
-                  className="h-20 flex-col gap-2" 
-                  variant="outline"
-                  onClick={() => setShowEmailDialog(true)}
-                >
-                  <Mail className="w-6 h-6" />
-                  <span>Email Box Score</span>
-                </Button>
-                <Button 
-                  className="h-20 flex-col gap-2" 
-                  variant="outline"
                   onClick={() => {
                     const url = `${window.location.origin}/live/${game.share_code}`;
                     navigator.clipboard.writeText(url);
