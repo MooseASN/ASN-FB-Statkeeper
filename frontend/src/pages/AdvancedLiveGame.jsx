@@ -517,6 +517,7 @@ export default function AdvancedLiveGame() {
   if (!game) return null;
 
   const currentTeamStats = possession === "home" ? homeStats : awayStats;
+  const currentTeamOnFloor = possession === "home" ? homeOnFloor : awayOnFloor;
   const currentTeamName = possession === "home" ? game.home_team_name : game.away_team_name;
   const currentTeamColor = possession === "home" ? homeColor : awayColor;
 
