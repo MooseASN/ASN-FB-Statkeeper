@@ -288,30 +288,30 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
       </div>
 
       {/* Shot buttons - larger */}
-      <div className="grid grid-cols-3 gap-2 mb-4">
+      <div className={`grid grid-cols-3 ${simpleMode ? 'gap-3 mb-4' : 'gap-2 mb-4'}`}>
         <button
           onClick={() => onShotClick(player, "ft")}
           disabled={disabled}
-          className="py-3 rounded-lg border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+          className={`${simpleMode ? 'py-4' : 'py-3'} rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors`}
         >
-          <div className="text-lg">FT</div>
-          <div className="text-xs text-muted-foreground">{simpleMode ? player.ft_made : `${player.ft_made}/${stats.ft_att}`}</div>
+          <div className={`${simpleMode ? 'text-xl' : 'text-lg'}`}>FT</div>
+          <div className={`${simpleMode ? 'text-sm' : 'text-xs'} text-muted-foreground`}>{simpleMode ? player.ft_made : `${player.ft_made}/${stats.ft_att}`}</div>
         </button>
         <button
           onClick={() => onShotClick(player, "fg2")}
           disabled={disabled}
-          className="py-3 rounded-lg border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+          className={`${simpleMode ? 'py-4' : 'py-3'} rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors`}
         >
-          <div className="text-lg">2PT</div>
-          <div className="text-xs text-muted-foreground">{simpleMode ? player.fg2_made : `${player.fg2_made}/${stats.fg2_att}`}</div>
+          <div className={`${simpleMode ? 'text-xl' : 'text-lg'}`}>2PT</div>
+          <div className={`${simpleMode ? 'text-sm' : 'text-xs'} text-muted-foreground`}>{simpleMode ? player.fg2_made : `${player.fg2_made}/${stats.fg2_att}`}</div>
         </button>
         <button
           onClick={() => onShotClick(player, "fg3")}
           disabled={disabled}
-          className="py-3 rounded-lg border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+          className={`${simpleMode ? 'py-4' : 'py-3'} rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors`}
         >
-          <div className="text-lg">3PT</div>
-          <div className="text-xs text-muted-foreground">{simpleMode ? player.fg3_made : `${player.fg3_made}/${stats.fg3_att}`}</div>
+          <div className={`${simpleMode ? 'text-xl' : 'text-lg'}`}>3PT</div>
+          <div className={`${simpleMode ? 'text-sm' : 'text-xs'} text-muted-foreground`}>{simpleMode ? player.fg3_made : `${player.fg3_made}/${stats.fg3_att}`}</div>
         </button>
       </div>
 
