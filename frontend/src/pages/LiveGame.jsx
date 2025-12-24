@@ -411,16 +411,21 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
 
       {/* Other stats - simplified or full */}
       {simpleMode ? (
-        <div className="grid grid-cols-2 gap-3 mt-2">
+        <div className="grid grid-cols-3 gap-3 mt-2">
           <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-            className="py-4 px-3 text-base bg-blue-100 hover:bg-blue-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-blue-200 hover:border-blue-400">
+            className="py-4 px-3 text-base bg-cyan-50 hover:bg-cyan-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-cyan-300 hover:border-cyan-500">
             <div className="text-2xl font-bold">{totalReb}</div>
             <div className="text-xs text-muted-foreground font-medium">REB</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-            className="py-4 px-3 text-base bg-slate-100 hover:bg-slate-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-slate-200 hover:border-slate-400">
+            className="py-4 px-3 text-base bg-purple-50 hover:bg-purple-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-purple-300 hover:border-purple-500">
             <div className="text-2xl font-bold">{player.assists}</div>
             <div className="text-xs text-muted-foreground font-medium">AST</div>
+          </button>
+          <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
+            className="py-4 px-3 text-base bg-red-50 hover:bg-red-100 text-red-600 rounded-xl disabled:opacity-50 transition-colors border-2 border-red-300 hover:border-red-500">
+            <div className="text-2xl font-bold">{player.fouls}</div>
+            <div className="text-xs text-muted-foreground font-medium">PF</div>
           </button>
         </div>
       ) : (
