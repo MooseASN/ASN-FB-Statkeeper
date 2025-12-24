@@ -579,6 +579,9 @@ class GameUpdate(BaseModel):
     home_bonus: Optional[str] = None
     away_bonus: Optional[str] = None
     play_by_play: Optional[List[dict]] = None
+    home_starters: Optional[List[str]] = None
+    away_starters: Optional[List[str]] = None
+    starters_selected: Optional[bool] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
