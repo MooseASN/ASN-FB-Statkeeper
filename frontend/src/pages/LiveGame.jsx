@@ -130,71 +130,71 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
         </div>
         
         {simpleMode ? (
-          /* Simple Mode - Two row layout for better spacing */
+          /* Simple Mode - Responsive layout for tablets/desktops */
           <div className="flex-1 flex flex-col gap-2">
             {/* Row 1: Player name with edit/delete and points */}
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-base">{player.player_name}</span>
+              <div className="flex items-center gap-1 sm:gap-2">
+                <span className="font-semibold text-sm sm:text-base truncate max-w-[120px] sm:max-w-none">{player.player_name}</span>
                 <button
                   onClick={() => onEditPlayer(player)}
-                  className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
+                  className="p-0.5 sm:p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
                   title="Edit player"
                 >
-                  <Pencil className="w-4 h-4" />
+                  <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
                 </button>
                 <button
                   onClick={() => onRemovePlayer(player)}
-                  className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                  className="p-0.5 sm:p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
                   title="Remove player"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
                 </button>
               </div>
-              <span className="text-lg font-bold">{pts} PTS</span>
+              <span className="text-base sm:text-lg font-bold">{pts} PTS</span>
             </div>
             
-            {/* Row 2: All stat buttons - uniform size and aligned */}
-            <div className="flex items-center gap-2 justify-between">
+            {/* Row 2: All stat buttons - responsive sizing */}
+            <div className="flex items-center gap-1 sm:gap-2 justify-between">
               <button
                 onClick={() => onShotClick(player, "fg2")}
                 disabled={disabled}
-                className="w-12 h-12 text-xs rounded-full border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-[10px] sm:text-xs rounded-full border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
               >
                 2PT
               </button>
               <button
                 onClick={() => onShotClick(player, "fg3")}
                 disabled={disabled}
-                className="w-12 h-12 text-xs rounded-full border-2 border-orange-300 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-[10px] sm:text-xs rounded-full border-2 border-orange-300 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
               >
                 3PT
               </button>
               <button
                 onClick={() => onShotClick(player, "ft")}
                 disabled={disabled}
-                className="w-12 h-12 text-xs rounded-full border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-[10px] sm:text-xs rounded-full border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
               >
                 FT
               </button>
               <button 
                 onClick={() => onStatUpdate(player.id, "dreb")} 
                 disabled={disabled}
-                className="w-12 h-12 text-xs rounded-full border-2 border-cyan-300 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-[10px] sm:text-xs rounded-full border-2 border-cyan-300 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors"
               >
                 REB
               </button>
               <button 
                 onClick={() => onStatUpdate(player.id, "assist")} 
                 disabled={disabled}
-                className="w-12 h-12 text-xs rounded-full border-2 border-purple-300 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-[10px] sm:text-xs rounded-full border-2 border-purple-300 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors"
               >
                 AST
               </button>
               <button 
                 onClick={() => onStatUpdate(player.id, "foul")} 
                 disabled={disabled}
-                className="w-12 h-12 text-xs rounded-full border-2 border-red-300 bg-red-50 hover:border-red-500 hover:bg-red-100 text-red-600 font-bold disabled:opacity-50 transition-colors"
+                className="w-10 h-10 sm:w-12 sm:h-12 text-[10px] sm:text-xs rounded-full border-2 border-red-300 bg-red-50 hover:border-red-500 hover:bg-red-100 text-red-600 font-bold disabled:opacity-50 transition-colors"
               >
                 PF
               </button>
