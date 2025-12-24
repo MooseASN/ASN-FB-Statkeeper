@@ -135,6 +135,16 @@ export default function AdvancedLiveGame() {
       setHomeStats(gameRes.data.home_player_stats || []);
       setAwayStats(gameRes.data.away_player_stats || []);
       setPlayByPlay((gameRes.data.play_by_play || []).slice().reverse());
+      
+      // Check if no players on floor - show starter dialog
+      const homeOnFloorCount = (gameRes.data.home_on_floor || []).length;
+      const awayOnFloorCount = (gameRes.data.away_on_floor || []).length;
+      if (homeOnFloorCount === 0 && awayOnFloorCount === 0 && 
+          gameRes.data.home_player_stats?.length > 0 && 
+          gameRes.data.away_player_stats?.length > 0 &&
+          !gameRes.data.starters_selected) {
+        setShowStarterDialog(true);
+      }
     } catch (error) {
       toast.error("Failed to load game");
       navigate("/");
