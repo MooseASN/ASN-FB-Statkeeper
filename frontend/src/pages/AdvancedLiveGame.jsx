@@ -1364,6 +1364,26 @@ export default function AdvancedLiveGame() {
               <RotateCcw className="w-4 h-4 mr-2" />
               Reset Team Fouls
             </Button>
+            
+            {/* Game Notes Section */}
+            <div className="border-t border-zinc-700 pt-4 mt-4">
+              <Label className="text-sm font-medium text-zinc-400 mb-2 block">Game Notes</Label>
+              <Textarea
+                value={game.note || ""}
+                onChange={async (e) => {
+                  const newNote = e.target.value;
+                  try {
+                    await axios.put(`${API}/games/${id}`, { note: newNote });
+                    setGame(prev => ({ ...prev, note: newNote }));
+                  } catch (error) {
+                    console.error("Failed to save note:", error);
+                  }
+                }}
+                placeholder="Add game notes here..."
+                className="bg-zinc-800 border-zinc-700 text-white min-h-[80px] resize-none"
+              />
+              <p className="text-xs text-zinc-500 mt-1">Notes auto-save as you type</p>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
