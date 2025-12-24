@@ -2842,6 +2842,10 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+@app.get("/api/health")
+async def api_health_check():
+    return {"status": "healthy", "service": "statmoose-api"}
+
 app.include_router(api_router)
 
 # Dynamic CORS handling for credentials
