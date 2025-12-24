@@ -514,6 +514,28 @@ export default function LiveGame() {
     return () => clearInterval(interval);
   }, [fetchGame]);
 
+  // Clock control functions - use useCallback for stable references (must be defined before useEffect that uses them)
+  const handleStartClock = useCallback(async () => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/start`);
+      setClockRunning(true);
+    } catch (error) {
+      toast.error("Failed to start clock");
+    }
+  }, [id]);
+
+  const handleStopClock = useCallback(async () => {
+    try {
+      await axios.post(`${API}/games/${id}/clock/stop`);
+      setClockRunning(false);
+      // Save current clock time
+      await axios.post(`${API}/games/${id}/clock/set`, { time: clockTime });
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to stop clock");
+    }
+  }, [id, clockTime, fetchGame]);
+
   // Backslash keyboard handler for clock toggle
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -567,29 +589,7 @@ export default function LiveGame() {
         clearInterval(clockIntervalRef.current);
       }
     };
-  }, [clockRunning, game?.clock_enabled]);
-
-  // Clock control functions - use useCallback for stable references
-  const handleStartClock = useCallback(async () => {
-    try {
-      await axios.post(`${API}/games/${id}/clock/start`);
-      setClockRunning(true);
-    } catch (error) {
-      toast.error("Failed to start clock");
-    }
-  }, [id]);
-
-  const handleStopClock = useCallback(async () => {
-    try {
-      await axios.post(`${API}/games/${id}/clock/stop`);
-      setClockRunning(false);
-      // Save current clock time
-      await axios.post(`${API}/games/${id}/clock/set`, { time: clockTime });
-      fetchGame();
-    } catch (error) {
-      toast.error("Failed to stop clock");
-    }
-  }, [id, clockTime, fetchGame]);
+  }, [clockRunning, game?.clock_enabled, handleStopClock]);
 
   const handleAdjustClock = async (seconds) => {
     const newTime = Math.max(0, clockTime + seconds);
