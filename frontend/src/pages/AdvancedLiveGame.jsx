@@ -536,11 +536,11 @@ export default function AdvancedLiveGame() {
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
                 <span className="font-bold">{game.home_team_name}</span>
-                <span className="text-2xl font-bold" style={{ color: homeColor }}>{homeTotals.pts}</span>
+                <span className="text-2xl font-bold text-white">{homeTotals.pts}</span>
               </div>
               <span className="text-zinc-500">-</span>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-bold" style={{ color: awayColor }}>{awayTotals.pts}</span>
+                <span className="text-2xl font-bold text-white">{awayTotals.pts}</span>
                 <span className="font-bold">{game.away_team_name}</span>
                 <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }}></div>
               </div>
