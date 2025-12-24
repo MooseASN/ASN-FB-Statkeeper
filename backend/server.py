@@ -1673,6 +1673,48 @@ async def get_event_public(event_id: str):
         "games": games
     }
 
+@api_router.get("/events/{event_id}/current-game")
+async def get_event_current_game(event_id: str):
+    """Get the current/most relevant game for an event.
+    Priority: 1) Active game, 2) Next upcoming scheduled game, 3) Most recent final game
+    """
+    event = await db.events.find_one({"id": event_id}, {"_id": 0})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    # Get all games for this event
+    games = []
+    for game_id in event.get("game_ids", []):
+        game = await db.games.find_one({"id": game_id}, {"_id": 0})
+        if game:
+            games.append(game)
+    
+    if not games:
+        raise HTTPException(status_code=404, detail="No games in this event")
+    
+    # 1. Check for active games first
+    active_games = [g for g in games if g.get("status") == "active"]
+    if active_games:
+        # Return the first active game (could sort by start time if multiple)
+        return {"share_code": active_games[0].get("share_code"), "game_id": active_games[0].get("id")}
+    
+    # 2. Check for upcoming scheduled games (sorted by date/time)
+    scheduled_games = [g for g in games if g.get("status") == "scheduled"]
+    if scheduled_games:
+        # Sort by date and time to get the next upcoming game
+        scheduled_games.sort(key=lambda g: (g.get("scheduled_date") or "9999-12-31", g.get("scheduled_time") or "23:59"))
+        return {"share_code": scheduled_games[0].get("share_code"), "game_id": scheduled_games[0].get("id")}
+    
+    # 3. Show the most recent final game (sorted by date/time descending)
+    final_games = [g for g in games if g.get("status") == "final"]
+    if final_games:
+        # Sort by date and time descending to get most recent
+        final_games.sort(key=lambda g: (g.get("scheduled_date") or "0000-01-01", g.get("scheduled_time") or "00:00"), reverse=True)
+        return {"share_code": final_games[0].get("share_code"), "game_id": final_games[0].get("id")}
+    
+    # Fallback: return the first game
+    return {"share_code": games[0].get("share_code"), "game_id": games[0].get("id")}
+
 @api_router.post("/events")
 async def create_event(event_data: EventCreate, user: User = Depends(get_current_user)):
     """Create a new event"""
