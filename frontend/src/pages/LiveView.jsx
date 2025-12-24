@@ -873,7 +873,7 @@ export default function LiveView() {
                     </span>
                   ) : g.status === "scheduled" ? (
                     <span className="text-blue-300 text-xs">
-                      {g.scheduled_time || 'TBD'}
+                      {formatScheduledTime(g.scheduled_time)}
                     </span>
                   ) : (
                     <span className="text-white/50 text-xs">FINAL</span>
@@ -923,7 +923,7 @@ export default function LiveView() {
                     </span>
                   ) : g.status === "scheduled" ? (
                     <span className="text-blue-300 text-xs">
-                      {g.scheduled_time || 'TBD'}
+                      {formatScheduledTime(g.scheduled_time)}
                     </span>
                   ) : (
                     <span className="text-white/50 text-xs">FINAL</span>
