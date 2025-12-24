@@ -713,9 +713,9 @@ export default function AdvancedLiveGame() {
       </div>
 
       {/* Main Content */}
-      <div className="flex">
-        {/* Left Panel - Play by Play / Summary / Leaders */}
-        <div className="w-64 bg-zinc-900 border-r border-zinc-800 h-[calc(100vh-120px)]">
+      <div className="flex flex-col md:flex-row">
+        {/* Left Panel - Play by Play / Summary / Leaders - hidden on small screens */}
+        <div className="hidden md:block w-56 lg:w-64 bg-zinc-900 border-r border-zinc-800 h-[calc(100vh-120px)]">
           <div className="flex border-b border-zinc-800">
             <button
               onClick={() => setLeftPanel("plays")}
