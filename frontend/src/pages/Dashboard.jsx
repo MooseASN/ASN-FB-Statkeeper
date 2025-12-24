@@ -358,6 +358,15 @@ export default function Dashboard({ user, onLogout }) {
                         </Button>
                         <Button
                           size="sm"
+                          variant="outline"
+                          onClick={() => navigate(`/edit-game/${game.id}`)}
+                          data-testid={`edit-scheduled-${game.id}`}
+                        >
+                          <Pencil className="w-4 h-4 mr-1" />
+                          Edit
+                        </Button>
+                        <Button
+                          size="sm"
                           className="bg-green-600 hover:bg-green-700"
                           onClick={(e) => handleStartScheduledGame(game.id, e)}
                           disabled={startingGameId === game.id}
