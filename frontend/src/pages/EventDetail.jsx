@@ -277,7 +277,20 @@ export default function EventDetail({ user, onLogout }) {
             </Card>
           ) : (
             <div className="space-y-3">
-              {event.games.map(game => (
+              {[...event.games]
+                .sort((a, b) => {
+                  // Sort by date first, then by time
+                  const dateA = a.scheduled_date || '9999-12-31';
+                  const dateB = b.scheduled_date || '9999-12-31';
+                  if (dateA !== dateB) {
+                    return dateA.localeCompare(dateB);
+                  }
+                  // If same date, sort by time
+                  const timeA = a.scheduled_time || '23:59';
+                  const timeB = b.scheduled_time || '23:59';
+                  return timeA.localeCompare(timeB);
+                })
+                .map(game => (
                 <Card key={game.id} data-testid={`event-game-${game.id}`}>
                   <CardContent className="py-4">
                     <div className="flex items-center justify-between">
