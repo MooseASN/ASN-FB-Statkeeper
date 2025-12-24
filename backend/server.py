@@ -1079,16 +1079,24 @@ async def update_game(game_id: str, update: GameUpdate, user: User = Depends(get
     
     # If team IDs are being updated, also update team names and colors
     if update.home_team_id:
-        home_team = await db.teams.find_one({"id": update.home_team_id}, {"_id": 0})
-        if home_team:
-            update_data["home_team_name"] = home_team["name"]
-            update_data["home_team_color"] = home_team.get("color", "#000000")
+        if update.home_team_id == "TBD":
+            update_data["home_team_name"] = "TBD"
+            update_data["home_team_color"] = "#666666"
+        else:
+            home_team = await db.teams.find_one({"id": update.home_team_id}, {"_id": 0})
+            if home_team:
+                update_data["home_team_name"] = home_team["name"]
+                update_data["home_team_color"] = home_team.get("color", "#000000")
     
     if update.away_team_id:
-        away_team = await db.teams.find_one({"id": update.away_team_id}, {"_id": 0})
-        if away_team:
-            update_data["away_team_name"] = away_team["name"]
-            update_data["away_team_color"] = away_team.get("color", "#FF6B00")
+        if update.away_team_id == "TBD":
+            update_data["away_team_name"] = "TBD"
+            update_data["away_team_color"] = "#666666"
+        else:
+            away_team = await db.teams.find_one({"id": update.away_team_id}, {"_id": 0})
+            if away_team:
+                update_data["away_team_name"] = away_team["name"]
+                update_data["away_team_color"] = away_team.get("color", "#FF6B00")
     
     await db.games.update_one({"id": game_id, "user_id": user.user_id}, {"$set": update_data})
     updated = await db.games.find_one({"id": game_id}, {"_id": 0})
