@@ -2122,6 +2122,113 @@ export default function AdvancedLiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Starter Selection Dialog */}
+      <Dialog open={showStarterDialog} onOpenChange={setShowStarterDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Select Starting Lineups</DialogTitle>
+          </DialogHeader>
+          <p className="text-zinc-400 text-sm">Select 5 starters for each team. Click to toggle selection.</p>
+          <div className="grid grid-cols-2 gap-6 mt-4">
+            {/* Home Team */}
+            <div className="bg-zinc-800 rounded-lg p-4">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }}></div>
+                {game?.home_team_name} ({homeStarters.length}/5)
+              </h3>
+              <ScrollArea className="h-[300px]">
+                <div className="space-y-1">
+                  {homeStats.map(player => (
+                    <button
+                      key={player.id}
+                      onClick={() => {
+                        if (homeStarters.includes(player.id)) {
+                          setHomeStarters(homeStarters.filter(id => id !== player.id));
+                        } else if (homeStarters.length < 5) {
+                          setHomeStarters([...homeStarters, player.id]);
+                        }
+                      }}
+                      className={`w-full flex items-center justify-between text-sm py-2 px-3 rounded transition-colors ${
+                        homeStarters.includes(player.id) 
+                          ? 'bg-green-600 text-white' 
+                          : 'hover:bg-zinc-700'
+                      }`}
+                    >
+                      <span>#{player.player_number} {player.player_name}</span>
+                      {homeStarters.includes(player.id) && <span>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+            
+            {/* Away Team */}
+            <div className="bg-zinc-800 rounded-lg p-4">
+              <h3 className="font-bold mb-3 flex items-center gap-2">
+                <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }}></div>
+                {game?.away_team_name} ({awayStarters.length}/5)
+              </h3>
+              <ScrollArea className="h-[300px]">
+                <div className="space-y-1">
+                  {awayStats.map(player => (
+                    <button
+                      key={player.id}
+                      onClick={() => {
+                        if (awayStarters.includes(player.id)) {
+                          setAwayStarters(awayStarters.filter(id => id !== player.id));
+                        } else if (awayStarters.length < 5) {
+                          setAwayStarters([...awayStarters, player.id]);
+                        }
+                      }}
+                      className={`w-full flex items-center justify-between text-sm py-2 px-3 rounded transition-colors ${
+                        awayStarters.includes(player.id) 
+                          ? 'bg-green-600 text-white' 
+                          : 'hover:bg-zinc-700'
+                      }`}
+                    >
+                      <span>#{player.player_number} {player.player_name}</span>
+                      {awayStarters.includes(player.id) && <span>✓</span>}
+                    </button>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowStarterDialog(false)}
+              className="border-zinc-700"
+            >
+              Skip
+            </Button>
+            <Button
+              onClick={async () => {
+                try {
+                  // Update game with selected starters on floor
+                  await axios.put(`${API}/games/${id}`, {
+                    home_on_floor: homeStarters,
+                    away_on_floor: awayStarters,
+                    home_starters: homeStarters,
+                    away_starters: awayStarters,
+                    starters_selected: true
+                  });
+                  toast.success("Starters selected!");
+                  setShowStarterDialog(false);
+                  fetchGame();
+                } catch (error) {
+                  toast.error("Failed to set starters");
+                }
+              }}
+              disabled={homeStarters.length !== 5 || awayStarters.length !== 5}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Confirm Starters ({homeStarters.length + awayStarters.length}/10)
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
