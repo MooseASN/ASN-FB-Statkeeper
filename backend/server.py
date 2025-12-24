@@ -942,7 +942,8 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         video_url=game_data.video_url,
         simple_mode=game_data.simple_mode,
         advanced_mode=game_data.advanced_mode,
-        possession="home"  # Default possession to home team
+        possession="home",  # Default possession to home team
+        note=game_data.note  # Game note/description
     )
     game.user_id = user.user_id
     
