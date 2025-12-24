@@ -638,7 +638,7 @@ async def get_team(team_id: str, user: User = Depends(get_current_user)):
 
 @api_router.put("/teams/{team_id}", response_model=Team)
 async def update_team(team_id: str, team_data: TeamCreate, user: User = Depends(get_current_user)):
-    existing = await db.teams.find_one({"id": team_id, "user_id": user.user_id}, {"_id": 0})
+    existing = await db.teams.find_one({"id": team_id, "user_id": user.user_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Team not found")
     
@@ -657,7 +657,7 @@ async def delete_team(team_id: str, user: User = Depends(get_current_user)):
 
 @api_router.post("/teams/{team_id}/roster/csv")
 async def upload_roster_csv(team_id: str, file: UploadFile = File(...), user: User = Depends(get_current_user)):
-    team = await db.teams.find_one({"id": team_id, "user_id": user.user_id}, {"_id": 0})
+    team = await db.teams.find_one({"id": team_id, "user_id": user.user_id})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     
@@ -683,7 +683,7 @@ class MaxPrepsImportRequest(BaseModel):
 @api_router.post("/teams/{team_id}/roster/maxpreps")
 async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, user: User = Depends(get_current_user)):
     """Import roster from any athletic website roster URL (MaxPreps, PrestoSports, Sidearm, etc.). Only extracts player number and name."""
-    team = await db.teams.find_one({"id": team_id, "user_id": user.user_id}, {"_id": 0})
+    team = await db.teams.find_one({"id": team_id, "user_id": user.user_id})
     if not team:
         raise HTTPException(status_code=404, detail="Team not found")
     
@@ -941,7 +941,7 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
 @api_router.post("/games/{game_id}/start")
 async def start_game(game_id: str, user: User = Depends(get_current_user)):
     """Start a scheduled game"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1021,7 +1021,7 @@ async def get_latest_active_game(user_id: str):
 
 @api_router.put("/games/{game_id}", response_model=Game)
 async def update_game(game_id: str, update: GameUpdate, user: User = Depends(get_current_user)):
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1035,7 +1035,7 @@ async def update_game(game_id: str, update: GameUpdate, user: User = Depends(get
 @api_router.delete("/games/{game_id}")
 async def delete_game(game_id: str, user: User = Depends(get_current_user)):
     """Delete a game and all its associated player stats"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1053,7 +1053,7 @@ async def delete_game(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/continue")
 async def continue_game(game_id: str, user: User = Depends(get_current_user)):
     """Continue a completed game - sets status back to active"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1074,7 +1074,7 @@ async def continue_game(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/reset-stats")
 async def reset_game_stats(game_id: str, user: User = Depends(get_current_user)):
     """Reset all player stats to 0 for a game"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1130,7 +1130,7 @@ class ClockUpdate(BaseModel):
 @api_router.post("/games/{game_id}/clock/start")
 async def start_clock(game_id: str, user: User = Depends(get_current_user)):
     """Start the game clock"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1159,7 +1159,7 @@ async def start_clock(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/clock/stop")
 async def stop_clock(game_id: str, user: User = Depends(get_current_user)):
     """Stop the game clock and calculate elapsed minutes for players on floor"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1195,7 +1195,7 @@ async def stop_clock(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/clock/set")
 async def set_clock(game_id: str, clock_data: ClockUpdate, user: User = Depends(get_current_user)):
     """Set the game clock time"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1211,7 +1211,7 @@ async def set_clock(game_id: str, clock_data: ClockUpdate, user: User = Depends(
 @api_router.post("/games/{game_id}/clock/tick")
 async def tick_clock(game_id: str, user: User = Depends(get_current_user)):
     """Decrement the game clock by 1 second"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1232,7 +1232,7 @@ async def tick_clock(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/clock/next-period")
 async def next_period(game_id: str, user: User = Depends(get_current_user)):
     """Advance to next period and reset clock"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1270,7 +1270,7 @@ async def next_period(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/clock/halftime")
 async def go_to_halftime(game_id: str, user: User = Depends(get_current_user)):
     """Set game to halftime"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1292,7 +1292,7 @@ async def go_to_halftime(game_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/games/{game_id}/clock/exit-halftime")
 async def exit_halftime(game_id: str, next_quarter: int, user: User = Depends(get_current_user)):
     """Exit halftime and move to specified quarter"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1315,7 +1315,7 @@ class TimeoutRequest(BaseModel):
 @api_router.post("/games/{game_id}/timeout")
 async def use_timeout(game_id: str, timeout_data: TimeoutRequest, user: User = Depends(get_current_user)):
     """Use a timeout for a team"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1380,11 +1380,11 @@ async def use_timeout(game_id: str, timeout_data: TimeoutRequest, user: User = D
 @api_router.post("/games/{game_id}/players/{player_id}/check-in")
 async def player_check_in(game_id: str, player_id: str, user: User = Depends(get_current_user)):
     """Check a player into the game (put them on the floor)"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
-    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id}, {"_id": 0})
+    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
     if not player_stat:
         raise HTTPException(status_code=404, detail="Player not found")
     
@@ -1424,11 +1424,11 @@ async def player_check_in(game_id: str, player_id: str, user: User = Depends(get
 @api_router.post("/games/{game_id}/players/{player_id}/check-out")
 async def player_check_out(game_id: str, player_id: str, user: User = Depends(get_current_user)):
     """Check a player out of the game (take them off the floor)"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
-    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id}, {"_id": 0})
+    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
     if not player_stat:
         raise HTTPException(status_code=404, detail="Player not found")
     
@@ -1469,7 +1469,7 @@ class GameNoteUpdate(BaseModel):
 @api_router.put("/games/{game_id}/note")
 async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User = Depends(get_current_user)):
     """Update the game note"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1616,7 +1616,7 @@ async def create_event(event_data: EventCreate, user: User = Depends(get_current
 @api_router.put("/events/{event_id}")
 async def update_event(event_id: str, event_data: EventCreate, user: User = Depends(get_current_user)):
     """Update an event"""
-    event = await db.events.find_one({"id": event_id, "user_id": user.user_id}, {"_id": 0})
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
@@ -1638,7 +1638,7 @@ async def update_event(event_id: str, event_data: EventCreate, user: User = Depe
 @api_router.delete("/events/{event_id}")
 async def delete_event(event_id: str, user: User = Depends(get_current_user)):
     """Delete an event (does not delete the games, just removes them from event)"""
-    event = await db.events.find_one({"id": event_id, "user_id": user.user_id}, {"_id": 0})
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
@@ -1655,11 +1655,11 @@ async def delete_event(event_id: str, user: User = Depends(get_current_user)):
 @api_router.post("/events/{event_id}/games/{game_id}")
 async def add_game_to_event(event_id: str, game_id: str, user: User = Depends(get_current_user)):
     """Add a game to an event"""
-    event = await db.events.find_one({"id": event_id, "user_id": user.user_id}, {"_id": 0})
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1681,7 +1681,7 @@ async def add_game_to_event(event_id: str, game_id: str, user: User = Depends(ge
 @api_router.delete("/events/{event_id}/games/{game_id}")
 async def remove_game_from_event(event_id: str, game_id: str, user: User = Depends(get_current_user)):
     """Remove a game from an event (does not delete the game)"""
-    event = await db.events.find_one({"id": event_id, "user_id": user.user_id}, {"_id": 0})
+    event = await db.events.find_one({"id": event_id, "user_id": user.user_id})
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
@@ -1707,7 +1707,7 @@ class BonusUpdate(BaseModel):
 @api_router.post("/games/{game_id}/bonus")
 async def update_bonus(game_id: str, bonus_data: BonusUpdate, user: User = Depends(get_current_user)):
     """Update bonus status for a team"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1728,7 +1728,7 @@ class PossessionUpdate(BaseModel):
 @api_router.post("/games/{game_id}/possession")
 async def update_possession(game_id: str, data: PossessionUpdate, user: User = Depends(get_current_user)):
     """Update possession for advanced mode"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -1818,11 +1818,11 @@ class PlayerUpdate(BaseModel):
 @api_router.put("/games/{game_id}/players/{player_id}")
 async def update_player(game_id: str, player_id: str, update: PlayerUpdate, user: User = Depends(get_current_user)):
     """Update a player's number or name"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
-    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id}, {"_id": 0})
+    player_stat = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
     if not player_stat:
         raise HTTPException(status_code=404, detail="Player not found")
     
@@ -1843,11 +1843,11 @@ async def update_player(game_id: str, player_id: str, update: PlayerUpdate, user
 
 @api_router.post("/games/{game_id}/stats")
 async def record_stat(game_id: str, stat: StatUpdate, user: User = Depends(get_current_user)):
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
-    player_stat = await db.player_stats.find_one({"id": stat.player_id}, {"_id": 0})
+    player_stat = await db.player_stats.find_one({"id": stat.player_id})
     if not player_stat:
         raise HTTPException(status_code=404, detail="Player stats not found")
     
@@ -1995,7 +1995,7 @@ async def record_stat(game_id: str, stat: StatUpdate, user: User = Depends(get_c
 
 @api_router.post("/games/{game_id}/players")
 async def add_player_to_game(game_id: str, request: AddPlayerRequest, user: User = Depends(get_current_user)):
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -2015,11 +2015,11 @@ async def add_player_to_game(game_id: str, request: AddPlayerRequest, user: User
 @api_router.delete("/games/{game_id}/players/{player_id}")
 async def remove_player_from_game(game_id: str, player_id: str, user: User = Depends(get_current_user)):
     """Remove a player from a game"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
-    player = await db.player_stats.find_one({"id": player_id, "game_id": game_id}, {"_id": 0})
+    player = await db.player_stats.find_one({"id": player_id, "game_id": game_id})
     if not player:
         raise HTTPException(status_code=404, detail="Player not found")
     
@@ -2049,7 +2049,7 @@ class PlayByPlayUpdate(BaseModel):
 @api_router.delete("/games/{game_id}/play-by-play/{play_id}")
 async def delete_play_by_play_entry(game_id: str, play_id: str, user: User = Depends(get_current_user)):
     """Delete a play-by-play entry and reverse the stats"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -2079,7 +2079,7 @@ async def delete_play_by_play_entry(game_id: str, play_id: str, user: User = Dep
     
     # Find player stats by matching player_number and player_name
     team_id = game["home_team_id"] if team == "home" else game["away_team_id"]
-    player_stat = await db.player_stats.find_one(, {"_id": 0}{
+    player_stat = await db.player_stats.find_one({
         "game_id": game_id,
         "team_id": team_id,
         "player_number": player_number,
@@ -2144,7 +2144,7 @@ async def delete_play_by_play_entry(game_id: str, play_id: str, user: User = Dep
 @api_router.put("/games/{game_id}/play-by-play/{play_id}")
 async def update_play_by_play_entry(game_id: str, play_id: str, update: PlayByPlayUpdate, user: User = Depends(get_current_user)):
     """Update a play-by-play entry (change player or action)"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
@@ -2171,14 +2171,14 @@ async def update_play_by_play_entry(game_id: str, play_id: str, update: PlayByPl
     team_id = game["home_team_id"] if team == "home" else game["away_team_id"]
     
     # Get old and new player stats
-    old_player = await db.player_stats.find_one(, {"_id": 0}{
+    old_player = await db.player_stats.find_one({
         "game_id": game_id,
         "team_id": team_id,
         "player_number": old_player_number,
         "player_name": old_player_name
     })
     
-    new_player = await db.player_stats.find_one({"id": update.player_id, "game_id": game_id}, {"_id": 0})
+    new_player = await db.player_stats.find_one({"id": update.player_id, "game_id": game_id})
     
     # Stat field mappings
     action_to_field = {
@@ -2264,7 +2264,7 @@ class TeamStatUpdate(BaseModel):
 @api_router.post("/games/{game_id}/team-stats")
 async def record_team_stat(game_id: str, stat: TeamStatUpdate, user: User = Depends(get_current_user)):
     """Record a team stat (rebound or turnover) without affecting individual player stats"""
-    game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
+    game = await db.games.find_one({"id": game_id, "user_id": user.user_id})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
