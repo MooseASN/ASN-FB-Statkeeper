@@ -199,7 +199,18 @@ export default function LiveView() {
         try {
           const eventRes = await axios.get(`${API}/events/${res.data.event_id}/public`);
           setEventInfo(eventRes.data);
-          setEventGames(eventRes.data.games || []);
+          // Sort games by date and time (earliest first)
+          const sortedGames = (eventRes.data.games || []).sort((a, b) => {
+            const dateA = a.scheduled_date || '9999-12-31';
+            const dateB = b.scheduled_date || '9999-12-31';
+            if (dateA !== dateB) {
+              return dateA.localeCompare(dateB);
+            }
+            const timeA = a.scheduled_time || '23:59';
+            const timeB = b.scheduled_time || '23:59';
+            return timeA.localeCompare(timeB);
+          });
+          setEventGames(sortedGames);
         } catch (eventErr) {
           console.error("Error fetching event:", eventErr);
         }
