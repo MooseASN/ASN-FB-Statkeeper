@@ -892,11 +892,19 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
 
 @api_router.post("/games", response_model=Game)
 async def create_game(game_data: GameCreate, user: User = Depends(get_current_user)):
-    home_team = await db.teams.find_one({"id": game_data.home_team_id, "user_id": user.user_id}, {"_id": 0})
-    away_team = await db.teams.find_one({"id": game_data.away_team_id, "user_id": user.user_id}, {"_id": 0})
+    # Handle TBD teams
+    home_team = None
+    away_team = None
     
-    if not home_team or not away_team:
-        raise HTTPException(status_code=404, detail="Team not found")
+    if game_data.home_team_id != "TBD":
+        home_team = await db.teams.find_one({"id": game_data.home_team_id, "user_id": user.user_id}, {"_id": 0})
+        if not home_team:
+            raise HTTPException(status_code=404, detail="Home team not found")
+    
+    if game_data.away_team_id != "TBD":
+        away_team = await db.teams.find_one({"id": game_data.away_team_id, "user_id": user.user_id}, {"_id": 0})
+        if not away_team:
+            raise HTTPException(status_code=404, detail="Away team not found")
     
     # Determine initial status
     initial_status = "active" if game_data.start_immediately else "scheduled"
@@ -912,12 +920,12 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     game = Game(
         home_team_id=game_data.home_team_id,
         away_team_id=game_data.away_team_id,
-        home_team_name=home_team["name"],
-        away_team_name=away_team["name"],
-        home_team_logo=home_team.get("logo_url"),
-        away_team_logo=away_team.get("logo_url"),
-        home_team_color=home_team.get("color", "#dc2626"),
-        away_team_color=away_team.get("color", "#7c3aed"),
+        home_team_name=home_team["name"] if home_team else "TBD",
+        away_team_name=away_team["name"] if away_team else "TBD",
+        home_team_logo=home_team.get("logo_url") if home_team else None,
+        away_team_logo=away_team.get("logo_url") if away_team else None,
+        home_team_color=home_team.get("color", "#dc2626") if home_team else "#666666",
+        away_team_color=away_team.get("color", "#7c3aed") if away_team else "#666666",
         status=initial_status,
         scheduled_date=game_data.scheduled_date,
         scheduled_time=game_data.scheduled_time,
@@ -939,24 +947,26 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     doc = game.model_dump()
     await db.games.insert_one(doc)
     
-    # Create player stats for all roster players
-    for player in home_team.get("roster", []):
-        stats = PlayerStats(
-            game_id=game.id,
-            team_id=game_data.home_team_id,
-            player_number=player["number"],
-            player_name=player["name"]
-        )
-        await db.player_stats.insert_one(stats.model_dump())
+    # Create player stats for roster players (only if teams are not TBD)
+    if home_team:
+        for player in home_team.get("roster", []):
+            stats = PlayerStats(
+                game_id=game.id,
+                team_id=game_data.home_team_id,
+                player_number=player["number"],
+                player_name=player["name"]
+            )
+            await db.player_stats.insert_one(stats.model_dump())
     
-    for player in away_team.get("roster", []):
-        stats = PlayerStats(
-            game_id=game.id,
-            team_id=game_data.away_team_id,
-            player_number=player["number"],
-            player_name=player["name"]
-        )
-        await db.player_stats.insert_one(stats.model_dump())
+    if away_team:
+        for player in away_team.get("roster", []):
+            stats = PlayerStats(
+                game_id=game.id,
+                team_id=game_data.away_team_id,
+                player_number=player["number"],
+                player_name=player["name"]
+            )
+            await db.player_stats.insert_one(stats.model_dump())
     
     return game
 
