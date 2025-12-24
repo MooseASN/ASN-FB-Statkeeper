@@ -945,9 +945,14 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     
     return game
 
+class StartGameRequest(BaseModel):
+    simple_mode: bool = False
+    advanced_mode: bool = False
+    clock_enabled: bool = False
+
 @api_router.post("/games/{game_id}/start")
-async def start_game(game_id: str, user: User = Depends(get_current_user)):
-    """Start a scheduled game"""
+async def start_game(game_id: str, request: StartGameRequest = None, user: User = Depends(get_current_user)):
+    """Start a scheduled game with optional mode selection"""
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
@@ -955,9 +960,21 @@ async def start_game(game_id: str, user: User = Depends(get_current_user)):
     if game["status"] != "scheduled":
         raise HTTPException(status_code=400, detail="Game is not in scheduled status")
     
+    # Build update with mode settings if provided
+    update_data = {
+        "status": "active", 
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    if request:
+        update_data["simple_mode"] = request.simple_mode
+        update_data["advanced_mode"] = request.advanced_mode
+        if request.clock_enabled:
+            update_data["clock_enabled"] = True
+    
     await db.games.update_one(
         {"id": game_id, "user_id": user.user_id},
-        {"$set": {"status": "active", "updated_at": datetime.now(timezone.utc).isoformat()}}
+        {"$set": update_data}
     )
     
     updated = await db.games.find_one({"id": game_id}, {"_id": 0})
