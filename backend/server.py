@@ -745,7 +745,11 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
             return ""
         # Remove extra whitespace, newlines, tabs and normalize
         cleaned = ' '.join(name_text.split())
-        return cleaned.strip()
+        cleaned = cleaned.strip()
+        # Remove leading jersey numbers that got included in name (e.g., "0 Cade Orness" -> "Cade Orness")
+        import re as re_inner
+        cleaned = re_inner.sub(r'^\d{1,3}\s+', '', cleaned)
+        return cleaned
     
     # PrestoSports/Sidearm specific selectors (common on college athletic sites)
     # These platforms use specific class patterns
