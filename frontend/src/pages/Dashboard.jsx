@@ -225,7 +225,13 @@ export default function Dashboard({ user, onLogout }) {
     }
     
     if (timeStr) {
-      return `${dateText} at ${timeStr}`;
+      // Convert 24-hour time to 12-hour format
+      const [hours, minutes] = timeStr.split(':');
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12;
+      const formattedTime = `${hour12}:${minutes} ${ampm}`;
+      return `${dateText} at ${formattedTime}`;
     }
     return dateText;
   };
