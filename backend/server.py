@@ -532,6 +532,10 @@ class Game(BaseModel):
     # On-floor players (player_ids)
     home_on_floor: List[str] = []
     away_on_floor: List[str] = []
+    # Starters (player_ids) - marked with * on box score
+    home_starters: List[str] = []
+    away_starters: List[str] = []
+    starters_selected: bool = False
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
