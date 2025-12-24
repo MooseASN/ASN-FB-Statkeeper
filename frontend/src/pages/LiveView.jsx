@@ -177,64 +177,6 @@ export default function LiveView() {
   // Primetime video ref
   const videoContainerRef = useRef(null);
 
-  // Handle scroll for PiP toggle
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!game?.primetime_enabled || !game?.video_url) return;
-      
-      const videoContainer = videoContainerRef.current;
-      if (!videoContainer) return;
-      
-      const rect = videoContainer.getBoundingClientRect();
-      // Enter PiP when video container scrolls out of view (bottom < 100px from top of viewport)
-      // Exit PiP when video container is back in view (top > -50px, meaning it's visible)
-      const shouldEnterPiP = rect.bottom < 100;
-      const shouldExitPiP = rect.top > -50;
-      
-      if (shouldEnterPiP && !isPiP) {
-        setIsPiP(true);
-      } else if (shouldExitPiP && isPiP) {
-        setIsPiP(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [game?.primetime_enabled, game?.video_url, isPiP]);
-
-  // Handle PiP dragging
-  const handleMouseDown = (e) => {
-    if (!pipRef.current) return;
-    setIsDragging(true);
-    const rect = pipRef.current.getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top
-    });
-  };
-
-  const handleMouseMove = useCallback((e) => {
-    if (!isDragging) return;
-    const newX = e.clientX - dragOffset.x;
-    const newY = e.clientY - dragOffset.y;
-    setPipPosition({ x: newX, y: newY });
-  }, [isDragging, dragOffset]);
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
-
-  useEffect(() => {
-    if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
-      window.addEventListener('mouseup', handleMouseUp);
-    }
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, handleMouseMove]);
-
   const fetchGame = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/games/share/${shareCode}`);
