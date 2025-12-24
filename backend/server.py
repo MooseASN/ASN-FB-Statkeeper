@@ -1572,6 +1572,9 @@ async def get_event(event_id: str, user: User = Depends(get_current_user)):
         if game:
             games.append(game)
     
+    # Sort games by date and time (earliest first)
+    games.sort(key=lambda g: (g.get("scheduled_date") or "9999-12-31", g.get("scheduled_time") or "23:59"))
+    
     return {**event, "games": games}
 
 @api_router.get("/events/{event_id}/public")
