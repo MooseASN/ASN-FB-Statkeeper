@@ -1014,7 +1014,10 @@ export default function AdvancedLiveGame() {
                     <tbody>
                       {awayOnFloor.map(p => (
                         <tr key={p.id} className="border-b border-zinc-800/50">
-                          <td className="py-1 font-bold">{p.player_number}</td>
+                          <td className="py-1 font-bold">
+                            {p.player_number}
+                            {(game?.away_starters || []).includes(p.id) && <span className="text-yellow-400 ml-0.5">*</span>}
+                          </td>
                           <td className="py-1 truncate max-w-[80px]">{p.player_name}</td>
                           <td className="py-1 text-center">{p.fg2_made + p.fg3_made}-{p.fg2_made + p.fg2_missed + p.fg3_made + p.fg3_missed}</td>
                           <td className="py-1 text-center">{p.fg3_made}-{p.fg3_made + p.fg3_missed}</td>
