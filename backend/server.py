@@ -1658,6 +1658,9 @@ async def get_event_public(event_id: str):
                 "recap": recap
             })
     
+    # Sort games by date and time (earliest first)
+    games.sort(key=lambda g: (g.get("scheduled_date") or "9999-12-31", g.get("scheduled_time") or "23:59"))
+    
     return {
         "id": event["id"],
         "name": event["name"],
