@@ -602,6 +602,7 @@ class GameUpdate(BaseModel):
     custom_timeouts: Optional[int] = None
     primetime_enabled: Optional[bool] = None
     video_url: Optional[str] = None
+    note: Optional[str] = None  # Game note/description
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
