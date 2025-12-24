@@ -1454,7 +1454,7 @@ export default function LiveGame() {
           </div>
 
           {/* Middle Column - Scoreboard & Stats */}
-          <div className="order-3 lg:order-2">
+          <div className="order-3 md:order-2">
             {/* Scoreboard */}
             <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
               <div className="flex items-center justify-between mb-4">
