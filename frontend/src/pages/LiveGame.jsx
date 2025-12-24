@@ -220,7 +220,7 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
           </>
         )}
         <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-red-100 hover:bg-red-200 text-red-600 rounded disabled:opacity-50 ml-auto">
+          className={`${simpleMode ? 'px-3 py-1.5 text-xs' : 'px-1.5 py-0.5 text-[10px]'} bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 ml-auto font-medium transition-colors`}>
           PF {player.fouls}
         </button>
       </div>
