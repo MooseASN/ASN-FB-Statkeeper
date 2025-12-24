@@ -402,13 +402,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Advanced Mode Stat Recording"
-    - "Advanced Mode Shot Make/Miss Dialog"
-    - "Advanced Mode Rebound Options"
-    - "Advanced Mode Foul Options"
-    - "Advanced Mode Substitution"
-    - "Advanced Mode Play Edit"
-    - "Advanced Mode Email Dialog"
+    - "XML Box Score Export"
+    - "Email Box Score"
+    - "Starter Selection with Small Rosters"
+    - "Stat Reversal on Play Edit"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -420,6 +417,8 @@ agent_communication:
     message: "Fork P1/P3 verification complete. P1 VERIFIED: 1) Advanced Mode clock works (click/spacebar toggles start/stop), 2) Player additions (single, bulk, link import) now correctly update the game roster on screen. P3 IMPLEMENTED: 1) Summary tab - working with team comparison stats, 2) Leaders tab - working with points/rebounds leaders, 3) Printable Box Score - now downloads PDF via backend API. P3 ALREADY EXISTED: CSV roster upload already on TeamDetail page, Game Recaps already in backend event ticker. Test credentials: email=schedtest@test.com, password=test123. Advanced mode game for testing: /game/425f43c2-51f5-4b25-820a-1ba02235f19e/advanced"
   - agent: "main"
     message: "MAJOR FIX: Fixed Advanced Mode stat recording and added new features. 1) Fixed API endpoints (was /stat, now /stats; was /team-stat, now /team-stats). 2) Shot make/miss dialog: Now shows MADE/MISSED buttons after selecting player for FT/2PT/3PT. 3) Rebound options: Already had Offensive/Defensive/Team options, now working correctly. 4) Foul options: Common/Technical foul selection before player select. 5) Substitution: Fixed GameUpdate model to include home_on_floor/away_on_floor - clicking players now toggles on/off court. 6) Editable play-by-play: Clicking plays opens edit dialog with Quarter, Player Name, Number, Action, Team fields + Save/Delete. 7) Email dialog: New dialog with email input field, comma-separated for multiple recipients. Test credentials: email=schedtest@test.com, password=test123. Advanced mode game: /game/425f43c2-51f5-4b25-820a-1ba02235f19e/advanced"
+  - agent: "main"
+    message: "Fork continuation - Implemented Priority 1 items: 1) XML Box Score Export - Backend endpoint /api/games/{game_id}/boxscore/xml generates SportsML format XML. Frontend Export tab has 'XML Box Score' button. 2) Email Box Score - Backend endpoint /api/games/{game_id}/email-boxscore sends HTML emails via Resend. Frontend dialog now calls backend API. NOTE: RESEND_API_KEY needs to be configured in backend/.env for emails to work. 3) Starter Selection - Fixed to allow small rosters (<5 players) to confirm with all available players selected. Test credentials: email=schedtest@test.com, password=test123. Test game: /game/425f43c2-51f5-4b25-820a-1ba02235f19e/advanced. Celtics team has only 3 players for small roster testing."
 
 ## Sponsor Banner Feature - Manual Testing Complete
 
