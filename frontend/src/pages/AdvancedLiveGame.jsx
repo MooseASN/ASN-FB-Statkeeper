@@ -2161,7 +2161,7 @@ export default function AdvancedLiveGame() {
           <DialogHeader>
             <DialogTitle>Select Starting Lineups</DialogTitle>
           </DialogHeader>
-          <p className="text-zinc-400 text-sm">Select 5 starters for each team. Click to toggle selection.</p>
+          <p className="text-zinc-400 text-sm">Select 5 starters for each team (or all players if roster has fewer than 5). Click to toggle selection.</p>
           <div className="grid grid-cols-2 gap-6 mt-4">
             {/* Home Team */}
             <div className="bg-zinc-800 rounded-lg p-4">
