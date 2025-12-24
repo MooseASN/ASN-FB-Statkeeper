@@ -1928,6 +1928,7 @@ export default function LiveGame() {
                   teamColor={teamsFlipped ? homeColor : awayColor}
                   onShotClick={handleShotClick}
                   onStatUpdate={handleStatUpdate}
+                  onReboundClick={handleReboundClick}
                   onEditPlayer={handleEditPlayer}
                   onRemovePlayer={handleRemovePlayer}
                   disabled={!isActive}
