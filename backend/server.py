@@ -2906,6 +2906,138 @@ async def get_game_boxscore_xml(game_id: str):
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+# ============ EMAIL BOX SCORE ============
+
+class EmailBoxScoreRequest(BaseModel):
+    emails: List[str]
+    live_url: str
+
+@api_router.post("/games/{game_id}/email-boxscore")
+async def email_boxscore(game_id: str, request: EmailBoxScoreRequest):
+    """Send box score email to specified recipients"""
+    
+    # Check if Resend API key is configured
+    if not resend.api_key:
+        raise HTTPException(status_code=500, detail="Email service not configured. Please set RESEND_API_KEY.")
+    
+    # Get game data
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Get player stats
+    home_stats = await db.player_stats.find({"game_id": game_id, "team_id": game["home_team_id"]}, {"_id": 0}).to_list(100)
+    away_stats = await db.player_stats.find({"game_id": game_id, "team_id": game["away_team_id"]}, {"_id": 0}).to_list(100)
+    
+    # Calculate scores
+    def calc_score(stats):
+        return sum(p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3 for p in stats)
+    
+    home_score = calc_score(home_stats)
+    away_score = calc_score(away_stats)
+    
+    # Build HTML email
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <style>
+            body {{ font-family: Arial, sans-serif; background-color: #1a1a1a; color: #ffffff; padding: 20px; }}
+            .container {{ max-width: 600px; margin: 0 auto; background-color: #2a2a2a; border-radius: 10px; padding: 20px; }}
+            .header {{ text-align: center; margin-bottom: 20px; }}
+            .score-box {{ display: flex; justify-content: space-around; background-color: #333; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
+            .team {{ text-align: center; }}
+            .team-name {{ font-size: 18px; color: #888; margin-bottom: 5px; }}
+            .team-score {{ font-size: 48px; font-weight: bold; }}
+            .vs {{ font-size: 24px; color: #666; align-self: center; }}
+            .stats-table {{ width: 100%; border-collapse: collapse; margin-bottom: 20px; }}
+            .stats-table th, .stats-table td {{ padding: 8px; text-align: left; border-bottom: 1px solid #444; }}
+            .stats-table th {{ background-color: #333; }}
+            .cta-button {{ display: block; text-align: center; background-color: #f97316; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; margin: 20px auto; max-width: 200px; }}
+            .footer {{ text-align: center; color: #666; font-size: 12px; margin-top: 20px; }}
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>🏀 Live Box Score</h1>
+                <p>Q{game.get('current_quarter', 1)} • {game.get('status', 'active').upper()}</p>
+            </div>
+            
+            <table style="width: 100%; margin-bottom: 20px;">
+                <tr>
+                    <td style="text-align: center; width: 40%;">
+                        <div style="font-size: 18px; color: #888;">{game['home_team_name']}</div>
+                        <div style="font-size: 48px; font-weight: bold;">{home_score}</div>
+                    </td>
+                    <td style="text-align: center; width: 20%; font-size: 24px; color: #666;">VS</td>
+                    <td style="text-align: center; width: 40%;">
+                        <div style="font-size: 18px; color: #888;">{game['away_team_name']}</div>
+                        <div style="font-size: 48px; font-weight: bold;">{away_score}</div>
+                    </td>
+                </tr>
+            </table>
+            
+            <h3>{game['home_team_name']} Leaders</h3>
+            <table class="stats-table">
+                <tr><th>Player</th><th>PTS</th><th>REB</th><th>AST</th></tr>
+    """
+    
+    # Add top 3 home players by points
+    home_sorted = sorted(home_stats, key=lambda p: p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3, reverse=True)[:3]
+    for p in home_sorted:
+        pts = p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3
+        reb = p.get("offensive_rebounds", 0) + p.get("defensive_rebounds", 0)
+        ast = p.get("assists", 0)
+        html_content += f'<tr><td>#{p.get("player_number", "")} {p.get("player_name", "")}</td><td>{pts}</td><td>{reb}</td><td>{ast}</td></tr>'
+    
+    html_content += f"""
+            </table>
+            
+            <h3>{game['away_team_name']} Leaders</h3>
+            <table class="stats-table">
+                <tr><th>Player</th><th>PTS</th><th>REB</th><th>AST</th></tr>
+    """
+    
+    # Add top 3 away players by points
+    away_sorted = sorted(away_stats, key=lambda p: p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3, reverse=True)[:3]
+    for p in away_sorted:
+        pts = p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3
+        reb = p.get("offensive_rebounds", 0) + p.get("defensive_rebounds", 0)
+        ast = p.get("assists", 0)
+        html_content += f'<tr><td>#{p.get("player_number", "")} {p.get("player_name", "")}</td><td>{pts}</td><td>{reb}</td><td>{ast}</td></tr>'
+    
+    html_content += f"""
+            </table>
+            
+            <a href="{request.live_url}" class="cta-button">View Live Stats</a>
+            
+            <div class="footer">
+                <p>Powered by StatMoose</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    
+    sender_email = os.environ.get('SENDER_EMAIL', 'onboarding@resend.dev')
+    
+    try:
+        # Send email to all recipients
+        params = {
+            "from": f"StatMoose <{sender_email}>",
+            "to": request.emails,
+            "subject": f"🏀 {game['home_team_name']} vs {game['away_team_name']} - Live Box Score",
+            "html": html_content
+        }
+        
+        email = resend.Emails.send(params)
+        
+        return {"success": True, "message": f"Box score sent to {len(request.emails)} recipient(s)", "id": email.get("id")}
+    except Exception as e:
+        logging.error(f"Failed to send email: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to send email: {str(e)}")
+
 # ============ UTILITY ENDPOINTS ============
 
 @api_router.get("/")
