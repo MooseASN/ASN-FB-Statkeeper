@@ -586,6 +586,21 @@ class GameUpdate(BaseModel):
     home_starters: Optional[List[str]] = None
     away_starters: Optional[List[str]] = None
     starters_selected: Optional[bool] = None
+    # Scheduling fields
+    home_team_id: Optional[str] = None
+    away_team_id: Optional[str] = None
+    scheduled_date: Optional[str] = None
+    scheduled_time: Optional[str] = None
+    # Game settings
+    simple_mode: Optional[bool] = None
+    advanced_mode: Optional[bool] = None
+    clock_enabled: Optional[bool] = None
+    period_duration: Optional[int] = None
+    period_label: Optional[str] = None
+    timeout_preset: Optional[str] = None
+    custom_timeouts: Optional[int] = None
+    primetime_enabled: Optional[bool] = None
+    video_url: Optional[str] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
