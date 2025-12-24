@@ -87,6 +87,14 @@ export default function AdvancedLiveGame() {
   const [showEditPlayDialog, setShowEditPlayDialog] = useState(false);
   const [editingPlay, setEditingPlay] = useState(null);
   
+  // Player number input for quick selection
+  const [playerNumberInput, setPlayerNumberInput] = useState("");
+  
+  // Starter selection dialog
+  const [showStarterDialog, setShowStarterDialog] = useState(false);
+  const [homeStarters, setHomeStarters] = useState([]);
+  const [awayStarters, setAwayStarters] = useState([]);
+  
   // Roster import state
   const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
   const [showSingleAddDialog, setShowSingleAddDialog] = useState(false);
