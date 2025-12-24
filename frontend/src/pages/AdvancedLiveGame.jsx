@@ -587,7 +587,7 @@ export default function AdvancedLiveGame() {
                 }
                 const lastPlay = playByPlay[0]; // Most recent play (reversed list)
                 
-                // Map action names to stat fields for reversing
+                // Map action names to backend stat_type for reversing
                 const actionToStat = {
                   "FT Made": "ft_made",
                   "FT Missed": "ft_missed",
@@ -595,14 +595,14 @@ export default function AdvancedLiveGame() {
                   "2PT Missed": "fg2_missed",
                   "3PT Made": "fg3_made",
                   "3PT Missed": "fg3_missed",
-                  "Off. Rebound": "offensive_rebounds",
-                  "Def. Rebound": "defensive_rebounds",
-                  "Assist": "assists",
-                  "Steal": "steals",
-                  "Block": "blocks",
-                  "Turnover": "turnovers",
-                  "Foul": "fouls",
-                  "Technical Foul": "fouls"
+                  "Off. Rebound": "oreb",
+                  "Def. Rebound": "dreb",
+                  "Assist": "assist",
+                  "Steal": "steal",
+                  "Block": "block",
+                  "Turnover": "turnover",
+                  "Foul": "foul",
+                  "Technical Foul": "foul"
                 };
                 
                 try {
