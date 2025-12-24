@@ -863,7 +863,7 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
             for selector in ['[class*="name"] a', '[class*="name"]', 'a[href*="bio"], a[href*="player"], h3, h4']:
                 elem = card.select_one(selector)
                 if elem:
-                    text = elem.get_text(strip=True)
+                    text = clean_name(elem.get_text())
                     if len(text) > 2 and re.match(r'^[A-Za-z]', text):
                         name = text
                         break
