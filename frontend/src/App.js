@@ -141,7 +141,7 @@ function App() {
           <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
         </Routes>
       </BrowserRouter>
-      <Toaster position="top-right" duration={2000} />
+      <Toaster position="top-right" duration={1500} dismissible={true} />
     </div>
   );
 }
