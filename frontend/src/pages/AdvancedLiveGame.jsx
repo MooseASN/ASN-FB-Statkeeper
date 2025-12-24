@@ -1047,7 +1047,7 @@ export default function AdvancedLiveGame() {
           {activeTab === "export" && (
             <div className="space-y-4">
               <h2 className="text-xl font-bold">Export Options</h2>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 gap-4">
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
@@ -1072,7 +1072,33 @@ export default function AdvancedLiveGame() {
                   }}
                 >
                   <FileDown className="w-6 h-6" />
-                  <span>Printable Box Score</span>
+                  <span>PDF Box Score</span>
+                </Button>
+                <Button 
+                  className="h-20 flex-col gap-2" 
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      const response = await axios.get(`${API}/games/${id}/boxscore/xml`, {
+                        responseType: 'blob'
+                      });
+                      const blob = new Blob([response.data], { type: 'application/xml' });
+                      const url = window.URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url;
+                      a.download = `boxscore_${game.home_team_name}_vs_${game.away_team_name}.xml`.replace(/ /g, '_');
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                      window.URL.revokeObjectURL(url);
+                      toast.success("Box score XML downloaded!");
+                    } catch (error) {
+                      toast.error("Failed to generate box score XML");
+                    }
+                  }}
+                >
+                  <FileDown className="w-6 h-6" />
+                  <span>XML Box Score</span>
                 </Button>
                 <Button 
                   className="h-20 flex-col gap-2" 
