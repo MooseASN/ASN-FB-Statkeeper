@@ -257,9 +257,24 @@ export default function EventDetail({ user, onLogout }) {
             </div>
           </div>
           
-          <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
-            Edit Event
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={copyEventLink}>
+              {linkCopied ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Link2 className="w-4 h-4 mr-2" />
+                  Copy Live Link
+                </>
+              )}
+            </Button>
+            <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
+              Edit Event
+            </Button>
+          </div>
         </div>
 
         {/* Games Section */}
