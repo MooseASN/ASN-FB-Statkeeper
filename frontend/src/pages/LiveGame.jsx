@@ -317,21 +317,21 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
 
       {/* Other stats - simplified or full */}
       {simpleMode ? (
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-3 gap-3 mt-2">
           <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-            className="py-2 px-2 text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
-            <div className="font-bold">{player.assists}</div>
-            <div className="text-[10px] text-muted-foreground">AST</div>
+            className="py-4 px-3 text-base bg-slate-100 hover:bg-slate-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-slate-200 hover:border-slate-400">
+            <div className="text-2xl font-bold">{player.assists}</div>
+            <div className="text-xs text-muted-foreground font-medium">AST</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-            className="py-2 px-2 text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
-            <div className="font-bold">{totalReb}</div>
-            <div className="text-[10px] text-muted-foreground">REB</div>
+            className="py-4 px-3 text-base bg-blue-100 hover:bg-blue-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-blue-200 hover:border-blue-400">
+            <div className="text-2xl font-bold">{totalReb}</div>
+            <div className="text-xs text-muted-foreground font-medium">REB</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-            className="py-2 px-2 text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
-            <div className="font-bold">{player.fouls}</div>
-            <div className="text-[10px] text-muted-foreground">PF</div>
+            className="py-4 px-3 text-base bg-red-100 hover:bg-red-200 text-red-600 rounded-xl disabled:opacity-50 transition-colors border-2 border-red-200 hover:border-red-400">
+            <div className="text-2xl font-bold">{player.fouls}</div>
+            <div className="text-xs text-muted-foreground font-medium">PF</div>
           </button>
         </div>
       ) : (
