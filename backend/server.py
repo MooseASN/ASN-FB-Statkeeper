@@ -2720,44 +2720,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
-# ============ XML BOX SCORE EXPORT ============
-@api_router.get("/games/{game_id}/boxscore/xml")
-async def get_game_boxscore_xml(game_id: str):
-    """Generate SportsML-format XML box score"""
-    game = await db.games.find_one({"id": game_id}, {"_id": 0})
-    if not game:
-        raise HTTPException(status_code=404, detail="Game not found")
-    
-    # Get player stats
-    home_stats = await db.player_stats.find({"game_id": game_id, "team_id": game["home_team_id"]}, {"_id": 0}).to_list(100)
-    away_stats = await db.player_stats.find({"game_id": game_id, "team_id": game["away_team_id"]}, {"_id": 0}).to_list(100)
-    
-    # Calculate totals
-    def calc_totals(stats):
-        return {
-            "pts": sum(p.get("ft_made", 0) + p.get("fg2_made", 0) * 2 + p.get("fg3_made", 0) * 3 for p in stats),
-            "fg_made": sum(p.get("fg2_made", 0) + p.get("fg3_made", 0) for p in stats),
-            "fg_att": sum(p.get("fg2_made", 0) + p.get("fg2_missed", 0) + p.get("fg3_made", 0) + p.get("fg3_missed", 0) for p in stats),
-            "fg3_made": sum(p.get("fg3_made", 0) for p in stats),
-            "fg3_att": sum(p.get("fg3_made", 0) + p.get("fg3_missed", 0) for p in stats),
-            "ft_made": sum(p.get("ft_made", 0) for p in stats),
-            "ft_att": sum(p.get("ft_made", 0) + p.get("ft_missed", 0) for p in stats),
-            "oreb": sum(p.get("offensive_rebounds", 0) for p in stats),
-            "dreb": sum(p.get("defensive_rebounds", 0) for p in stats),
-            "reb": sum(p.get("offensive_rebounds", 0) + p.get("defensive_rebounds", 0) for p in stats),
-            "ast": sum(p.get("assists", 0) for p in stats),
-            "stl": sum(p.get("steals", 0) for p in stats),
-            "blk": sum(p.get("blocks", 0) for p in stats),
-            "to": sum(p.get("turnovers", 0) for p in stats),
-            "pf": sum(p.get("fouls", 0) for p in stats),
-        }
-    
-    home_totals = calc_totals(home_stats)
-    away_totals = calc_totals(away_stats)
-    
-    # Get starters
-    home_starters = game.get("home_starters", [])
-    away_starters = game.get("away_starters", [])
+# ============ UTILITY ENDPOINTS ============
     
     # Build XML
     from xml.etree.ElementTree import Element, SubElement, tostring
