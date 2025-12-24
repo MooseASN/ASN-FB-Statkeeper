@@ -103,6 +103,7 @@ export default function NewGame({ user, onLogout }) {
         start_immediately: true,
         simple_mode: statMode === "simple",
         advanced_mode: statMode === "advanced",
+        note: gameNote || null,
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
