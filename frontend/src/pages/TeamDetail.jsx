@@ -366,7 +366,7 @@ export default function TeamDetail({ user, onLogout }) {
                   data-testid="import-maxpreps-btn"
                 >
                   <LinkIcon className="w-4 h-4 mr-2" />
-                  MaxPreps
+                  Import from URL
                 </Button>
               </div>
             </div>
