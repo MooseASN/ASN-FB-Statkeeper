@@ -463,40 +463,40 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onRe
           {/* Row 2: All Stat Buttons - FT, 2PT, 3PT, REB, AST, BLK, STL, TOV, PF */}
           <div className="grid grid-cols-9 gap-1 sm:gap-1.5">
             <button onClick={() => onShotClick(player, "ft")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">FT</div>
+              className="aspect-square rounded-lg border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">FT</span>
             </button>
             <button onClick={() => onShotClick(player, "fg2")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">2PT</div>
+              className="aspect-square rounded-lg border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">2PT</span>
             </button>
             <button onClick={() => onShotClick(player, "fg3")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">3PT</div>
+              className="aspect-square rounded-lg border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">3PT</span>
             </button>
             <button onClick={() => onReboundClick && onReboundClick(player)} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-cyan-200 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">REB</div>
+              className="aspect-square rounded-lg border-2 border-cyan-200 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">REB</span>
             </button>
             <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-purple-200 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">AST</div>
+              className="aspect-square rounded-lg border-2 border-purple-200 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">AST</span>
             </button>
             <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-slate-400 hover:bg-slate-100 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">BLK</div>
+              className="aspect-square rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-slate-400 hover:bg-slate-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">BLK</span>
             </button>
             <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-indigo-200 bg-indigo-50 hover:border-indigo-500 hover:bg-indigo-100 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">STL</div>
+              className="aspect-square rounded-lg border-2 border-indigo-200 bg-indigo-50 hover:border-indigo-500 hover:bg-indigo-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">STL</span>
             </button>
             <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-amber-200 bg-amber-50 hover:border-amber-500 hover:bg-amber-100 text-amber-700 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">TOV</div>
+              className="aspect-square rounded-lg border-2 border-amber-200 bg-amber-50 hover:border-amber-500 hover:bg-amber-100 text-amber-700 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">TOV</span>
             </button>
             <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-              className="py-2 sm:py-3 rounded-lg border-2 border-red-200 bg-red-50 hover:border-red-500 hover:bg-red-100 text-red-600 font-bold disabled:opacity-50 transition-colors">
-              <div className="text-xs sm:text-sm">PF</div>
+              className="aspect-square rounded-lg border-2 border-red-200 bg-red-50 hover:border-red-500 hover:bg-red-100 text-red-600 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
+              <span className="text-[10px] sm:text-xs">PF</span>
             </button>
           </div>
         </>
