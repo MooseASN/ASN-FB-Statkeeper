@@ -1801,16 +1801,82 @@ export default function AdvancedLiveGame() {
               </div>
               <div>
                 <Label className="text-zinc-400">Action/Play</Label>
-                <Input
-                  value={editingPlay.action || ""}
-                  onChange={(e) => setEditingPlay({ ...editingPlay, action: e.target.value })}
-                  className="bg-zinc-800 border-zinc-700"
-                />
+                <Select 
+                  value={editingPlay.action || ""} 
+                  onValueChange={(v) => setEditingPlay({ ...editingPlay, action: v })}
+                >
+                  <SelectTrigger className="bg-zinc-800 border-zinc-700">
+                    <SelectValue placeholder="Select action" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FT Made">FT Made</SelectItem>
+                    <SelectItem value="FT Missed">FT Missed</SelectItem>
+                    <SelectItem value="2PT Made">2PT Made</SelectItem>
+                    <SelectItem value="2PT Missed">2PT Missed</SelectItem>
+                    <SelectItem value="3PT Made">3PT Made</SelectItem>
+                    <SelectItem value="3PT Missed">3PT Missed</SelectItem>
+                    <SelectItem value="Off. Rebound">Off. Rebound</SelectItem>
+                    <SelectItem value="Def. Rebound">Def. Rebound</SelectItem>
+                    <SelectItem value="Assist">Assist</SelectItem>
+                    <SelectItem value="Steal">Steal</SelectItem>
+                    <SelectItem value="Block">Block</SelectItem>
+                    <SelectItem value="Turnover">Turnover</SelectItem>
+                    <SelectItem value="Foul">Foul</SelectItem>
+                    <SelectItem value="Technical Foul">Technical Foul</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex gap-2">
                 <Button
                   onClick={async () => {
                     try {
+                      // Get the original play to know what stat to reverse
+                      const originalPlay = playByPlay[editingPlay.index];
+                      
+                      // Map action names to stat fields
+                      const actionToStat = {
+                        "FT Made": { field: "ft_made", points: 1 },
+                        "FT Missed": { field: "ft_missed", points: 0 },
+                        "2PT Made": { field: "fg2_made", points: 2 },
+                        "2PT Missed": { field: "fg2_missed", points: 0 },
+                        "3PT Made": { field: "fg3_made", points: 3 },
+                        "3PT Missed": { field: "fg3_missed", points: 0 },
+                        "Off. Rebound": { field: "offensive_rebounds", points: 0 },
+                        "Def. Rebound": { field: "defensive_rebounds", points: 0 },
+                        "Assist": { field: "assists", points: 0 },
+                        "Steal": { field: "steals", points: 0 },
+                        "Block": { field: "blocks", points: 0 },
+                        "Turnover": { field: "turnovers", points: 0 },
+                        "Foul": { field: "fouls", points: 0 },
+                        "Technical Foul": { field: "fouls", points: 0 }
+                      };
+
+                      // If player or action changed, we need to update stats
+                      const playerChanged = originalPlay.player_id !== editingPlay.player_id;
+                      const actionChanged = originalPlay.action !== editingPlay.action;
+                      
+                      if (playerChanged || actionChanged) {
+                        // Reverse the old stat from the old player
+                        if (originalPlay.player_id && actionToStat[originalPlay.action]) {
+                          const oldStat = actionToStat[originalPlay.action];
+                          await axios.post(`${API}/games/${id}/stats`, {
+                            player_id: originalPlay.player_id,
+                            stat_type: oldStat.field,
+                            increment: -1
+                          });
+                        }
+                        
+                        // Add the new stat to the new player
+                        if (editingPlay.player_id && actionToStat[editingPlay.action]) {
+                          const newStat = actionToStat[editingPlay.action];
+                          await axios.post(`${API}/games/${id}/stats`, {
+                            player_id: editingPlay.player_id,
+                            stat_type: newStat.field,
+                            increment: 1
+                          });
+                        }
+                      }
+
                       // Update play in backend
                       const updatedPlays = [...playByPlay];
                       updatedPlays[editingPlay.index] = {
@@ -1836,6 +1902,33 @@ export default function AdvancedLiveGame() {
                 <Button
                   onClick={async () => {
                     try {
+                      // Map action names to stat fields for reversing
+                      const actionToStat = {
+                        "FT Made": "ft_made",
+                        "FT Missed": "ft_missed",
+                        "2PT Made": "fg2_made",
+                        "2PT Missed": "fg2_missed",
+                        "3PT Made": "fg3_made",
+                        "3PT Missed": "fg3_missed",
+                        "Off. Rebound": "offensive_rebounds",
+                        "Def. Rebound": "defensive_rebounds",
+                        "Assist": "assists",
+                        "Steal": "steals",
+                        "Block": "blocks",
+                        "Turnover": "turnovers",
+                        "Foul": "fouls",
+                        "Technical Foul": "fouls"
+                      };
+                      
+                      // Reverse the stat when deleting
+                      if (editingPlay.player_id && actionToStat[editingPlay.action]) {
+                        await axios.post(`${API}/games/${id}/stats`, {
+                          player_id: editingPlay.player_id,
+                          stat_type: actionToStat[editingPlay.action],
+                          increment: -1
+                        });
+                      }
+                      
                       // Delete play from backend
                       const updatedPlays = playByPlay.filter((_, i) => i !== editingPlay.index);
                       await axios.put(`${API}/games/${id}`, {
