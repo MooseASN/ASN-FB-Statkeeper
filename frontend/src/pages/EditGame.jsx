@@ -84,6 +84,9 @@ export default function EditGame({ user, onLogout }) {
       setPrimetimeEnabled(gameData.primetime_enabled || false);
       setVideoUrl(gameData.video_url || "");
       
+      // Game note
+      setGameNote(gameData.note || "");
+      
       // Stat mode
       if (gameData.advanced_mode) {
         setStatMode("advanced");
