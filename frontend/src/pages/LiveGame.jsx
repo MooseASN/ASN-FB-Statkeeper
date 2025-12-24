@@ -130,62 +130,75 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
         </div>
         
         {simpleMode ? (
-          /* Simple Mode - Single row layout: Name/Edit/Delete | Buttons | PTS */
-          <div className="flex-1 flex items-center gap-2">
-            {/* Player name and actions - full name visible */}
-            <div className="flex items-center gap-1 min-w-0 flex-shrink-0">
-              <span className="font-medium text-sm whitespace-nowrap">{player.player_name}</span>
-              <button
-                onClick={() => onEditPlayer(player)}
-                className="p-0.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded flex-shrink-0"
-                title="Edit player"
-              >
-                <Pencil className="w-3 h-3" />
-              </button>
-              <button
-                onClick={() => onRemovePlayer(player)}
-                className="p-0.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded flex-shrink-0"
-                title="Remove player"
-              >
-                <Trash2 className="w-3 h-3" />
-              </button>
+          /* Simple Mode - Two row layout for better spacing */
+          <div className="flex-1 flex flex-col gap-2">
+            {/* Row 1: Player name with edit/delete and points */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-base">{player.player_name}</span>
+                <button
+                  onClick={() => onEditPlayer(player)}
+                  className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
+                  title="Edit player"
+                >
+                  <Pencil className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => onRemovePlayer(player)}
+                  className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
+                  title="Remove player"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+              <span className="text-lg font-bold">{pts} PTS</span>
             </div>
             
-            {/* Stat buttons in order: 2PT, 3PT, FT, REB, AST (no PF) */}
-            <div className="flex items-center gap-1.5 flex-1 justify-center">
+            {/* Row 2: All stat buttons - uniform size and aligned */}
+            <div className="flex items-center gap-2 justify-between">
               <button
                 onClick={() => onShotClick(player, "fg2")}
                 disabled={disabled}
-                className="w-9 h-9 text-[10px] rounded-full border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+                className="w-12 h-12 text-xs rounded-full border-2 border-blue-300 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
               >
                 2PT
               </button>
               <button
                 onClick={() => onShotClick(player, "fg3")}
                 disabled={disabled}
-                className="w-9 h-9 text-[10px] rounded-full border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+                className="w-12 h-12 text-xs rounded-full border-2 border-orange-300 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
               >
                 3PT
               </button>
               <button
                 onClick={() => onShotClick(player, "ft")}
                 disabled={disabled}
-                className="w-9 h-9 text-[10px] rounded-full border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+                className="w-12 h-12 text-xs rounded-full border-2 border-emerald-300 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
               >
                 FT
               </button>
-              <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-                className="px-2 py-1 text-[10px] bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 font-medium transition-colors">
+              <button 
+                onClick={() => onStatUpdate(player.id, "dreb")} 
+                disabled={disabled}
+                className="w-12 h-12 text-xs rounded-full border-2 border-cyan-300 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors"
+              >
                 REB
               </button>
-              <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-                className="px-2 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 font-medium transition-colors">
+              <button 
+                onClick={() => onStatUpdate(player.id, "assist")} 
+                disabled={disabled}
+                className="w-12 h-12 text-xs rounded-full border-2 border-purple-300 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors"
+              >
                 AST
               </button>
+              <button 
+                onClick={() => onStatUpdate(player.id, "foul")} 
+                disabled={disabled}
+                className="w-12 h-12 text-xs rounded-full border-2 border-red-300 bg-red-50 hover:border-red-500 hover:bg-red-100 text-red-600 font-bold disabled:opacity-50 transition-colors"
+              >
+                PF
+              </button>
             </div>
-            
-            {/* Total points */}
-            <span className="text-sm font-bold whitespace-nowrap flex-shrink-0">{pts} PTS</span>
           </div>
         ) : (
           /* Classic Mode - Original layout */
