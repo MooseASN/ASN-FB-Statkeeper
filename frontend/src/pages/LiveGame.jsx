@@ -326,57 +326,85 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEd
           </div>
           <p className="text-sm text-muted-foreground">
             {simpleMode 
-              ? `${player.ft_made} FT • ${player.fg2_made} 2P • ${player.fg3_made} 3P • ${totalReb} REB • ${player.assists} AST`
+              ? `${player.fg2_made} 2P • ${player.fg3_made} 3P • ${player.ft_made} FT • ${totalReb} REB • ${player.assists} AST`
               : `${stats.fg_made}/${stats.fg_att} FG (${stats.fg_pct}%) • ${totalReb} REB • ${player.assists} AST`
             }
           </p>
         </div>
         <div className="text-right">
-          <div className="text-3xl font-bold" style={{ color: teamColor }}>{pts}</div>
-          <div className="text-xs text-muted-foreground">PTS</div>
+          <div className="text-3xl font-bold" style={{ color: teamColor }}>{pts} <span className="text-lg">PTS</span></div>
         </div>
       </div>
 
-      {/* Shot buttons - larger */}
-      <div className={`grid grid-cols-3 ${simpleMode ? 'gap-3 mb-4' : 'gap-2 mb-4'}`}>
-        <button
-          onClick={() => onShotClick(player, "ft")}
-          disabled={disabled}
-          className={`${simpleMode ? 'py-4' : 'py-3'} rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors`}
-        >
-          <div className={`${simpleMode ? 'text-xl' : 'text-lg'}`}>FT</div>
-          <div className={`${simpleMode ? 'text-sm' : 'text-xs'} text-muted-foreground`}>{simpleMode ? player.ft_made : `${player.ft_made}/${stats.ft_att}`}</div>
-        </button>
-        <button
-          onClick={() => onShotClick(player, "fg2")}
-          disabled={disabled}
-          className={`${simpleMode ? 'py-4' : 'py-3'} rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors`}
-        >
-          <div className={`${simpleMode ? 'text-xl' : 'text-lg'}`}>2PT</div>
-          <div className={`${simpleMode ? 'text-sm' : 'text-xs'} text-muted-foreground`}>{simpleMode ? player.fg2_made : `${player.fg2_made}/${stats.fg2_att}`}</div>
-        </button>
-        <button
-          onClick={() => onShotClick(player, "fg3")}
-          disabled={disabled}
-          className={`${simpleMode ? 'py-4' : 'py-3'} rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors`}
-        >
-          <div className={`${simpleMode ? 'text-xl' : 'text-lg'}`}>3PT</div>
-          <div className={`${simpleMode ? 'text-sm' : 'text-xs'} text-muted-foreground`}>{simpleMode ? player.fg3_made : `${player.fg3_made}/${stats.fg3_att}`}</div>
-        </button>
-      </div>
+      {/* Shot buttons - in order: 2PT, 3PT, FT for Simple Mode */}
+      {simpleMode ? (
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <button
+            onClick={() => onShotClick(player, "fg2")}
+            disabled={disabled}
+            className="py-4 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+          >
+            <div className="text-xl">2PT</div>
+            <div className="text-sm text-muted-foreground">{player.fg2_made}</div>
+          </button>
+          <button
+            onClick={() => onShotClick(player, "fg3")}
+            disabled={disabled}
+            className="py-4 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+          >
+            <div className="text-xl">3PT</div>
+            <div className="text-sm text-muted-foreground">{player.fg3_made}</div>
+          </button>
+          <button
+            onClick={() => onShotClick(player, "ft")}
+            disabled={disabled}
+            className="py-4 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+          >
+            <div className="text-xl">FT</div>
+            <div className="text-sm text-muted-foreground">{player.ft_made}</div>
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          <button
+            onClick={() => onShotClick(player, "ft")}
+            disabled={disabled}
+            className="py-3 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
+          >
+            <div className="text-lg">FT</div>
+            <div className="text-xs text-muted-foreground">{player.ft_made}/{stats.ft_att}</div>
+          </button>
+          <button
+            onClick={() => onShotClick(player, "fg2")}
+            disabled={disabled}
+            className="py-3 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
+          >
+            <div className="text-lg">2PT</div>
+            <div className="text-xs text-muted-foreground">{player.fg2_made}/{stats.fg2_att}</div>
+          </button>
+          <button
+            onClick={() => onShotClick(player, "fg3")}
+            disabled={disabled}
+            className="py-3 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
+          >
+            <div className="text-lg">3PT</div>
+            <div className="text-xs text-muted-foreground">{player.fg3_made}/{stats.fg3_att}</div>
+          </button>
+        </div>
+      )}
 
       {/* Other stats - simplified or full */}
       {simpleMode ? (
         <div className="grid grid-cols-3 gap-3 mt-2">
-          <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-            className="py-4 px-3 text-base bg-slate-100 hover:bg-slate-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-slate-200 hover:border-slate-400">
-            <div className="text-2xl font-bold">{player.assists}</div>
-            <div className="text-xs text-muted-foreground font-medium">AST</div>
-          </button>
           <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
             className="py-4 px-3 text-base bg-blue-100 hover:bg-blue-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-blue-200 hover:border-blue-400">
             <div className="text-2xl font-bold">{totalReb}</div>
             <div className="text-xs text-muted-foreground font-medium">REB</div>
+          </button>
+          <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
+            className="py-4 px-3 text-base bg-slate-100 hover:bg-slate-200 rounded-xl disabled:opacity-50 transition-colors border-2 border-slate-200 hover:border-slate-400">
+            <div className="text-2xl font-bold">{player.assists}</div>
+            <div className="text-xs text-muted-foreground font-medium">AST</div>
           </button>
           <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
             className="py-4 px-3 text-base bg-red-100 hover:bg-red-200 text-red-600 rounded-xl disabled:opacity-50 transition-colors border-2 border-red-200 hover:border-red-400">
