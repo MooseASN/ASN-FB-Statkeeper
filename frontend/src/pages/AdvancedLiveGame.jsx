@@ -78,11 +78,6 @@ export default function AdvancedLiveGame() {
   const [showFoulTypeDialog, setShowFoulTypeDialog] = useState(false);
   const [pendingFoulPlayer, setPendingFoulPlayer] = useState(null);
   
-  // Email box score dialog
-  const [showEmailDialog, setShowEmailDialog] = useState(false);
-  const [emailAddresses, setEmailAddresses] = useState("");
-  const [emailSending, setEmailSending] = useState(false);
-  
   // Edit play dialog
   const [showEditPlayDialog, setShowEditPlayDialog] = useState(false);
   const [editingPlay, setEditingPlay] = useState(null);
