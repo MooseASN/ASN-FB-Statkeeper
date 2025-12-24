@@ -841,6 +841,12 @@ export default function LiveGame() {
   };
 
   const handleShotClick = (player, shotType) => {
+    // In Simple Mode, directly add the made shot without dialog
+    if (game?.simple_mode) {
+      handleStatUpdate(player.id, `${shotType}_made`);
+      return;
+    }
+    // In Classic Mode, show the make/miss dialog
     setSelectedPlayer(player);
     setSelectedShotType(shotType);
     setShotModalOpen(true);
