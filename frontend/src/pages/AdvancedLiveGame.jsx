@@ -2253,7 +2253,12 @@ export default function AdvancedLiveGame() {
                   toast.error("Failed to set starters");
                 }
               }}
-              disabled={homeStarters.length === 0 || awayStarters.length === 0}
+              disabled={
+                (homeStarters.length === 0) || 
+                (awayStarters.length === 0) || 
+                (homeStats.length >= 5 && homeStarters.length < 5) || 
+                (awayStats.length >= 5 && awayStarters.length < 5)
+              }
               className="bg-green-600 hover:bg-green-700"
             >
               Confirm Starters ({homeStarters.length} + {awayStarters.length})
