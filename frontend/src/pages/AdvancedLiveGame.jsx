@@ -1176,32 +1176,66 @@ export default function AdvancedLiveGame() {
       </div>
 
       {/* Player Select Dialog */}
-      <Dialog open={showPlayerSelect} onOpenChange={setShowPlayerSelect}>
+      <Dialog open={showPlayerSelect} onOpenChange={(open) => {
+        setShowPlayerSelect(open);
+        if (!open) setPlayerNumberInput("");
+      }}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
           <DialogHeader>
             <DialogTitle>Select Player - {activeAction?.toUpperCase().replace('_', ' ')}</DialogTitle>
           </DialogHeader>
+          {/* Number Input */}
+          <div className="mb-4">
+            <Input
+              type="text"
+              placeholder="Type player number and press Enter"
+              value={playerNumberInput}
+              onChange={(e) => setPlayerNumberInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && playerNumberInput) {
+                  const player = currentTeamOnFloor.find(p => p.player_number === playerNumberInput);
+                  if (player) {
+                    if (activeAction === 'ft' || activeAction === '2pt' || activeAction === '3pt') {
+                      setPendingShotPlayer(player);
+                      setPendingShotType(activeAction);
+                      setShowPlayerSelect(false);
+                      setPlayerNumberInput("");
+                      setShowShotResultDialog(true);
+                    } else {
+                      handleStatAction(player.id, activeAction);
+                      setShowPlayerSelect(false);
+                      setPlayerNumberInput("");
+                    }
+                  } else {
+                    toast.error(`Player #${playerNumberInput} not on floor`);
+                  }
+                }
+              }}
+              className="bg-zinc-800 border-zinc-700 text-center text-2xl font-bold"
+              autoFocus
+            />
+          </div>
           {currentTeamOnFloor.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-zinc-400">No players on the floor</p>
               <p className="text-zinc-500 text-sm mt-2">Add players via Substitution first</p>
             </div>
           ) : (
-            <div className="grid grid-cols-5 gap-2 mt-4">
+            <div className="grid grid-cols-5 gap-2">
               {currentTeamOnFloor.map(player => (
                 <button
                   key={player.id}
                   onClick={() => {
-                    // For shots (ft, 2pt, 3pt), show make/miss dialog
                     if (activeAction === 'ft' || activeAction === '2pt' || activeAction === '3pt') {
                       setPendingShotPlayer(player);
                       setPendingShotType(activeAction);
                       setShowPlayerSelect(false);
+                      setPlayerNumberInput("");
                       setShowShotResultDialog(true);
                     } else {
-                      // For other stats (steal, assist, block, foul, etc.), record directly
                       handleStatAction(player.id, activeAction);
                       setShowPlayerSelect(false);
+                      setPlayerNumberInput("");
                     }
                   }}
                   className="aspect-square rounded-lg font-bold text-xl hover:ring-2 ring-white transition-all"
