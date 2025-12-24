@@ -796,7 +796,7 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
             
             for i, h in enumerate(headers):
                 h_clean = h.lower()
-                if num_idx < 0 and ('#' in h_clean or 'no' == h_clean or 'jersey' in h_clean or h_clean == 'number'):
+                if num_idx < 0 and ('#' in h_clean or 'no' == h_clean or 'no.' == h_clean or 'jersey' in h_clean or h_clean == 'number'):
                     num_idx = i
                 if name_idx < 0 and ('name' in h_clean or 'player' in h_clean or 'athlete' in h_clean):
                     name_idx = i
@@ -806,7 +806,10 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                 for row in rows:
                     cells = row.find_all(['td', 'th'])
                     if len(cells) > max(num_idx, name_idx):
-                        number = cells[num_idx].get_text(strip=True).replace('#', '')
+                        # Extract number and clean it (remove "No.:", "#", etc.)
+                        raw_number = cells[num_idx].get_text(strip=True)
+                        number = re.sub(r'^(No\.?:?\s*|#)', '', raw_number, flags=re.IGNORECASE).strip()
+                        
                         name_cell = cells[name_idx]
                         # Try to get name from link first, then text
                         name_link = name_cell.find('a')
