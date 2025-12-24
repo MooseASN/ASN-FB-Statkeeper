@@ -250,34 +250,34 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
                 </button>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <span className="text-[10px] text-muted-foreground hidden sm:inline">
-                  {player.ft_made}/{stats.ft_att} • {player.fg2_made}/{stats.fg2_att} • {player.fg3_made}/{stats.fg3_att}
+                <span className="text-xs text-muted-foreground hidden sm:inline">
+                  {player.ft_made}/{stats.ft_att} FT • {player.fg2_made + player.fg3_made}/{stats.fg2_att + stats.fg3_att} FG • {player.fg3_made}/{stats.fg3_att} 3PT
                 </span>
                 <span className="text-sm font-bold">{pts} PTS</span>
               </div>
             </div>
             
-            {/* Row 2: All 9 stat buttons - square */}
+            {/* Row 2: All 9 stat buttons - square with larger text */}
             <div className="grid grid-cols-9 gap-1">
               <button onClick={() => onShotClick(player, "ft")} disabled={disabled}
                 className="aspect-square rounded border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
-                <span className="text-[9px]">FT</span>
+                <span className="text-[10px] sm:text-xs">FT</span>
               </button>
               <button onClick={() => onShotClick(player, "fg2")} disabled={disabled}
                 className="aspect-square rounded border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
-                <span className="text-[9px]">2PT</span>
+                <span className="text-[10px] sm:text-xs">2PT</span>
               </button>
               <button onClick={() => onShotClick(player, "fg3")} disabled={disabled}
                 className="aspect-square rounded border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
-                <span className="text-[9px]">3PT</span>
+                <span className="text-[10px] sm:text-xs">3PT</span>
               </button>
               <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
                 className="aspect-square rounded border-2 border-cyan-200 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
-                <span className="text-[9px]">REB</span>
+                <span className="text-[10px] sm:text-xs">REB</span>
               </button>
               <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
                 className="aspect-square rounded border-2 border-purple-200 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
-                <span className="text-[9px]">AST</span>
+                <span className="text-[10px] sm:text-xs">AST</span>
               </button>
               <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
                 className="aspect-square rounded border-2 border-slate-200 bg-slate-50 hover:border-slate-400 hover:bg-slate-100 font-bold disabled:opacity-50 transition-colors flex items-center justify-center">
