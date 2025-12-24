@@ -160,39 +160,39 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
           </div>
         </div>
         
-        <div className="flex items-center gap-1">
+        <div className={`flex items-center ${simpleMode ? 'gap-2' : 'gap-1'}`}>
           <button
             onClick={() => onShotClick(player, "ft")}
             disabled={disabled}
-            className="w-8 h-8 rounded-full border border-slate-300 hover:border-emerald-500 hover:bg-emerald-50 text-[10px] font-bold disabled:opacity-50"
+            className={`${simpleMode ? 'w-10 h-10 text-xs' : 'w-8 h-8 text-[10px]'} rounded-full border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors`}
           >
             FT
           </button>
           <button
             onClick={() => onShotClick(player, "fg2")}
             disabled={disabled}
-            className="w-8 h-8 rounded-full border border-slate-300 hover:border-blue-500 hover:bg-blue-50 text-[10px] font-bold disabled:opacity-50"
+            className={`${simpleMode ? 'w-10 h-10 text-xs' : 'w-8 h-8 text-[10px]'} rounded-full border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors`}
           >
             2PT
           </button>
           <button
             onClick={() => onShotClick(player, "fg3")}
             disabled={disabled}
-            className="w-8 h-8 rounded-full border border-slate-300 hover:border-orange-500 hover:bg-orange-50 text-[10px] font-bold disabled:opacity-50"
+            className={`${simpleMode ? 'w-10 h-10 text-xs' : 'w-8 h-8 text-[10px]'} rounded-full border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors`}
           >
             3PT
           </button>
         </div>
       </div>
       
-      <div className="flex items-center gap-1 mt-1 ml-9">
+      <div className={`flex items-center ${simpleMode ? 'gap-2 mt-2 ml-9' : 'gap-1 mt-1 ml-9'}`}>
         <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-          className="px-1.5 py-0.5 text-[10px] bg-slate-100 hover:bg-slate-200 rounded disabled:opacity-50">
+          className={`${simpleMode ? 'px-3 py-1.5 text-xs' : 'px-1.5 py-0.5 text-[10px]'} bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 font-medium transition-colors`}>
           AST {player.assists}
         </button>
         {simpleMode ? (
           <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-            className="px-1.5 py-0.5 text-[10px] bg-blue-100 hover:bg-blue-200 rounded disabled:opacity-50">
+            className="px-3 py-1.5 text-xs bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 font-medium transition-colors">
             REB {totalReb}
           </button>
         ) : (
