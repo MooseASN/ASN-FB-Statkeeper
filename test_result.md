@@ -382,6 +382,42 @@ frontend:
         agent: "main"
         comment: "Printable Box Score button now downloads PDF via /api/games/{id}/boxscore/pdf endpoint. Email Box Score copies live stats link. Verified via screenshot - PDF downloaded successfully."
 
+  - task: "XML Box Score Export"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Backend endpoint /api/games/{game_id}/boxscore/xml generates SportsML format XML. Frontend Export tab has XML Box Score button. Verified via curl - XML returns valid SportsML data."
+
+  - task: "Email Box Score"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Backend endpoint /api/games/{game_id}/email-boxscore sends HTML emails via Resend. Frontend dialog calls backend API with email validation. NOTE: Requires RESEND_API_KEY in backend/.env."
+
+  - task: "Starter Selection Small Roster"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/AdvancedLiveGame.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Fixed starter selection to allow teams with <5 players. Confirm button enabled when all available players selected for small roster teams."
+
   - task: "Advanced Mode Summary and Leaders Tabs"
     implemented: true
     working: true
