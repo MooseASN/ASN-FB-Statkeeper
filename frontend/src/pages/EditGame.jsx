@@ -134,7 +134,8 @@ export default function EditGame({ user, onLogout }) {
         timeout_preset: timeoutPreset,
         custom_timeouts: timeoutPreset === "custom" ? customTimeouts : null,
         primetime_enabled: primetimeEnabled,
-        video_url: primetimeEnabled ? videoUrl : null
+        video_url: primetimeEnabled ? videoUrl : null,
+        note: gameNote || null
       };
 
       await axios.put(`${API}/games/${id}`, updateData);
