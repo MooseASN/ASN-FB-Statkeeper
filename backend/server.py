@@ -1965,6 +1965,7 @@ async def record_stat(game_id: str, stat: StatUpdate, user: User = Depends(get_c
             "id": str(uuid.uuid4()),
             "quarter": game["current_quarter"],
             "team": team_key,
+            "player_id": stat.player_id,
             "player_name": player_stat["player_name"],
             "player_number": player_stat["player_number"],
             "action": action_labels.get(stat.stat_type, stat.stat_type),
