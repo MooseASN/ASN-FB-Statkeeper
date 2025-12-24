@@ -84,6 +84,7 @@ const ColorPicker = ({ value, onChange }) => {
 };
 
 export default function Teams({ user, onLogout }) {
+  const navigate = useNavigate();
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
