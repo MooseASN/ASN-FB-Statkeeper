@@ -700,6 +700,113 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Start Game Mode Selection Dialog */}
+      <Dialog open={startModeDialogOpen} onOpenChange={setStartModeDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Start Game</DialogTitle>
+          </DialogHeader>
+          {selectedGameToStart && (
+            <div className="space-y-4 pt-2">
+              {/* Game Info */}
+              <div className="bg-gradient-to-r from-slate-800 to-slate-700 rounded-lg p-4 text-white text-center">
+                <div className="flex items-center justify-center gap-4">
+                  <span className="font-semibold">{selectedGameToStart.home_team_name}</span>
+                  <span className="text-white/60">vs</span>
+                  <span className="font-semibold">{selectedGameToStart.away_team_name}</span>
+                </div>
+              </div>
+
+              {/* Mode Selection */}
+              <div>
+                <Label className="text-base font-semibold mb-3 block">Select Stat Tracking Mode</Label>
+                <div className="grid grid-cols-3 gap-3">
+                  {/* Simple Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStartMode("simple")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      selectedStartMode === "simple" 
+                        ? "border-green-500 bg-green-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="font-semibold text-green-700 mb-1">Simple</div>
+                    <p className="text-xs text-slate-600">Basic tracking</p>
+                  </button>
+                  
+                  {/* Classic Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStartMode("classic")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      selectedStartMode === "classic" 
+                        ? "border-black bg-slate-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="font-semibold text-slate-800 mb-1">Classic</div>
+                    <p className="text-xs text-slate-600">Full stats</p>
+                  </button>
+                  
+                  {/* Advanced Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedStartMode("advanced")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      selectedStartMode === "advanced" 
+                        ? "border-blue-500 bg-blue-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="font-semibold text-blue-700 mb-1">Advanced</div>
+                    <p className="text-xs text-slate-600">Pro interface</p>
+                  </button>
+                </div>
+              </div>
+
+              {/* Mode Description */}
+              {selectedStartMode === "simple" && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm text-green-700">
+                    <strong>Simple Mode:</strong> FT/2PT/3PT makes, rebounds, assists, fouls
+                  </p>
+                </div>
+              )}
+              {selectedStartMode === "classic" && (
+                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3">
+                  <p className="text-sm text-slate-700">
+                    <strong>Classic Mode:</strong> Full stats with traditional interface
+                  </p>
+                </div>
+              )}
+              {selectedStartMode === "advanced" && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-sm text-blue-700">
+                    <strong>Advanced Mode:</strong> Hotkeys, possession arrow, game clock, pro layout
+                  </p>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex justify-end gap-2 pt-2">
+                <Button variant="outline" onClick={() => setStartModeDialogOpen(false)}>
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={confirmStartGame}
+                  disabled={startingGameId === selectedGameToStart?.id}
+                  className="bg-green-600 hover:bg-green-700"
+                >
+                  <PlayCircle className="w-4 h-4 mr-1" />
+                  {startingGameId === selectedGameToStart?.id ? "Starting..." : "Start Game"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
