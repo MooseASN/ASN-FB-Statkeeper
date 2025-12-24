@@ -130,11 +130,18 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
         </div>
         
         {simpleMode ? (
-          /* Simple Mode - Single row layout: Name/Delete | Buttons | PTS */
-          <div className="flex-1 flex items-center gap-3">
-            {/* Player name and actions */}
-            <div className="flex items-center gap-1 min-w-0">
-              <span className="font-medium text-sm truncate max-w-[80px]">{player.player_name}</span>
+          /* Simple Mode - Single row layout: Name/Edit/Delete | Buttons | PTS */
+          <div className="flex-1 flex items-center gap-2">
+            {/* Player name and actions - full name visible */}
+            <div className="flex items-center gap-1 min-w-0 flex-shrink-0">
+              <span className="font-medium text-sm whitespace-nowrap">{player.player_name}</span>
+              <button
+                onClick={() => onEditPlayer(player)}
+                className="p-0.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded flex-shrink-0"
+                title="Edit player"
+              >
+                <Pencil className="w-3 h-3" />
+              </button>
               <button
                 onClick={() => onRemovePlayer(player)}
                 className="p-0.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded flex-shrink-0"
@@ -144,7 +151,7 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
               </button>
             </div>
             
-            {/* Stat buttons in order: 2PT, 3PT, FT, REB, AST */}
+            {/* Stat buttons in order: 2PT, 3PT, FT, REB, AST (no PF) */}
             <div className="flex items-center gap-1.5 flex-1 justify-center">
               <button
                 onClick={() => onShotClick(player, "fg2")}
@@ -175,14 +182,10 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
                 className="px-2 py-1 text-[10px] bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 font-medium transition-colors">
                 AST
               </button>
-              <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-                className="px-2 py-1 text-[10px] bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 font-medium transition-colors">
-                PF
-              </button>
             </div>
             
             {/* Total points */}
-            <span className="text-sm font-bold whitespace-nowrap">{pts} PTS</span>
+            <span className="text-sm font-bold whitespace-nowrap flex-shrink-0">{pts} PTS</span>
           </div>
         ) : (
           /* Classic Mode - Original layout */
