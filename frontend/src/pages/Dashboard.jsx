@@ -34,6 +34,11 @@ export default function Dashboard({ user, onLogout }) {
   const [embedWidth, setEmbedWidth] = useState("1920");
   const [embedHeight, setEmbedHeight] = useState("300");
 
+  // Start game mode selection dialog
+  const [startModeDialogOpen, setStartModeDialogOpen] = useState(false);
+  const [selectedGameToStart, setSelectedGameToStart] = useState(null);
+  const [selectedStartMode, setSelectedStartMode] = useState("classic");
+
   useEffect(() => {
     fetchData();
     fetchSponsorBanners();
