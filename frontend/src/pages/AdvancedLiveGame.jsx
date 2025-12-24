@@ -900,19 +900,19 @@ export default function AdvancedLiveGame() {
         </div>
 
         {/* Main Panel */}
-        <div className="flex-1 p-4">
+        <div className="flex-1 p-2 sm:p-4">
           {activeTab === "addplay" && (
             <div className="space-y-4">
               {/* Adding Play For */}
               <div className="flex items-center gap-2 mb-4">
-                <span className="text-zinc-400">Adding play for:</span>
-                <span className="px-3 py-1 rounded font-bold" style={{ backgroundColor: currentTeamColor }}>
+                <span className="text-zinc-400 text-sm">Adding play for:</span>
+                <span className="px-3 py-1 rounded font-bold text-sm" style={{ backgroundColor: currentTeamColor }}>
                   {currentTeamName}
                 </span>
               </div>
 
-              {/* Main Stat Buttons Grid */}
-              <div className="grid grid-cols-4 gap-3">
+              {/* Main Stat Buttons Grid - Responsive */}
+              <div className="grid grid-cols-3 sm:grid-cols-4 gap-2 sm:gap-3">
                 <StatButton label="2PT Shot" hotkey="J" onClick={() => { setActiveAction('2pt'); setShowPlayerSelect(true); }}  />
                 <StatButton label="3PT Shot" hotkey="L" onClick={() => { setActiveAction('3pt'); setShowPlayerSelect(true); }}  />
                 <StatButton label="Free Throw" hotkey="F" onClick={() => { setActiveAction('ft'); setShowPlayerSelect(true); }}  />
