@@ -758,6 +758,8 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
     # Look for roster tables with specific PrestoSports/Sidearm patterns
     presto_rows = soup.select('.sidearm-roster-player, .roster-player, [class*="roster"] tr, .s-person-card, .s-person, [class*="RosterCard"], [class*="roster-card"], .team-roster-item')
     
+    print(f"DEBUG: Found {len(presto_rows)} presto_rows")
+    
     for row in presto_rows:
         number = ""
         name = ""
