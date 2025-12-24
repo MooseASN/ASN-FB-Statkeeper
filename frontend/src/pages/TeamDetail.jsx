@@ -254,10 +254,10 @@ export default function TeamDetail({ user, onLogout }) {
     toast.success(`Added ${newPlayers.length} player(s) to roster`);
   };
 
-  // MaxPreps import handler
+  // Roster URL import handler
   const handleMaxPrepsImport = async () => {
     if (!maxPrepsUrl.trim()) {
-      toast.error("Please enter a MaxPreps roster URL");
+      toast.error("Please enter a roster page URL");
       return;
     }
     
@@ -271,7 +271,7 @@ export default function TeamDetail({ user, onLogout }) {
       setMaxPrepsOpen(false);
       setMaxPrepsUrl("");
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to import from MaxPreps");
+      toast.error(error.response?.data?.detail || "Failed to import roster from URL");
     } finally {
       setMaxPrepsLoading(false);
     }
