@@ -42,6 +42,9 @@ export default function NewGame({ user, onLogout }) {
   // Game mode option: "simple", "classic", "advanced"
   const [statMode, setStatMode] = useState("classic");
 
+  // Game notes
+  const [gameNote, setGameNote] = useState("");
+
   useEffect(() => {
     fetchTeams();
   }, []);
