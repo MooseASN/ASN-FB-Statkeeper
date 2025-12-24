@@ -744,20 +744,26 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
     
     # Method 1: PrestoSports roster table (common structure)
     # Look for roster tables with specific PrestoSports/Sidearm patterns
-    presto_rows = soup.select('.sidearm-roster-player, .roster-player, [class*="roster"] tr, .s-person-card')
+    presto_rows = soup.select('.sidearm-roster-player, .roster-player, [class*="roster"] tr, .s-person-card, .s-person, [class*="RosterCard"], [class*="roster-card"], .team-roster-item')
     
     for row in presto_rows:
         number = ""
         name = ""
         
         # Try PrestoSports/Sidearm specific selectors
-        num_elem = row.select_one('.sidearm-roster-player-jersey-number, .roster-player-jersey, [class*="jersey"], [class*="number"]:not([class*="phone"])')
-        name_elem = row.select_one('.sidearm-roster-player-name a, .roster-player-name a, [class*="player-name"], .s-person-details__personal-single-line a')
+        num_elem = row.select_one('.sidearm-roster-player-jersey-number, .roster-player-jersey, [class*="jersey"], [class*="number"]:not([class*="phone"]), .s-stamp, [class*="Jersey"], .player-no')
+        name_elem = row.select_one('.sidearm-roster-player-name a, .roster-player-name a, [class*="player-name"], .s-person-details__personal-single-line a, [class*="PlayerName"], .roster-name a, .player-info a')
         
         if num_elem:
             number = num_elem.get_text(strip=True).replace('#', '')
         if name_elem:
             name = name_elem.get_text(strip=True)
+        
+        # If name not found, try broader selectors
+        if not name:
+            name_elem = row.select_one('a[href*="bio"], a[href*="player"], a[href*="roster"], h3, h4, .name')
+            if name_elem:
+                name = name_elem.get_text(strip=True)
         
         # Validate and add
         if number and name and re.match(r'^\d{1,3}$', number):
