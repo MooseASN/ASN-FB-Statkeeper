@@ -330,178 +330,173 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
 };
 
 // ============ EXPANDED PLAYER CARD ============
-const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn, simpleMode }) => {
+const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onReboundClick, onEditPlayer, onRemovePlayer, disabled, clockEnabled, isOnFloor, onToggleFloor, canCheckIn, simpleMode }) => {
   const pts = player.ft_made + (player.fg2_made * 2) + (player.fg3_made * 3);
   const stats = calcShootingStats(player);
   const totalReb = player.offensive_rebounds + player.defensive_rebounds;
   
   return (
-    <div className={`bg-white rounded-xl p-4 shadow-sm border ${isOnFloor ? 'ring-2 ring-green-500' : ''}`} data-testid={`player-card-${player.id}`}>
-      {/* Header with player info */}
-      <div className="flex items-center gap-3 mb-4">
-        {/* On-floor checkbox - to the left of player info */}
-        {clockEnabled && (
-          <Checkbox
-            checked={isOnFloor}
-            onCheckedChange={() => onToggleFloor(player.id)}
-            disabled={!isOnFloor && !canCheckIn}
-            className="w-5 h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-            title={isOnFloor ? "On floor" : (canCheckIn ? "Check in" : "5 players max")}
-          />
-        )}
-        <div 
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0"
-          style={{ backgroundColor: teamColor }}
-        >
-          {player.player_number}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h4 className="font-bold text-lg truncate">{player.player_name}</h4>
-            <div className="flex items-center gap-1 flex-shrink-0">
-              <button
-                onClick={() => onEditPlayer(player)}
-                className="p-1 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
-                title="Edit player"
-              >
-                <Pencil className="w-4 h-4" />
-              </button>
-              <button
-                onClick={() => onRemovePlayer(player)}
-                className="p-1 text-red-400 hover:text-red-600 hover:bg-red-50 rounded"
-                title="Remove player"
-              >
-                <Trash2 className="w-4 h-4" />
-              </button>
+    <div className={`bg-white rounded-xl p-3 sm:p-4 shadow-sm border ${isOnFloor ? 'ring-2 ring-green-500' : ''}`} data-testid={`player-card-${player.id}`}>
+      {simpleMode ? (
+        /* ============ SIMPLE MODE EXPANDED ============ */
+        <>
+          {/* Header with player info */}
+          <div className="flex items-center gap-3 mb-4">
+            {clockEnabled && (
+              <Checkbox
+                checked={isOnFloor}
+                onCheckedChange={() => onToggleFloor(player.id)}
+                disabled={!isOnFloor && !canCheckIn}
+                className="w-5 h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+              />
+            )}
+            <div 
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg flex-shrink-0"
+              style={{ backgroundColor: teamColor }}
+            >
+              {player.player_number}
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h4 className="font-bold text-base sm:text-lg truncate">{player.player_name}</h4>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <button onClick={() => onEditPlayer(player)} className="p-1 text-slate-400 hover:text-slate-600 rounded">
+                    <Pencil className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </button>
+                  <button onClick={() => onRemovePlayer(player)} className="p-1 text-red-400 hover:text-red-600 rounded">
+                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </button>
+                </div>
+              </div>
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                {player.fg2_made} 2P • {player.fg3_made} 3P • {player.ft_made} FT
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl sm:text-3xl font-bold" style={{ color: teamColor }}>{pts} <span className="text-sm sm:text-lg">PTS</span></div>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">
-            {simpleMode 
-              ? `${player.fg2_made} 2P • ${player.fg3_made} 3P • ${player.ft_made} FT • ${totalReb} REB • ${player.assists} AST`
-              : `${stats.fg_made}/${stats.fg_att} FG (${stats.fg_pct}%) • ${totalReb} REB • ${player.assists} AST`
-            }
-          </p>
-        </div>
-        <div className="text-right">
-          <div className="text-3xl font-bold" style={{ color: teamColor }}>{pts} <span className="text-lg">PTS</span></div>
-        </div>
-      </div>
-
-      {/* Shot buttons - in order: 2PT, 3PT, FT for Simple Mode */}
-      {simpleMode ? (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
-          <button
-            onClick={() => onShotClick(player, "fg2")}
-            disabled={disabled}
-            className="py-3 sm:py-4 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
-          >
-            <div className="text-lg sm:text-xl">2PT</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">{player.fg2_made}</div>
-          </button>
-          <button
-            onClick={() => onShotClick(player, "fg3")}
-            disabled={disabled}
-            className="py-3 sm:py-4 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
-          >
-            <div className="text-lg sm:text-xl">3PT</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">{player.fg3_made}</div>
-          </button>
-          <button
-            onClick={() => onShotClick(player, "ft")}
-            disabled={disabled}
-            className="py-3 sm:py-4 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
-          >
-            <div className="text-lg sm:text-xl">FT</div>
-            <div className="text-xs sm:text-sm text-muted-foreground">{player.ft_made}</div>
-          </button>
-        </div>
-      ) : (
-        <div className="grid grid-cols-3 gap-1.5 sm:gap-2 mb-4">
-          <button
-            onClick={() => onShotClick(player, "ft")}
-            disabled={disabled}
-            className="py-2 sm:py-3 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors"
-          >
-            <div className="text-base sm:text-lg">FT</div>
-            <div className="text-[10px] sm:text-xs text-muted-foreground">{player.ft_made}/{stats.ft_att}</div>
-          </button>
-          <button
-            onClick={() => onShotClick(player, "fg2")}
-            disabled={disabled}
-            className="py-2 sm:py-3 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors"
-          >
-            <div className="text-base sm:text-lg">2PT</div>
-            <div className="text-[10px] sm:text-xs text-muted-foreground">{player.fg2_made}/{stats.fg2_att}</div>
-          </button>
-          <button
-            onClick={() => onShotClick(player, "fg3")}
-            disabled={disabled}
-            className="py-2 sm:py-3 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors"
-          >
-            <div className="text-base sm:text-lg">3PT</div>
-            <div className="text-[10px] sm:text-xs text-muted-foreground">{player.fg3_made}/{stats.fg3_att}</div>
-          </button>
-        </div>
-      )}
-
-      {/* Other stats - simplified or full */}
-      {simpleMode ? (
-        <div className="grid grid-cols-3 gap-2 sm:gap-3 mt-2">
-          <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-            className="py-3 sm:py-4 px-2 sm:px-3 text-sm sm:text-base bg-cyan-50 hover:bg-cyan-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-cyan-300 hover:border-cyan-500">
-            <div className="text-xl sm:text-2xl font-bold">{totalReb}</div>
-            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">REB</div>
-          </button>
-          <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-            className="py-3 sm:py-4 px-2 sm:px-3 text-sm sm:text-base bg-purple-50 hover:bg-purple-100 rounded-xl disabled:opacity-50 transition-colors border-2 border-purple-300 hover:border-purple-500">
-            <div className="text-xl sm:text-2xl font-bold">{player.assists}</div>
-            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">AST</div>
-          </button>
-          <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-            className="py-3 sm:py-4 px-2 sm:px-3 text-sm sm:text-base bg-red-50 hover:bg-red-100 text-red-600 rounded-xl disabled:opacity-50 transition-colors border-2 border-red-300 hover:border-red-500">
-            <div className="text-xl sm:text-2xl font-bold">{player.fouls}</div>
-            <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">PF</div>
-          </button>
-        </div>
-      ) : (
-        <>
-          <div className="grid grid-cols-4 gap-1.5 sm:gap-2 mb-2">
-            <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.assists}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">AST</div>
+          
+          {/* Shot buttons */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+            <button onClick={() => onShotClick(player, "fg2")} disabled={disabled}
+              className="py-3 sm:py-4 rounded-xl border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-lg sm:text-xl">2PT</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{player.fg2_made}</div>
             </button>
-            <button onClick={() => onStatUpdate(player.id, "oreb")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-green-100 hover:bg-green-200 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.offensive_rebounds}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">OREB</div>
+            <button onClick={() => onShotClick(player, "fg3")} disabled={disabled}
+              className="py-3 sm:py-4 rounded-xl border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-lg sm:text-xl">3PT</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{player.fg3_made}</div>
             </button>
-            <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-blue-100 hover:bg-blue-200 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.defensive_rebounds}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">DREB</div>
-            </button>
-            <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-purple-100 hover:bg-purple-200 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.steals}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">STL</div>
+            <button onClick={() => onShotClick(player, "ft")} disabled={disabled}
+              className="py-3 sm:py-4 rounded-xl border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-lg sm:text-xl">FT</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">{player.ft_made}</div>
             </button>
           </div>
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-2">
-            <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-slate-100 hover:bg-slate-200 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.blocks}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">BLK</div>
+          
+          {/* Other stats */}
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
+            <button onClick={() => onStatUpdate(player.id, "dreb")} disabled={disabled}
+              className="py-3 sm:py-4 bg-cyan-50 hover:bg-cyan-100 rounded-xl disabled:opacity-50 border-2 border-cyan-300 hover:border-cyan-500">
+              <div className="text-xl sm:text-2xl font-bold">{totalReb}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">REB</div>
             </button>
-            <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-red-50 hover:bg-red-100 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.turnovers}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">TOV</div>
+            <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
+              className="py-3 sm:py-4 bg-purple-50 hover:bg-purple-100 rounded-xl disabled:opacity-50 border-2 border-purple-300 hover:border-purple-500">
+              <div className="text-xl sm:text-2xl font-bold">{player.assists}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">AST</div>
             </button>
             <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
-              className="py-1.5 sm:py-2 px-1.5 sm:px-2 text-xs sm:text-sm bg-red-100 hover:bg-red-200 text-red-600 rounded-lg disabled:opacity-50 transition-colors">
-              <div className="font-bold">{player.fouls}</div>
-              <div className="text-[8px] sm:text-[10px] text-muted-foreground">PF</div>
+              className="py-3 sm:py-4 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl disabled:opacity-50 border-2 border-red-300 hover:border-red-500">
+              <div className="text-xl sm:text-2xl font-bold">{player.fouls}</div>
+              <div className="text-[10px] sm:text-xs text-muted-foreground font-medium">PF</div>
+            </button>
+          </div>
+        </>
+      ) : (
+        /* ============ CLASSIC MODE - REVAMPED UI ============ */
+        <>
+          {/* Row 1: Number | Name + Shooting Splits | Points */}
+          <div className="flex items-center gap-2 sm:gap-3 mb-3">
+            {/* On-floor checkbox */}
+            {clockEnabled && (
+              <Checkbox
+                checked={isOnFloor}
+                onCheckedChange={() => onToggleFloor(player.id)}
+                disabled={!isOnFloor && !canCheckIn}
+                className="w-4 h-4 sm:w-5 sm:h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 flex-shrink-0"
+              />
+            )}
+            
+            {/* Player Number */}
+            <div 
+              className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-lg flex-shrink-0"
+              style={{ backgroundColor: teamColor }}
+            >
+              {player.player_number}
+            </div>
+            
+            {/* Name + Shooting Splits */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <h4 className="font-bold text-sm sm:text-base truncate max-w-[140px] sm:max-w-[200px]">{player.player_name}</h4>
+                <button onClick={() => onEditPlayer(player)} className="p-0.5 sm:p-1 text-slate-400 hover:text-slate-600 rounded flex-shrink-0">
+                  <Pencil className="w-3 h-3" />
+                </button>
+                <button onClick={() => onRemovePlayer(player)} className="p-0.5 sm:p-1 text-red-400 hover:text-red-600 rounded flex-shrink-0">
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
+                FT: {player.ft_made}/{stats.ft_att} • 2PT: {player.fg2_made}/{stats.fg2_att} • 3PT: {player.fg3_made}/{stats.fg3_att}
+              </p>
+            </div>
+            
+            {/* Points */}
+            <div className="text-right flex-shrink-0">
+              <div className="text-xl sm:text-2xl font-bold" style={{ color: teamColor }}>{pts} <span className="text-xs sm:text-sm">PTS</span></div>
+            </div>
+          </div>
+          
+          {/* Row 2: All Stat Buttons - FT, 2PT, 3PT, REB, AST, BLK, STL, TOV, PF */}
+          <div className="grid grid-cols-9 gap-1 sm:gap-1.5">
+            <button onClick={() => onShotClick(player, "ft")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-emerald-200 hover:border-emerald-500 hover:bg-emerald-50 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">FT</div>
+            </button>
+            <button onClick={() => onShotClick(player, "fg2")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-blue-200 hover:border-blue-500 hover:bg-blue-50 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">2PT</div>
+            </button>
+            <button onClick={() => onShotClick(player, "fg3")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-orange-200 hover:border-orange-500 hover:bg-orange-50 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">3PT</div>
+            </button>
+            <button onClick={() => onReboundClick && onReboundClick(player)} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-cyan-200 bg-cyan-50 hover:border-cyan-500 hover:bg-cyan-100 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">REB</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "assist")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-purple-200 bg-purple-50 hover:border-purple-500 hover:bg-purple-100 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">AST</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "block")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-slate-200 bg-slate-50 hover:border-slate-400 hover:bg-slate-100 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">BLK</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "steal")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-indigo-200 bg-indigo-50 hover:border-indigo-500 hover:bg-indigo-100 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">STL</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "turnover")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-amber-200 bg-amber-50 hover:border-amber-500 hover:bg-amber-100 text-amber-700 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">TOV</div>
+            </button>
+            <button onClick={() => onStatUpdate(player.id, "foul")} disabled={disabled}
+              className="py-2 sm:py-3 rounded-lg border-2 border-red-200 bg-red-50 hover:border-red-500 hover:bg-red-100 text-red-600 font-bold disabled:opacity-50 transition-colors">
+              <div className="text-xs sm:text-sm">PF</div>
             </button>
           </div>
         </>
