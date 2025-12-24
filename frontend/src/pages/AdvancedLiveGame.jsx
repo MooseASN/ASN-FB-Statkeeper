@@ -2227,10 +2227,10 @@ export default function AdvancedLiveGame() {
                   toast.error("Failed to set starters");
                 }
               }}
-              disabled={homeStarters.length !== 5 || awayStarters.length !== 5}
+              disabled={homeStarters.length === 0 || awayStarters.length === 0}
               className="bg-green-600 hover:bg-green-700"
             >
-              Confirm Starters ({homeStarters.length + awayStarters.length}/10)
+              Confirm Starters ({homeStarters.length} + {awayStarters.length})
             </Button>
           </div>
         </DialogContent>
