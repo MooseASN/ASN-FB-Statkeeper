@@ -1273,6 +1273,15 @@ export default function LiveGame() {
         simpleMode={game?.simple_mode}
       />
 
+      {/* Rebound Modal for Classic Mode */}
+      <ReboundModal
+        isOpen={reboundModalOpen}
+        onClose={() => setReboundModalOpen(false)}
+        playerName={reboundPlayer?.player_name}
+        onOffensive={() => handleReboundResult('offensive')}
+        onDefensive={() => handleReboundResult('defensive')}
+      />
+
       {/* Side Action Buttons - Flippable with teams */}
       <SideActionButton 
         label={teamsFlipped ? "Away Rebound" : "Home Rebound"} 
