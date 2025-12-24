@@ -179,6 +179,9 @@ export default function EditGame({ user, onLogout }) {
                   <SelectValue placeholder="Select home team" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="TBD">
+                    <span className="text-slate-500 italic">TBD (To Be Determined)</span>
+                  </SelectItem>
                   {teams.map((team) => (
                     <SelectItem key={team.id} value={team.id} disabled={team.id === awayTeamId}>
                       {team.name} ({team.roster?.length || 0} players)
@@ -186,7 +189,11 @@ export default function EditGame({ user, onLogout }) {
                   ))}
                 </SelectContent>
               </Select>
-              {selectedHome && (
+              {homeTeamId === "TBD" ? (
+                <p className="text-sm text-slate-500 mt-1 italic">
+                  Team to be determined
+                </p>
+              ) : selectedHome && (
                 <p className="text-sm text-muted-foreground mt-1">
                   Roster: {selectedHome.roster?.length || 0} players
                 </p>
@@ -206,6 +213,9 @@ export default function EditGame({ user, onLogout }) {
                   <SelectValue placeholder="Select away team" />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="TBD">
+                    <span className="text-slate-500 italic">TBD (To Be Determined)</span>
+                  </SelectItem>
                   {teams.map((team) => (
                     <SelectItem key={team.id} value={team.id} disabled={team.id === homeTeamId}>
                       {team.name} ({team.roster?.length || 0} players)
@@ -213,7 +223,11 @@ export default function EditGame({ user, onLogout }) {
                   ))}
                 </SelectContent>
               </Select>
-              {selectedAway && (
+              {awayTeamId === "TBD" ? (
+                <p className="text-sm text-slate-500 mt-1 italic">
+                  Team to be determined
+                </p>
+              ) : selectedAway && (
                 <p className="text-sm text-muted-foreground mt-1">
                   Roster: {selectedAway.roster?.length || 0} players
                 </p>
@@ -225,12 +239,16 @@ export default function EditGame({ user, onLogout }) {
               <div className="bg-gradient-to-r from-[#000000] to-[#333333] rounded-xl p-6 text-white text-center">
                 <div className="flex items-center justify-center gap-4">
                   <div className="flex-1">
-                    <p className="text-lg font-semibold">{selectedHome?.name}</p>
+                    <p className={`text-lg font-semibold ${homeTeamId === "TBD" ? "italic text-white/60" : ""}`}>
+                      {homeTeamId === "TBD" ? "TBD" : selectedHome?.name}
+                    </p>
                     <p className="text-white/60 text-sm">Home</p>
                   </div>
                   <div className="text-3xl font-bold">VS</div>
                   <div className="flex-1">
-                    <p className="text-lg font-semibold">{selectedAway?.name}</p>
+                    <p className={`text-lg font-semibold ${awayTeamId === "TBD" ? "italic text-white/60" : ""}`}>
+                      {awayTeamId === "TBD" ? "TBD" : selectedAway?.name}
+                    </p>
                     <p className="text-white/60 text-sm">Away</p>
                   </div>
                 </div>
