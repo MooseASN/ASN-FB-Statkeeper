@@ -11,6 +11,7 @@ import EditGame from "@/pages/EditGame";
 import LiveGame from "@/pages/LiveGame";
 import AdvancedLiveGame from "@/pages/AdvancedLiveGame";
 import LiveView from "@/pages/LiveView";
+import EventLive from "@/pages/EventLive";
 import EmbedLiveGame from "@/pages/EmbedLiveGame";
 import EmbedLatestGame from "@/pages/EmbedLatestGame";
 import GameHistory from "@/pages/GameHistory";
