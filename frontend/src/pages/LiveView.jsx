@@ -174,13 +174,8 @@ export default function LiveView() {
   const [eventGames, setEventGames] = useState([]);
   const [eventInfo, setEventInfo] = useState(null);
   
-  // Primetime video state
-  const [isPiP, setIsPiP] = useState(false);
-  const [pipPosition, setPipPosition] = useState({ x: 20, y: 20 });
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  // Primetime video ref
   const videoContainerRef = useRef(null);
-  const pipRef = useRef(null);
 
   // Handle scroll for PiP toggle
   useEffect(() => {
