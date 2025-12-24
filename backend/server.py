@@ -807,7 +807,7 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                         name_cell = cells[name_idx]
                         # Try to get name from link first, then text
                         name_link = name_cell.find('a')
-                        name = name_link.get_text(strip=True) if name_link else name_cell.get_text(strip=True)
+                        name = clean_name(name_link.get_text() if name_link else name_cell.get_text())
                         
                         if number and name and re.match(r'^\d{1,3}$', number):
                             roster.append({"number": number, "name": name})
@@ -827,7 +827,7 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                     name = ""
                     
                     for i, cell in enumerate(cells[:5]):  # Check first 5 cells
-                        text = cell.get_text(strip=True).replace('#', '')
+                        text = clean_name(cell.get_text()).replace('#', '')
                         # Check if it looks like a jersey number
                         if not number and re.match(r'^\d{1,3}$', text):
                             number = text
@@ -836,7 +836,7 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                             # Prefer names from links
                             link = cell.find('a')
                             if link:
-                                name = link.get_text(strip=True)
+                                name = clean_name(link.get_text())
                             else:
                                 name = text
                     
