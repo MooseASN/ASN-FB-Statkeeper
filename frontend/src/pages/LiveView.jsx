@@ -796,7 +796,11 @@ export default function LiveView() {
                   {[...playByPlay].reverse().map((play, idx) => (
                     <div 
                       key={play.id || idx} 
-                      className={`p-3 rounded text-sm ${play.team === 'home' ? 'bg-red-50 border-l-2 border-red-500' : 'bg-purple-50 border-l-2 border-purple-500'}`}
+                      className="p-3 rounded text-sm border-l-4"
+                      style={{ 
+                        backgroundColor: play.team === 'home' ? `${homeColor}15` : `${awayColor}15`,
+                        borderLeftColor: play.team === 'home' ? homeColor : awayColor
+                      }}
                     >
                       <div className="flex justify-between items-start">
                         <div>
