@@ -1612,7 +1612,8 @@ async def create_event(event_data: EventCreate, user: User = Depends(get_current
         location=event_data.location,
         start_date=event_data.start_date,
         end_date=event_data.end_date or event_data.start_date,
-        logo_data=event_data.logo_data
+        logo_data=event_data.logo_data,
+        color=event_data.color
     )
     event.user_id = user.user_id
     
