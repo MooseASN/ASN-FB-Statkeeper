@@ -739,6 +739,14 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
     
     roster = []
     
+    # Helper function to clean player names
+    def clean_name(name_text):
+        if not name_text:
+            return ""
+        # Remove extra whitespace, newlines, tabs and normalize
+        cleaned = ' '.join(name_text.split())
+        return cleaned.strip()
+    
     # PrestoSports/Sidearm specific selectors (common on college athletic sites)
     # These platforms use specific class patterns
     
