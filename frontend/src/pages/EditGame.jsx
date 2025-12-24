@@ -43,6 +43,9 @@ export default function EditGame({ user, onLogout }) {
   // Game mode option: "simple", "classic", "advanced"
   const [statMode, setStatMode] = useState("classic");
 
+  // Game notes
+  const [gameNote, setGameNote] = useState("");
+
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
