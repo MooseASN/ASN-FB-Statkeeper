@@ -1117,30 +1117,37 @@ export default function AdvancedLiveGame() {
           <DialogHeader>
             <DialogTitle>Select Player - {activeAction?.toUpperCase().replace('_', ' ')}</DialogTitle>
           </DialogHeader>
-          <div className="grid grid-cols-5 gap-2 mt-4">
-            {currentTeamStats.map(player => (
-              <button
-                key={player.id}
-                onClick={() => {
-                  // For shots (ft, 2pt, 3pt), show make/miss dialog
-                  if (activeAction === 'ft' || activeAction === '2pt' || activeAction === '3pt') {
-                    setPendingShotPlayer(player);
-                    setPendingShotType(activeAction);
-                    setShowPlayerSelect(false);
-                    setShowShotResultDialog(true);
-                  } else {
-                    // For other stats (steal, assist, block, foul, etc.), record directly
-                    handleStatAction(player.id, activeAction);
-                    setShowPlayerSelect(false);
-                  }
-                }}
-                className="aspect-square rounded-lg font-bold text-xl hover:ring-2 ring-white transition-all"
-                style={{ backgroundColor: currentTeamColor }}
-              >
-                {player.player_number}
-              </button>
-            ))}
-          </div>
+          {currentTeamOnFloor.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-zinc-400">No players on the floor</p>
+              <p className="text-zinc-500 text-sm mt-2">Add players via Substitution first</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-5 gap-2 mt-4">
+              {currentTeamOnFloor.map(player => (
+                <button
+                  key={player.id}
+                  onClick={() => {
+                    // For shots (ft, 2pt, 3pt), show make/miss dialog
+                    if (activeAction === 'ft' || activeAction === '2pt' || activeAction === '3pt') {
+                      setPendingShotPlayer(player);
+                      setPendingShotType(activeAction);
+                      setShowPlayerSelect(false);
+                      setShowShotResultDialog(true);
+                    } else {
+                      // For other stats (steal, assist, block, foul, etc.), record directly
+                      handleStatAction(player.id, activeAction);
+                      setShowPlayerSelect(false);
+                    }
+                  }}
+                  className="aspect-square rounded-lg font-bold text-xl hover:ring-2 ring-white transition-all"
+                  style={{ backgroundColor: currentTeamColor }}
+                >
+                  {player.player_number}
+                </button>
+              ))}
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
