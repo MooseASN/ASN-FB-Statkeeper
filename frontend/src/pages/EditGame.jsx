@@ -7,8 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Save, Users, Calendar, Clock, Timer, PlayCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Users, Calendar, Clock, Timer, PlayCircle, Loader2, FileText } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
