@@ -1851,12 +1851,14 @@ export default function AdvancedLiveGame() {
                         "Technical Foul": { field: "fouls", points: 0 }
                       };
 
-                      // If player or action changed, we need to update stats
+                      // Check what changed
+                      const teamChanged = originalPlay.team !== editingPlay.team;
                       const playerChanged = originalPlay.player_id !== editingPlay.player_id;
                       const actionChanged = originalPlay.action !== editingPlay.action;
                       
-                      if (playerChanged || actionChanged) {
-                        // Reverse the old stat from the old player
+                      // If anything changed that affects stats, we need to update
+                      if (teamChanged || playerChanged || actionChanged) {
+                        // ALWAYS reverse the old stat from the original player (regardless of team change)
                         if (originalPlay.player_id && actionToStat[originalPlay.action]) {
                           const oldStat = actionToStat[originalPlay.action];
                           await axios.post(`${API}/games/${id}/stats`, {
@@ -1866,7 +1868,7 @@ export default function AdvancedLiveGame() {
                           });
                         }
                         
-                        // Add the new stat to the new player
+                        // ALWAYS add the new stat to the new player (if player is selected)
                         if (editingPlay.player_id && actionToStat[editingPlay.action]) {
                           const newStat = actionToStat[editingPlay.action];
                           await axios.post(`${API}/games/${id}/stats`, {
