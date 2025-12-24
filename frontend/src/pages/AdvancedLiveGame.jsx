@@ -2079,10 +2079,11 @@ const StatButton = ({ label, hotkey, onClick }) => {
   return (
     <button
       onClick={onClick}
-      className="bg-zinc-700 hover:bg-zinc-600 px-4 py-4 rounded-lg font-bold transition-colors flex flex-col items-center justify-center gap-1 text-white"
+      className="px-4 py-4 rounded-lg font-bold transition-colors flex flex-col items-center justify-center gap-1 text-white border border-white/50 hover:border-white"
+      style={{ backgroundColor: '#545454' }}
     >
       <span className="text-lg">{label}</span>
-      <span className="text-sm opacity-70">({hotkey})</span>
+      <span className="text-base opacity-80">({hotkey})</span>
     </button>
   );
 };
