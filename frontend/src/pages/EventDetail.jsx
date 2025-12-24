@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Calendar, MapPin, Image, Plus, X, PlayCircle, Clock, Video, ExternalLink } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Image, Plus, X, PlayCircle, Clock, Video, ExternalLink, Link2, Check } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
