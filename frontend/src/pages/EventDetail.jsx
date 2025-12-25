@@ -21,6 +21,7 @@ export default function EventDetail({ user, onLogout }) {
   const [addGameDialogOpen, setAddGameDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [sortOrder, setSortOrder] = useState("oldest"); // "oldest" or "newest"
   
   // Edit form state
   const [editName, setEditName] = useState("");
