@@ -1661,7 +1661,7 @@ export default function AdvancedLiveGame() {
               <span>Away Possession</span><span className="font-mono bg-zinc-800 px-2 rounded">V</span>
             </div>
             <div className="flex justify-between py-1 border-b border-zinc-800 col-span-2">
-              <span>Start/Stop Clock</span><span className="font-mono bg-zinc-800 px-2 rounded">Space</span>
+              <span>Start/Stop Clock</span><span className="font-mono bg-zinc-800 px-2 rounded">\</span>
             </div>
           </div>
         </DialogContent>
