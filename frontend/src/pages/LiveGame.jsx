@@ -568,6 +568,7 @@ export default function LiveGame() {
   const [clockRunning, setClockRunning] = useState(false);
   const clockIntervalRef = useRef(null);
   const [showPeriodEndDialog, setShowPeriodEndDialog] = useState(false);
+  const [resetFoulsOnAdvance, setResetFoulsOnAdvance] = useState(true);
   const [showHalftimeExitDialog, setShowHalftimeExitDialog] = useState(false);
 
   // Note state
