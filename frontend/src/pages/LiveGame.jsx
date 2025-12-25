@@ -2125,6 +2125,16 @@ export default function LiveGame() {
               The clock has reached 0:00. What would you like to do?
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="py-3 border-t border-b my-2">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <Checkbox
+                checked={resetFoulsOnAdvance}
+                onCheckedChange={setResetFoulsOnAdvance}
+                className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
+              />
+              <span className="text-sm">Reset team fouls for next period</span>
+            </label>
+          </div>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel>Continue Playing</AlertDialogCancel>
             {game?.current_quarter === 2 && (
@@ -2138,7 +2148,7 @@ export default function LiveGame() {
               </Button>
             )}
             <AlertDialogAction
-              onClick={handleNextPeriod}
+              onClick={() => handleNextPeriod(resetFoulsOnAdvance)}
               className="bg-green-600 hover:bg-green-700 gap-2"
             >
               <SkipForward className="w-4 h-4" />
