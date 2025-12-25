@@ -1323,8 +1323,8 @@ async def tick_clock(game_id: str, user: User = Depends(get_current_user)):
 
 
 @api_router.post("/games/{game_id}/clock/next-period")
-async def next_period(game_id: str, user: User = Depends(get_current_user)):
-    """Advance to next period and reset clock"""
+async def next_period(game_id: str, reset_fouls: bool = False, user: User = Depends(get_current_user)):
+    """Advance to next period and reset clock, optionally reset team fouls"""
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
@@ -1345,20 +1345,27 @@ async def next_period(game_id: str, user: User = Depends(get_current_user)):
     while len(away_scores) < new_quarter:
         away_scores.append(0)
     
+    update_data = {
+        "current_quarter": new_quarter,
+        "clock_time": period_duration,
+        "clock_running": False,
+        "is_halftime": False,
+        "quarter_scores.home": home_scores,
+        "quarter_scores.away": away_scores,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Reset team fouls if requested
+    if reset_fouls:
+        update_data["home_team_fouls"] = 0
+        update_data["away_team_fouls"] = 0
+    
     await db.games.update_one(
         {"id": game_id, "user_id": user.user_id},
-        {"$set": {
-            "current_quarter": new_quarter,
-            "clock_time": period_duration,
-            "clock_running": False,
-            "is_halftime": False,
-            "quarter_scores.home": home_scores,
-            "quarter_scores.away": away_scores,
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }}
+        {"$set": update_data}
     )
     
-    return {"message": f"Advanced to period {new_quarter}", "current_quarter": new_quarter}
+    return {"message": f"Advanced to period {new_quarter}", "current_quarter": new_quarter, "fouls_reset": reset_fouls}
 
 @api_router.post("/games/{game_id}/clock/halftime")
 async def go_to_halftime(game_id: str, user: User = Depends(get_current_user)):
