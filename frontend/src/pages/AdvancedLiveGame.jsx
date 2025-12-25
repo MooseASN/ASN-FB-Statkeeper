@@ -351,22 +351,15 @@ export default function AdvancedLiveGame() {
   // Actually advance quarter with optional foul reset
   const confirmAdvanceQuarter = async (resetFouls) => {
     try {
-      // Advance to next quarter (no limit for overtime)
+      // Use the backend next-period endpoint which handles foul reset
+      await axios.post(`${API}/games/${id}/clock/next-period`, null, {
+        params: { reset_fouls: resetFouls }
+      });
       const nextQuarter = (game.current_quarter || 1) + 1;
-      const updates = { 
-        current_quarter: nextQuarter,
-        clock_time: game.period_duration || 720 // Reset clock to period duration
-      };
-      
-      // Reset fouls if requested
+      toast.success(`Advanced to ${game.period_label} ${nextQuarter}${nextQuarter > 4 ? ' (OT)' : ''}`);
       if (resetFouls) {
-        // Reset all player fouls - would need backend support
-        // For now, just acknowledge
         toast.success("Team fouls reset");
       }
-      
-      await axios.put(`${API}/games/${id}`, updates);
-      toast.success(`Advanced to ${game.period_label} ${nextQuarter}${nextQuarter > 4 ? ' (OT)' : ''}`);
       setShowAdvanceQuarterDialog(false);
       setShowGameControlDialog(false);
       fetchGame();
