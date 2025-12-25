@@ -282,10 +282,21 @@ export default function EventDetail({ user, onLogout }) {
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Event Schedule</h2>
-            <Button onClick={handleOpenAddGame} className="gap-2" data-testid="add-game-btn">
-              <Plus className="w-4 h-4" />
-              Add Game
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => setSortOrder(sortOrder === "oldest" ? "newest" : "oldest")}
+                className="gap-2"
+              >
+                <Clock className="w-4 h-4" />
+                {sortOrder === "oldest" ? "Oldest First" : "Newest First"}
+              </Button>
+              <Button onClick={handleOpenAddGame} className="gap-2" data-testid="add-game-btn">
+                <Plus className="w-4 h-4" />
+                Add Game
+              </Button>
+            </div>
           </div>
 
           {event.games?.length === 0 ? (
@@ -308,12 +319,16 @@ export default function EventDetail({ user, onLogout }) {
                   const dateA = a.scheduled_date || '9999-12-31';
                   const dateB = b.scheduled_date || '9999-12-31';
                   if (dateA !== dateB) {
-                    return dateA.localeCompare(dateB);
+                    return sortOrder === "oldest" 
+                      ? dateA.localeCompare(dateB)
+                      : dateB.localeCompare(dateA);
                   }
                   // If same date, sort by time
                   const timeA = a.scheduled_time || '23:59';
                   const timeB = b.scheduled_time || '23:59';
-                  return timeA.localeCompare(timeB);
+                  return sortOrder === "oldest"
+                    ? timeA.localeCompare(timeB)
+                    : timeB.localeCompare(timeA);
                 })
                 .map(game => (
                 <Card key={game.id} data-testid={`event-game-${game.id}`}>
