@@ -704,9 +704,11 @@ export default function LiveGame() {
     }
   };
 
-  const handleNextPeriod = async () => {
+  const handleNextPeriod = async (resetFouls = resetFoulsOnAdvance) => {
     try {
-      await axios.post(`${API}/games/${id}/clock/next-period`);
+      await axios.post(`${API}/games/${id}/clock/next-period`, null, {
+        params: { reset_fouls: resetFouls }
+      });
       setShowPeriodEndDialog(false);
       fetchGame();
     } catch (error) {
