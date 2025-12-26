@@ -157,6 +157,522 @@ function KickoffDialog({ open, homeTeam, awayTeam, homeColor, awayColor, onSelec
   );
 }
 
+// Player Selection Component
+function PlayerSelector({ label, roster, selectedNumber, onSelect, teamColor }) {
+  const [inputValue, setInputValue] = useState('');
+  
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && inputValue) {
+      const num = parseInt(inputValue);
+      if (!isNaN(num)) {
+        onSelect(num);
+        setInputValue('');
+      }
+    }
+  };
+  
+  return (
+    <div className="space-y-3">
+      <label className="text-sm text-zinc-400 uppercase tracking-wide">{label}</label>
+      
+      {/* Number Input */}
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value.replace(/\D/g, '').slice(0, 2))}
+          onKeyPress={handleKeyPress}
+          placeholder="Enter #"
+          className="flex-1 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold focus:outline-none focus:border-blue-500"
+        />
+        <Button
+          onClick={() => {
+            const num = parseInt(inputValue);
+            if (!isNaN(num)) {
+              onSelect(num);
+              setInputValue('');
+            }
+          }}
+          disabled={!inputValue}
+          className="bg-blue-600 hover:bg-blue-700"
+        >
+          Select
+        </Button>
+      </div>
+      
+      {/* Roster Grid */}
+      {roster && roster.length > 0 && (
+        <div className="grid grid-cols-6 gap-1 max-h-32 overflow-y-auto">
+          {roster.map((player) => (
+            <button
+              key={player.id}
+              onClick={() => onSelect(player.number)}
+              className={`py-1 px-2 rounded text-sm font-bold transition-all ${
+                selectedNumber === player.number
+                  ? 'text-white'
+                  : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+              }`}
+              style={selectedNumber === player.number ? { backgroundColor: teamColor } : {}}
+              title={player.name}
+            >
+              #{player.number}
+            </button>
+          ))}
+        </div>
+      )}
+      
+      {/* Selected Player Display */}
+      {selectedNumber && (
+        <div 
+          className="text-center py-2 rounded font-bold"
+          style={{ backgroundColor: `${teamColor}40`, color: teamColor }}
+        >
+          #{selectedNumber} Selected
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Yard Line Selector Component
+function YardLineSelector({ label, value, onChange, direction = 'left' }) {
+  const presets = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+  
+  return (
+    <div className="space-y-2">
+      <label className="text-sm text-zinc-400 uppercase tracking-wide">{label}</label>
+      <div className="flex items-center gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-zinc-600"
+          onClick={() => onChange(Math.max(0, value - 5))}
+        >
+          -5
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-zinc-600"
+          onClick={() => onChange(Math.max(0, value - 1))}
+        >
+          -1
+        </Button>
+        <div className="flex-1 text-center">
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => onChange(Math.max(0, Math.min(50, parseInt(e.target.value) || 0)))}
+            className="w-20 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold focus:outline-none focus:border-blue-500"
+          />
+          <div className="text-xs text-zinc-500 mt-1">Yard Line</div>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-zinc-600"
+          onClick={() => onChange(Math.min(50, value + 1))}
+        >
+          +1
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          className="border-zinc-600"
+          onClick={() => onChange(Math.min(50, value + 5))}
+        >
+          +5
+        </Button>
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {presets.map((yard) => (
+          <button
+            key={yard}
+            onClick={() => onChange(yard)}
+            className={`px-2 py-1 rounded text-xs font-medium transition-all ${
+              value === yard
+                ? 'bg-blue-600 text-white'
+                : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+            }`}
+          >
+            {yard}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Kickoff Workflow Dialog
+function KickoffWorkflowDialog({ 
+  open, 
+  step, 
+  kickingTeam,
+  receivingTeam,
+  kickingTeamName,
+  receivingTeamName,
+  kickingTeamColor,
+  receivingTeamColor,
+  kickingRoster,
+  receivingRoster,
+  kickoffData,
+  setKickoffData,
+  onBack,
+  onNext,
+  onComplete
+}) {
+  const [customYardLine, setCustomYardLine] = useState(35);
+  
+  // Step 1: Select kickoff yard line and direction
+  if (step === 1) {
+    return (
+      <Dialog open={open}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">KICKOFF SETUP</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              {kickingTeamName} kicking to {receivingTeamName}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 mt-4">
+            {/* Kickoff Yard Line */}
+            <div>
+              <label className="text-sm text-zinc-400 uppercase tracking-wide mb-3 block">
+                Kickoff From
+              </label>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, kickoffYardLine: 35 }))}
+                  className={`flex-1 h-16 text-lg font-bold ${
+                    kickoffData.kickoffYardLine === 35 ? '' : 'bg-zinc-700 hover:bg-zinc-600'
+                  }`}
+                  style={kickoffData.kickoffYardLine === 35 ? { backgroundColor: kickingTeamColor } : {}}
+                >
+                  35 Yard Line
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, kickoffYardLine: 40 }))}
+                  className={`flex-1 h-16 text-lg font-bold ${
+                    kickoffData.kickoffYardLine === 40 ? '' : 'bg-zinc-700 hover:bg-zinc-600'
+                  }`}
+                  style={kickoffData.kickoffYardLine === 40 ? { backgroundColor: kickingTeamColor } : {}}
+                >
+                  40 Yard Line
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, kickoffYardLine: customYardLine, isCustom: true }))}
+                  className={`flex-1 h-16 text-lg font-bold ${
+                    kickoffData.isCustom ? '' : 'bg-zinc-700 hover:bg-zinc-600'
+                  }`}
+                  style={kickoffData.isCustom ? { backgroundColor: kickingTeamColor } : {}}
+                >
+                  Custom
+                </Button>
+              </div>
+              
+              {kickoffData.isCustom && (
+                <div className="mt-3 flex items-center justify-center gap-3">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-zinc-600"
+                    onClick={() => {
+                      const newVal = Math.max(1, customYardLine - 5);
+                      setCustomYardLine(newVal);
+                      setKickoffData(prev => ({ ...prev, kickoffYardLine: newVal }));
+                    }}
+                  >
+                    -5
+                  </Button>
+                  <input
+                    type="number"
+                    value={customYardLine}
+                    onChange={(e) => {
+                      const val = Math.max(1, Math.min(50, parseInt(e.target.value) || 35));
+                      setCustomYardLine(val);
+                      setKickoffData(prev => ({ ...prev, kickoffYardLine: val }));
+                    }}
+                    className="w-20 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                  />
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-zinc-600"
+                    onClick={() => {
+                      const newVal = Math.min(50, customYardLine + 5);
+                      setCustomYardLine(newVal);
+                      setKickoffData(prev => ({ ...prev, kickoffYardLine: newVal }));
+                    }}
+                  >
+                    +5
+                  </Button>
+                </div>
+              )}
+            </div>
+            
+            {/* Direction */}
+            <div>
+              <label className="text-sm text-zinc-400 uppercase tracking-wide mb-3 block">
+                Kicking Direction
+              </label>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, direction: 'left' }))}
+                  className={`flex-1 h-12 font-bold ${
+                    kickoffData.direction === 'left' ? 'bg-blue-600' : 'bg-zinc-700 hover:bg-zinc-600'
+                  }`}
+                >
+                  ← Left (to {receivingTeamName})
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, direction: 'right' }))}
+                  className={`flex-1 h-12 font-bold ${
+                    kickoffData.direction === 'right' ? 'bg-blue-600' : 'bg-zinc-700 hover:bg-zinc-600'
+                  }`}
+                >
+                  Right (to {receivingTeamName}) →
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-6">
+            <Button
+              onClick={onNext}
+              disabled={!kickoffData.kickoffYardLine || !kickoffData.direction}
+              className="bg-green-600 hover:bg-green-700 px-8"
+            >
+              Next →
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  // Step 2: Select Kicker
+  if (step === 2) {
+    return (
+      <Dialog open={open}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">SELECT KICKER</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              {kickingTeamName} - Kickoff from {kickoffData.kickoffYardLine} yard line
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            <PlayerSelector
+              label="Kicker"
+              roster={kickingRoster}
+              selectedNumber={kickoffData.kickerNumber}
+              onSelect={(num) => setKickoffData(prev => ({ ...prev, kickerNumber: num }))}
+              teamColor={kickingTeamColor}
+            />
+          </div>
+          
+          <div className="flex justify-between gap-2 mt-6">
+            <Button variant="outline" onClick={onBack} className="border-zinc-600">
+              ← Back
+            </Button>
+            <Button
+              onClick={onNext}
+              disabled={!kickoffData.kickerNumber}
+              className="bg-green-600 hover:bg-green-700 px-8"
+            >
+              Next →
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  // Step 3: Select Returner
+  if (step === 3) {
+    return (
+      <Dialog open={open}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">SELECT RETURNER</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              {receivingTeamName} - Who will return the kick?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            <PlayerSelector
+              label="Kick Returner"
+              roster={receivingRoster}
+              selectedNumber={kickoffData.returnerNumber}
+              onSelect={(num) => setKickoffData(prev => ({ ...prev, returnerNumber: num }))}
+              teamColor={receivingTeamColor}
+            />
+          </div>
+          
+          <div className="flex justify-between gap-2 mt-6">
+            <Button variant="outline" onClick={onBack} className="border-zinc-600">
+              ← Back
+            </Button>
+            <Button
+              onClick={onNext}
+              disabled={!kickoffData.returnerNumber}
+              className="bg-green-600 hover:bg-green-700 px-8"
+            >
+              Next →
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  // Step 4: Return Details (fielded at, returned to, tackler)
+  if (step === 4) {
+    return (
+      <Dialog open={open}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">RETURN DETAILS</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              #{kickoffData.returnerNumber} fielding the kick
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6 mt-4">
+            {/* Special Results */}
+            <div>
+              <label className="text-sm text-zinc-400 uppercase tracking-wide mb-2 block">
+                Special Result (or skip)
+              </label>
+              <div className="flex flex-wrap gap-2">
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchback', fieldedAt: 25, returnedTo: 25 }))}
+                  className={`${kickoffData.specialResult === 'touchback' ? 'bg-blue-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                >
+                  Touchback
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'fair_catch' }))}
+                  className={`${kickoffData.specialResult === 'fair_catch' ? 'bg-yellow-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                >
+                  Fair Catch
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'out_of_bounds', fieldedAt: 40, returnedTo: 40 }))}
+                  className={`${kickoffData.specialResult === 'out_of_bounds' ? 'bg-purple-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                >
+                  Out of Bounds
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchdown' }))}
+                  className={`${kickoffData.specialResult === 'touchdown' ? 'bg-green-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                >
+                  Touchdown
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: null }))}
+                  className={`${!kickoffData.specialResult ? 'bg-orange-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                >
+                  Regular Return
+                </Button>
+              </div>
+            </div>
+            
+            {/* Yard Line Inputs - Only show if regular return */}
+            {!kickoffData.specialResult && (
+              <>
+                <YardLineSelector
+                  label="Fielded At (Yard Line)"
+                  value={kickoffData.fieldedAt || 5}
+                  onChange={(val) => setKickoffData(prev => ({ ...prev, fieldedAt: val }))}
+                />
+                
+                <YardLineSelector
+                  label="Returned To (Yard Line)"
+                  value={kickoffData.returnedTo || 25}
+                  onChange={(val) => setKickoffData(prev => ({ ...prev, returnedTo: val }))}
+                />
+              </>
+            )}
+            
+            {kickoffData.specialResult === 'fair_catch' && (
+              <YardLineSelector
+                label="Fair Catch At (Yard Line)"
+                value={kickoffData.fieldedAt || 25}
+                onChange={(val) => setKickoffData(prev => ({ ...prev, fieldedAt: val, returnedTo: val }))}
+              />
+            )}
+          </div>
+          
+          <div className="flex justify-between gap-2 mt-6">
+            <Button variant="outline" onClick={onBack} className="border-zinc-600">
+              ← Back
+            </Button>
+            <Button
+              onClick={onNext}
+              className="bg-green-600 hover:bg-green-700 px-8"
+            >
+              Next →
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  // Step 5: Select Tackler
+  if (step === 5) {
+    return (
+      <Dialog open={open}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">SELECT TACKLER</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              {kickingTeamName} - Who made the tackle?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 space-y-4">
+            <Button
+              onClick={() => setKickoffData(prev => ({ ...prev, tacklerNumber: null, noTackle: true }))}
+              className={`w-full h-12 ${kickoffData.noTackle ? 'bg-zinc-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+            >
+              No Tackle / Not Recorded
+            </Button>
+            
+            <div className="text-center text-zinc-500 text-sm">— or select tackler —</div>
+            
+            <PlayerSelector
+              label="Tackler"
+              roster={kickingRoster}
+              selectedNumber={kickoffData.tacklerNumber}
+              onSelect={(num) => setKickoffData(prev => ({ ...prev, tacklerNumber: num, noTackle: false }))}
+              teamColor={kickingTeamColor}
+            />
+          </div>
+          
+          <div className="flex justify-between gap-2 mt-6">
+            <Button variant="outline" onClick={onBack} className="border-zinc-600">
+              ← Back
+            </Button>
+            <Button
+              onClick={onComplete}
+              className="bg-green-600 hover:bg-green-700 px-8"
+            >
+              Complete Kickoff ✓
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+  
+  return null;
+}
+
 // Play type buttons
 const PLAY_TYPES = [
   { id: 'run', label: 'Run', color: 'bg-green-600' },
