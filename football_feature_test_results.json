@@ -1,54 +1,54 @@
 {
-  "timestamp": "2025-12-26T21:14:26.127322",
+  "timestamp": "2025-12-26T23:07:27.761981",
   "overall_success": true,
   "test_results": [
     {
       "test": "Admin Authentication",
       "success": true,
       "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
-      "timestamp": "2025-12-26T21:14:25.808534",
+      "timestamp": "2025-12-26T23:07:27.378464",
       "details": null
     },
     {
       "test": "Share Button API",
       "success": true,
       "message": "Share link endpoint working - Game: Test Home Team vs Test Away Team",
-      "timestamp": "2025-12-26T21:14:25.822914",
+      "timestamp": "2025-12-26T23:07:27.391132",
       "details": null
     },
     {
       "test": "Time of Possession Backend",
       "success": true,
       "message": "TOP correctly saved - Home: 300s, Away: 420s",
-      "timestamp": "2025-12-26T21:14:25.890323",
+      "timestamp": "2025-12-26T23:07:27.494990",
       "details": null
     },
     {
       "test": "Drives Section Data",
       "success": true,
       "message": "Drive data available - 1 drives, 2 plays",
-      "timestamp": "2025-12-26T21:14:25.915400",
+      "timestamp": "2025-12-26T23:07:27.559107",
       "details": null
     },
     {
       "test": "Box Score Data",
       "success": true,
       "message": "Box score data available - player stats and team stats present",
-      "timestamp": "2025-12-26T21:14:25.980314",
+      "timestamp": "2025-12-26T23:07:27.623292",
       "details": null
     },
     {
       "test": "Timeouts Display Data",
       "success": true,
       "message": "Timeout data saved correctly - Home: 2, Away: 1",
-      "timestamp": "2025-12-26T21:14:26.047786",
+      "timestamp": "2025-12-26T23:07:27.685660",
       "details": null
     },
     {
       "test": "API Endpoints Comprehensive",
       "success": true,
       "message": "Both GET public and PUT authenticated endpoints working correctly",
-      "timestamp": "2025-12-26T21:14:26.127124",
+      "timestamp": "2025-12-26T23:07:27.761770",
       "details": null
     }
   ]
