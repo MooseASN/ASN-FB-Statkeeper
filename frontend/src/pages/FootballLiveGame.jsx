@@ -1505,7 +1505,13 @@ export default function FootballLiveGame({ user, onLogout }) {
   const handleSubmitPassPlay = () => {
     const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
     const defTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    const defTeam = possession === 'home' ? 'away' : 'home';
     const direction = possession === 'home' ? 1 : -1;
+    
+    // Format player displays with names
+    const qbDisplay = formatPlayer(passQBNumber, possession);
+    const receiverDisplay = passReceiverNumber ? formatPlayer(passReceiverNumber, possession) : '';
+    const defenderDisplay = passDefenderNumber ? formatPlayer(passDefenderNumber, defTeam) : '';
     
     let description = '';
     let newBallPosition = ballPosition;
@@ -1518,43 +1524,43 @@ export default function FootballLiveGame({ user, onLogout }) {
         newBallPosition = Math.max(0, Math.min(100, ballPosition + (yards * direction)));
         isFirstDown = (possession === 'home' && newBallPosition >= firstDownMarker) ||
                       (possession === 'away' && newBallPosition <= firstDownMarker);
-        description = `#${passQBNumber} pass to #${passReceiverNumber} for ${yards} yards`;
-        if (passDefenderNumber) description += `. Tackle by #${passDefenderNumber}`;
+        description = `${qbDisplay} pass to ${receiverDisplay} for ${yards} yards`;
+        if (passDefenderNumber) description += `. Tackle by ${defenderDisplay}`;
         if (isFirstDown) description += ' - FIRST DOWN';
         break;
         
       case 'touchdown':
         newBallPosition = possession === 'home' ? 100 : 0;
         isTouchdown = true;
-        description = `#${passQBNumber} pass to #${passReceiverNumber} for ${yards} yards - TOUCHDOWN!`;
+        description = `${qbDisplay} pass to ${receiverDisplay} for ${yards} yards - TOUCHDOWN!`;
         break;
         
       case 'incomplete':
-        description = `#${passQBNumber} pass incomplete`;
+        description = `${qbDisplay} pass incomplete`;
         break;
         
       case 'sacked':
         newBallPosition = Math.max(0, Math.min(100, ballPosition + (yards * direction))); // yards is negative
-        description = `#${passQBNumber} sacked for loss of ${Math.abs(yards)} yards`;
-        if (passDefenderNumber) description += ` by #${passDefenderNumber}`;
+        description = `${qbDisplay} sacked for loss of ${Math.abs(yards)} yards`;
+        if (passDefenderNumber) description += ` by ${defenderDisplay}`;
         break;
         
       case 'intercepted':
         turnover = true;
         const intReturnDir = possession === 'home' ? -1 : 1;
         newBallPosition = Math.max(0, Math.min(100, ballPosition + (interceptionReturnYards * intReturnDir)));
-        description = `#${passQBNumber} pass INTERCEPTED by #${passDefenderNumber}`;
+        description = `${qbDisplay} pass INTERCEPTED by ${defenderDisplay}`;
         if (interceptionReturnYards > 0) {
           description += `, returned ${interceptionReturnYards} yards`;
         }
         break;
         
       case 'dropped':
-        description = `#${passQBNumber} pass to #${passReceiverNumber} DROPPED`;
+        description = `${qbDisplay} pass to ${receiverDisplay} DROPPED`;
         break;
         
       case 'broken_up':
-        description = `#${passQBNumber} pass broken up by #${passDefenderNumber}`;
+        description = `${qbDisplay} pass broken up by ${defenderDisplay}`;
         break;
         
       default:
