@@ -997,6 +997,14 @@ class GameUpdate(BaseModel):
     primetime_enabled: Optional[bool] = None
     video_url: Optional[str] = None
     note: Optional[str] = None  # Game note/description
+    # Football-specific state
+    football_state: Optional[dict] = None
+    # Football scores (for public stats)
+    home_score: Optional[int] = None
+    away_score: Optional[int] = None
+    possession: Optional[str] = None
+    home_time_of_possession: Optional[int] = None
+    away_time_of_possession: Optional[int] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
