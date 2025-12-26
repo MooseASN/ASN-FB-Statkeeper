@@ -31,8 +31,10 @@ export default function FootballLiveStats({
   homeColor = '#dc2626',
   awayColor = '#2563eb',
   possession,
+  homeTimeOfPossession = 0,
+  awayTimeOfPossession = 0,
 }) {
-  const [activeLeaderTab, setActiveLeaderTab] = useState('tackles');
+  const [activeLeaderTab, setActiveLeaderTab] = useState('rushYards');
   const [activeSection, setActiveSection] = useState('summary'); // summary, play-by-play, team-stats, leaders
 
   // Format clock time
