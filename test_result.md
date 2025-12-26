@@ -105,6 +105,18 @@
 user_problem_statement: Build a basketball statistics tracking website with team management, game statistics, live view sharing, PDF box score export, user authentication, and game history management.
 
 backend:
+  - task: "Football New Features Backend APIs"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: All 7 backend API tests PASSED for new football features: 1) Share Button API - Public endpoint working correctly, 2) Time of Possession Backend - TOP data correctly saved/retrieved, 3) Drives Section Data - Drive data with play count/yards/result available, 4) Box Score Data - Player stats (passing/rushing/receiving) and team stats correctly saved, 5) Timeouts Display Data - Timeout counts correctly saved/retrieved, 6) API Endpoints Comprehensive - Both GET public and PUT authenticated endpoints working with football_state persistence. All backend APIs supporting the new football features are working correctly."
+
   - task: "Team CRUD with color field"
     implemented: true
     working: true
