@@ -151,6 +151,7 @@ export default function AdvancedLiveGame() {
 
   useEffect(() => {
     fetchGame();
+    document.title = "StatMoose BKB";
     const interval = setInterval(fetchGame, 5000);
     return () => clearInterval(interval);
   }, [fetchGame]);
