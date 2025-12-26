@@ -1,47 +1,47 @@
 {
-  "timestamp": "2025-12-26T17:14:18.447355",
+  "timestamp": "2025-12-26T18:33:41.300690",
   "overall_success": true,
   "test_results": [
     {
       "test": "Admin Authentication",
       "success": true,
       "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
-      "timestamp": "2025-12-26T17:14:18.258590",
+      "timestamp": "2025-12-26T18:33:41.104118",
       "details": null
     },
     {
       "test": "Football Game Exists",
       "success": true,
       "message": "Game found - Sport: football, Status: active, Teams: Test Home Team vs Test Away Team",
-      "timestamp": "2025-12-26T17:14:18.270016",
+      "timestamp": "2025-12-26T18:33:41.117983",
       "details": null
     },
     {
       "test": "Football State Update",
       "success": true,
       "message": "Football state successfully saved and verified via public endpoint",
-      "timestamp": "2025-12-26T17:14:18.329811",
+      "timestamp": "2025-12-26T18:33:41.219931",
       "details": null
     },
     {
       "test": "Football State Persistence",
       "success": true,
       "message": "Football state correctly persisted and retrieved from public endpoint",
-      "timestamp": "2025-12-26T17:14:18.380801",
+      "timestamp": "2025-12-26T18:33:41.233851",
       "details": null
     },
     {
       "test": "Football Stats Accumulation",
       "success": true,
       "message": "Football stats correctly accumulated across multiple plays",
-      "timestamp": "2025-12-26T17:14:18.438710",
+      "timestamp": "2025-12-26T18:33:41.292573",
       "details": null
     },
     {
       "test": "Public Stats Endpoint",
       "success": true,
       "message": "Public endpoint working - 2 plays, stats available: True",
-      "timestamp": "2025-12-26T17:14:18.447164",
+      "timestamp": "2025-12-26T18:33:41.300535",
       "details": null
     }
   ]
