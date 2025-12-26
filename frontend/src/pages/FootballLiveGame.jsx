@@ -915,8 +915,8 @@ export default function FootballLiveGame({ user, onLogout }) {
           break;
         case 'u':
           e.preventDefault();
-          setShowPuntWorkflow(true);
-          setPuntStep(1);
+          setSelectedPlayType('punt');
+          setPlayStep(1);
           break;
         case 'k':
           e.preventDefault();
@@ -929,14 +929,14 @@ export default function FootballLiveGame({ user, onLogout }) {
             setShowPenaltyDialog(true);
           } else {
             // F for Field Goal
-            setShowFieldGoalWorkflow(true);
-            setFieldGoalStep(1);
+            setSelectedPlayType('field_goal');
+            setPlayStep(1);
           }
           break;
         case 'e':
           e.preventDefault();
-          setShowExtraPointWorkflow(true);
-          setExtraPointStep(1);
+          setSelectedPlayType('extra_point');
+          setPlayStep(0);
           break;
         case 'g':
           e.preventDefault();
