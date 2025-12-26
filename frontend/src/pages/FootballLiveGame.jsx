@@ -2126,15 +2126,22 @@ export default function FootballLiveGame({ user, onLogout }) {
       description = `Two-point conversion - NO GOOD`;
     }
     
+    // Create play entry with comprehensive data model
+    // Extra point is not part of a drive - it follows after a TD
     const play = {
-      id: Date.now(),
-      quarter,
-      clock: formatTime(clockTime),
+      id: `play-${Date.now()}`,
+      play_id: `play-${Date.now()}`,
+      period: quarter,
+      clock_start: clockTime,
+      clock_end: clockTime,
       team: possession,
       type: 'extra_point',
       kicker: kickerNumber,
       result: extraPointResult,
       description,
+      no_play: true, // Extra points don't count as drive plays
+      quarter, // Legacy field for display
+      clock: formatTime(clockTime), // Legacy field for display
     };
     
     setPlayLog(prev => [play, ...prev]);
