@@ -20,7 +20,7 @@ export default function FootballStatsView() {
   const [error, setError] = useState(null);
 
   // Helper to format play description from event data
-  const formatPlayDescription = (event) => {
+  const formatPlayDescription = useCallback((event) => {
     if (event.description) return event.description;
     
     let desc = '';
@@ -53,7 +53,7 @@ export default function FootballStatsView() {
         desc = event.event_type || 'Play';
     }
     return desc;
-  };
+  }, []);
 
   // Polling interval for live updates
   useEffect(() => {
