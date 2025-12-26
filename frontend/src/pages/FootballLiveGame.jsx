@@ -2050,7 +2050,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     setShowAdvanceQuarterDialog(false);
   };
 
-  // Start new drive
+  // Start new drive (NFL rules: drive starts when team gains possession)
   const startNewDrive = (team) => {
     setCurrentDrive({
       startTime: clockTime,
@@ -2058,7 +2058,8 @@ export default function FootballLiveGame({ user, onLogout }) {
       startPosition: ballPosition,
       plays: 0,
       yards: 0,
-      team: team
+      team: team,
+      elapsedTime: 0
     });
   };
 
@@ -2071,22 +2072,18 @@ export default function FootballLiveGame({ user, onLogout }) {
     }));
   };
 
-  // Calculate drive time
+  // Calculate drive time - uses elapsed time directly for accuracy
   const getDriveTime = () => {
-    if (!currentDrive.startTime) return '0:00';
-    
-    let totalSeconds = 0;
-    if (currentDrive.startQuarter === quarter) {
-      totalSeconds = currentDrive.startTime - clockTime;
-    } else {
-      // Multi-quarter drive
-      const quarterLength = game?.clock_settings?.period_duration || 900;
-      const quartersElapsed = quarter - currentDrive.startQuarter;
-      totalSeconds = currentDrive.startTime + ((quartersElapsed - 1) * quarterLength) + (quarterLength - clockTime);
-    }
-    
-    const mins = Math.floor(Math.max(0, totalSeconds) / 60);
-    const secs = Math.max(0, totalSeconds) % 60;
+    const totalSeconds = currentDrive.elapsedTime || 0;
+    const mins = Math.floor(totalSeconds / 60);
+    const secs = totalSeconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+  
+  // Format time of possession
+  const formatTOP = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
