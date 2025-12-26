@@ -4525,6 +4525,71 @@ export default function FootballLiveGame({ user, onLogout }) {
           </div>
         </div>
       </div>
+
+      {/* Help Dialog - Keyboard Shortcuts */}
+      <Dialog open={showHelpDialog} onOpenChange={setShowHelpDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">⌨️ Keyboard Shortcuts</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              Quick keys for faster stat tracking
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 mt-4">
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">\</kbd>
+                <span>Start/Stop Clock</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">R</kbd>
+                <span>Run Play</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">P</kbd>
+                <span>Pass Play</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">U</kbd>
+                <span>Punt</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">K</kbd>
+                <span>Kickoff</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">F</kbd>
+                <span>Field Goal</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">E</kbd>
+                <span>Extra Point</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">G</kbd>
+                <span>Penalty</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">T</kbd>
+                <span>Timeout</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">?</kbd>
+                <span>Show Help</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">Esc</kbd>
+                <span>Cancel/Reset</span>
+              </div>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <Button onClick={() => setShowHelpDialog(false)} className="bg-zinc-700 hover:bg-zinc-600">
+              Got it!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
