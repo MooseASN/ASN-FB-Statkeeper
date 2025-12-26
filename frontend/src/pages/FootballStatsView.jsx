@@ -147,6 +147,10 @@ export default function FootballStatsView() {
   // Convert clock string to seconds
   const clockParts = currentClock.split(':');
   const clockSeconds = parseInt(clockParts[0]) * 60 + parseInt(clockParts[1] || 0);
+  
+  // Get time of possession from game data
+  const homeTimeOfPossession = game.home_time_of_possession || 0;
+  const awayTimeOfPossession = game.away_time_of_possession || 0;
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -178,6 +182,8 @@ export default function FootballStatsView() {
         homeColor={game.home_team_color || '#dc2626'}
         awayColor={game.away_team_color || '#2563eb'}
         possession={game.possession || 'home'}
+        homeTimeOfPossession={homeTimeOfPossession}
+        awayTimeOfPossession={awayTimeOfPossession}
       />
     </div>
   );
