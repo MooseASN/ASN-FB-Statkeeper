@@ -1418,6 +1418,278 @@ export default function FootballLiveGame({ user, onLogout }) {
     setPassReceiverNumber(null);
     setPassDefenderNumber(null);
     setInterceptionReturnYards(0);
+    setPuntPunterNumber(null);
+    setPuntReturnerNumber(null);
+    setPuntDistance(40);
+    setPuntReturnYards(0);
+    setKickerNumber(null);
+    setFgDistance(30);
+    setPenaltyTeam(null);
+    setPenaltyYards(5);
+    setPenaltyDescription('');
+  };
+
+  // Handle Punt Play submission
+  const handleSubmitPuntPlay = () => {
+    const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const defTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    
+    let description = `#${puntPunterNumber} punt for ${puntDistance} yards`;
+    let newBallPosition = ballPosition;
+    let turnover = selectedResult !== 'blocked';
+    
+    switch (selectedResult) {
+      case 'punted':
+        const puntDirection = possession === 'home' ? 1 : -1;
+        const landedAt = Math.max(0, Math.min(100, ballPosition + (puntDistance * puntDirection)));
+        newBallPosition = Math.max(0, Math.min(100, landedAt - (puntReturnYards * puntDirection)));
+        if (puntReturnerNumber) {
+          description += `. Returned by #${puntReturnerNumber} for ${puntReturnYards} yards`;
+        }
+        break;
+      case 'touchback':
+        newBallPosition = possession === 'home' ? 80 : 20; // Opponent's 20
+        description += ' - Touchback';
+        break;
+      case 'fair_catch':
+        const fcDirection = possession === 'home' ? 1 : -1;
+        newBallPosition = Math.max(0, Math.min(100, ballPosition + (puntDistance * fcDirection)));
+        description += ` - Fair catch by #${puntReturnerNumber}`;
+        break;
+      case 'blocked':
+        turnover = false;
+        description = `#${puntPunterNumber} punt BLOCKED`;
+        break;
+      case 'muffed':
+        // Muffed punt recovered by kicking team
+        turnover = false;
+        description += ` - MUFFED, recovered by ${teamName}`;
+        break;
+      case 'returned':
+        const retDirection = possession === 'home' ? 1 : -1;
+        const puntLanded = Math.max(0, Math.min(100, ballPosition + (puntDistance * retDirection)));
+        newBallPosition = Math.max(0, Math.min(100, puntLanded - (puntReturnYards * retDirection)));
+        description += `. Returned by #${puntReturnerNumber} for ${puntReturnYards} yards`;
+        // Check for return TD
+        if ((possession === 'home' && newBallPosition <= 0) || (possession === 'away' && newBallPosition >= 100)) {
+          description += ' - TOUCHDOWN!';
+          if (possession === 'home') {
+            setAwayScore(prev => prev + 6);
+          } else {
+            setHomeScore(prev => prev + 6);
+          }
+        }
+        break;
+    }
+    
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: possession,
+      type: 'punt',
+      punter: puntPunterNumber,
+      returner: puntReturnerNumber,
+      distance: puntDistance,
+      returnYards: puntReturnYards,
+      result: selectedResult,
+      down,
+      ball_on: getYardLineText(),
+      description,
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    if (turnover) {
+      setBallPosition(newBallPosition);
+      setPossession(possession === 'home' ? 'away' : 'home');
+      setDown(1);
+      setDistance(10);
+      const newFDMarker = possession === 'home' 
+        ? Math.max(0, newBallPosition - 10) 
+        : Math.min(100, newBallPosition + 10);
+      setFirstDownMarker(newFDMarker);
+      toast.info(`${defTeamName} ball`);
+    } else {
+      // Blocked punt - offense keeps ball but loses down
+      setDown(prev => prev + 1);
+      if (down >= 4) {
+        setPossession(possession === 'home' ? 'away' : 'home');
+        setDown(1);
+        setDistance(10);
+      }
+    }
+    
+    resetPlayState();
+  };
+
+  // Handle Field Goal submission
+  const handleSubmitFieldGoal = () => {
+    const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    
+    let description = `#${kickerNumber} ${fgDistance}-yard field goal attempt`;
+    
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: possession,
+      type: 'field_goal',
+      kicker: kickerNumber,
+      distance: fgDistance,
+      result: selectedResult,
+      down,
+      ball_on: getYardLineText(),
+      description: description + (selectedResult === 'good' ? ' - GOOD!' : selectedResult === 'blocked' ? ' - BLOCKED' : ' - NO GOOD'),
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    if (selectedResult === 'good') {
+      if (possession === 'home') {
+        setHomeScore(prev => prev + 3);
+      } else {
+        setAwayScore(prev => prev + 3);
+      }
+      toast.success(`${teamName} Field Goal!`);
+      // After FG, other team gets ball at their 25 (kickoff simulation)
+      setPossession(possession === 'home' ? 'away' : 'home');
+      const newBallPos = possession === 'home' ? 75 : 25;
+      setBallPosition(newBallPos);
+      setDown(1);
+      setDistance(10);
+      const newFDMarker = possession === 'home' ? 65 : 35;
+      setFirstDownMarker(newFDMarker);
+    } else {
+      // Missed FG - other team gets ball at spot of kick
+      setPossession(possession === 'home' ? 'away' : 'home');
+      setDown(1);
+      setDistance(10);
+      const newFDMarker = possession === 'home' 
+        ? Math.max(0, ballPosition - 10) 
+        : Math.min(100, ballPosition + 10);
+      setFirstDownMarker(newFDMarker);
+      toast.info('Field Goal missed');
+    }
+    
+    resetPlayState();
+  };
+
+  // Handle Extra Point submission
+  const handleSubmitExtraPoint = () => {
+    const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    
+    let description = '';
+    
+    if (selectedResult === 'good') {
+      description = `#${kickerNumber} extra point - GOOD!`;
+      if (possession === 'home') {
+        setHomeScore(prev => prev + 1);
+      } else {
+        setAwayScore(prev => prev + 1);
+      }
+    } else if (selectedResult === 'no_good') {
+      description = `#${kickerNumber} extra point - NO GOOD`;
+    } else if (selectedResult === 'two_point_good') {
+      description = `Two-point conversion - GOOD!`;
+      if (possession === 'home') {
+        setHomeScore(prev => prev + 2);
+      } else {
+        setAwayScore(prev => prev + 2);
+      }
+    } else {
+      description = `Two-point conversion - NO GOOD`;
+    }
+    
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: possession,
+      type: 'extra_point',
+      kicker: kickerNumber,
+      result: selectedResult,
+      description,
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    // After PAT, other team gets ball (kickoff)
+    setPossession(possession === 'home' ? 'away' : 'home');
+    const newBallPos = possession === 'home' ? 75 : 25;
+    setBallPosition(newBallPos);
+    setDown(1);
+    setDistance(10);
+    const newFDMarker = possession === 'home' ? 65 : 35;
+    setFirstDownMarker(newFDMarker);
+    
+    resetPlayState();
+  };
+
+  // Handle Penalty submission
+  const handleSubmitPenalty = () => {
+    const offenseTeam = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const defenseTeam = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    
+    let description = '';
+    let repeatDown = false;
+    let autoFirstDown = false;
+    
+    switch (selectedResult) {
+      case 'offense':
+        description = `Penalty on ${offenseTeam}: ${penaltyDescription || 'Offensive penalty'} - ${penaltyYards} yards`;
+        // Move ball back
+        const offDir = possession === 'home' ? -1 : 1;
+        const newOffPos = Math.max(0, Math.min(100, ballPosition + (penaltyYards * offDir)));
+        setBallPosition(newOffPos);
+        setDistance(prev => prev + penaltyYards);
+        break;
+      case 'defense':
+        description = `Penalty on ${defenseTeam}: ${penaltyDescription || 'Defensive penalty'} - ${penaltyYards} yards`;
+        // Move ball forward
+        const defDir = possession === 'home' ? 1 : -1;
+        const newDefPos = Math.max(0, Math.min(100, ballPosition + (penaltyYards * defDir)));
+        setBallPosition(newDefPos);
+        // Check for auto first down on certain yardage
+        if (penaltyYards >= distance) {
+          autoFirstDown = true;
+        }
+        break;
+      case 'declined':
+        description = `Penalty declined`;
+        break;
+      case 'offsetting':
+        description = `Offsetting penalties - replay down`;
+        repeatDown = true;
+        break;
+    }
+    
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: possession,
+      type: 'penalty',
+      result: selectedResult,
+      yards: penaltyYards,
+      description,
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    if (autoFirstDown) {
+      setDown(1);
+      setDistance(10);
+      const newFDMarker = possession === 'home' 
+        ? Math.min(100, ballPosition + 10) 
+        : Math.max(0, ballPosition - 10);
+      setFirstDownMarker(newFDMarker);
+      toast.success('Automatic First Down!');
+    } else if (!repeatDown && selectedResult !== 'declined') {
+      // Keep same down for penalties
+    }
+    
+    resetPlayState();
   };
 
   // Change possession
