@@ -853,26 +853,113 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
   };
 
-  // Handle kickoff selection
-  const handleKickoffSelect = (team) => {
-    // Team that kicks receives next half, so opposite team has possession
-    const receivingTeam = team === 'home' ? 'away' : 'home';
-    setPossession(receivingTeam);
-    setBallPosition(receivingTeam === 'home' ? 25 : 75);
-    setShowKickoffDialog(false);
+  // Handle kickoff team selection (step 0)
+  const handleKickoffTeamSelect = (team) => {
+    setKickingTeam(team);
+    setShowKickoffTeamDialog(false);
+    setShowKickoffWorkflow(true);
+    setKickoffStep(1);
+    // Reset kickoff data
+    setKickoffData({
+      kickoffYardLine: 35,
+      direction: null,
+      isCustom: false,
+      kickerNumber: null,
+      returnerNumber: null,
+      fieldedAt: 5,
+      returnedTo: 25,
+      specialResult: null,
+      tacklerNumber: null,
+      noTackle: false,
+    });
+  };
+
+  // Handle kickoff workflow navigation
+  const handleKickoffBack = () => {
+    if (kickoffStep > 1) {
+      setKickoffStep(prev => prev - 1);
+    }
+  };
+
+  const handleKickoffNext = () => {
+    if (kickoffStep < 5) {
+      setKickoffStep(prev => prev + 1);
+    }
+  };
+
+  // Complete kickoff and record the play
+  const handleKickoffComplete = () => {
+    const receivingTeam = kickingTeam === 'home' ? 'away' : 'home';
+    const kickingTeamName = kickingTeam === 'home' ? game.home_team_name : game.away_team_name;
+    const receivingTeamName = receivingTeam === 'home' ? game.home_team_name : game.away_team_name;
+    
+    // Build description
+    let description = `#${kickoffData.kickerNumber} kickoff from ${kickoffData.kickoffYardLine} yard line`;
+    
+    if (kickoffData.specialResult === 'touchback') {
+      description += ` - Touchback. Ball at 25 yard line.`;
+    } else if (kickoffData.specialResult === 'fair_catch') {
+      description += ` - Fair catch by #${kickoffData.returnerNumber} at ${kickoffData.fieldedAt} yard line.`;
+    } else if (kickoffData.specialResult === 'out_of_bounds') {
+      description += ` - Out of bounds. Ball at 40 yard line.`;
+    } else if (kickoffData.specialResult === 'touchdown') {
+      description += ` - TOUCHDOWN! Return by #${kickoffData.returnerNumber}!`;
+    } else {
+      description += ` - Fielded by #${kickoffData.returnerNumber} at ${kickoffData.fieldedAt}`;
+      description += `, returned to ${kickoffData.returnedTo} yard line`;
+      if (kickoffData.tacklerNumber) {
+        description += `. Tackle by #${kickoffData.tacklerNumber}.`;
+      } else {
+        description += `.`;
+      }
+    }
     
     // Add kickoff to play log
     const kickoffPlay = {
       id: Date.now(),
       quarter,
       clock: formatTime(clockTime),
-      team: team,
+      team: kickingTeam,
       type: 'kickoff',
-      description: `${team === 'home' ? game.home_team_name : game.away_team_name} kicks off`,
+      kicker: kickoffData.kickerNumber,
+      returner: kickoffData.returnerNumber,
+      kickoffFrom: kickoffData.kickoffYardLine,
+      fieldedAt: kickoffData.fieldedAt,
+      returnedTo: kickoffData.returnedTo,
+      tackler: kickoffData.tacklerNumber,
+      specialResult: kickoffData.specialResult,
+      description,
     };
     setPlayLog(prev => [kickoffPlay, ...prev]);
     
-    toast.success(`${receivingTeam === 'home' ? game.home_team_name : game.away_team_name} receives`);
+    // Set game state based on result
+    setPossession(receivingTeam);
+    
+    if (kickoffData.specialResult === 'touchback') {
+      setBallPosition(receivingTeam === 'home' ? 25 : 75);
+    } else if (kickoffData.specialResult === 'out_of_bounds') {
+      setBallPosition(receivingTeam === 'home' ? 40 : 60);
+    } else if (kickoffData.specialResult === 'touchdown') {
+      // Handle return TD
+      if (receivingTeam === 'home') {
+        setHomeScore(prev => prev + 6);
+      } else {
+        setAwayScore(prev => prev + 6);
+      }
+      setBallPosition(receivingTeam === 'home' ? 98 : 2);
+    } else {
+      // Regular return - set ball position
+      // Convert yard line to field position (0-100)
+      const yardLine = kickoffData.returnedTo;
+      setBallPosition(receivingTeam === 'home' ? yardLine : 100 - yardLine);
+    }
+    
+    setDown(1);
+    setDistance(10);
+    
+    // Close workflow
+    setShowKickoffWorkflow(false);
+    toast.success(`${receivingTeamName} ball at the ${kickoffData.specialResult === 'touchback' ? 25 : kickoffData.specialResult === 'out_of_bounds' ? 40 : kickoffData.returnedTo} yard line`);
   };
 
   // Format clock time
