@@ -4335,6 +4335,26 @@ export default function FootballLiveGame({ user, onLogout }) {
                               <option value="penalty">Penalty</option>
                               <option value="timeout">Timeout</option>
                             </select>
+                            <select
+                              value={editPlayData?.result || 'gain'}
+                              onChange={(e) => setEditPlayData(prev => ({ ...prev, result: e.target.value }))}
+                              className="bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs"
+                            >
+                              <option value="gain">Gain</option>
+                              <option value="no_gain">No Gain</option>
+                              <option value="loss">Loss</option>
+                              <option value="complete">Complete</option>
+                              <option value="incomplete">Incomplete</option>
+                              <option value="touchdown">Touchdown</option>
+                              <option value="good">Good</option>
+                              <option value="no_good">No Good</option>
+                              <option value="two_point_good">2PT Good</option>
+                              <option value="two_point_no_good">2PT No Good</option>
+                              <option value="intercepted">Intercepted</option>
+                              <option value="fumble_lost">Fumble Lost</option>
+                              <option value="safety">Safety</option>
+                              <option value="blocked">Blocked</option>
+                            </select>
                             <input
                               type="number"
                               value={editPlayData?.yards || 0}
