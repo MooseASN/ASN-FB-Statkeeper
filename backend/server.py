@@ -214,16 +214,23 @@ async def register(user_data: UserRegister, response: Response):
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin, response: Response):
-    """Login with email and password"""
-    user = await db.users.find_one({"email": credentials.email.lower()}, {"_id": 0})
+    """Login with email OR username and password"""
+    # Try to find user by email first, then by username
+    login_identifier = credentials.email.lower().strip()
+    user = await db.users.find_one({"email": login_identifier}, {"_id": 0})
+    
     if not user:
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        # Try username
+        user = await db.users.find_one({"username": login_identifier}, {"_id": 0})
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email/username or password")
     
     if user.get("auth_provider") == "google":
         raise HTTPException(status_code=400, detail="This account uses Google login. Please sign in with Google.")
     
     if not pwd_context.verify(credentials.password, user.get("password_hash", "")):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
+        raise HTTPException(status_code=401, detail="Invalid email/username or password")
     
     # Create session
     session_token = f"session_{uuid.uuid4().hex}"
