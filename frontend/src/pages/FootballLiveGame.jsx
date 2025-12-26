@@ -1452,17 +1452,35 @@ export default function FootballLiveGame({ user, onLogout }) {
       setDown(1);
       setDistance(0);
       toast.success(`${teamName} TOUCHDOWN!`);
+      
+      // Reset play state and automatically trigger Extra Point workflow
+      resetPlayState();
+      setTimeout(() => {
+        setShowExtraPointWorkflow(true);
+        setExtraPointStep(1);
+      }, 500);
+      updateDriveStats(yards);
+      return; // Exit early to prevent resetPlayState being called again
     } else if (selectedResult === 'fumble_lost') {
       setBallPosition(newBallPosition);
-      setPossession(possession === 'home' ? 'away' : 'home');
+      // Switch possession and start new drive
+      const newPossession = possession === 'home' ? 'away' : 'home';
+      setPossession(newPossession);
       setDown(1);
       setDistance(10);
       // Update first down marker for new possession
-      const newFDMarker = possession === 'home' 
-        ? Math.max(0, newBallPosition - 10) 
-        : Math.min(100, newBallPosition + 10);
+      const newFDMarker = newPossession === 'home' 
+        ? Math.min(100, newBallPosition + 10) 
+        : Math.max(0, newBallPosition - 10);
       setFirstDownMarker(newFDMarker);
-      toast.info('Fumble - turnover!');
+      // Start new drive
+      setCurrentDrive({
+        startTime: clockTime,
+        plays: 0,
+        yards: 0,
+        elapsedTime: 0
+      });
+      toast.info('Fumble - turnover! New drive started.');
     } else {
       setBallPosition(newBallPosition);
       
