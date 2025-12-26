@@ -228,6 +228,33 @@ export default function AdminDashboard({ user, onLogout }) {
           </Card>
         </div>
 
+        {/* Migration Warning - Show if teams don't match total */}
+        {stats && (stats.total_teams > (stats.basketball_teams + stats.football_teams)) && (
+          <Card className="border-amber-300 bg-amber-50">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <AlertTriangle className="w-6 h-6 text-amber-600" />
+                  <div>
+                    <p className="font-semibold text-amber-800">Teams Missing Sport Assignment</p>
+                    <p className="text-sm text-amber-700">
+                      {stats.total_teams - stats.basketball_teams - stats.football_teams} teams don't have a sport assigned and won't appear in Basketball or Football views.
+                    </p>
+                  </div>
+                </div>
+                <Button 
+                  onClick={handleMigrateTeams} 
+                  disabled={migrating}
+                  className="bg-amber-600 hover:bg-amber-700"
+                >
+                  <Wrench className="w-4 h-4 mr-2" />
+                  {migrating ? "Migrating..." : "Assign to Basketball"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Users Table */}
         <Card>
           <CardHeader>
