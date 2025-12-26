@@ -769,8 +769,7 @@ async def get_admin_stats(admin: User = Depends(get_admin_user)):
 @api_router.get("/admin/check")
 async def check_admin_status(user: User = Depends(get_current_user)):
     """Check if current user is an admin"""
-    is_admin = user.email.lower() in ADMIN_EMAILS
-    return {"is_admin": is_admin}
+    return {"is_admin": is_admin_user(user)}
 
 # ============ DATA MODELS ============
 
