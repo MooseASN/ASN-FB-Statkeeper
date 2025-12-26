@@ -2073,6 +2073,160 @@ export default function FootballLiveGame({ user, onLogout }) {
         </DialogContent>
       </Dialog>
 
+      {/* Timeout Selection Dialog */}
+      <Dialog open={showTimeoutDialog} onOpenChange={setShowTimeoutDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">CALL TIMEOUT</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-1 gap-3 mt-4">
+            <Button
+              onClick={() => handleUseTimeout('home')}
+              disabled={homeTimeouts === 0}
+              className="h-16 text-lg"
+              style={{ backgroundColor: homeColor }}
+            >
+              {homeTeamName} ({homeTimeouts} remaining)
+            </Button>
+            <Button
+              onClick={() => handleUseTimeout('away')}
+              disabled={awayTimeouts === 0}
+              className="h-16 text-lg"
+              style={{ backgroundColor: awayColor }}
+            >
+              {awayTeamName} ({awayTimeouts} remaining)
+            </Button>
+            <Button
+              onClick={() => handleUseTimeout(null, 'media')}
+              variant="outline"
+              className="h-16 text-lg border-zinc-600"
+            >
+              📺 Media Timeout
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Spot Ball Dialog */}
+      <Dialog open={showSpotBallDialog} onOpenChange={setShowSpotBallDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">SPOT BALL</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              Place the ball on any yard line
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4">
+            <YardLineSelector
+              label="Yard Line"
+              value={spotBallYardLine}
+              onChange={setSpotBallYardLine}
+              maxYards={100}
+              showSide={true}
+            />
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" className="border-zinc-600" onClick={() => setShowSpotBallDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSpotBall} className="bg-green-600 hover:bg-green-700">
+              Spot Ball
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Set Down & Distance Dialog */}
+      <Dialog open={showSetDownDialog} onOpenChange={setShowSetDownDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">SET DOWN & DISTANCE</DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4 mt-4">
+            <div>
+              <label className="text-sm text-zinc-400 uppercase">Down</label>
+              <div className="flex gap-2 mt-2">
+                {[1, 2, 3, 4].map(d => (
+                  <Button
+                    key={d}
+                    onClick={() => setManualDown(d)}
+                    className={`flex-1 ${manualDown === d ? 'bg-blue-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                  >
+                    {d}{d === 1 ? 'st' : d === 2 ? 'nd' : d === 3 ? 'rd' : 'th'}
+                  </Button>
+                ))}
+              </div>
+            </div>
+            
+            <div>
+              <label className="text-sm text-zinc-400 uppercase">Distance (Yards to Go)</label>
+              <div className="flex items-center gap-3 mt-2">
+                <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setManualDistance(prev => Math.max(1, prev - 5))}>-5</Button>
+                <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setManualDistance(prev => Math.max(1, prev - 1))}>-1</Button>
+                <input
+                  type="number"
+                  value={manualDistance}
+                  onChange={(e) => setManualDistance(Math.max(1, parseInt(e.target.value) || 1))}
+                  className="w-20 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                />
+                <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setManualDistance(prev => prev + 1)}>+1</Button>
+                <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setManualDistance(prev => prev + 5)}>+5</Button>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button size="sm" variant="outline" className="border-zinc-600 text-xs" onClick={() => setManualDistance(1)}>1</Button>
+                <Button size="sm" variant="outline" className="border-zinc-600 text-xs" onClick={() => setManualDistance(5)}>5</Button>
+                <Button size="sm" variant="outline" className="border-zinc-600 text-xs" onClick={() => setManualDistance(10)}>10</Button>
+                <Button size="sm" variant="outline" className="border-zinc-600 text-xs" onClick={() => setManualDistance(15)}>15</Button>
+                <Button size="sm" variant="outline" className="border-zinc-600 text-xs" onClick={() => setManualDistance(20)}>20</Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" className="border-zinc-600" onClick={() => setShowSetDownDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSetDownDistance} className="bg-green-600 hover:bg-green-700">
+              Set Down & Distance
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Advance Quarter Dialog */}
+      <Dialog open={showAdvanceQuarterDialog} onOpenChange={setShowAdvanceQuarterDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">ADVANCE QUARTER</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              {quarter === 2 ? 'Advance to Halftime?' : quarter === 4 ? 'End Game?' : `Advance to Q${quarter + 1}?`}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="mt-4 text-center">
+            <div className="text-4xl font-bold mb-4">
+              Q{quarter} → {quarter === 2 ? 'HALF' : quarter === 4 ? 'END' : `Q${quarter + 1}`}
+            </div>
+            {quarter === 2 && (
+              <p className="text-zinc-400 text-sm">Teams will switch sides. Timeouts will reset at start of Q3.</p>
+            )}
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" className="border-zinc-600" onClick={() => setShowAdvanceQuarterDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAdvanceQuarter} className="bg-green-600 hover:bg-green-700">
+              {quarter === 2 ? 'Go to Halftime' : quarter === 4 ? 'End Game' : 'Advance Quarter'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Kickoff Team Selection Dialog */}
       <KickoffDialog
         open={showKickoffTeamDialog}
