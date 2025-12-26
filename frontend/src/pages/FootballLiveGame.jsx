@@ -753,8 +753,27 @@ export default function FootballLiveGame({ user, onLogout }) {
   
   // Game state
   const [game, setGame] = useState(null);
+  const [homeRoster, setHomeRoster] = useState([]);
+  const [awayRoster, setAwayRoster] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showKickoffDialog, setShowKickoffDialog] = useState(false);
+  
+  // Kickoff workflow state
+  const [showKickoffTeamDialog, setShowKickoffTeamDialog] = useState(false);
+  const [showKickoffWorkflow, setShowKickoffWorkflow] = useState(false);
+  const [kickoffStep, setKickoffStep] = useState(1);
+  const [kickingTeam, setKickingTeam] = useState(null);
+  const [kickoffData, setKickoffData] = useState({
+    kickoffYardLine: 35,
+    direction: null,
+    isCustom: false,
+    kickerNumber: null,
+    returnerNumber: null,
+    fieldedAt: 5,
+    returnedTo: 25,
+    specialResult: null,
+    tacklerNumber: null,
+    noTackle: false,
+  });
   
   // Play state
   const [possession, setPossession] = useState('home'); // 'home' or 'away'
@@ -792,6 +811,18 @@ export default function FootballLiveGame({ user, onLogout }) {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
       
+      // Fetch rosters for both teams
+      try {
+        const [homeTeamRes, awayTeamRes] = await Promise.all([
+          axios.get(`${API}/teams/${res.data.home_team_id}`),
+          axios.get(`${API}/teams/${res.data.away_team_id}`)
+        ]);
+        setHomeRoster(homeTeamRes.data.roster || []);
+        setAwayRoster(awayTeamRes.data.roster || []);
+      } catch (e) {
+        console.log("Could not fetch rosters", e);
+      }
+      
       // Initialize from game state if exists
       if (res.data.football_state) {
         const state = res.data.football_state;
@@ -808,7 +839,7 @@ export default function FootballLiveGame({ user, onLogout }) {
         setClockTime(state.clock_time ?? 900);
       } else {
         // New game - show kickoff dialog
-        setShowKickoffDialog(true);
+        setShowKickoffTeamDialog(true);
       }
       
       if (res.data.clock_time !== undefined) {
