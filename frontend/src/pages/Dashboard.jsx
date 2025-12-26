@@ -435,25 +435,29 @@ export default function Dashboard({ user, onLogout }) {
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {activeGames.map(game => (
-                <Link key={game.id} to={`/game/${game.id}`}>
+                <Link key={game.id} to={game.sport === 'football' ? `/football/${game.id}` : `/game/${game.id}`}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.home_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000]">
-                            {calculateScore(game.quarter_scores, "home")}
+                            {game.sport === 'football' 
+                              ? (game.football_state?.home_score || game.home_score || 0)
+                              : calculateScore(game.quarter_scores, "home")}
                           </p>
                         </div>
                         <div className="px-4">
                           <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
-                            Q{game.current_quarter}
+                            Q{game.sport === 'football' ? (game.football_state?.quarter || 1) : game.current_quarter}
                           </span>
                         </div>
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.away_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000]">
-                            {calculateScore(game.quarter_scores, "away")}
+                            {game.sport === 'football' 
+                              ? (game.football_state?.away_score || game.away_score || 0)
+                              : calculateScore(game.quarter_scores, "away")}
                           </p>
                         </div>
                       </div>
