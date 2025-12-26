@@ -1889,6 +1889,20 @@ export default function FootballLiveGame({ user, onLogout }) {
                 <Button
                   size="sm"
                   variant="outline"
+                  onClick={() => {
+                    // Parse current time for the dialog
+                    setTempClockMinutes(Math.floor(clockTime / 60));
+                    setTempClockSeconds(clockTime % 60);
+                    setShowSetClockDialog(true);
+                  }}
+                  className="border-zinc-600 text-zinc-300"
+                >
+                  <Clock className="w-4 h-4 mr-1" />
+                  Set
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
                   onClick={() => setClockTime(900)}
                   className="border-zinc-600 text-zinc-300"
                 >
