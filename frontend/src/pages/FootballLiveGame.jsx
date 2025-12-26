@@ -529,7 +529,7 @@ function KickoffWorkflowDialog({
     );
   }
   
-  // Step 4: Return Details (fielded at, returned to, tackler)
+  // Step 4: Return Details - fielded at FIRST, then result
   if (step === 4) {
     return (
       <Dialog open={open}>
@@ -542,67 +542,58 @@ function KickoffWorkflowDialog({
           </DialogHeader>
           
           <div className="space-y-6 mt-4">
-            {/* Special Results */}
+            {/* Fielded At - FIRST */}
+            <YardLineSelector
+              label="Fielded At (Yard Line)"
+              value={kickoffData.fieldedAt || 5}
+              onChange={(val) => setKickoffData(prev => ({ ...prev, fieldedAt: val }))}
+            />
+            
+            {/* Return Result */}
             <div>
               <label className="text-sm text-zinc-400 uppercase tracking-wide mb-2 block">
-                Special Result (or skip)
+                Return Result
               </label>
               <div className="flex flex-wrap gap-2">
                 <Button
-                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchback', fieldedAt: 25, returnedTo: 25 }))}
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: null }))}
+                  className={`${!kickoffData.specialResult ? 'bg-orange-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                >
+                  Return
+                </Button>
+                <Button
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchback', returnedTo: 25 }))}
                   className={`${kickoffData.specialResult === 'touchback' ? 'bg-blue-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
                 >
                   Touchback
                 </Button>
                 <Button
-                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'fair_catch' }))}
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'fair_catch', returnedTo: prev.fieldedAt }))}
                   className={`${kickoffData.specialResult === 'fair_catch' ? 'bg-yellow-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
                 >
                   Fair Catch
                 </Button>
                 <Button
-                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'out_of_bounds', fieldedAt: 40, returnedTo: 40 }))}
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'out_of_bounds', returnedTo: 40 }))}
                   className={`${kickoffData.specialResult === 'out_of_bounds' ? 'bg-purple-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
                 >
                   Out of Bounds
                 </Button>
                 <Button
-                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchdown' }))}
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchdown', returnedTo: 0 }))}
                   className={`${kickoffData.specialResult === 'touchdown' ? 'bg-green-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
                 >
                   Touchdown
                 </Button>
-                <Button
-                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: null }))}
-                  className={`${!kickoffData.specialResult ? 'bg-orange-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
-                >
-                  Regular Return
-                </Button>
               </div>
             </div>
             
-            {/* Yard Line Inputs - Only show if regular return */}
+            {/* Returned To - Only show for regular return */}
             {!kickoffData.specialResult && (
-              <>
-                <YardLineSelector
-                  label="Fielded At (Yard Line)"
-                  value={kickoffData.fieldedAt || 5}
-                  onChange={(val) => setKickoffData(prev => ({ ...prev, fieldedAt: val }))}
-                />
-                
-                <YardLineSelector
-                  label="Returned To (Yard Line)"
-                  value={kickoffData.returnedTo || 25}
-                  onChange={(val) => setKickoffData(prev => ({ ...prev, returnedTo: val }))}
-                />
-              </>
-            )}
-            
-            {kickoffData.specialResult === 'fair_catch' && (
               <YardLineSelector
-                label="Fair Catch At (Yard Line)"
-                value={kickoffData.fieldedAt || 25}
-                onChange={(val) => setKickoffData(prev => ({ ...prev, fieldedAt: val, returnedTo: val }))}
+                label="Returned To (Yard Line)"
+                value={kickoffData.returnedTo || 25}
+                onChange={(val) => setKickoffData(prev => ({ ...prev, returnedTo: val }))}
               />
             )}
           </div>
