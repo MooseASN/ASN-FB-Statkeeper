@@ -789,6 +789,21 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [passDefenderNumber, setPassDefenderNumber] = useState(null);
   const [interceptionReturnYards, setInterceptionReturnYards] = useState(0);
   
+  // Punt play state
+  const [puntPunterNumber, setPuntPunterNumber] = useState(null);
+  const [puntReturnerNumber, setPuntReturnerNumber] = useState(null);
+  const [puntDistance, setPuntDistance] = useState(40);
+  const [puntReturnYards, setPuntReturnYards] = useState(0);
+  
+  // Field Goal / Extra Point state
+  const [kickerNumber, setKickerNumber] = useState(null);
+  const [fgDistance, setFgDistance] = useState(30);
+  
+  // Penalty state
+  const [penaltyTeam, setPenaltyTeam] = useState(null); // 'offense' or 'defense'
+  const [penaltyYards, setPenaltyYards] = useState(5);
+  const [penaltyDescription, setPenaltyDescription] = useState('');
+  
   // Play workflow step
   const [playStep, setPlayStep] = useState(0); // 0=select type, 1=select player, 2=result, 3=yards, 4=tackler
   
