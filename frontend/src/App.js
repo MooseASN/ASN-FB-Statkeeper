@@ -109,7 +109,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       {/* Account settings - requires auth but not sport */}
       <Route path="/account" element={
         <ProtectedRoute user={user}>
-          <AccountSettings user={user} onLogout={handleLogout} onUserUpdate={() => fetchUser()} />
+          <AccountSettings user={user} onLogout={handleLogout} onUserUpdate={() => window.location.reload()} />
         </ProtectedRoute>
       } />
       
