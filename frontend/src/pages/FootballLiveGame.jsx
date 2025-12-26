@@ -803,15 +803,20 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [quarter, setQuarter] = useState(1);
   const [firstDownMarker, setFirstDownMarker] = useState(35); // Ball position needed for first down
   
-  // Current Drive tracking
+  // Current Drive tracking - includes time of possession
   const [currentDrive, setCurrentDrive] = useState({
     startTime: null,
     startQuarter: 1,
     startPosition: 25,
     plays: 0,
     yards: 0,
-    team: 'home'
+    team: 'home',
+    elapsedTime: 0 // Track elapsed time for accurate TOP
   });
+  
+  // Time of possession tracking (total for the game)
+  const [homeTimeOfPossession, setHomeTimeOfPossession] = useState(0); // in seconds
+  const [awayTimeOfPossession, setAwayTimeOfPossession] = useState(0); // in seconds
   
   // Game control dialogs
   const [showSpotBallDialog, setShowSpotBallDialog] = useState(false);
