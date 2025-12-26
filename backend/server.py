@@ -654,8 +654,11 @@ async def create_team(team_data: TeamCreate, user: User = Depends(get_current_us
     return team
 
 @api_router.get("/teams", response_model=List[Team])
-async def get_teams(user: User = Depends(get_current_user)):
-    teams = await db.teams.find({"user_id": user.user_id}, {"_id": 0}).to_list(100)
+async def get_teams(sport: Optional[str] = None, user: User = Depends(get_current_user)):
+    query = {"user_id": user.user_id}
+    if sport:
+        query["sport"] = sport
+    teams = await db.teams.find(query, {"_id": 0}).to_list(100)
     return teams
 
 @api_router.get("/teams/{team_id}", response_model=Team)
