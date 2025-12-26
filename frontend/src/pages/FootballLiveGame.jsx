@@ -800,6 +800,29 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [quarter, setQuarter] = useState(1);
   const [firstDownMarker, setFirstDownMarker] = useState(35); // Ball position needed for first down
   
+  // Current Drive tracking
+  const [currentDrive, setCurrentDrive] = useState({
+    startTime: null,
+    startQuarter: 1,
+    startPosition: 25,
+    plays: 0,
+    yards: 0,
+    team: 'home'
+  });
+  
+  // Game control dialogs
+  const [showSpotBallDialog, setShowSpotBallDialog] = useState(false);
+  const [showSetDownDialog, setShowSetDownDialog] = useState(false);
+  const [showTimeoutDialog, setShowTimeoutDialog] = useState(false);
+  const [showAdvanceQuarterDialog, setShowAdvanceQuarterDialog] = useState(false);
+  const [spotBallYardLine, setSpotBallYardLine] = useState(25);
+  const [manualDown, setManualDown] = useState(1);
+  const [manualDistance, setManualDistance] = useState(10);
+  
+  // Editable play log
+  const [editingPlayId, setEditingPlayId] = useState(null);
+  const [editPlayData, setEditPlayData] = useState(null);
+  
   // Current play
   const [selectedPlayType, setSelectedPlayType] = useState(null);
   const [selectedResult, setSelectedResult] = useState(null);
