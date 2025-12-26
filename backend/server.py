@@ -1424,7 +1424,8 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         simple_mode=game_data.simple_mode,
         advanced_mode=game_data.advanced_mode,
         possession="home",  # Default possession to home team
-        note=game_data.note  # Game note/description
+        note=game_data.note,  # Game note/description
+        sport=game_data.sport  # Pass the sport from the request!
     )
     game.user_id = user.user_id
     
