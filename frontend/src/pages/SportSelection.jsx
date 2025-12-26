@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSport, SPORTS, SPORT_CONFIG } from "@/contexts/SportContext";
 import { Card, CardContent } from "@/components/ui/card";
