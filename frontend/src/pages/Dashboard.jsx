@@ -115,8 +115,8 @@ export default function Dashboard({ user, onLogout }) {
   const fetchData = async () => {
     try {
       const [gamesRes, teamsRes] = await Promise.all([
-        axios.get(`${API}/games`),
-        axios.get(`${API}/teams`)
+        axios.get(`${API}/games`, { params: { sport: selectedSport } }),
+        axios.get(`${API}/teams`, { params: { sport: selectedSport } })
       ]);
       
       const games = gamesRes.data;
