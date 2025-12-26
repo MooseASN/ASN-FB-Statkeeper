@@ -1,0 +1,106 @@
+{
+  "timestamp": "2025-12-26T17:13:24.540066",
+  "overall_success": false,
+  "test_results": [
+    {
+      "test": "Admin Authentication",
+      "success": true,
+      "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
+      "timestamp": "2025-12-26T17:13:24.287362",
+      "details": null
+    },
+    {
+      "test": "Football Game Exists",
+      "success": true,
+      "message": "Game found - Sport: football, Status: active, Teams: Test Home Team vs Test Away Team",
+      "timestamp": "2025-12-26T17:13:24.347155",
+      "details": null
+    },
+    {
+      "test": "Football State Update",
+      "success": false,
+      "message": "Football state not found in response",
+      "timestamp": "2025-12-26T17:13:24.368865",
+      "details": {
+        "id": "a640f656-1ea6-4929-8589-82f58a1069d9",
+        "user_id": "user_admin_001",
+        "home_team_id": "4ae66cc7-c27d-4fb3-a003-d1f97cf8fde0",
+        "away_team_id": "2ea3e357-c4dd-4ba1-9afb-1272a63aad50",
+        "home_team_name": "Test Home Team",
+        "away_team_name": "Test Away Team",
+        "home_team_logo": null,
+        "away_team_logo": null,
+        "home_team_color": "#dc2626",
+        "away_team_color": "#2563eb",
+        "status": "active",
+        "current_quarter": 1,
+        "quarter_scores": {
+          "home": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "away": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "play_by_play": [],
+        "share_code": "test1234",
+        "scheduled_date": null,
+        "scheduled_time": null,
+        "note": null,
+        "clock_enabled": false,
+        "period_duration": 720,
+        "period_label": "Quarter",
+        "clock_time": 720,
+        "clock_running": false,
+        "clock_last_started": null,
+        "is_halftime": false,
+        "total_timeouts": 4,
+        "home_timeouts_used": 0,
+        "away_timeouts_used": 0,
+        "primetime_enabled": false,
+        "video_url": null,
+        "event_id": null,
+        "home_bonus": null,
+        "away_bonus": null,
+        "simple_mode": false,
+        "advanced_mode": false,
+        "possession": null,
+        "home_on_floor": [],
+        "away_on_floor": [],
+        "home_starters": [],
+        "away_starters": [],
+        "starters_selected": false,
+        "sport": "football",
+        "created_at": "2025-12-26T16:57:56.769681+00:00",
+        "updated_at": "2025-12-26T17:13:24.359656+00:00"
+      }
+    },
+    {
+      "test": "Football State Persistence",
+      "success": true,
+      "message": "Football state correctly persisted and retrieved from public endpoint",
+      "timestamp": "2025-12-26T17:13:24.420435",
+      "details": null
+    },
+    {
+      "test": "Football Stats Accumulation",
+      "success": true,
+      "message": "Football stats correctly accumulated across multiple plays",
+      "timestamp": "2025-12-26T17:13:24.488620",
+      "details": null
+    },
+    {
+      "test": "Public Stats Endpoint",
+      "success": true,
+      "message": "Public endpoint working - 2 plays, stats available: True",
+      "timestamp": "2025-12-26T17:13:24.539898",
+      "details": null
+    }
+  ]
+}
