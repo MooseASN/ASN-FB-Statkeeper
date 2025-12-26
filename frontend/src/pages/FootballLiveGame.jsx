@@ -1947,10 +1947,13 @@ export default function FootballLiveGame({ user, onLogout }) {
         break;
     }
     
+    // Create play entry with comprehensive data model
     const play = {
-      id: Date.now(),
-      quarter,
-      clock: formatTime(clockTime),
+      id: `play-${Date.now()}`,
+      play_id: `play-${Date.now()}`,
+      period: quarter,
+      clock_start: clockTime,
+      clock_end: clockTime,
       team: possession,
       type: 'punt',
       punter: puntPunterNumber,
@@ -1959,29 +1962,51 @@ export default function FootballLiveGame({ user, onLogout }) {
       returnYards: puntReturnYards,
       result: selectedResult,
       down,
+      start_spot: ballPosition,
+      end_spot: newBallPosition,
       ball_on: getYardLineText(),
       description,
+      no_play: false,
+      quarter, // Legacy field for display
+      clock: formatTime(clockTime), // Legacy field for display
     };
     
     setPlayLog(prev => [play, ...prev]);
     
+    // Add play to current drive
+    addPlayToDrive(play);
+    
     if (turnover) {
+      // End current drive with punt result
+      endDrive('punt', ballPosition);
+      
       setBallPosition(newBallPosition);
-      setPossession(possession === 'home' ? 'away' : 'home');
+      const newPossession = possession === 'home' ? 'away' : 'home';
+      setPossession(newPossession);
       setDown(1);
       setDistance(10);
       const newFDMarker = possession === 'home' 
         ? Math.max(0, newBallPosition - 10) 
         : Math.min(100, newBallPosition + 10);
       setFirstDownMarker(newFDMarker);
+      
+      // Start new drive for receiving team
+      startNewDrive('punt', newPossession);
       toast.info(`${defTeamName} ball`);
     } else {
       // Blocked punt - offense keeps ball but loses down
       setDown(prev => prev + 1);
       if (down >= 4) {
-        setPossession(possession === 'home' ? 'away' : 'home');
+        // End current drive due to turnover on downs after blocked punt
+        endDrive('downs', ballPosition);
+        
+        const newPossession = possession === 'home' ? 'away' : 'home';
+        setPossession(newPossession);
         setDown(1);
         setDistance(10);
+        
+        // Start new drive for receiving team
+        startNewDrive('turnover_on_downs', newPossession);
       }
     }
     
