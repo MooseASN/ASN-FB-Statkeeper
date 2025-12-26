@@ -875,6 +875,7 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [penaltyTeam, setPenaltyTeam] = useState(null); // 'offense' or 'defense'
   const [penaltyYards, setPenaltyYards] = useState(5);
   const [penaltyDescription, setPenaltyDescription] = useState('');
+  const [penaltyPlayerNumber, setPenaltyPlayerNumber] = useState(null); // Player who committed the penalty
   const [showPenaltyDialog, setShowPenaltyDialog] = useState(false);
   const [gameRuleset, setGameRuleset] = useState('NFHS'); // Default ruleset for game
   
