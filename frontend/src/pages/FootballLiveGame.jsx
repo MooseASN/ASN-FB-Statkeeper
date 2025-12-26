@@ -1874,31 +1874,36 @@ export default function FootballLiveGame({ user, onLogout }) {
   };
 
   // Handle Extra Point submission
-  const handleSubmitExtraPoint = () => {
+  const handleSubmitExtraPoint = (result) => {
     const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
     const scoringTeam = possession; // Store the scoring team before switching
+    
+    // Use the passed result parameter instead of selectedResult state
+    const extraPointResult = result || selectedResult;
     
     // Format kicker display with name
     const kickerDisplay = kickerNumber ? formatPlayer(kickerNumber, possession) : '';
     
     let description = '';
     
-    if (selectedResult === 'good') {
+    if (extraPointResult === 'good') {
       description = kickerNumber ? `${kickerDisplay} extra point - GOOD!` : 'Extra point - GOOD!';
       if (possession === 'home') {
         setHomeScore(prev => prev + 1);
       } else {
         setAwayScore(prev => prev + 1);
       }
-    } else if (selectedResult === 'no_good') {
+      toast.success('+1 Point - Extra Point Good!');
+    } else if (extraPointResult === 'no_good') {
       description = kickerNumber ? `${kickerDisplay} extra point - NO GOOD` : 'Extra point - NO GOOD';
-    } else if (selectedResult === 'two_point_good') {
+    } else if (extraPointResult === 'two_point_good') {
       description = `Two-point conversion - GOOD!`;
       if (possession === 'home') {
         setHomeScore(prev => prev + 2);
       } else {
         setAwayScore(prev => prev + 2);
       }
+      toast.success('+2 Points - Two-point conversion Good!');
     } else {
       description = `Two-point conversion - NO GOOD`;
     }
@@ -1910,7 +1915,7 @@ export default function FootballLiveGame({ user, onLogout }) {
       team: possession,
       type: 'extra_point',
       kicker: kickerNumber,
-      result: selectedResult,
+      result: extraPointResult,
       description,
     };
     
