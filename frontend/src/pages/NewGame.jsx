@@ -295,7 +295,8 @@ export default function NewGame({ user, onLogout }) {
                 </div>
               )}
 
-              {/* Game Mode Selection */}
+              {/* Game Mode Selection - Basketball only */}
+              {selectedSport === "basketball" && (
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center gap-2">
                   <Users className="w-5 h-5 text-slate-600" />
@@ -395,6 +396,7 @@ export default function NewGame({ user, onLogout }) {
                   </div>
                 )}
               </div>
+              )}
 
               {/* Clock Options */}
               <div className="border rounded-lg p-4 space-y-4">
