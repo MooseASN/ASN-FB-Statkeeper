@@ -3743,7 +3743,8 @@ export default function FootballLiveGame({ user, onLogout }) {
                         </div>
                         
                         {/* FG Distance */}
-                        <div className="flex items-center justify-center gap-3 mt-4">
+                        <div className="text-sm text-zinc-400 uppercase">Distance</div>
+                        <div className="flex items-center justify-center gap-3">
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => Math.max(17, prev - 5))}>-5</Button>
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => Math.max(17, prev - 1))}>-1</Button>
                           <div className="px-4 py-2 bg-zinc-800 rounded text-center">
@@ -3752,6 +3753,19 @@ export default function FootballLiveGame({ user, onLogout }) {
                           </div>
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => prev + 1)}>+1</Button>
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => prev + 5)}>+5</Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 justify-center mt-2">
+                          {[20, 25, 30, 35, 40, 45, 50, 55].map(d => (
+                            <Button 
+                              key={d}
+                              size="sm" 
+                              variant="outline" 
+                              className={`border-zinc-600 ${fgDistance === d ? 'bg-yellow-600 border-yellow-500' : ''}`}
+                              onClick={() => setFgDistance(d)}
+                            >
+                              {d}
+                            </Button>
+                          ))}
                         </div>
                         
                         <div className="text-sm text-zinc-400 uppercase mt-4">Result</div>
@@ -3774,8 +3788,94 @@ export default function FootballLiveGame({ user, onLogout }) {
                         <div className="flex gap-2 mt-4">
                           <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
                           <Button 
-                            onClick={handleSubmitFieldGoal}
+                            onClick={() => selectedResult === 'blocked' ? setPlayStep(2) : handleSubmitFieldGoal()}
                             disabled={!selectedResult}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            {selectedResult === 'blocked' ? 'Continue →' : 'Complete Play ✓'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Blocked - Select Blocker */}
+                    {playStep === 2 && selectedResult === 'blocked' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{kickerNumber} {fgDistance}-yard FG attempt - <span className="text-red-400 font-bold">BLOCKED</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Blocker</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={fgBlockerNumber || ''}
+                            onChange={(e) => setFgBlockerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setFgBlockerNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  fgBlockerNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(1)}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(3)}
+                            className="bg-yellow-600 hover:bg-yellow-700"
+                          >
+                            Continue →
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 4: Blocked - Return Distance */}
+                    {playStep === 3 && selectedResult === 'blocked' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Blocked by {fgBlockerNumber ? `#${fgBlockerNumber}` : 'defense'}
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Return</div>
+                        
+                        <Button 
+                          onClick={() => { setFgNoReturn(true); handleSubmitFieldGoal(); }}
+                          className={`w-full mb-2 ${fgNoReturn ? 'bg-zinc-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
+                        >
+                          No Return / Dead Ball
+                        </Button>
+                        
+                        <div className="text-sm text-zinc-500 text-center">- or select return yards -</div>
+                        
+                        <div className="flex items-center justify-center gap-3 mt-2">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setFgNoReturn(false); setFgReturnYards(prev => Math.max(0, prev - 5)); }}>-5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setFgNoReturn(false); setFgReturnYards(prev => Math.max(0, prev - 1)); }}>-1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Return Yards</div>
+                            <div className="text-2xl font-bold text-yellow-400">{fgReturnYards}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setFgNoReturn(false); setFgReturnYards(prev => prev + 1); }}>+1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setFgNoReturn(false); setFgReturnYards(prev => prev + 5); }}>+5</Button>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(2)}>← Back</Button>
+                          <Button 
+                            onClick={() => { setFgNoReturn(false); handleSubmitFieldGoal(); }}
                             className="bg-green-600 hover:bg-green-700 px-8"
                           >
                             Complete Play ✓
