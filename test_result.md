@@ -159,11 +159,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "CSV upload endpoint exists at POST /api/teams/{team_id}/roster/csv"
+      - working: true
+        agent: "testing"
+        comment: "TESTED: CSV roster upload working correctly - uploaded 3 test players successfully via POST /api/teams/{team_id}/roster/csv endpoint"
 
   - task: "User Authentication"
     implemented: true
