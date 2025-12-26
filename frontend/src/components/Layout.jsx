@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight } from "lucide-react";
+import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
