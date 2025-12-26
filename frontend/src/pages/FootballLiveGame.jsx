@@ -3454,7 +3454,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                       </div>
                     )}
                     
-                    {/* Step 2: Result & Distance */}
+                    {/* Step 2: Result Selection */}
                     {playStep === 1 && (
                       <div className="space-y-4">
                         <div className="text-sm text-zinc-400">
@@ -3503,7 +3503,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                       </div>
                     )}
                     
-                    {/* Step 3: Returner & Return Yards */}
+                    {/* Step 3: Select Returner */}
                     {playStep === 2 && (
                       <div className="space-y-4">
                         <div className="text-sm text-zinc-400">
@@ -3536,22 +3536,149 @@ export default function FootballLiveGame({ user, onLogout }) {
                           </div>
                         </div>
                         
-                        {/* Return Yards */}
-                        {selectedResult !== 'fair_catch' && (
-                          <div className="flex items-center justify-center gap-3 mt-4">
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 5))}>-5</Button>
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 1))}>-1</Button>
-                            <div className="px-4 py-2 bg-zinc-800 rounded text-center">
-                              <div className="text-xs text-zinc-500">Return Yards</div>
-                              <div className="text-2xl font-bold text-yellow-400">{puntReturnYards}</div>
-                            </div>
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 1)}>+1</Button>
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 5)}>+5</Button>
-                          </div>
-                        )}
-                        
                         <div className="flex gap-2 mt-4">
                           <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(1)}>← Back</Button>
+                          <Button 
+                            onClick={() => selectedResult === 'fair_catch' ? handleSubmitPuntPlay() : setPlayStep(3)}
+                            disabled={!puntReturnerNumber}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            {selectedResult === 'fair_catch' ? 'Complete Play ✓' : 'Continue →'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 4: Return Start Yard Line */}
+                    {playStep === 3 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{puntPunterNumber} punt for {puntDistance} yards • Returner: #{puntReturnerNumber}
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Return Starts At (Yard Line)</div>
+                        <div className="flex items-center justify-center gap-3 mt-2">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnStartYardLine(prev => Math.max(0, prev - 10))}>-10</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnStartYardLine(prev => Math.max(0, prev - 5))}>-5</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Yard Line</div>
+                            <div className="text-2xl font-bold text-blue-400">{puntReturnStartYardLine}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnStartYardLine(prev => Math.min(100, prev + 5))}>+5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnStartYardLine(prev => Math.min(100, prev + 10))}>+10</Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 justify-center mt-2">
+                          {[5, 10, 15, 20, 25, 30, 35, 40].map(yl => (
+                            <Button 
+                              key={yl}
+                              size="sm" 
+                              variant="outline" 
+                              className={`border-zinc-600 ${puntReturnStartYardLine === yl ? 'bg-blue-600 border-blue-500' : ''}`}
+                              onClick={() => setPuntReturnStartYardLine(yl)}
+                            >
+                              {yl}
+                            </Button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(2)}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(4)}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            Continue →
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 5: Return Yards */}
+                    {playStep === 4 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{puntPunterNumber} punt • #{puntReturnerNumber} fielded at {puntReturnStartYardLine} yard line
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Return Yards</div>
+                        <div className="flex items-center justify-center gap-3 mt-2">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 5))}>-5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 1))}>-1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Return Yards</div>
+                            <div className="text-2xl font-bold text-yellow-400">{puntReturnYards}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 1)}>+1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 5)}>+5</Button>
+                        </div>
+                        <div className="flex flex-wrap gap-2 justify-center mt-2">
+                          {[0, 5, 10, 15, 20, 25, 30].map(y => (
+                            <Button 
+                              key={y}
+                              size="sm" 
+                              variant="outline" 
+                              className={`border-zinc-600 ${puntReturnYards === y ? 'bg-yellow-600 border-yellow-500' : ''}`}
+                              onClick={() => setPuntReturnYards(y)}
+                            >
+                              {y}
+                            </Button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(3)}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(5)}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            Continue →
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 6: Select Tackler */}
+                    {playStep === 5 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{puntReturnerNumber} returned {puntReturnYards} yards
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Tackler</div>
+                        <Button 
+                          onClick={() => { setPuntTacklerNumber(null); handleSubmitPuntPlay(); }}
+                          className="w-full bg-zinc-700 hover:bg-zinc-600 mb-2"
+                        >
+                          No Tackle / Not Recorded
+                        </Button>
+                        
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={puntTacklerNumber || ''}
+                            onChange={(e) => setPuntTacklerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPuntTacklerNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  puntTacklerNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(4)}>← Back</Button>
                           <Button 
                             onClick={handleSubmitPuntPlay}
                             className="bg-green-600 hover:bg-green-700 px-8"
