@@ -9,11 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus, Calendar, MapPin, Image, Trash2 } from "lucide-react";
 import Layout from "@/components/Layout";
+import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Events({ user, onLogout }) {
   const navigate = useNavigate();
+  const { selectedSport } = useSport();
+  const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -31,11 +34,11 @@ export default function Events({ user, onLogout }) {
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+  }, [selectedSport]);
 
   const fetchEvents = async () => {
     try {
-      const res = await axios.get(`${API}/events`);
+      const res = await axios.get(`${API}/events`, { params: { sport: selectedSport } });
       setEvents(res.data);
     } catch (error) {
       toast.error("Failed to load events");
