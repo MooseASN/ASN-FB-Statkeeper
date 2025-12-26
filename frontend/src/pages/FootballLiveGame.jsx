@@ -1044,6 +1044,133 @@ export default function FootballLiveGame({ user, onLogout }) {
     document.title = "StatMoose FB";
   }, [id]);
 
+  // ============================================
+  // DRIVE TRACKING FUNCTIONS (Per Specification)
+  // ============================================
+  
+  // Convert normalized position (0-100) to human-readable yard line
+  // 0 = own goal, 50 = midfield, 100 = opponent goal
+  const normalizedToYardLine = useCallback((normalized, team) => {
+    if (normalized <= 0) return `${team === possession ? 'Own' : 'Opp'} Goal`;
+    if (normalized >= 100) return `${team === possession ? 'Opp' : 'Own'} Goal`;
+    if (normalized === 50) return '50';
+    if (normalized < 50) {
+      return `Own ${normalized}`;
+    } else {
+      return `Opp ${100 - normalized}`;
+    }
+  }, [possession]);
+
+  // Start a new drive
+  const startNewDrive = useCallback((reason, newPossession = possession) => {
+    const newDrive = {
+      id: `drive-${Date.now()}`,
+      team: newPossession,
+      startPeriod: quarter,
+      startClock: clockTime,
+      startPosition: ballPosition,
+      startReason: reason,
+      plays: [],
+      playCount: 0,
+      netYards: 0,
+      elapsedTime: 0,
+      endPeriod: null,
+      endClock: null,
+      endPosition: null,
+      result: null,
+    };
+    
+    // Save the previous drive if it had plays
+    if (currentDrive.playCount > 0) {
+      const endedDrive = {
+        ...currentDrive,
+        endPeriod: quarter,
+        endClock: clockTime,
+        endPosition: ballPosition,
+        netYards: ballPosition - currentDrive.startPosition,
+      };
+      setAllDrives(prev => [...prev, endedDrive]);
+    }
+    
+    setCurrentDrive(newDrive);
+    return newDrive;
+  }, [possession, quarter, clockTime, ballPosition, currentDrive]);
+
+  // End the current drive with a result
+  const endDrive = useCallback((result, endPosition = ballPosition) => {
+    const endedDrive = {
+      ...currentDrive,
+      endPeriod: quarter,
+      endClock: clockTime,
+      endPosition: endPosition,
+      netYards: endPosition - currentDrive.startPosition,
+      result: result,
+    };
+    
+    setAllDrives(prev => [...prev, endedDrive]);
+    return endedDrive;
+  }, [currentDrive, quarter, clockTime, ballPosition]);
+
+  // Add a play to the current drive
+  const addPlayToDrive = useCallback((play) => {
+    const yardsGained = play.end_spot - play.start_spot;
+    
+    setCurrentDrive(prev => ({
+      ...prev,
+      plays: [...prev.plays, play],
+      playCount: play.no_play ? prev.playCount : prev.playCount + 1,
+      netYards: play.end_spot - prev.startPosition,
+    }));
+  }, []);
+
+  // Calculate drive time from start to current
+  const calculateDriveTime = useCallback((drive) => {
+    if (!drive.startClock) return 0;
+    
+    const endClock = drive.endClock || clockTime;
+    const startPeriod = drive.startPeriod || 1;
+    const endPeriod = drive.endPeriod || quarter;
+    
+    // Same period calculation
+    if (startPeriod === endPeriod) {
+      return drive.startClock - endClock;
+    }
+    
+    // Cross-period calculation (15:00 per quarter = 900 seconds)
+    const periodLength = 900; // 15 minutes
+    let totalTime = drive.startClock; // Time from start to end of start period
+    
+    // Add full periods in between
+    for (let p = startPeriod + 1; p < endPeriod; p++) {
+      totalTime += periodLength;
+    }
+    
+    // Add time from start of end period to end clock
+    totalTime += (periodLength - endClock);
+    
+    return totalTime;
+  }, [clockTime, quarter]);
+
+  // Format drive summary for display
+  const formatDriveSummary = useCallback((drive) => {
+    const teamName = drive.team === 'home' ? game?.home_team_name : game?.away_team_name;
+    const startSpot = normalizedToYardLine(drive.startPosition, drive.team);
+    const endSpot = normalizedToYardLine(drive.endPosition || ballPosition, drive.team);
+    const topSeconds = drive.elapsedTime || calculateDriveTime(drive);
+    const topMins = Math.floor(topSeconds / 60);
+    const topSecs = topSeconds % 60;
+    
+    return {
+      team: teamName,
+      start: `Q${drive.startPeriod} ${formatTime(drive.startClock)} ${startSpot}`,
+      end: `Q${drive.endPeriod || quarter} ${formatTime(drive.endClock || clockTime)} ${endSpot}`,
+      plays: drive.playCount,
+      netYards: drive.netYards >= 0 ? `+${drive.netYards}` : `${drive.netYards}`,
+      timeOfPossession: `${topMins}:${topSecs.toString().padStart(2, '0')}`,
+      result: drive.result || 'In Progress',
+    };
+  }, [game, normalizedToYardLine, ballPosition, calculateDriveTime, quarter, clockTime, formatTime]);
+
   // Auto-save football state when playLog changes
   useEffect(() => {
     if (playLog.length > 0 && game) {
