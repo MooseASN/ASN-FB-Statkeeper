@@ -1596,9 +1596,12 @@ async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User =
 # ============ EVENT/TOURNAMENT ENDPOINTS ============
 
 @api_router.get("/events")
-async def get_events(user: User = Depends(get_current_user)):
+async def get_events(sport: Optional[str] = None, user: User = Depends(get_current_user)):
     """Get all events for the current user"""
-    events = await db.events.find({"user_id": user.user_id}, {"_id": 0}).to_list(100)
+    query = {"user_id": user.user_id}
+    if sport:
+        query["sport"] = sport
+    events = await db.events.find(query, {"_id": 0}).to_list(100)
     return events
 
 @api_router.get("/events/{event_id}")
