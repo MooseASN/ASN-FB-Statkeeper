@@ -3283,6 +3283,426 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+# ============ FOOTBALL BOX SCORE PDF ============
+
+@api_router.get("/games/{game_id}/football-boxscore/pdf")
+async def generate_football_boxscore_pdf(game_id: str):
+    """Generate a comprehensive football box score PDF (public endpoint)"""
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Get events/play log for this game
+    events = await db.events.find({"game_id": game_id}, {"_id": 0}).sort("created_at", 1).to_list(500)
+    
+    # Calculate stats from events
+    home_stats = {"rushing": {}, "passing": {}, "receiving": {}, "defense": {}, "returns": {}, "kicking": {}}
+    away_stats = {"rushing": {}, "passing": {}, "receiving": {}, "defense": {}, "returns": {}, "kicking": {}}
+    
+    team_stats = {
+        "home": {
+            "first_downs": 0, "first_downs_rush": 0, "first_downs_pass": 0, "first_downs_penalty": 0,
+            "rush_att": 0, "rush_yds": 0, "rush_td": 0,
+            "pass_comp": 0, "pass_att": 0, "pass_yds": 0, "pass_td": 0, "pass_int": 0,
+            "total_yds": 0, "penalties": 0, "penalty_yds": 0,
+            "fumbles": 0, "fumbles_lost": 0,
+            "punts": 0, "punt_yds": 0,
+            "fg_made": 0, "fg_att": 0,
+            "third_down_conv": 0, "third_down_att": 0,
+            "fourth_down_conv": 0, "fourth_down_att": 0,
+            "possession_time": 0,
+            "sacks": 0, "sack_yds": 0,
+        },
+        "away": {
+            "first_downs": 0, "first_downs_rush": 0, "first_downs_pass": 0, "first_downs_penalty": 0,
+            "rush_att": 0, "rush_yds": 0, "rush_td": 0,
+            "pass_comp": 0, "pass_att": 0, "pass_yds": 0, "pass_td": 0, "pass_int": 0,
+            "total_yds": 0, "penalties": 0, "penalty_yds": 0,
+            "fumbles": 0, "fumbles_lost": 0,
+            "punts": 0, "punt_yds": 0,
+            "fg_made": 0, "fg_att": 0,
+            "third_down_conv": 0, "third_down_att": 0,
+            "fourth_down_conv": 0, "fourth_down_att": 0,
+            "possession_time": 0,
+            "sacks": 0, "sack_yds": 0,
+        }
+    }
+    
+    quarter_scores = {"home": [0, 0, 0, 0], "away": [0, 0, 0, 0]}
+    scoring_plays = []
+    
+    def get_player_key(team, player_num):
+        return f"{team}_{player_num}"
+    
+    def init_player(stats_dict, category, key, default_stats):
+        if key not in stats_dict[category]:
+            stats_dict[category][key] = default_stats.copy()
+    
+    # Process events to calculate stats
+    for event in events:
+        team = event.get("team", "home")
+        stats = home_stats if team == "home" else away_stats
+        ts = team_stats[team]
+        def_team = "away" if team == "home" else "home"
+        def_stats = away_stats if team == "home" else home_stats
+        
+        event_type = event.get("event_type", "")
+        result = event.get("result", "")
+        yards = event.get("yards", 0) or 0
+        quarter = event.get("quarter", 1)
+        points = event.get("points", 0) or 0
+        
+        # Track scoring
+        if points > 0 and 1 <= quarter <= 4:
+            quarter_scores[team][quarter - 1] += points
+            scoring_plays.append({
+                "quarter": quarter,
+                "time": event.get("timestamp", ""),
+                "team": team,
+                "description": event.get("description", ""),
+                "score": f"{sum(quarter_scores['away'][:quarter])}-{sum(quarter_scores['home'][:quarter])}"
+            })
+        
+        # Rushing stats
+        if event_type == "run":
+            ts["rush_att"] += 1
+            ts["rush_yds"] += yards
+            ts["total_yds"] += yards
+            if result == "touchdown":
+                ts["rush_td"] += 1
+            if event.get("first_down"):
+                ts["first_downs"] += 1
+                ts["first_downs_rush"] += 1
+            
+            carrier = event.get("carrier")
+            if carrier:
+                key = get_player_key(team, carrier)
+                init_player(stats, "rushing", key, {"num": carrier, "att": 0, "yds": 0, "td": 0, "lg": 0})
+                stats["rushing"][key]["att"] += 1
+                stats["rushing"][key]["yds"] += yards
+                stats["rushing"][key]["lg"] = max(stats["rushing"][key]["lg"], yards)
+                if result == "touchdown":
+                    stats["rushing"][key]["td"] += 1
+            
+            # Tackler
+            tackler = event.get("tackler")
+            if tackler:
+                key = get_player_key(def_team, tackler)
+                init_player(def_stats, "defense", key, {"num": tackler, "tot": 0, "solo": 0, "ast": 0, "tfl": 0, "sack": 0, "int": 0, "pbu": 0})
+                def_stats["defense"][key]["tot"] += 1
+                def_stats["defense"][key]["solo"] += 1
+        
+        # Passing stats
+        elif event_type == "pass":
+            ts["pass_att"] += 1
+            qb = event.get("qb")
+            receiver = event.get("receiver")
+            
+            if result in ["complete", "touchdown"]:
+                ts["pass_comp"] += 1
+                ts["pass_yds"] += yards
+                ts["total_yds"] += yards
+                if result == "touchdown":
+                    ts["pass_td"] += 1
+                if event.get("first_down"):
+                    ts["first_downs"] += 1
+                    ts["first_downs_pass"] += 1
+                
+                # QB stats
+                if qb:
+                    key = get_player_key(team, qb)
+                    init_player(stats, "passing", key, {"num": qb, "comp": 0, "att": 0, "yds": 0, "td": 0, "int": 0, "lg": 0})
+                    stats["passing"][key]["comp"] += 1
+                    stats["passing"][key]["att"] += 1
+                    stats["passing"][key]["yds"] += yards
+                    stats["passing"][key]["lg"] = max(stats["passing"][key]["lg"], yards)
+                    if result == "touchdown":
+                        stats["passing"][key]["td"] += 1
+                
+                # Receiver stats
+                if receiver:
+                    key = get_player_key(team, receiver)
+                    init_player(stats, "receiving", key, {"num": receiver, "rec": 0, "yds": 0, "td": 0, "lg": 0})
+                    stats["receiving"][key]["rec"] += 1
+                    stats["receiving"][key]["yds"] += yards
+                    stats["receiving"][key]["lg"] = max(stats["receiving"][key]["lg"], yards)
+                    if result == "touchdown":
+                        stats["receiving"][key]["td"] += 1
+            
+            elif result == "incomplete":
+                if qb:
+                    key = get_player_key(team, qb)
+                    init_player(stats, "passing", key, {"num": qb, "comp": 0, "att": 0, "yds": 0, "td": 0, "int": 0, "lg": 0})
+                    stats["passing"][key]["att"] += 1
+            
+            elif result == "intercepted":
+                ts["pass_int"] += 1
+                if qb:
+                    key = get_player_key(team, qb)
+                    init_player(stats, "passing", key, {"num": qb, "comp": 0, "att": 0, "yds": 0, "td": 0, "int": 0, "lg": 0})
+                    stats["passing"][key]["att"] += 1
+                    stats["passing"][key]["int"] += 1
+                
+                # Defender interception
+                defender = event.get("defender")
+                if defender:
+                    key = get_player_key(def_team, defender)
+                    init_player(def_stats, "defense", key, {"num": defender, "tot": 0, "solo": 0, "ast": 0, "tfl": 0, "sack": 0, "int": 0, "pbu": 0})
+                    def_stats["defense"][key]["int"] += 1
+            
+            elif result == "sack":
+                team_stats[def_team]["sacks"] += 1
+                team_stats[def_team]["sack_yds"] += abs(yards)
+                tackler = event.get("tackler")
+                if tackler:
+                    key = get_player_key(def_team, tackler)
+                    init_player(def_stats, "defense", key, {"num": tackler, "tot": 0, "solo": 0, "ast": 0, "tfl": 0, "sack": 0, "int": 0, "pbu": 0})
+                    def_stats["defense"][key]["sack"] += 1
+                    def_stats["defense"][key]["tot"] += 1
+        
+        # Punt stats
+        elif event_type == "punt":
+            distance = event.get("distance", 0) or 0
+            ts["punts"] += 1
+            ts["punt_yds"] += distance
+            
+            # Punt return
+            return_yds = event.get("return_yards", 0) or 0
+            if return_yds > 0:
+                returner = event.get("returner")
+                if returner:
+                    key = get_player_key(def_team, returner)
+                    init_player(def_stats, "returns", key, {"num": returner, "pr_no": 0, "pr_yds": 0, "pr_td": 0, "pr_lg": 0, "kr_no": 0, "kr_yds": 0, "kr_td": 0, "kr_lg": 0})
+                    def_stats["returns"][key]["pr_no"] += 1
+                    def_stats["returns"][key]["pr_yds"] += return_yds
+                    def_stats["returns"][key]["pr_lg"] = max(def_stats["returns"][key]["pr_lg"], return_yds)
+        
+        # Field goal stats
+        elif event_type == "field_goal":
+            ts["fg_att"] += 1
+            if result == "good":
+                ts["fg_made"] += 1
+        
+        # Penalty stats
+        elif event_type == "penalty":
+            penalty_team = event.get("against_team", "offense")
+            pen_yds = event.get("yards", 0) or 0
+            if penalty_team == "offense":
+                ts["penalties"] += 1
+                ts["penalty_yds"] += pen_yds
+            else:
+                team_stats[def_team]["penalties"] += 1
+                team_stats[def_team]["penalty_yds"] += pen_yds
+        
+        # Track 3rd/4th down
+        down = event.get("down", 0)
+        if down == 3:
+            ts["third_down_att"] += 1
+            if event.get("first_down") or result == "touchdown":
+                ts["third_down_conv"] += 1
+        elif down == 4 and event_type not in ["punt", "field_goal"]:
+            ts["fourth_down_att"] += 1
+            if event.get("first_down") or result == "touchdown":
+                ts["fourth_down_conv"] += 1
+    
+    # Build PDF
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.3*inch, bottomMargin=0.3*inch, leftMargin=0.4*inch, rightMargin=0.4*inch)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Title style
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=16, alignment=1, spaceAfter=2)
+    subtitle_style = ParagraphStyle('Subtitle', parent=styles['Normal'], fontSize=10, alignment=1, spaceAfter=8)
+    section_style = ParagraphStyle('Section', parent=styles['Heading2'], fontSize=11, spaceBefore=12, spaceAfter=4)
+    
+    home_name = game.get('home_team_name', 'Home')
+    away_name = game.get('away_team_name', 'Away')
+    
+    # Header
+    elements.append(Paragraph(f"<b>{away_name} vs {home_name}</b>", title_style))
+    game_date = game.get('date', '')
+    elements.append(Paragraph(f"Football Box Score • {game_date}", subtitle_style))
+    
+    # Score by Quarter
+    home_total = sum(quarter_scores['home'])
+    away_total = sum(quarter_scores['away'])
+    
+    score_data = [
+        ["", "1st", "2nd", "3rd", "4th", "Total"],
+        [away_name, quarter_scores['away'][0], quarter_scores['away'][1], quarter_scores['away'][2], quarter_scores['away'][3], away_total],
+        [home_name, quarter_scores['home'][0], quarter_scores['home'][1], quarter_scores['home'][2], quarter_scores['home'][3], home_total],
+    ]
+    
+    score_table = Table(score_data, colWidths=[2.5*inch, 0.6*inch, 0.6*inch, 0.6*inch, 0.6*inch, 0.7*inch])
+    score_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ('FONTNAME', (-1, 1), (-1, -1), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+    ]))
+    elements.append(score_table)
+    elements.append(Spacer(1, 12))
+    
+    # Team Statistics Comparison
+    elements.append(Paragraph("<b>TEAM STATISTICS</b>", section_style))
+    
+    def format_downs(conv, att):
+        pct = f"({round(conv/att*100)}%)" if att > 0 else "(0%)"
+        return f"{conv}-{att} {pct}"
+    
+    ts_h = team_stats["home"]
+    ts_a = team_stats["away"]
+    
+    team_stat_data = [
+        [away_name, "STAT", home_name],
+        [ts_a["first_downs"], "First Downs", ts_h["first_downs"]],
+        [f"{ts_a['rush_att']}-{ts_a['rush_yds']}", "Rushes-Yards", f"{ts_h['rush_att']}-{ts_h['rush_yds']}"],
+        [f"{ts_a['pass_comp']}-{ts_a['pass_att']}-{ts_a['pass_int']}", "Comp-Att-Int", f"{ts_h['pass_comp']}-{ts_h['pass_att']}-{ts_h['pass_int']}"],
+        [ts_a["pass_yds"], "Passing Yards", ts_h["pass_yds"]],
+        [ts_a["total_yds"], "Total Yards", ts_h["total_yds"]],
+        [f"{ts_a['penalties']}-{ts_a['penalty_yds']}", "Penalties-Yards", f"{ts_h['penalties']}-{ts_h['penalty_yds']}"],
+        [format_downs(ts_a["third_down_conv"], ts_a["third_down_att"]), "3rd Down Conv", format_downs(ts_h["third_down_conv"], ts_h["third_down_att"])],
+        [format_downs(ts_a["fourth_down_conv"], ts_a["fourth_down_att"]), "4th Down Conv", format_downs(ts_h["fourth_down_conv"], ts_h["fourth_down_att"])],
+        [f"{ts_a['sacks']}-{ts_a['sack_yds']}", "Sacks-Yards", f"{ts_h['sacks']}-{ts_h['sack_yds']}"],
+        [f"{ts_a['punts']}-{round(ts_a['punt_yds']/ts_a['punts'], 1) if ts_a['punts'] > 0 else 0}", "Punts-Avg", f"{ts_h['punts']}-{round(ts_h['punt_yds']/ts_h['punts'], 1) if ts_h['punts'] > 0 else 0}"],
+    ]
+    
+    team_stat_table = Table(team_stat_data, colWidths=[2*inch, 2*inch, 2*inch])
+    team_stat_table.setStyle(TableStyle([
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('ALIGN', (0, 0), (0, -1), 'CENTER'),
+        ('ALIGN', (1, 0), (1, -1), 'CENTER'),
+        ('ALIGN', (2, 0), (2, -1), 'CENTER'),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ('BACKGROUND', (1, 1), (1, -1), colors.Color(0.95, 0.95, 0.95)),
+    ]))
+    elements.append(team_stat_table)
+    
+    # Scoring Summary
+    if scoring_plays:
+        elements.append(Paragraph("<b>SCORING SUMMARY</b>", section_style))
+        scoring_data = [["Qtr", "Time", "Team", "Play", "Score"]]
+        for sp in scoring_plays:
+            team_abbrev = home_name[:3].upper() if sp["team"] == "home" else away_name[:3].upper()
+            scoring_data.append([sp["quarter"], sp["time"], team_abbrev, sp["description"][:50], sp["score"]])
+        
+        scoring_table = Table(scoring_data, colWidths=[0.4*inch, 0.6*inch, 0.5*inch, 3.5*inch, 0.7*inch])
+        scoring_table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ALIGN', (0, 0), (2, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ]))
+        elements.append(scoring_table)
+    
+    def create_individual_table(title, data, headers, col_widths):
+        """Create a formatted individual stats table"""
+        if not data:
+            return None
+        elements_list = []
+        elements_list.append(Paragraph(f"<b>{title}</b>", section_style))
+        table_data = [headers] + data
+        table = Table(table_data, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+        ]))
+        elements_list.append(table)
+        return elements_list
+    
+    # Rushing Stats
+    def format_rushing(stats_dict, team_name):
+        rows = []
+        for key, s in sorted(stats_dict["rushing"].items(), key=lambda x: x[1]["yds"], reverse=True):
+            avg = round(s["yds"] / s["att"], 1) if s["att"] > 0 else 0
+            rows.append([f"#{s['num']} ({team_name[:3]})", s["att"], s["yds"], avg, s["td"], s["lg"]])
+        return rows
+    
+    rushing_data = format_rushing(home_stats, home_name) + format_rushing(away_stats, away_name)
+    if rushing_data:
+        rushing_elements = create_individual_table("RUSHING", rushing_data, ["Player", "Car", "Yds", "Avg", "TD", "Lg"], [1.8*inch, 0.5*inch, 0.6*inch, 0.5*inch, 0.4*inch, 0.5*inch])
+        if rushing_elements:
+            elements.extend(rushing_elements)
+    
+    # Passing Stats
+    def format_passing(stats_dict, team_name):
+        rows = []
+        for key, s in sorted(stats_dict["passing"].items(), key=lambda x: x[1]["yds"], reverse=True):
+            pct = round(s["comp"] / s["att"] * 100, 1) if s["att"] > 0 else 0
+            rows.append([f"#{s['num']} ({team_name[:3]})", f"{s['comp']}-{s['att']}", pct, s["yds"], s["td"], s["int"], s["lg"]])
+        return rows
+    
+    passing_data = format_passing(home_stats, home_name) + format_passing(away_stats, away_name)
+    if passing_data:
+        passing_elements = create_individual_table("PASSING", passing_data, ["Player", "C-A", "Pct", "Yds", "TD", "Int", "Lg"], [1.5*inch, 0.7*inch, 0.5*inch, 0.6*inch, 0.4*inch, 0.4*inch, 0.5*inch])
+        if passing_elements:
+            elements.extend(passing_elements)
+    
+    # Receiving Stats
+    def format_receiving(stats_dict, team_name):
+        rows = []
+        for key, s in sorted(stats_dict["receiving"].items(), key=lambda x: x[1]["yds"], reverse=True):
+            avg = round(s["yds"] / s["rec"], 1) if s["rec"] > 0 else 0
+            rows.append([f"#{s['num']} ({team_name[:3]})", s["rec"], s["yds"], avg, s["td"], s["lg"]])
+        return rows
+    
+    receiving_data = format_receiving(home_stats, home_name) + format_receiving(away_stats, away_name)
+    if receiving_data:
+        receiving_elements = create_individual_table("RECEIVING", receiving_data, ["Player", "Rec", "Yds", "Avg", "TD", "Lg"], [1.8*inch, 0.5*inch, 0.6*inch, 0.5*inch, 0.4*inch, 0.5*inch])
+        if receiving_elements:
+            elements.extend(receiving_elements)
+    
+    # Defense Stats
+    def format_defense(stats_dict, team_name):
+        rows = []
+        for key, s in sorted(stats_dict["defense"].items(), key=lambda x: x[1]["tot"], reverse=True):
+            rows.append([f"#{s['num']} ({team_name[:3]})", s["tot"], s["solo"], s["ast"], s["tfl"], s["sack"], s["int"], s["pbu"]])
+        return rows
+    
+    defense_data = format_defense(home_stats, home_name) + format_defense(away_stats, away_name)
+    if defense_data:
+        defense_elements = create_individual_table("DEFENSE", defense_data, ["Player", "Tot", "Solo", "Ast", "TFL", "Sack", "Int", "PBU"], [1.5*inch, 0.45*inch, 0.45*inch, 0.45*inch, 0.45*inch, 0.5*inch, 0.4*inch, 0.45*inch])
+        if defense_elements:
+            elements.extend(defense_elements)
+    
+    # Returns Stats
+    def format_returns(stats_dict, team_name):
+        rows = []
+        for key, s in stats_dict["returns"].items():
+            if s["pr_no"] > 0 or s["kr_no"] > 0:
+                pr_avg = round(s["pr_yds"] / s["pr_no"], 1) if s["pr_no"] > 0 else 0
+                kr_avg = round(s["kr_yds"] / s["kr_no"], 1) if s["kr_no"] > 0 else 0
+                rows.append([f"#{s['num']} ({team_name[:3]})", s["pr_no"], s["pr_yds"], pr_avg, s["kr_no"], s["kr_yds"], kr_avg])
+        return rows
+    
+    returns_data = format_returns(home_stats, home_name) + format_returns(away_stats, away_name)
+    if returns_data:
+        returns_elements = create_individual_table("RETURNS", returns_data, ["Player", "PR No", "PR Yds", "PR Avg", "KR No", "KR Yds", "KR Avg"], [1.4*inch, 0.55*inch, 0.65*inch, 0.6*inch, 0.55*inch, 0.65*inch, 0.6*inch])
+        if returns_elements:
+            elements.extend(returns_elements)
+    
+    # Build and return PDF
+    doc.build(elements)
+    buffer.seek(0)
+    
+    filename = f"football_boxscore_{away_name}_vs_{home_name}.pdf".replace(" ", "_")
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # ============ UTILITY ENDPOINTS ============
 
 @api_router.get("/")
