@@ -1225,6 +1225,24 @@ export default function FootballLiveGame({ user, onLogout }) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Get player name from roster by number
+  const getPlayerName = useCallback((number, team = possession) => {
+    const roster = team === 'home' ? homeRoster : awayRoster;
+    const player = roster.find(p => String(p.number) === String(number));
+    if (player && player.name) {
+      // Return first name or first part of name (up to 8 chars)
+      const firstName = player.name.split(' ')[0];
+      return firstName.length > 8 ? firstName.substring(0, 8) : firstName;
+    }
+    return '';
+  }, [homeRoster, awayRoster, possession]);
+
+  // Format player display (number + name if available)
+  const formatPlayer = useCallback((number, team = possession) => {
+    const name = getPlayerName(number, team);
+    return name ? `#${number} ${name}` : `#${number}`;
+  }, [getPlayerName, possession]);
+
   // Handle play submission
   const handleSubmitPlay = () => {
     if (!selectedPlayType || !selectedResult) {
