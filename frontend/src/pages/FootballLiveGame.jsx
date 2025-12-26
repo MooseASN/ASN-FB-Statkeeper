@@ -2402,17 +2402,21 @@ export default function FootballLiveGame({ user, onLogout }) {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-4">
+      <div className="max-w-7xl mx-auto px-4 py-4">
         <div className="grid grid-cols-12 gap-4">
-          {/* Left Panel - Play Type Selection */}
+          {/* Left Panel - Play Type Selection & Game Control */}
           <div className="col-span-2 space-y-2">
             <div className="text-xs text-zinc-500 uppercase tracking-wide mb-2">Play Type</div>
             {PLAY_TYPES.map((type) => (
               <button
                 key={type.id}
                 onClick={() => {
-                  setSelectedPlayType(type.id);
-                  setSelectedResult(null);
+                  if (type.id === 'other') {
+                    setShowTimeoutDialog(true);
+                  } else {
+                    setSelectedPlayType(type.id);
+                    setSelectedResult(null);
+                  }
                 }}
                 className={`w-full py-2 px-3 rounded text-sm font-medium transition-all ${
                   selectedPlayType === type.id 
@@ -2420,24 +2424,182 @@ export default function FootballLiveGame({ user, onLogout }) {
                     : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
                 }`}
               >
-                {type.label}
+                {type.id === 'other' ? 'Timeout' : type.label}
               </button>
             ))}
             
-            <div className="border-t border-zinc-700 pt-2 mt-4">
+            <div className="border-t border-zinc-700 pt-2 mt-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full border-zinc-600 text-zinc-300"
+                className="w-full border-zinc-600 text-zinc-300 mb-2"
                 onClick={togglePossession}
               >
                 Change Possession
               </Button>
             </div>
+            
+            {/* Game Control Section */}
+            <div className="border-t border-zinc-700 pt-2">
+              <div className="text-xs text-zinc-500 uppercase tracking-wide mb-2">Game Control</div>
+              <div className="space-y-1">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-zinc-600 text-zinc-300 text-xs"
+                  onClick={() => { setSpotBallYardLine(ballPosition); setShowSpotBallDialog(true); }}
+                >
+                  📍 Spot Ball
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-zinc-600 text-zinc-300 text-xs"
+                  onClick={() => { setManualDown(down); setManualDistance(distance); setShowSetDownDialog(true); }}
+                >
+                  🔢 Set Down & Distance
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-zinc-600 text-zinc-300 text-xs"
+                  onClick={() => setShowAdvanceQuarterDialog(true)}
+                >
+                  ⏭️ Advance Quarter
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full border-zinc-600 text-zinc-300 text-xs"
+                  disabled
+                >
+                  📄 Box Score PDF
+                </Button>
+              </div>
+            </div>
           </div>
 
-          {/* Center - Field and Play Input */}
+          {/* Center - Field, Drive Info, and Play Input */}
           <div className="col-span-7 space-y-4">
+            {/* Top Row: Scoreboard + Current Drive */}
+            <div className="flex gap-4">
+              {/* Scoreboard - Compact */}
+              <div className="flex-1 bg-zinc-900 rounded-lg p-3 border border-zinc-800">
+                <div className="flex items-center justify-between">
+                  {/* Home Team */}
+                  <div className="flex items-center gap-3">
+                    <div 
+                      className="w-3 h-8 rounded"
+                      style={{ backgroundColor: homeColor }}
+                    />
+                    <div>
+                      <div className="text-sm font-bold">{homeTeamName}</div>
+                      <div className="text-2xl font-black">{homeScore}</div>
+                    </div>
+                  </div>
+                  
+                  {/* Clock & Quarter */}
+                  <div className="text-center">
+                    <div className="text-3xl font-mono font-bold text-yellow-400">
+                      {formatTime(clockTime)}
+                    </div>
+                    <div className="text-sm text-zinc-400">Q{quarter}</div>
+                    <div className="flex gap-1 mt-1">
+                      <Button
+                        size="sm"
+                        variant={clockRunning ? "destructive" : "default"}
+                        onClick={() => setClockRunning(!clockRunning)}
+                        className={`h-6 px-2 ${clockRunning ? "" : "bg-green-600 hover:bg-green-700"}`}
+                      >
+                        {clockRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => { setTempClockMinutes(Math.floor(clockTime / 60)); setTempClockSeconds(clockTime % 60); setShowSetClockDialog(true); }}
+                        className="h-6 px-2 border-zinc-600"
+                      >
+                        <Clock className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Away Team */}
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <div className="text-sm font-bold text-right">{awayTeamName}</div>
+                      <div className="text-2xl font-black text-right">{awayScore}</div>
+                    </div>
+                    <div 
+                      className="w-3 h-8 rounded"
+                      style={{ backgroundColor: awayColor }}
+                    />
+                  </div>
+                </div>
+                
+                {/* Down & Distance */}
+                <div className="mt-2 pt-2 border-t border-zinc-700 flex items-center justify-between text-sm">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-yellow-400">
+                      {down}{down === 1 ? 'st' : down === 2 ? 'nd' : down === 3 ? 'rd' : 'th'} & {distance}
+                    </span>
+                    <span className="text-zinc-400">on {getYardLineText()}</span>
+                  </div>
+                  <div className="flex gap-1">
+                    {[...Array(3)].map((_, i) => (
+                      <div 
+                        key={`h-${i}`}
+                        className={`w-2 h-2 rounded-full ${i < homeTimeouts ? 'bg-yellow-400' : 'bg-zinc-700'}`}
+                        title={`${homeTeamName} TO`}
+                      />
+                    ))}
+                    <span className="text-zinc-600 mx-1">|</span>
+                    {[...Array(3)].map((_, i) => (
+                      <div 
+                        key={`a-${i}`}
+                        className={`w-2 h-2 rounded-full ${i < awayTimeouts ? 'bg-yellow-400' : 'bg-zinc-700'}`}
+                        title={`${awayTeamName} TO`}
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Current Drive */}
+              <div className="w-48 bg-zinc-900 rounded-lg p-3 border border-zinc-800">
+                <div className="text-xs text-zinc-500 uppercase tracking-wide mb-2">Current Drive</div>
+                <div 
+                  className="text-sm font-bold mb-2 flex items-center gap-2"
+                  style={{ color: possession === 'home' ? homeColor : awayColor }}
+                >
+                  <div className="w-2 h-2 rounded-full bg-current animate-pulse" />
+                  {possession === 'home' ? homeTeamName : awayTeamName}
+                </div>
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div>
+                    <div className="text-lg font-bold">{currentDrive.plays}</div>
+                    <div className="text-[10px] text-zinc-500 uppercase">Plays</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold">{currentDrive.yards}</div>
+                    <div className="text-[10px] text-zinc-500 uppercase">Yards</div>
+                  </div>
+                  <div>
+                    <div className="text-lg font-bold">{getDriveTime()}</div>
+                    <div className="text-[10px] text-zinc-500 uppercase">Time</div>
+                  </div>
+                </div>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="w-full mt-2 h-6 text-xs border-zinc-600"
+                  onClick={() => startNewDrive(possession)}
+                >
+                  New Drive
+                </Button>
+              </div>
+            </div>
+            
             {/* Football Field */}
             <FootballField
               ballPosition={ballPosition}
