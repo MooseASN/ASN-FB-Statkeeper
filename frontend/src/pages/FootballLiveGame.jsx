@@ -2192,9 +2192,12 @@ export default function FootballLiveGame({ user, onLogout }) {
     let repeatDown = false;
     let autoFirstDown = false;
     
+    // Build player info string
+    const playerInfo = penaltyPlayerNumber ? ` (#${penaltyPlayerNumber})` : '';
+    
     switch (selectedResult) {
       case 'offense':
-        description = `Penalty on ${offenseTeam}: ${penaltyDescription || 'Offensive penalty'} - ${penaltyYards} yards`;
+        description = `Penalty on ${offenseTeam}${playerInfo}: ${penaltyDescription || 'Offensive penalty'} - ${penaltyYards} yards`;
         // Move ball back
         const offDir = possession === 'home' ? -1 : 1;
         const newOffPos = Math.max(0, Math.min(100, ballPosition + (penaltyYards * offDir)));
@@ -2202,7 +2205,7 @@ export default function FootballLiveGame({ user, onLogout }) {
         setDistance(prev => prev + penaltyYards);
         break;
       case 'defense':
-        description = `Penalty on ${defenseTeam}: ${penaltyDescription || 'Defensive penalty'} - ${penaltyYards} yards`;
+        description = `Penalty on ${defenseTeam}${playerInfo}: ${penaltyDescription || 'Defensive penalty'} - ${penaltyYards} yards`;
         // Move ball forward
         const defDir = possession === 'home' ? 1 : -1;
         const newDefPos = Math.max(0, Math.min(100, ballPosition + (penaltyYards * defDir)));
