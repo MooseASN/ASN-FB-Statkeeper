@@ -684,21 +684,47 @@ async def get_all_users(admin: User = Depends(get_admin_user)):
     """Get all users (admin only) - excludes password hashes"""
     users = await db.users.find({}, {"_id": 0, "password_hash": 0, "security_questions": 0}).to_list(10000)
     
-    # Add additional stats for each user
+    # Get all user IDs
+    user_ids = [user.get("user_id") for user in users]
+    
+    # Batch count queries using aggregation (avoids N+1)
+    team_counts = {}
+    game_counts = {}
+    event_counts = {}
+    
+    # Count teams per user in single query
+    team_agg = await db.teams.aggregate([
+        {"$match": {"user_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+    ]).to_list(10000)
+    for item in team_agg:
+        team_counts[item["_id"]] = item["count"]
+    
+    # Count games per user in single query
+    game_agg = await db.games.aggregate([
+        {"$match": {"user_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+    ]).to_list(10000)
+    for item in game_agg:
+        game_counts[item["_id"]] = item["count"]
+    
+    # Count events per user in single query
+    event_agg = await db.events.aggregate([
+        {"$match": {"user_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+    ]).to_list(10000)
+    for item in event_agg:
+        event_counts[item["_id"]] = item["count"]
+    
+    # Enrich users with counts
     enriched_users = []
     for user in users:
         user_id = user.get("user_id")
-        
-        # Count teams, games, events for this user
-        team_count = await db.teams.count_documents({"user_id": user_id})
-        game_count = await db.games.count_documents({"user_id": user_id})
-        event_count = await db.events.count_documents({"user_id": user_id})
-        
         enriched_users.append({
             **user,
-            "team_count": team_count,
-            "game_count": game_count,
-            "event_count": event_count
+            "team_count": team_counts.get(user_id, 0),
+            "game_count": game_counts.get(user_id, 0),
+            "event_count": event_counts.get(user_id, 0)
         })
     
     return {
@@ -712,6 +738,38 @@ async def export_users_csv(admin: User = Depends(get_admin_user)):
     """Export all users as CSV (admin only)"""
     users = await db.users.find({}, {"_id": 0, "password_hash": 0, "security_questions": 0}).to_list(10000)
     
+    # Get all user IDs
+    user_ids = [user.get("user_id") for user in users]
+    
+    # Batch count queries using aggregation (avoids N+1)
+    team_counts = {}
+    game_counts = {}
+    event_counts = {}
+    
+    # Count teams per user in single query
+    team_agg = await db.teams.aggregate([
+        {"$match": {"user_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+    ]).to_list(10000)
+    for item in team_agg:
+        team_counts[item["_id"]] = item["count"]
+    
+    # Count games per user in single query
+    game_agg = await db.games.aggregate([
+        {"$match": {"user_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+    ]).to_list(10000)
+    for item in game_agg:
+        game_counts[item["_id"]] = item["count"]
+    
+    # Count events per user in single query
+    event_agg = await db.events.aggregate([
+        {"$match": {"user_id": {"$in": user_ids}}},
+        {"$group": {"_id": "$user_id", "count": {"$sum": 1}}}
+    ]).to_list(10000)
+    for item in event_agg:
+        event_counts[item["_id"]] = item["count"]
+    
     # Create CSV
     output = io.StringIO()
     fieldnames = ["user_id", "email", "username", "name", "auth_provider", "created_at", "team_count", "game_count", "event_count"]
@@ -720,10 +778,6 @@ async def export_users_csv(admin: User = Depends(get_admin_user)):
     
     for user in users:
         user_id = user.get("user_id")
-        team_count = await db.teams.count_documents({"user_id": user_id})
-        game_count = await db.games.count_documents({"user_id": user_id})
-        event_count = await db.events.count_documents({"user_id": user_id})
-        
         writer.writerow({
             "user_id": user.get("user_id", ""),
             "email": user.get("email", ""),
@@ -731,9 +785,9 @@ async def export_users_csv(admin: User = Depends(get_admin_user)):
             "name": user.get("name", ""),
             "auth_provider": user.get("auth_provider", "local"),
             "created_at": user.get("created_at", ""),
-            "team_count": team_count,
-            "game_count": game_count,
-            "event_count": event_count
+            "team_count": team_counts.get(user_id, 0),
+            "game_count": game_counts.get(user_id, 0),
+            "event_count": event_counts.get(user_id, 0)
         })
     
     output.seek(0)
