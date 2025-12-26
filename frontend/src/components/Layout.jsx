@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight, Settings } from "lucide-react";
+import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight, Settings, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +9,8 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
+
+const ADMIN_EMAILS = ["antlersportsnetwork@gmail.com"];
 
 export default function Layout({ children, user, onLogout }) {
   const location = useLocation();
