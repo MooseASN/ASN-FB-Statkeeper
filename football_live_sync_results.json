@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-12-26T18:34:46.117658",
+  "overall_success": false,
+  "test_results": [
+    {
+      "test": "Admin Authentication",
+      "success": true,
+      "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
+      "timestamp": "2025-12-26T18:34:46.106899",
+      "details": null
+    },
+    {
+      "test": "Backend API State Verification",
+      "success": false,
+      "message": "play_log has 2 plays, expected 3+",
+      "timestamp": "2025-12-26T18:34:46.117514",
+      "details": null
+    }
+  ]
+}
