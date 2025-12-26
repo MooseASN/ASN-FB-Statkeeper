@@ -29,8 +29,8 @@ export default function NewGame({ user, onLogout }) {
   const [scheduledDate, setScheduledDate] = useState("");
   const [scheduledTime, setScheduledTime] = useState("");
   
-  // Clock options
-  const [clockEnabled, setClockEnabled] = useState(false);
+  // Clock options - always enabled for football
+  const [clockEnabled, setClockEnabled] = useState(selectedSport === "football" ? true : false);
   const [periodMinutes, setPeriodMinutes] = useState(12);
   const [periodSeconds, setPeriodSeconds] = useState(0);
   const [periodLabel, setPeriodLabel] = useState("Quarter"); // "Quarter" or "Period"
