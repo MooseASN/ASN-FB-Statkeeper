@@ -43,6 +43,14 @@ export default function FootballLiveStats({
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
+  
+  // Format time of possession (accepts seconds as number)
+  const formatTOP = (seconds) => {
+    const totalSecs = typeof seconds === 'number' ? seconds : 0;
+    const mins = Math.floor(totalSecs / 60);
+    const secs = totalSecs % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Get quarter label
   const getQuarterLabel = (q) => {
