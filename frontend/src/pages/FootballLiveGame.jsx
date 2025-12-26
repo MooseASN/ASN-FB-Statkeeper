@@ -2653,7 +2653,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                   variant="outline"
                   size="sm"
                   className="w-full border-zinc-600 text-zinc-300 text-xs"
-                  disabled
+                  onClick={() => window.open(`${process.env.REACT_APP_BACKEND_URL}/api/games/${id}/football-boxscore/pdf`, '_blank')}
                 >
                   📄 Box Score PDF
                 </Button>
