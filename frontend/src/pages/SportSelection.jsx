@@ -4,15 +4,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LogOut, Lock } from "lucide-react";
 
-// Users allowed to access Football
-const FOOTBALL_ALLOWED_EMAILS = ["antlersportsnetwork@gmail.com"];
+// Users allowed to access Football (admins)
+const FOOTBALL_ALLOWED_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
+const FOOTBALL_ALLOWED_USERNAMES = ["admin"];
 
 export default function SportSelection({ user, onLogout }) {
   const navigate = useNavigate();
   const { selectSport } = useSport();
 
-  // Check if user can access football
-  const canAccessFootball = FOOTBALL_ALLOWED_EMAILS.includes(user?.email?.toLowerCase());
+  // Check if user can access football (admins only)
+  const canAccessFootball = FOOTBALL_ALLOWED_EMAILS.includes(user?.email?.toLowerCase()) ||
+                            FOOTBALL_ALLOWED_USERNAMES.includes(user?.username?.toLowerCase());
 
   const handleSelectSport = (sport) => {
     if (sport === SPORTS.FOOTBALL && !canAccessFootball) {
