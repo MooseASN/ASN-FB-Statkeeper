@@ -941,10 +941,11 @@ export default function FootballLiveGame({ user, onLogout }) {
     // Set game state based on result
     setPossession(receivingTeam);
     
+    let newBallPos;
     if (kickoffData.specialResult === 'touchback') {
-      setBallPosition(receivingTeam === 'home' ? 25 : 75);
+      newBallPos = receivingTeam === 'home' ? 25 : 75;
     } else if (kickoffData.specialResult === 'out_of_bounds') {
-      setBallPosition(receivingTeam === 'home' ? 40 : 60);
+      newBallPos = receivingTeam === 'home' ? 40 : 60;
     } else if (kickoffData.specialResult === 'touchdown') {
       // Handle return TD
       if (receivingTeam === 'home') {
@@ -952,16 +953,23 @@ export default function FootballLiveGame({ user, onLogout }) {
       } else {
         setAwayScore(prev => prev + 6);
       }
-      setBallPosition(receivingTeam === 'home' ? 98 : 2);
+      newBallPos = receivingTeam === 'home' ? 98 : 2;
     } else {
       // Regular return - set ball position
       // Convert yard line to field position (0-100)
       const yardLine = kickoffData.returnedTo;
-      setBallPosition(receivingTeam === 'home' ? yardLine : 100 - yardLine);
+      newBallPos = receivingTeam === 'home' ? yardLine : 100 - yardLine;
     }
     
+    setBallPosition(newBallPos);
     setDown(1);
     setDistance(10);
+    
+    // Set first down marker (10 yards from ball in direction of goal)
+    const newFDMarker = receivingTeam === 'home' 
+      ? Math.min(100, newBallPos + 10) 
+      : Math.max(0, newBallPos - 10);
+    setFirstDownMarker(newFDMarker);
     
     // Close workflow
     setShowKickoffWorkflow(false);
