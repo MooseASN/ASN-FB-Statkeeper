@@ -442,6 +442,18 @@ frontend:
         agent: "main"
         comment: "Summary tab shows team comparison (PTS, REB, AST, STL, BLK, TO). Leaders tab shows top 5 points and rebounds leaders. Both verified via screenshot."
 
+  - task: "Football Public Stats Page UI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/pages/FootballStatsView.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Public football stats page working correctly. Page loads without authentication, team abbreviations show 'TES' (3-character fallback), navigation tabs functional (Summary, Play-by-Play, Team Stats, Leaders), scoreboard displays with quarter breakdown, StatMoose branding visible. All UI components rendering as expected."
+
 metadata:
   created_by: "main_agent"
   version: "1.2"
