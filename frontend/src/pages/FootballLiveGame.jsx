@@ -850,10 +850,12 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [kickerNumber, setKickerNumber] = useState(null);
   const [fgDistance, setFgDistance] = useState(30);
   
-  // Penalty state
+  // Penalty state - Enhanced with ruleset support
   const [penaltyTeam, setPenaltyTeam] = useState(null); // 'offense' or 'defense'
   const [penaltyYards, setPenaltyYards] = useState(5);
   const [penaltyDescription, setPenaltyDescription] = useState('');
+  const [showPenaltyDialog, setShowPenaltyDialog] = useState(false);
+  const [gameRuleset, setGameRuleset] = useState('NFHS'); // Default ruleset for game
   
   // Play workflow step
   const [playStep, setPlayStep] = useState(0); // 0=select type, 1=select player, 2=result, 3=yards, 4=tackler
