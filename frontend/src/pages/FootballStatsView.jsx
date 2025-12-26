@@ -19,6 +19,42 @@ export default function FootballStatsView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Helper to format play description from event data
+  const formatPlayDescription = (event) => {
+    if (event.description) return event.description;
+    
+    let desc = '';
+    switch (event.event_type) {
+      case 'run':
+        desc = `#${event.carrier || '?'} rush for ${event.yards || 0} yards`;
+        break;
+      case 'pass':
+        if (event.result === 'complete') {
+          desc = `#${event.qb || '?'} pass complete to #${event.receiver || '?'} for ${event.yards || 0} yards`;
+        } else if (event.result === 'incomplete') {
+          desc = `#${event.qb || '?'} pass incomplete`;
+        } else if (event.result === 'intercepted') {
+          desc = `#${event.qb || '?'} pass INTERCEPTED`;
+        }
+        break;
+      case 'punt':
+        desc = `#${event.punter || '?'} punt for ${event.distance || 0} yards`;
+        break;
+      case 'field_goal':
+        desc = `#${event.kicker || '?'} ${event.distance || 0}-yard field goal ${event.result === 'good' ? 'GOOD' : 'NO GOOD'}`;
+        break;
+      case 'extra_point':
+        desc = `Extra point ${event.result === 'good' ? 'GOOD' : 'NO GOOD'}`;
+        break;
+      case 'penalty':
+        desc = `PENALTY: ${event.penalty_name || 'Unknown'} - ${event.yards || 0} yards`;
+        break;
+      default:
+        desc = event.event_type || 'Play';
+    }
+    return desc;
+  };
+
   // Polling interval for live updates
   useEffect(() => {
     const fetchGameData = async () => {
@@ -66,43 +102,7 @@ export default function FootballStatsView() {
     // Poll for updates every 10 seconds for live games
     const interval = setInterval(fetchGameData, 10000);
     return () => clearInterval(interval);
-  }, [id]);
-
-  // Helper to format play description from event data
-  const formatPlayDescription = (event) => {
-    if (event.description) return event.description;
-    
-    let desc = '';
-    switch (event.event_type) {
-      case 'run':
-        desc = `#${event.carrier || '?'} rush for ${event.yards || 0} yards`;
-        break;
-      case 'pass':
-        if (event.result === 'complete') {
-          desc = `#${event.qb || '?'} pass complete to #${event.receiver || '?'} for ${event.yards || 0} yards`;
-        } else if (event.result === 'incomplete') {
-          desc = `#${event.qb || '?'} pass incomplete`;
-        } else if (event.result === 'intercepted') {
-          desc = `#${event.qb || '?'} pass INTERCEPTED`;
-        }
-        break;
-      case 'punt':
-        desc = `#${event.punter || '?'} punt for ${event.distance || 0} yards`;
-        break;
-      case 'field_goal':
-        desc = `#${event.kicker || '?'} ${event.distance || 0}-yard field goal ${event.result === 'good' ? 'GOOD' : 'NO GOOD'}`;
-        break;
-      case 'extra_point':
-        desc = `Extra point ${event.result === 'good' ? 'GOOD' : 'NO GOOD'}`;
-        break;
-      case 'penalty':
-        desc = `PENALTY: ${event.penalty_name || 'Unknown'} - ${event.yards || 0} yards`;
-        break;
-      default:
-        desc = event.event_type || 'Play';
-    }
-    return desc;
-  };
+  }, [id, formatPlayDescription]);
 
   if (loading) {
     return (
