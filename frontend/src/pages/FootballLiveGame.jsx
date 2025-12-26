@@ -2762,6 +2762,17 @@ export default function FootballLiveGame({ user, onLogout }) {
                     ))}
                   </div>
                 </div>
+                
+                {/* Time of Possession */}
+                <div className="mt-1 flex items-center justify-between text-xs text-zinc-500">
+                  <div className="flex items-center gap-1">
+                    <span>TOP:</span>
+                    <span style={{ color: homeColor }}>{formatTOP(homeTimeOfPossession)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span style={{ color: awayColor }}>{formatTOP(awayTimeOfPossession)}</span>
+                  </div>
+                </div>
               </div>
               
               {/* Current Drive */}
