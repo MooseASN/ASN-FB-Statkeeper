@@ -1,0 +1,55 @@
+{
+  "timestamp": "2025-12-26T21:13:48.945573",
+  "overall_success": false,
+  "test_results": [
+    {
+      "test": "Admin Authentication",
+      "success": true,
+      "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
+      "timestamp": "2025-12-26T21:13:48.739140",
+      "details": null
+    },
+    {
+      "test": "Share Button API",
+      "success": true,
+      "message": "Share link endpoint working - Game: Test Home Team vs Test Away Team",
+      "timestamp": "2025-12-26T21:13:48.749136",
+      "details": null
+    },
+    {
+      "test": "Time of Possession Backend",
+      "success": true,
+      "message": "TOP correctly saved - Home: 300s, Away: 420s",
+      "timestamp": "2025-12-26T21:13:48.782687",
+      "details": null
+    },
+    {
+      "test": "Drives Section Data",
+      "success": true,
+      "message": "Drive data available - 1 drives, 2 plays",
+      "timestamp": "2025-12-26T21:13:48.850472",
+      "details": null
+    },
+    {
+      "test": "Box Score Data",
+      "success": true,
+      "message": "Box score data available - player stats and team stats present",
+      "timestamp": "2025-12-26T21:13:48.875134",
+      "details": null
+    },
+    {
+      "test": "Timeouts Display Data",
+      "success": true,
+      "message": "Timeout data saved correctly - Home: 2, Away: 1",
+      "timestamp": "2025-12-26T21:13:48.894650",
+      "details": null
+    },
+    {
+      "test": "API Endpoints Comprehensive",
+      "success": false,
+      "message": "Public endpoint missing play_log data",
+      "timestamp": "2025-12-26T21:13:48.945402",
+      "details": null
+    }
+  ]
+}
