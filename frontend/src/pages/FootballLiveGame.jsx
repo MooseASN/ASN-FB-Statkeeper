@@ -2136,16 +2136,148 @@ export default function FootballLiveGame({ user, onLogout }) {
     setEditPlayData({ ...play });
   };
 
+  // Recalculate game state from play log
+  // This ensures consistency when plays are edited or deleted
+  const recalculateGameState = useCallback((plays) => {
+    if (!plays || plays.length === 0) {
+      // Reset to initial state
+      setBallPosition(25);
+      setDown(1);
+      setDistance(10);
+      setFirstDownMarker(35);
+      setPossession('home');
+      setHomeScore(0);
+      setAwayScore(0);
+      return;
+    }
+
+    // Get the most recent play to determine current state
+    const mostRecentPlay = plays[0]; // plays are stored newest first
+    
+    // Calculate scores from all plays
+    let newHomeScore = 0;
+    let newAwayScore = 0;
+    
+    plays.forEach(play => {
+      const team = play.team;
+      // Touchdowns
+      if (play.result === 'touchdown' || play.type === 'touchdown') {
+        if (team === 'home') newHomeScore += 6;
+        else newAwayScore += 6;
+      }
+      // Extra points
+      if (play.type === 'extra_point' && play.result === 'good') {
+        if (team === 'home') newHomeScore += 1;
+        else newAwayScore += 1;
+      }
+      // Two-point conversions
+      if (play.result === 'two_point_good') {
+        if (team === 'home') newHomeScore += 2;
+        else newAwayScore += 2;
+      }
+      // Field goals
+      if (play.type === 'field_goal' && play.result === 'good') {
+        if (team === 'home') newHomeScore += 3;
+        else newAwayScore += 3;
+      }
+      // Safeties (score for defensive team)
+      if (play.result === 'safety') {
+        if (team === 'home') newAwayScore += 2;
+        else newHomeScore += 2;
+      }
+    });
+
+    setHomeScore(newHomeScore);
+    setAwayScore(newAwayScore);
+
+    // Calculate current field position, down, distance from most recent play
+    // We need to replay the logic from the last play
+    if (mostRecentPlay.new_ball_position !== undefined) {
+      setBallPosition(mostRecentPlay.new_ball_position);
+    }
+    if (mostRecentPlay.new_down !== undefined) {
+      setDown(mostRecentPlay.new_down);
+    }
+    if (mostRecentPlay.new_distance !== undefined) {
+      setDistance(mostRecentPlay.new_distance);
+    }
+    if (mostRecentPlay.new_possession !== undefined) {
+      setPossession(mostRecentPlay.new_possession);
+    }
+    if (mostRecentPlay.new_first_down_marker !== undefined) {
+      setFirstDownMarker(mostRecentPlay.new_first_down_marker);
+    }
+
+    toast.info('Game state recalculated from play log');
+  }, []);
+
   // Save edited play
   const handleSaveEditPlay = () => {
     if (!editPlayData) return;
     
-    setPlayLog(prev => prev.map(p => 
+    const updatedPlays = playLog.map(p => 
       p.id === editingPlayId ? { ...editPlayData } : p
-    ));
+    );
+    
+    setPlayLog(updatedPlays);
+    
+    // Recalculate scores based on updated play data
+    recalculateScoresFromPlays(updatedPlays);
+    
     setEditingPlayId(null);
     setEditPlayData(null);
-    toast.success('Play updated');
+    toast.success('Play updated - stats adjusted');
+  };
+
+  // Recalculate only scores (for edits that don't affect field position)
+  const recalculateScoresFromPlays = (plays) => {
+    let newHomeScore = 0;
+    let newAwayScore = 0;
+    
+    plays.forEach(play => {
+      const team = play.team;
+      // Touchdowns
+      if (play.result === 'touchdown' || play.type === 'touchdown') {
+        if (team === 'home') newHomeScore += 6;
+        else newAwayScore += 6;
+      }
+      // Extra points
+      if (play.type === 'extra_point' && play.result === 'good') {
+        if (team === 'home') newHomeScore += 1;
+        else newAwayScore += 1;
+      }
+      // Two-point conversions
+      if (play.result === 'two_point_good') {
+        if (team === 'home') newHomeScore += 2;
+        else newAwayScore += 2;
+      }
+      // Field goals
+      if (play.type === 'field_goal' && play.result === 'good') {
+        if (team === 'home') newHomeScore += 3;
+        else newAwayScore += 3;
+      }
+      // Safeties
+      if (play.result === 'safety') {
+        if (team === 'home') newAwayScore += 2;
+        else newHomeScore += 2;
+      }
+    });
+
+    setHomeScore(newHomeScore);
+    setAwayScore(newAwayScore);
+  };
+
+  // Delete a play and recalculate game state
+  const handleDeletePlay = (playId) => {
+    const updatedPlays = playLog.filter(p => p.id !== playId);
+    setPlayLog(updatedPlays);
+    
+    // Recalculate scores
+    recalculateScoresFromPlays(updatedPlays);
+    
+    setEditingPlayId(null);
+    setEditPlayData(null);
+    toast.success('Play deleted - stats adjusted');
   };
 
   // Cancel edit
@@ -2157,8 +2289,13 @@ export default function FootballLiveGame({ user, onLogout }) {
   // Undo last play
   const undoLastPlay = () => {
     if (playLog.length === 0) return;
-    setPlayLog(prev => prev.slice(1));
-    toast.success("Last play undone");
+    const updatedPlays = playLog.slice(1);
+    setPlayLog(updatedPlays);
+    
+    // Recalculate scores after undo
+    recalculateScoresFromPlays(updatedPlays);
+    
+    toast.success("Last play undone - stats adjusted");
   };
 
   if (loading) {
