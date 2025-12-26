@@ -16,7 +16,7 @@ export const SPORT_CONFIG = {
     description: "Track basketball stats in real-time"
   },
   football: {
-    name: "American Football",
+    name: "Football",
     icon: "🏈",
     color: "#2D5A27",
     bgGradient: "from-green-700 to-green-900",
