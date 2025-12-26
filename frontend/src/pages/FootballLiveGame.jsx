@@ -2019,21 +2019,32 @@ export default function FootballLiveGame({ user, onLogout }) {
     
     let description = `#${kickerNumber} ${fgDistance}-yard field goal attempt`;
     
+    // Create play entry with comprehensive data model
     const play = {
-      id: Date.now(),
-      quarter,
-      clock: formatTime(clockTime),
+      id: `play-${Date.now()}`,
+      play_id: `play-${Date.now()}`,
+      period: quarter,
+      clock_start: clockTime,
+      clock_end: clockTime,
       team: possession,
       type: 'field_goal',
       kicker: kickerNumber,
       distance: fgDistance,
       result: selectedResult,
       down,
+      start_spot: ballPosition,
+      end_spot: ballPosition,
       ball_on: getYardLineText(),
       description: description + (selectedResult === 'good' ? ' - GOOD!' : selectedResult === 'blocked' ? ' - BLOCKED' : ' - NO GOOD'),
+      no_play: false,
+      quarter, // Legacy field for display
+      clock: formatTime(clockTime), // Legacy field for display
     };
     
     setPlayLog(prev => [play, ...prev]);
+    
+    // Add play to current drive
+    addPlayToDrive(play);
     
     if (selectedResult === 'good') {
       if (possession === 'home') {
@@ -2042,23 +2053,38 @@ export default function FootballLiveGame({ user, onLogout }) {
         setAwayScore(prev => prev + 3);
       }
       toast.success(`${teamName} Field Goal!`);
+      
+      // End current drive with FG result
+      endDrive('FG', ballPosition);
+      
       // After FG, other team gets ball at their 25 (kickoff simulation)
-      setPossession(possession === 'home' ? 'away' : 'home');
+      const newPossession = possession === 'home' ? 'away' : 'home';
+      setPossession(newPossession);
       const newBallPos = possession === 'home' ? 75 : 25;
       setBallPosition(newBallPos);
       setDown(1);
       setDistance(10);
       const newFDMarker = possession === 'home' ? 65 : 35;
       setFirstDownMarker(newFDMarker);
+      
+      // Start new drive for receiving team
+      startNewDrive('after_score', newPossession);
     } else {
+      // End current drive - missed FG
+      endDrive('missed_fg', ballPosition);
+      
       // Missed FG - other team gets ball at spot of kick
-      setPossession(possession === 'home' ? 'away' : 'home');
+      const newPossession = possession === 'home' ? 'away' : 'home';
+      setPossession(newPossession);
       setDown(1);
       setDistance(10);
       const newFDMarker = possession === 'home' 
         ? Math.max(0, ballPosition - 10) 
         : Math.min(100, ballPosition + 10);
       setFirstDownMarker(newFDMarker);
+      
+      // Start new drive for receiving team
+      startNewDrive('missed_fg', newPossession);
       toast.info('Field Goal missed');
     }
     
