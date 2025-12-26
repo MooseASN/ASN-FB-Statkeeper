@@ -513,37 +513,37 @@ class FootballFeatureTester:
             return False
     
     def run_all_tests(self):
-        """Run all football backend tests"""
-        print("🏈 Starting Football Backend API Tests")
-        print("=" * 50)
+        """Run all football feature tests"""
+        print("🏈 Starting Football Feature Backend API Tests")
+        print("=" * 60)
         
         # Test 1: Authentication
         if not self.authenticate():
             print("❌ Authentication failed - cannot continue with other tests")
             return False
         
-        # Test 2: Game exists
-        game_data = self.test_game_exists()
-        if not game_data:
-            print("❌ Game not found - cannot continue with state tests")
-            return False
+        # Test 2: Share Button API
+        self.test_share_button_api()
         
-        # Test 3: Football state update
-        self.test_football_state_update()
+        # Test 3: Time of Possession Backend
+        self.test_time_of_possession_backend()
         
-        # Test 4: Football state persistence
-        self.test_football_state_persistence()
+        # Test 4: Drives Section Data
+        self.test_drives_section_data()
         
-        # Test 5: Stats accumulation
-        self.test_football_stats_accumulation()
+        # Test 5: Box Score Data
+        self.test_box_score_data()
         
-        # Test 6: Public stats endpoint
-        self.test_public_stats_endpoint()
+        # Test 6: Timeouts Display Data
+        self.test_timeouts_display_data()
+        
+        # Test 7: API Endpoints Comprehensive
+        self.test_api_endpoints_comprehensive()
         
         # Summary
-        print("\n" + "=" * 50)
-        print("🏈 Football Backend Test Summary")
-        print("=" * 50)
+        print("\n" + "=" * 60)
+        print("🏈 Football Feature Backend Test Summary")
+        print("=" * 60)
         
         passed = sum(1 for result in self.test_results if result["success"])
         total = len(self.test_results)
@@ -555,7 +555,7 @@ class FootballFeatureTester:
         print(f"\nResults: {passed}/{total} tests passed")
         
         if passed == total:
-            print("🎉 All football backend tests PASSED!")
+            print("🎉 All football feature backend tests PASSED!")
             return True
         else:
             print(f"⚠️  {total - passed} test(s) FAILED")
@@ -563,11 +563,11 @@ class FootballFeatureTester:
 
 def main():
     """Main test runner"""
-    tester = FootballBackendTester()
+    tester = FootballFeatureTester()
     success = tester.run_all_tests()
     
     # Save detailed results
-    with open("/app/football_test_results.json", "w") as f:
+    with open("/app/football_feature_test_results.json", "w") as f:
         json.dump({
             "timestamp": datetime.now().isoformat(),
             "overall_success": success,
