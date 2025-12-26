@@ -57,18 +57,18 @@ export default function Login({ onLogin }) {
             <img src="/logo-black.png" alt="StatMoose" className="w-16 h-16 object-contain" />
           </div>
           <CardTitle className="text-2xl">Welcome to StatMoose</CardTitle>
-          <CardDescription>Sign in to track your basketball stats</CardDescription>
+          <CardDescription>Sign in to track your sports stats</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Email or Username</Label>
               <Input
                 id="email"
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="email@example.com or username"
                 required
                 data-testid="login-email"
               />
