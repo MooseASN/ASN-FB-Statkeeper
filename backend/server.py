@@ -66,8 +66,24 @@ class UserRegister(BaseModel):
     security_questions: List[SecurityQuestionAnswer] = []
 
 class UserLogin(BaseModel):
-    email: str
+    email: str  # Can be email OR username
     password: str
+
+class UpdateUsernameRequest(BaseModel):
+    new_username: str
+    security_answer: str
+
+class UpdateEmailRequest(BaseModel):
+    new_email: str
+    security_answer: str
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+    security_answer: str
+
+class VerifySecurityRequest(BaseModel):
+    answer: str
 
 class User(BaseModel):
     model_config = ConfigDict(extra="ignore")
