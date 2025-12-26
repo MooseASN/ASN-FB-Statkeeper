@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const SportContext = createContext(null);
 
@@ -25,7 +25,10 @@ export const SPORT_CONFIG = {
 };
 
 export function SportProvider({ children }) {
-  const [selectedSport, setSelectedSport] = useState(null);
+  // Initialize from sessionStorage if available
+  const [selectedSport, setSelectedSport] = useState(() => {
+    return sessionStorage.getItem("selected_sport") || null;
+  });
 
   const selectSport = (sport) => {
     setSelectedSport(sport);
