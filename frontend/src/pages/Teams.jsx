@@ -86,6 +86,8 @@ const ColorPicker = ({ value, onChange }) => {
 
 export default function Teams({ user, onLogout }) {
   const navigate = useNavigate();
+  const { selectedSport } = useSport();
+  const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -93,11 +95,13 @@ export default function Teams({ user, onLogout }) {
 
   useEffect(() => {
     fetchTeams();
-  }, []);
+  }, [selectedSport]);
 
   const fetchTeams = async () => {
     try {
-      const res = await axios.get(`${API}/teams`);
+      const res = await axios.get(`${API}/teams`, {
+        params: { sport: selectedSport }
+      });
       setTeams(res.data);
     } catch (error) {
       toast.error("Failed to load teams");
@@ -113,7 +117,10 @@ export default function Teams({ user, onLogout }) {
     }
 
     try {
-      const res = await axios.post(`${API}/teams`, newTeam);
+      const res = await axios.post(`${API}/teams`, {
+        ...newTeam,
+        sport: selectedSport
+      });
       toast.success("Team created successfully");
       setNewTeam({ name: "", logo_url: "", color: "#dc2626" });
       setIsDialogOpen(false);
