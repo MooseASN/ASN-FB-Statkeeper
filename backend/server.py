@@ -540,6 +540,8 @@ class Game(BaseModel):
     home_starters: List[str] = []
     away_starters: List[str] = []
     starters_selected: bool = False
+    # Sport type
+    sport: str = "basketball"  # "basketball" or "football"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
