@@ -104,6 +104,13 @@ function AppRoutes({ user, onLogin, onLogout }) {
         </ProtectedRoute>
       } />
       
+      {/* Account settings - requires auth but not sport */}
+      <Route path="/account" element={
+        <ProtectedRoute user={user}>
+          <AccountSettings user={user} onLogout={handleLogout} onUserUpdate={() => fetchUser()} />
+        </ProtectedRoute>
+      } />
+      
       {/* Protected routes - require both auth and sport selection */}
       <Route path="/" element={<SportProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/events" element={<SportProtectedRoute user={user}><Events user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
