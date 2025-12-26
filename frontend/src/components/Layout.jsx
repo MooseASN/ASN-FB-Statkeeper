@@ -1,5 +1,5 @@
-import { Link, useLocation } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User, Calendar } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,11 +8,20 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
 export default function Layout({ children, user, onLogout }) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedSport, clearSport } = useSport();
+  const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/");
+
+  const handleSwitchSport = () => {
+    clearSport();
+    navigate("/select-sport");
+  };
   
   return (
     <div className="min-h-screen bg-slate-50">
@@ -20,14 +29,31 @@ export default function Layout({ children, user, onLogout }) {
       <header className="bg-white border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <Link to="/" className="flex items-center gap-2">
-              <img 
-                src="/logo-black.png" 
-                alt="StatMoose" 
-                className="w-8 h-8 object-contain"
-              />
-              <span className="text-xl font-bold text-[#000000] hidden sm:block">StatMoose</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              <Link to="/" className="flex items-center gap-2">
+                <img 
+                  src="/logo-black.png" 
+                  alt="StatMoose" 
+                  className="w-8 h-8 object-contain"
+                />
+                <span className="text-xl font-bold text-[#000000] hidden sm:block">StatMoose</span>
+              </Link>
+              
+              {/* Sport Badge with Switch Button */}
+              <button
+                onClick={handleSwitchSport}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-sm font-medium transition-colors hover:opacity-80"
+                style={{ 
+                  backgroundColor: `${sportConfig.color}15`,
+                  color: sportConfig.color
+                }}
+                title="Switch sport"
+              >
+                <span>{sportConfig.icon}</span>
+                <span className="hidden sm:inline">{sportConfig.name}</span>
+                <ArrowLeftRight className="w-3 h-3 ml-1 opacity-60" />
+              </button>
+            </div>
             
             <nav className="flex items-center gap-1 sm:gap-2">
               <Link to="/">
@@ -101,6 +127,11 @@ export default function Layout({ children, user, onLogout }) {
                   <DropdownMenuContent align="end">
                     <DropdownMenuItem className="text-sm text-muted-foreground">
                       {user.email}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSwitchSport} className="cursor-pointer">
+                      <ArrowLeftRight className="w-4 h-4 mr-2" />
+                      Switch Sport
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={onLogout} className="text-red-600 cursor-pointer">
