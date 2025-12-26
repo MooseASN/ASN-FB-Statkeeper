@@ -2396,6 +2396,24 @@ export default function FootballLiveGame({ user, onLogout }) {
         onComplete={handleKickoffComplete}
       />
 
+      {/* Enhanced Penalty Workflow Dialog */}
+      <PenaltyWorkflowDialog
+        open={showPenaltyDialog}
+        onClose={() => setShowPenaltyDialog(false)}
+        onSubmit={handleEnhancedPenaltySubmit}
+        homeTeamName={homeTeamName}
+        awayTeamName={awayTeamName}
+        homeColor={homeColor}
+        awayColor={awayColor}
+        possession={possession}
+        ballPosition={ballPosition}
+        down={down}
+        distance={distance}
+        homeRoster={homeRoster}
+        awayRoster={awayRoster}
+        defaultRuleset={gameRuleset}
+      />
+
       {/* Header */}
       <header className="bg-zinc-900 border-b border-zinc-800 px-4 py-2">
         <div className="flex items-center justify-between">
