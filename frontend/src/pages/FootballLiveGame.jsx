@@ -976,6 +976,38 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
   };
 
+  // Save football game state to backend
+  const saveFootballState = useCallback(async (newPlayLog = playLog, newHomeScore = homeScore, newAwayScore = awayScore) => {
+    if (!id) return;
+    
+    try {
+      const footballState = {
+        possession,
+        ball_position: ballPosition,
+        down,
+        distance,
+        quarter,
+        home_score: newHomeScore,
+        away_score: newAwayScore,
+        home_timeouts: homeTimeouts,
+        away_timeouts: awayTimeouts,
+        play_log: newPlayLog,
+        clock_time: clockTime
+      };
+      
+      await axios.put(`${API}/games/${id}`, {
+        football_state: footballState,
+        home_score: newHomeScore,
+        away_score: newAwayScore,
+        possession,
+        home_time_of_possession: homeTimeOfPossession,
+        away_time_of_possession: awayTimeOfPossession
+      });
+    } catch (error) {
+      console.error("Failed to save game state:", error);
+    }
+  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession]);
+
   // Handle kickoff team selection (step 0)
   const handleKickoffTeamSelect = (team) => {
     setKickingTeam(team);
