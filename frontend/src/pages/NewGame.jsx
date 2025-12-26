@@ -121,8 +121,10 @@ export default function NewGame({ user, onLogout }) {
         ...getPrimetimeSettings()
       });
       toast.success("Game started!");
-      // Navigate to advanced mode if enabled, otherwise regular game page
-      if (statMode === "advanced") {
+      // Navigate based on sport and mode
+      if (selectedSport === "football") {
+        navigate(`/football/${res.data.id}`);
+      } else if (statMode === "advanced") {
         navigate(`/game/${res.data.id}/advanced`);
       } else {
         navigate(`/game/${res.data.id}`);
