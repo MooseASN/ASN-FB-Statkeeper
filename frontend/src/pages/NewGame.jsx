@@ -412,28 +412,39 @@ export default function NewGame({ user, onLogout }) {
                       Game Clock
                     </Label>
                   </div>
-                  <Switch
-                    id="clock-toggle"
-                    checked={clockEnabled}
-                    onCheckedChange={setClockEnabled}
-                    disabled={statMode === "advanced"} // Cannot disable clock in advanced mode
-                    data-testid="clock-toggle"
-                  />
+                  {/* Football always has clock - no toggle */}
+                  {selectedSport !== "football" && (
+                    <Switch
+                      id="clock-toggle"
+                      checked={clockEnabled}
+                      onCheckedChange={setClockEnabled}
+                      disabled={statMode === "advanced"} // Cannot disable clock in advanced mode
+                      data-testid="clock-toggle"
+                    />
+                  )}
+                  {selectedSport === "football" && (
+                    <span className="text-sm text-green-600 font-medium">Always On</span>
+                  )}
                 </div>
                 
-                {statMode === "advanced" && !clockEnabled && (
+                {statMode === "advanced" && !clockEnabled && selectedSport !== "football" && (
                   <p className="text-xs text-amber-600">Clock is required for Advanced Mode and has been enabled.</p>
                 )}
                 
-                {clockEnabled && (
+                {(clockEnabled || selectedSport === "football") && (
                   <div className="space-y-4 pt-2 border-t">
                     <p className="text-sm text-muted-foreground">
-                      Enable clock to track player minutes and manage game time
+                      {selectedSport === "football" 
+                        ? "Set your quarter length for this game"
+                        : "Enable clock to track player minutes and manage game time"
+                      }
                     </p>
                     
                     {/* Period Duration */}
                     <div>
-                      <Label className="text-sm font-medium">Period Duration</Label>
+                      <Label className="text-sm font-medium">
+                        {selectedSport === "football" ? "Quarter Length" : "Period Duration"}
+                      </Label>
                       <div className="flex items-center gap-2 mt-2">
                         <div className="flex-1">
                           <Label className="text-xs text-muted-foreground">Minutes</Label>
@@ -461,38 +472,42 @@ export default function NewGame({ user, onLogout }) {
                           />
                         </div>
                       </div>
-                      <div className="flex gap-2 mt-2">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => { setPeriodMinutes(12); setPeriodSeconds(0); }}
-                          className="text-xs"
-                        >
-                          NBA (12:00)
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => { setPeriodMinutes(8); setPeriodSeconds(0); }}
-                          className="text-xs"
-                        >
-                          HS (8:00)
-                        </Button>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => { setPeriodMinutes(20); setPeriodSeconds(0); }}
-                          className="text-xs"
-                        >
-                          College (20:00)
-                        </Button>
-                      </div>
+                      {/* Time presets - only for basketball */}
+                      {selectedSport !== "football" && (
+                        <div className="flex gap-2 mt-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setPeriodMinutes(12); setPeriodSeconds(0); }}
+                            className="text-xs"
+                          >
+                            NBA (12:00)
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setPeriodMinutes(8); setPeriodSeconds(0); }}
+                            className="text-xs"
+                          >
+                            HS (8:00)
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => { setPeriodMinutes(20); setPeriodSeconds(0); }}
+                            className="text-xs"
+                          >
+                            College (20:00)
+                          </Button>
+                        </div>
+                      )}
                     </div>
                     
-                    {/* Period Label */}
+                    {/* Period Label - only for basketball */}
+                    {selectedSport !== "football" && (
                     <div>
                       <Label className="text-sm font-medium">Period Label</Label>
                       <div className="flex gap-2 mt-2">
@@ -518,6 +533,7 @@ export default function NewGame({ user, onLogout }) {
                         </Button>
                       </div>
                     </div>
+                    )}
                     
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <p className="text-sm text-slate-600">
