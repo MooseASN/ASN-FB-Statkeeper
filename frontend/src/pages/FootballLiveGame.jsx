@@ -2516,12 +2516,49 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
   };
 
-  // Calculate drive time - uses elapsed time directly for accuracy
+  // Calculate drive time - uses elapsed time or calculates from clock
   const getDriveTime = () => {
-    const totalSeconds = currentDrive.elapsedTime || 0;
-    const mins = Math.floor(totalSeconds / 60);
-    const secs = totalSeconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    // First try the elapsedTime field
+    if (currentDrive.elapsedTime) {
+      const totalSeconds = currentDrive.elapsedTime;
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    // Fall back to calculating from start clock
+    if (currentDrive.startClock !== undefined && currentDrive.startPeriod !== undefined) {
+      // If same period
+      if (currentDrive.startPeriod === quarter) {
+        const elapsed = currentDrive.startClock - clockTime;
+        const totalSeconds = Math.max(0, elapsed);
+        const mins = Math.floor(totalSeconds / 60);
+        const secs = totalSeconds % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      } else {
+        // Cross-period - for simplicity just show elapsed from start period
+        const periodLength = 900; // 15 minutes
+        let totalTime = currentDrive.startClock;
+        for (let p = currentDrive.startPeriod + 1; p < quarter; p++) {
+          totalTime += periodLength;
+        }
+        totalTime += (periodLength - clockTime);
+        const mins = Math.floor(totalTime / 60);
+        const secs = totalTime % 60;
+        return `${mins}:${secs.toString().padStart(2, '0')}`;
+      }
+    }
+    
+    // Legacy fallback using startTime
+    if (currentDrive.startTime !== undefined) {
+      const elapsed = currentDrive.startTime - clockTime;
+      const totalSeconds = Math.max(0, elapsed);
+      const mins = Math.floor(totalSeconds / 60);
+      const secs = totalSeconds % 60;
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    }
+    
+    return '0:00';
   };
   
   // Format time of possession
