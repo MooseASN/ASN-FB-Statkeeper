@@ -10,7 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
-const ADMIN_EMAILS = ["antlersportsnetwork@gmail.com"];
+const ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
+const ADMIN_USERNAMES = ["admin"];
+
+const isAdminUser = (user) => {
+  if (!user) return false;
+  return ADMIN_EMAILS.includes(user.email?.toLowerCase()) || 
+         ADMIN_USERNAMES.includes(user.username?.toLowerCase());
+};
 
 export default function Layout({ children, user, onLogout }) {
   const location = useLocation();
