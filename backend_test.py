@@ -125,31 +125,40 @@ class FootballBackendTester:
             })
             
             if response.status_code == 200:
-                updated_game = response.json()
-                saved_state = updated_game.get("football_state")
+                # The PUT response doesn't include football_state due to Game model limitations
+                # But we can verify it was saved by checking the public endpoint
+                verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
                 
-                if saved_state:
-                    # Verify key fields were saved
-                    play_log = saved_state.get("play_log", [])
-                    scores = saved_state.get("scores", {})
-                    ball_pos = saved_state.get("ball_position", {})
+                if verify_response.status_code == 200:
+                    game_data = verify_response.json()
+                    saved_state = game_data.get("football_state")
                     
-                    if (len(play_log) > 0 and 
-                        play_log[0].get("play_type") == "RUN" and
-                        scores.get("home") == 0 and
-                        ball_pos.get("yard_line") == 32):
+                    if saved_state:
+                        # Verify key fields were saved
+                        play_log = saved_state.get("play_log", [])
+                        scores = saved_state.get("scores", {})
+                        ball_pos = saved_state.get("ball_position", {})
                         
-                        self.log_test("Football State Update", True, 
-                                     "Football state successfully saved with play log, scores, and ball position")
-                        return saved_state
+                        if (len(play_log) > 0 and 
+                            play_log[0].get("play_type") == "RUN" and
+                            scores.get("home") == 0 and
+                            ball_pos.get("yard_line") == 32):
+                            
+                            self.log_test("Football State Update", True, 
+                                         "Football state successfully saved and verified via public endpoint")
+                            return saved_state
+                        else:
+                            self.log_test("Football State Update", False, 
+                                         "Football state saved but data integrity check failed", 
+                                         f"Saved state: {saved_state}")
+                            return None
                     else:
                         self.log_test("Football State Update", False, 
-                                     "Football state saved but data integrity check failed", 
-                                     f"Saved state: {saved_state}")
+                                     "Football state not found after update")
                         return None
                 else:
                     self.log_test("Football State Update", False, 
-                                 "Football state not found in response", updated_game)
+                                 "Failed to verify update via public endpoint")
                     return None
             else:
                 self.log_test("Football State Update", False, 
