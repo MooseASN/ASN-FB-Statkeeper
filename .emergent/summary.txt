@@ -1,162 +1,159 @@
 <analysis>**original_problem_statement:**
 The user's initial request was for a basketball statistics tracking website, which was later expanded to include American Football.
 
-**New PRODUCT REQUIREMENTS for this session:**
-*   **Comprehensive Penalty System:**
-    *   Implement a penalty catalog with variants for NFHS, NCAA, and NAIA rulesets.
-    *   The system must map user input (aliases, abbreviations) to official penalties.
-    *   It should ask context-aware follow-up questions only when necessary (e.g., for spot fouls).
-*   **Enhanced Play Workflows:**
-    *   **Punt:** Capture the returner, the yard line where the return begins, return yardage, and the tackler (with a no tackle option).
-    *   **Field Goal:** Handle blocked kicks, allowing selection of the blocker and details of any return.
-    *   **PAT:** Allow the kicker to be selected for both Good and No Good attempts.
-*   **Live Stats Interface:**
-    *   Build a public-facing live stats page modeled after the Sidearm Sports interface.
-    *   The interface must include a scoreboard, scoring plays, team stats, individual leaders, and a play-by-play feed.
-    *   The live stats page should display team logos, with a fallback to the first three characters of the team name if a logo is unavailable.
-*   **Drive Clock & Data Accuracy:**
-    *   The Current Drive clock must run in real-time concurrently with the main game clock.
-    *   Ensure all game data is accurately reflected in the live stats output.
-*   **PDF Box Score:**
-    *   Generate a detailed PDF box score for football games, accessible from the live game controls.
-*   **UI/UX Polish:**
-    *   The browser tab for the sport selection page should say StatMoose.
-    *   The browser tab for the football live stats page should say StatMoose FB.
-    *   Remove a duplicated scoreboard from the live stat tracker UI and correctly align the remaining elements.
+The user has now provided a comprehensive and strict specification for tracking football plays and drives accurately. The system must adhere to a specific data model for , , and  objects. Key requirements include:
+- A normalized yard line system (0-100).
+- Strict definitions for what constitutes the start and end of a drive.
+- Precise calculation for drive distance (Net Yards) and Time of Possession (TOP), accounting for penalties and turnovers.
+- Specific output format for drive summaries.
+- Revised workflows for Punts and Penalties.
+- Hotkeys for all major actions in the stat tracker.
+- Automatic workflow chaining (e.g., Touchdown -> Extra Point -> Kickoff).
+- Inclusion of player names in play-by-play descriptions.
+- Various UI/UX fixes, such as moving timeout indicators and fixing the drive clock.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a dual-sport stat tracker. This session heavily expanded the football module by implementing a sophisticated penalty tracking system, a public-facing live stats page, and a PDF box score generator. Key play workflows (Punt, Field Goal, PAT) were significantly enhanced to capture more granular data. A major new feature is the real-time drive clock that syncs with the game clock, providing live Time of Possession data on both the stat-entry and public stats pages.
+The application is a dual-sport stat tracker for basketball and football. The football module includes a stat-entry interface (), a public-facing live stats page () with a scoreboard, play-by-play, team stats, and newly added Drives and Box Score sections. The backend supports creating and updating games, with fixes recently implemented to ensure sport-specific data is handled correctly. The agent has just begun a major refactoring of the drive tracking logic to conform to a new, detailed specification provided by the user.
 
 **Last working item**:
-- Last item agent was working: The agent was performing UI cleanup based on user feedback. It removed a large, duplicated scoreboard section from  and updated the  component to display team logos with a 3-character fallback if no logo is present.
+- Last item agent was working: The agent began implementing a comprehensive and strict drive-tracking system based on a new user specification. This involved refactoring the state in  to introduce a more detailed  object and adding helper functions (, ) to manage the drive lifecycle according to the new rules.
 - Status: IN PROGRESS
 - Agent Testing Done: N
-- Which testing method agent to use? Frontend testing agent
 - User Testing Done: N
+- Which testing method agent to use? Frontend testing agent
 
 **All Pending/In progress Issue list**:
-- **Issue 1: UI Layout and Logo Display Verification (P0)**
-    - **Description:** The latest changes to remove a duplicated scoreboard and add team logo logic have been implemented but not visually verified. It's critical to confirm that these changes have not introduced any layout issues.
-    - **Attempted fixes:** The agent has edited the JSX in  and .
-    - **Next debug checklist:**
-        1.  Take a screenshot of the  page to confirm the duplicated scoreboard is gone and the layout is clean.
-        2.  Take a screenshot of the  page to verify that team logos (or the 3-letter fallback) are displayed correctly.
-        3.  Run the JavaScript linter on the modified files to catch any syntax errors.
-    - **Why fix this issue and what will be achieved with the fix?** This will confirm the user's latest UI requests have been successfully implemented and the interface is visually correct before moving on.
-    - **Status:** IN PROGRESS
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** frontend
-    - **Blocked on other issue:** None
+- **Issue 1: Incomplete Drive Tracking Logic Integration (P0)**
+  - **Description:** The new, more accurate drive tracking data model and helper functions (, ) have been added to . However, they are not yet integrated into the play submission handlers (, , etc.). The application still relies on older, less accurate logic for its drive calculations.
+  - **Attempted fixes:** The agent created the new state structure and helper functions.
+  - **Next debug checklist:**
+    1.  Go through each play submission handler in  (e.g., , , ).
+    2.  Incorporate calls to  and  at the correct moments (e.g., after turnovers, scores, punts, or at the start of a half).
+    3.  Ensure every new  object created conforms to the user's data model specification (including , , , , etc.).
+    4.  Update the UI elements that display drive information to source their data from the new  state object.
+  - **Why fix this issue and what will be achieved with the fix?** This is critical for ensuring accurate drive summaries, time of possession, and net yardage calculations, which is the user's primary current requirement.
+  - **Status:** IN PROGRESS
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** frontend
+  - **Blocked on other issue:** None
 
 **In progress Task List**:
-- None.
+- **Task 1: Implement Comprehensive Drive & Play Tracking System (P0)**
+  - **Where to resume:** In . The new  state and helper functions (, ) exist but need to be called from within the various play submission handlers (like , etc.).
+  - **What will be achieved with this?** The application will accurately track football drives according to the user's detailed specification, enabling correct drive chart and box score generation.
+  - **Status:** IN PROGRESS
+  - **Should Test frontend/backend/both after fix?** frontend
+  - **Blocked on something:** None
 
 **Upcoming and Future Tasks**
 *   **Upcoming Tasks:**
-    *   P1: Implement comprehensive individual and team stat accumulation for football. While plays are logged, the logic to aggregate stats (e.g., total passing yards, tackles) across the entire game for the stats page and box score needs to be completed and verified.
-    *   P2: Perform a full visual test of the  page by running a mock game to ensure all data points (scores, stats, play-by-play) are accurate.
+    *   P1: **Revise Punt Workflow:** Update the punt workflow in  to follow the sequence: .
+    *   P1: **Revise Penalty Workflow:** Add a Personal Foul button. Update the penalty workflow to: .
+    *   P1: **Player Names in Play Recaps:** The  helper has been created. Ensure it's used in all play description generation functions (, , etc.) in  and that the results display correctly in both the tracker and public stats page.
+    *   P2: **Hotkeys:** The initial  for hotkeys has been added to . Verify all hotkeys (especially for play types like Punt, Field Goal) correctly open the corresponding workflows.
+    *   P2: **Automatic Workflow Chaining:** The logic to chain Touchdown -> Extra Point -> Kickoff has been added. This needs to be thoroughly tested with different scenarios (e.g., 2-pt conversion, missed PAT).
 
 *   **Future Tasks:**
     *   Visually test Game Recaps in the event ticker.
     *   Perform a rigorous UI-based test of the CSV roster upload feature for football.
 
 **Completed work in this session**
-- **Feature: Comprehensive Penalty System:**
-  - Created a penalty catalog with ruleset variants ().
-  - Implemented a new  component with fuzzy search and context-aware questions.
-- **Feature: Enhanced Play Workflows:**
-  - Updated the Punt, Field Goal (with blocked kicks), and PAT workflows in  to capture more detailed information.
-- **Feature: Live Football Stats Page:**
-  - Created a public-facing stats page () with a  component modeled after Sidearm Sports.
-  - Added a public API endpoint () to serve game data without authentication.
-- **Feature: Live Drive Clock:**
-  - Implemented a real-time Time of Possession clock for the Current Drive that syncs with the main game clock in .
-- **Feature: PDF Box Score for Football:**
-  - Added a backend endpoint () in  to generate a detailed PDF box score.
+- **Feature: New Public Stats Tabs:**
+  - Added Drives and Box Score tabs and corresponding sections to the public stats page ().
+- **Feature: Sport-Specific Dashboard Filtering:**
+  - Fixed a critical bug where all new games defaulted to basketball.
+  - Ensured the dashboard correctly filters and displays only football games in the football section and basketball games in the basketball section.
+  - Corrected game card links on the dashboard to navigate to the appropriate stat tracker ( or ).
+- **Bugfix: Live Stats Syncing:**
+  - Corrected the public stats page to fetch play-by-play data from  instead of the incorrect  collection, ensuring the tracker and public page are in sync.
+- **Bugfix: Extra Point Scoring:**
+  - Fixed a bug where successful PATs and 2-point conversions were not adding points to the scoreboard.
+- **Bugfix: Drive Clock Calculation:**
+  - Fixed the Current Drive clock on the stat tracker, which now correctly calculates and displays elapsed time.
 - **UI/UX Polish:**
-  - Set the browser tab titles for the Sport Selection (StatMoose) and Football Stats (StatMoose FB) pages.
+  - Moved timeout indicators under the team scores on the stat tracker and under team names on the public stats page.
+  - Replaced the Live Stats button with a Share button that copies the public URL.
+  - Corrected the main HTML title of the application to StatMoose.
+  - Removed extraneous Player minutes... text from the game creation page.
+- **Deployment Readiness:**
+  - Resolved several deployment-blocking issues, including  errors,  file formatting, and N+1 query problems in backend endpoints.
 
 **Earlier issues found/mentioned but not fixed**
 *   None.
 
 **Known issue recurrence from previous fork**
-*   N/A
+*   None.
 
 **Code Architecture**
-
+create_gamefootball_state
 
 **Key Technical Concepts**
-*   **Public API Endpoint:** A dedicated, unauthenticated endpoint () was created to allow public sharing of live stats.
-*   **PDF Generation (Backend):** The  library was used in FastAPI to dynamically generate a formatted PDF document for the football box score.
-*   **Real-time State Synchronization:** A  hook with  is used to synchronize the Current Drive time of possession with the running game clock state.
-*   **Fuzzy Search:** The penalty dialog uses a fuzzy search mechanism to match user input against a catalog of penalty names and aliases.
+- **State Refactoring (In Progress):** A significant refactoring of the game state in  is underway to implement a highly structured data model for drive tracking, as per user specification.
+- **Global Hotkeys:** A  hook listening for  events has been implemented in  to trigger game actions.
+- **Client-Side Derived State:** The public stats page () uses  hooks extensively to compute complex derived data (team stats, drive summaries, box scores) from the raw  on the client side.
+- **Asynchronous State Handling:** Addressed bugs related to React's async  by passing state-setting functions directly to event handlers to ensure immediate access to the new value.
 
 **key DB schema**
-*   No schema changes were made in this session.
+- ** collection:** The document structure now includes a  object which contains the entire state of a football game, including the .
+- ** (Pydantic Model):** Updated in  to accept , allowing the entire game state to be persisted in a single API call.
 
 **changes in tech stack**
-*   None.
+- None.
 
 **All files of reference**
-*   **/app/frontend/src/pages/FootballLiveGame.jsx**: Primary file for stat entry. Heavily modified with new workflows, UI, and state logic.
-*   **/app/frontend/src/components/FootballLiveStats.jsx**: Key new component for displaying the public live stats.
-*   **/app/frontend/src/pages/FootballStatsView.jsx**: New public page that hosts the live stats component.
-*   **/app/frontend/src/components/PenaltyWorkflowDialog.jsx**: New component for the penalty logging flow.
-*   **/app/frontend/src/data/penaltyCatalog.js**: New data file defining football penalties.
-*   **/app/backend/server.py**: Updated with new public game and PDF box score endpoints.
+-   **/app/frontend/src/pages/FootballLiveGame.jsx**: The most critical file. It's being heavily modified to implement the new drive tracking system, hotkeys, and revised workflows.
+-   **/app/frontend/src/components/FootballLiveStats.jsx**: Updated with the new Drives and Box Score UI sections.
+-   **/app/frontend/src/pages/Dashboard.jsx**: Updated to fix sport-specific filtering and navigation.
+-   **/app/backend/server.py**: The  endpoint was fixed to respect the  parameter.
 
 **Areas that need refactoring**:
-*    has grown even larger and more complex. It is a prime candidate for being broken down into smaller, more manageable components and custom hooks.
-*    remains a single monolithic file. The new PDF generation logic is extensive and could be moved to a separate utility module.
+- **/app/frontend/src/pages/FootballLiveGame.jsx** is now over 5,000 lines long and is becoming unmanageable. It desperately needs to be broken down into smaller components and custom hooks (e.g., , , , and separate components for each play dialog).
 
 **key api endpoints**
-*   : **NEW** Public endpoint to fetch game data for the live stats view.
-*   : **NEW** (Admin-only) Generates a PDF of the football box score.
+-   : Fixed to correctly assign the  of a newly created game.
+-   : Now used to persist the entire  object.
 
 **Critical Info for New Agent**
-*   **Admin Access Required:** To test the main stat-entry interface (), you must log in as the admin user (). The agent had to manually create this user in the  to overcome login issues.
-*   **Immediate Verification Needed:** Your first task should be to visually verify the last UI changes. Take screenshots of the live game page to check for the removed scoreboard and the public stats page to check the new team logo implementation.
-*   **Public vs. Private Views:** Remember there are two distinct UIs for a game: the private, admin-only stat-entry page () and the public, read-only stats page ().
+- Your primary and highest-priority task is to complete the integration of the new drive tracking system as specified by the user in message #530. The foundational code exists in , but it is not yet wired into the play submission handlers. This is a blocker for accurate stats.
+- The  file is extremely large and complex. Be very careful when making changes and consider opportunities to break out small, independent pieces of logic into helper functions if not full components.
 
 **documents and test reports created in this job**
-*   None.
+- None.
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **Request:** Complete all upcoming tasks - **Status:** DONE.
-9.  **Request:** Provide an example of a PDF box score. - **Status:** DONE.
-8.  **Request:** Make sure the live stat output reflects all data accurately... - **Status:** IN PROGRESS.
-7.  **Request:** ...the drive clock needs to make sure it moves when the game clock moves... - **Status:** DONE.
-6.  **Request:** ...the tab name should show StatMoose FB. - **Status:** DONE.
-5.  **Request:** You duplicated the same score and clock area...Remove the one in the middle... - **Status:** IN PROGRESS (Code written, verification pending).
-4.  **Request:** ...use the uploaded logo. If there is no logo, use the first 3 characters... - **Status:** IN PROGRESS (Code written, verification pending).
-3.  **Acknowledgement:** User acknowledged the live stats implementation.
-2.  **Acknowledgement:** User acknowledged the workflow enhancements.
-1.  **Request:** User provided a comprehensive list of tasks including the penalty system, workflow updates, and the live stats page. - **Status:** Mostly complete, with final UI verification pending.
+10. **Request (Spec):** User provided a detailed, multi-page specification for how football drives, plays, and stats must be tracked. This is the new source of truth. (Status: **IN PROGRESS**)
+9.  **Feedback:** The Extra Point buttons don't add points, and the drive clock is not working correctly. (Status: **RESOLVED**)
+8.  **Feedback:** Listed a large number of feature requests and bug fixes: player names in recaps, hotkeys, revised punt/penalty workflows, automatic workflow chaining after scores, and a broken drive clock. (Status: **PARTIALLY ADDRESSED**, drive clock fixed, others in progress)
+7.  **Feedback:** Clicking a live football game on the dashboard goes to the basketball statting page. Text needs to be removed from game creation. (Status: **RESOLVED**)
+6.  **Feedback (3rd time):** Live football games are still not appearing on the home page's live section after starting them. (Status: **RESOLVED**, bug was in the backend  endpoint).
+5.  **Feedback:** Scheduled/live/past games are not being filtered correctly by sport. (Status: **RESOLVED**)
+4.  **Feedback:** The live stat link isn't reflecting real-time changes, timeouts are positioned incorrectly, live games aren't on the home page, and TOP isn't calculating. (Status: **RESOLVED**)
+3.  **Feedback:** The link preview title for the site shows StatMoose BKB but should just be StatMoose. (Status: **RESOLVED**)
+2.  **Request:** Call deployer agent and run health check. (Status: **DONE**, led to fixing deployment blockers).
+1.  **Feedback:** When a play is edited, the related stats must be properly adjusted. (Status: **RESOLVED**)
 
 **Project Health Check:**
-*   **Broken:** None confirmed, but the  and  components are at risk of layout issues due to recent untested changes.
-*   **Mocked:** None
+- **Broken:** The core drive tracking logic is in a transitional state. While the app runs, the drive stats displayed on the UI are based on old, inaccurate calculations. This will be fixed by completing the  task.
+- **Mocked:** None
 
 **3rd Party Integrations**
-*   **react-player:** Used for embedding video streams.
-*   **beautifulsoup4 / lxml:** Used on the backend for web scraping.
-*   **reportlab:** Used on the backend for PDF generation.
+- **react-player:** Used for embedding video streams.
+- **beautifulsoup4 / lxml:** Used on the backend for web scraping.
+- **reportlab:** Used on the backend for PDF generation.
 
 **Testing status**
 - Testing agent used after significant changes: NO
 - Troubleshoot agent used after agent stuck in loop: NO
 - Test files created: []
-- Known regressions: None known.
+- Known regressions: None.
 
 **Credentials to test flow:**
-*   **Admin User:**
-    *   Email: 
-    *   Password: 
-*   **Regular User:**
-    *   Email: 
-    *   Password: 
+- **Admin User:**
+    - Email: 
+    - Password: 
 
 **What agent forgot to execute**
-*   The agent wrote the code for the latest UI cleanup requests (removing a duplicated scoreboard and adding team logo logic) but did not perform any verification (e.g., taking a screenshot) to confirm the changes were successful and didn't introduce new visual bugs. This should be the immediate next step.</analysis>
+- The agent has not yet started the user's requested revisions for the **Punt** and **Penalty** workflows.
+- While the agent added the foundation for hotkeys and player names in play recaps, these features are not fully integrated or tested across all play types.</analysis>
