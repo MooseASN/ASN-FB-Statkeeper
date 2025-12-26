@@ -2460,6 +2460,7 @@ export default function FootballLiveGame({ user, onLogout }) {
               Share
             </Button>
           </div>
+        </div>
       </header>
 
       {/* Scoreboard */}
