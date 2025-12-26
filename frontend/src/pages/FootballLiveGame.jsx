@@ -574,7 +574,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                     <div
                       key={i}
                       className={`w-3 h-3 rounded-full ${i < homeTimeouts ? 'bg-yellow-500' : 'bg-zinc-700'}`}
-                      onClick={() => i < homeTimeouts && useTimeout('home')}
+                      onClick={() => i < homeTimeouts && handleUseTimeout('home')}
                     />
                   ))}
                 </div>
