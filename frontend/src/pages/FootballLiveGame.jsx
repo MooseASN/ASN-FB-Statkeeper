@@ -27,7 +27,7 @@ import {
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Football Field Component with StatMoose logo
-function FootballField({ ballPosition, possession, homeTeam, awayTeam, homeColor, awayColor }) {
+function FootballField({ ballPosition, possession, homeTeam, awayTeam, homeColor, awayColor, firstDownMarker }) {
   // ballPosition: 0-100 (0 = home endzone, 100 = away endzone)
   // Convert to yard line (0-50-0)
   const getYardLine = (pos) => {
@@ -111,10 +111,10 @@ function FootballField({ ballPosition, possession, homeTeam, awayTeam, homeColor
           </div>
         </div>
         
-        {/* First down marker */}
+        {/* First down marker - using actual firstDownMarker state */}
         <div 
           className="absolute top-0 bottom-0 w-1 bg-yellow-400/70"
-          style={{ left: `${Math.min(100, ballPosition + 10)}%` }}
+          style={{ left: `${Math.max(0, Math.min(100, firstDownMarker))}%` }}
         />
       </div>
       
