@@ -524,7 +524,8 @@ export default function NewGame({ user, onLogout }) {
                 )}
               </div>
 
-              {/* Timeout Options */}
+              {/* Timeout Options - Only for Basketball */}
+              {selectedSport === "basketball" && (
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center gap-2">
                   <Clock className="w-5 h-5 text-slate-600" />
@@ -581,6 +582,7 @@ export default function NewGame({ user, onLogout }) {
                   </p>
                 </div>
               </div>
+              )}
 
               {/* Primetime Mode */}
               <div className="border rounded-lg p-4 space-y-4">
