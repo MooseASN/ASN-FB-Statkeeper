@@ -858,6 +858,450 @@ export default function FootballLiveStats({
           </div>
         )}
 
+        {/* Drives View */}
+        {activeSection === 'drives' && (
+          <div className="bg-zinc-900 rounded-lg overflow-hidden">
+            <div className="px-4 py-3 border-b border-zinc-800">
+              <h3 className="font-bold">Drive Summaries</h3>
+              <p className="text-sm text-zinc-500">Hover over a drive for details</p>
+            </div>
+            <div className="p-4">
+              {/* Drive Chart Visual */}
+              <div className="relative mb-4">
+                {/* Field markers */}
+                <div className="flex justify-between text-xs text-zinc-600 mb-1 px-2">
+                  <span>{awayAbbrev}</span>
+                  <span>50</span>
+                  <span>{homeAbbrev}</span>
+                </div>
+                <div className="h-2 bg-gradient-to-r from-blue-900 via-zinc-700 to-red-900 rounded mb-2" />
+                
+                {/* Drive bars */}
+                <div className="space-y-2">
+                  {drives.map((drive, idx) => {
+                    const teamColor = drive.team === 'home' ? homeColor : awayColor;
+                    const teamName = drive.team === 'home' ? homeTeamName : awayTeamName;
+                    const startPct = drive.team === 'home' 
+                      ? (100 - drive.startYardLine) 
+                      : drive.startYardLine;
+                    const width = Math.abs(drive.totalYards);
+                    
+                    return (
+                      <div 
+                        key={drive.id}
+                        className="relative h-8 group"
+                        onMouseEnter={() => setHoveredDrive(drive)}
+                        onMouseLeave={() => setHoveredDrive(null)}
+                      >
+                        {/* Drive bar */}
+                        <div 
+                          className="absolute h-6 rounded flex items-center justify-center text-xs font-medium cursor-pointer transition-all hover:h-7 hover:-mt-0.5"
+                          style={{
+                            left: `${Math.min(startPct, startPct + width / 2)}%`,
+                            width: `${Math.max(width, 5)}%`,
+                            backgroundColor: teamColor,
+                            minWidth: '40px'
+                          }}
+                        >
+                          <span className="truncate px-1">
+                            {drive.result === 'TOUCHDOWN' ? '🏈 TD' : 
+                             drive.result === 'FIELD GOAL' ? '🎯 FG' : 
+                             drive.plays.length + ' plays'}
+                          </span>
+                        </div>
+                        
+                        {/* Tooltip */}
+                        {hoveredDrive?.id === drive.id && (
+                          <div className="absolute z-10 left-1/2 -translate-x-1/2 top-10 bg-zinc-800 border border-zinc-700 rounded-lg p-3 shadow-xl min-w-64 max-w-sm">
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-3 h-3 rounded" style={{ backgroundColor: teamColor }} />
+                              <span className="font-bold">{teamName}</span>
+                              <span className={`text-xs ${getResultColor(drive.result)}`}>{drive.result}</span>
+                            </div>
+                            <div className="text-sm text-zinc-300 space-y-1">
+                              <p>
+                                Drive started on <span className="font-medium">{teamName.substring(0,3).toUpperCase()} {drive.startYardLine}</span> and 
+                                ended on <span className="font-medium">{drive.endYardLine || drive.startYardLine}</span>
+                              </p>
+                              <p className="text-zinc-400">
+                                {drive.plays.length} plays, {drive.totalYards > 0 ? '+' : ''}{drive.totalYards} yards
+                              </p>
+                              {(drive.result === 'TOUCHDOWN' || drive.result === 'FIELD GOAL') && (
+                                <p className="text-green-400 font-medium">
+                                  {drive.result === 'TOUCHDOWN' ? '🏈 Scoring drive - Touchdown!' : '🎯 Scoring drive - Field Goal!'}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Drive List */}
+              <div className="space-y-2 mt-6">
+                <h4 className="text-sm font-medium text-zinc-400 mb-2">Drive Details</h4>
+                {drives.map((drive, idx) => (
+                  <div 
+                    key={drive.id}
+                    className="bg-zinc-800 rounded p-3 cursor-pointer hover:bg-zinc-750 transition-colors"
+                    onMouseEnter={() => setHoveredDrive(drive)}
+                    onMouseLeave={() => setHoveredDrive(null)}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div 
+                          className="w-8 h-8 rounded flex items-center justify-center text-xs font-bold"
+                          style={{ backgroundColor: drive.team === 'home' ? homeColor : awayColor }}
+                        >
+                          {drive.team === 'home' ? homeAbbrev : awayAbbrev}
+                        </div>
+                        <div>
+                          <div className="text-sm font-medium">
+                            Q{drive.quarter} • {drive.plays.length} plays, {drive.totalYards} yards
+                          </div>
+                          <div className="text-xs text-zinc-500">
+                            Started: {drive.team === 'home' ? homeAbbrev : awayAbbrev} {drive.startYardLine}
+                          </div>
+                        </div>
+                      </div>
+                      <div className={`text-sm font-bold ${getResultColor(drive.result)}`}>
+                        {drive.result}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {drives.length === 0 && (
+                  <div className="text-center text-zinc-500 py-8">No drives recorded yet</div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Box Score View */}
+        {activeSection === 'box-score' && (
+          <div className="flex gap-4">
+            {/* Main Box Score Tables - Left Side */}
+            <div className="flex-1 space-y-4">
+              {/* Offense Section */}
+              <div className="bg-zinc-900 rounded-lg overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-800">
+                  <h3 className="font-bold">Offense</h3>
+                </div>
+                
+                {/* Passing */}
+                <div className="p-4 border-b border-zinc-800">
+                  <h4 className="text-sm font-medium text-zinc-400 mb-3">Passing</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Away Team */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-4 h-4 rounded" style={{ backgroundColor: awayColor }} />
+                        <span className="text-sm font-medium">{awayTeamName}</span>
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">C/A</th>
+                            <th className="text-center">YDS</th>
+                            <th className="text-center">TD</th>
+                            <th className="text-center">INT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.away.passing.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.comp}/{p.att}</td>
+                              <td className="text-center">{p.yards}</td>
+                              <td className="text-center">{p.td}</td>
+                              <td className="text-center">{p.int}</td>
+                            </tr>
+                          ))}
+                          {boxScore.away.passing.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Home Team */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-4 h-4 rounded" style={{ backgroundColor: homeColor }} />
+                        <span className="text-sm font-medium">{homeTeamName}</span>
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">C/A</th>
+                            <th className="text-center">YDS</th>
+                            <th className="text-center">TD</th>
+                            <th className="text-center">INT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.home.passing.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.comp}/{p.att}</td>
+                              <td className="text-center">{p.yards}</td>
+                              <td className="text-center">{p.td}</td>
+                              <td className="text-center">{p.int}</td>
+                            </tr>
+                          ))}
+                          {boxScore.home.passing.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rushing */}
+                <div className="p-4 border-b border-zinc-800">
+                  <h4 className="text-sm font-medium text-zinc-400 mb-3">Rushing</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Away Team */}
+                    <div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">ATT</th>
+                            <th className="text-center">YDS</th>
+                            <th className="text-center">TD</th>
+                            <th className="text-center">LNG</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.away.rushing.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.att}</td>
+                              <td className="text-center">{p.yards}</td>
+                              <td className="text-center">{p.td}</td>
+                              <td className="text-center">{p.long}</td>
+                            </tr>
+                          ))}
+                          {boxScore.away.rushing.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Home Team */}
+                    <div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">ATT</th>
+                            <th className="text-center">YDS</th>
+                            <th className="text-center">TD</th>
+                            <th className="text-center">LNG</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.home.rushing.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.att}</td>
+                              <td className="text-center">{p.yards}</td>
+                              <td className="text-center">{p.td}</td>
+                              <td className="text-center">{p.long}</td>
+                            </tr>
+                          ))}
+                          {boxScore.home.rushing.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Receiving */}
+                <div className="p-4">
+                  <h4 className="text-sm font-medium text-zinc-400 mb-3">Receiving</h4>
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Away Team */}
+                    <div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">REC</th>
+                            <th className="text-center">YDS</th>
+                            <th className="text-center">TD</th>
+                            <th className="text-center">LNG</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.away.receiving.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.rec}</td>
+                              <td className="text-center">{p.yards}</td>
+                              <td className="text-center">{p.td}</td>
+                              <td className="text-center">{p.long}</td>
+                            </tr>
+                          ))}
+                          {boxScore.away.receiving.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Home Team */}
+                    <div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">REC</th>
+                            <th className="text-center">YDS</th>
+                            <th className="text-center">TD</th>
+                            <th className="text-center">LNG</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.home.receiving.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.rec}</td>
+                              <td className="text-center">{p.yards}</td>
+                              <td className="text-center">{p.td}</td>
+                              <td className="text-center">{p.long}</td>
+                            </tr>
+                          ))}
+                          {boxScore.home.receiving.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Defense Section */}
+              <div className="bg-zinc-900 rounded-lg overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-800">
+                  <h3 className="font-bold">Defense</h3>
+                </div>
+                <div className="p-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Away Team Defense */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-4 h-4 rounded" style={{ backgroundColor: awayColor }} />
+                        <span className="text-sm font-medium">{awayTeamName}</span>
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">TCKL</th>
+                            <th className="text-center">SACK</th>
+                            <th className="text-center">TFL</th>
+                            <th className="text-center">INT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.away.defense.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.tackles}</td>
+                              <td className="text-center">{p.sacks}</td>
+                              <td className="text-center">{p.tfl}</td>
+                              <td className="text-center">{p.int}</td>
+                            </tr>
+                          ))}
+                          {boxScore.away.defense.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                    {/* Home Team Defense */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-4 h-4 rounded" style={{ backgroundColor: homeColor }} />
+                        <span className="text-sm font-medium">{homeTeamName}</span>
+                      </div>
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-zinc-500 text-xs">
+                            <th className="text-left py-1">#</th>
+                            <th className="text-center">TCKL</th>
+                            <th className="text-center">SACK</th>
+                            <th className="text-center">TFL</th>
+                            <th className="text-center">INT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {boxScore.home.defense.map((p, i) => (
+                            <tr key={i} className="border-t border-zinc-800">
+                              <td className="py-1">#{p.number}</td>
+                              <td className="text-center">{p.tackles}</td>
+                              <td className="text-center">{p.sacks}</td>
+                              <td className="text-center">{p.tfl}</td>
+                              <td className="text-center">{p.int}</td>
+                            </tr>
+                          ))}
+                          {boxScore.home.defense.length === 0 && (
+                            <tr><td colSpan={5} className="text-zinc-500 py-2">-</td></tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Special Teams Section */}
+              <div className="bg-zinc-900 rounded-lg overflow-hidden">
+                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-800">
+                  <h3 className="font-bold">Special Teams</h3>
+                </div>
+                <div className="p-4 text-center text-zinc-500">
+                  Special teams stats will be populated as plays are recorded
+                </div>
+              </div>
+            </div>
+
+            {/* Team Stats Comparison - Right Side */}
+            <div className="w-72 flex-shrink-0">
+              <div className="bg-zinc-900 rounded-lg overflow-hidden sticky top-4">
+                <div className="px-4 py-3 border-b border-zinc-800 bg-zinc-800">
+                  <h3 className="font-bold text-sm">Team Stats</h3>
+                </div>
+                <div className="p-3 space-y-2">
+                  <div className="grid grid-cols-3 text-xs text-zinc-500 text-center mb-2">
+                    <span style={{ color: awayColor }}>{awayAbbrev}</span>
+                    <span></span>
+                    <span style={{ color: homeColor }}>{homeAbbrev}</span>
+                  </div>
+                  
+                  <TeamStatRow label="1st Downs" away={teamStats.away.firstDowns} home={teamStats.home.firstDowns} awayColor={awayColor} homeColor={homeColor} />
+                  <TeamStatRow label="Total Yards" away={teamStats.away.totalYards} home={teamStats.home.totalYards} awayColor={awayColor} homeColor={homeColor} />
+                  <TeamStatRow label="Rush Yards" away={teamStats.away.rushingYards} home={teamStats.home.rushingYards} awayColor={awayColor} homeColor={homeColor} />
+                  <TeamStatRow label="Pass Yards" away={teamStats.away.passingYards} home={teamStats.home.passingYards} awayColor={awayColor} homeColor={homeColor} />
+                  <TeamStatRow label="Penalties" away={teamStats.away.penalties} home={teamStats.home.penalties} awayColor={awayColor} homeColor={homeColor} />
+                  <TeamStatRow label="Turnovers" away={teamStats.away.turnovers} home={teamStats.home.turnovers} awayColor={awayColor} homeColor={homeColor} />
+                  <TeamStatRow label="TOP" away={formatTOP(awayTimeOfPossession)} home={formatTOP(homeTimeOfPossession)} awayColor={awayColor} homeColor={homeColor} />
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Play-by-Play View */}
         {activeSection === 'play-by-play' && (
           <div className="bg-zinc-900 rounded-lg overflow-hidden">
