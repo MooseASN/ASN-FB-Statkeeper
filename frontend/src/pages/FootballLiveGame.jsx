@@ -4361,11 +4361,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                               size="sm" 
                               variant="destructive" 
                               className="h-6 px-2 text-xs ml-auto"
-                              onClick={() => {
-                                setPlayLog(prev => prev.filter(p => p.id !== editingPlayId));
-                                handleCancelEdit();
-                                toast.success('Play deleted');
-                              }}
+                              onClick={() => handleDeletePlay(editingPlayId)}
                             >
                               Delete
                             </Button>
