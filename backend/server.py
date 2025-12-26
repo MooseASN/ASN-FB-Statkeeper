@@ -1435,6 +1435,28 @@ async def get_games(sport: Optional[str] = None, user: User = Depends(get_curren
     games = await db.games.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
     return games
 
+@api_router.get("/games/public/{game_id}")
+async def get_game_public(game_id: str):
+    """Public endpoint to view game stats - no authentication required"""
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    player_stats = await db.player_stats.find({"game_id": game_id}, {"_id": 0}).to_list(100)
+    
+    home_stats = [s for s in player_stats if s["team_id"] == game.get("home_team_id")]
+    away_stats = [s for s in player_stats if s["team_id"] == game.get("away_team_id")]
+    
+    # Get events/play log for this game
+    events = await db.events.find({"game_id": game_id}, {"_id": 0}).sort("created_at", -1).to_list(500)
+    
+    return {
+        **game,
+        "home_player_stats": home_stats,
+        "away_player_stats": away_stats,
+        "events": events
+    }
+
 @api_router.get("/games/{game_id}")
 async def get_game(game_id: str, user: User = Depends(get_current_user)):
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
