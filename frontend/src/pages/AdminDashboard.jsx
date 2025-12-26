@@ -238,7 +238,7 @@ export default function AdminDashboard({ user, onLogout }) {
                   <div>
                     <p className="font-semibold text-amber-800">Teams Missing Sport Assignment</p>
                     <p className="text-sm text-amber-700">
-                      {stats.total_teams - stats.basketball_teams - stats.football_teams} teams don't have a sport assigned and won't appear in Basketball or Football views.
+                      {stats.total_teams - stats.basketball_teams - stats.football_teams} teams don&apos;t have a sport assigned and won&apos;t appear in Basketball or Football views.
                     </p>
                   </div>
                 </div>
