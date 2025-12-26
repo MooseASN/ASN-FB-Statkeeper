@@ -92,7 +92,8 @@ export default function Events({ user, onLogout }) {
         start_date: startDate,
         end_date: endDate || startDate,
         logo_data: logoData,
-        color: eventColor
+        color: eventColor,
+        sport: selectedSport
       });
       
       toast.success("Event created!");
