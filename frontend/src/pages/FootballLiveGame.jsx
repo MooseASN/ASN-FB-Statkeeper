@@ -1001,6 +1001,9 @@ export default function FootballLiveGame({ user, onLogout }) {
         setAwayTimeouts(state.away_timeouts ?? 3);
         setPlayLog(state.play_log || []);
         setClockTime(state.clock_time ?? 900);
+        // Restore Time of Possession
+        setHomeTimeOfPossession(state.home_time_of_possession || 0);
+        setAwayTimeOfPossession(state.away_time_of_possession || 0);
       } else {
         // New game - show kickoff dialog
         setShowKickoffTeamDialog(true);
