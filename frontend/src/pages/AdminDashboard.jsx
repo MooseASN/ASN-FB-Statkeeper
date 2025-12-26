@@ -22,7 +22,9 @@ import {
   Shield,
   Calendar,
   Trophy,
-  Target
+  Target,
+  Wrench,
+  AlertTriangle
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
@@ -36,6 +38,7 @@ export default function AdminDashboard({ user, onLogout }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [lastUpdated, setLastUpdated] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [migrating, setMigrating] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
