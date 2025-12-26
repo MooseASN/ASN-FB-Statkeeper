@@ -653,6 +653,117 @@ async def update_display_name(data: dict, user: User = Depends(get_current_user)
     
     return {"message": "Name updated successfully", "name": new_name}
 
+# ============ ADMIN ENDPOINTS ============
+
+ADMIN_EMAILS = ["antlersportsnetwork@gmail.com"]
+
+async def get_admin_user(user: User = Depends(get_current_user)) -> User:
+    """Verify user is an admin"""
+    if user.email.lower() not in ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+@api_router.get("/admin/users")
+async def get_all_users(admin: User = Depends(get_admin_user)):
+    """Get all users (admin only) - excludes password hashes"""
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0, "security_questions": 0}).to_list(10000)
+    
+    # Add additional stats for each user
+    enriched_users = []
+    for user in users:
+        user_id = user.get("user_id")
+        
+        # Count teams, games, events for this user
+        team_count = await db.teams.count_documents({"user_id": user_id})
+        game_count = await db.games.count_documents({"user_id": user_id})
+        event_count = await db.events.count_documents({"user_id": user_id})
+        
+        enriched_users.append({
+            **user,
+            "team_count": team_count,
+            "game_count": game_count,
+            "event_count": event_count
+        })
+    
+    return {
+        "users": enriched_users,
+        "total": len(enriched_users),
+        "fetched_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/admin/users/export")
+async def export_users_csv(admin: User = Depends(get_admin_user)):
+    """Export all users as CSV (admin only)"""
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0, "security_questions": 0}).to_list(10000)
+    
+    # Create CSV
+    output = io.StringIO()
+    fieldnames = ["user_id", "email", "username", "name", "auth_provider", "created_at", "team_count", "game_count", "event_count"]
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
+    writer.writeheader()
+    
+    for user in users:
+        user_id = user.get("user_id")
+        team_count = await db.teams.count_documents({"user_id": user_id})
+        game_count = await db.games.count_documents({"user_id": user_id})
+        event_count = await db.events.count_documents({"user_id": user_id})
+        
+        writer.writerow({
+            "user_id": user.get("user_id", ""),
+            "email": user.get("email", ""),
+            "username": user.get("username", ""),
+            "name": user.get("name", ""),
+            "auth_provider": user.get("auth_provider", "local"),
+            "created_at": user.get("created_at", ""),
+            "team_count": team_count,
+            "game_count": game_count,
+            "event_count": event_count
+        })
+    
+    output.seek(0)
+    return StreamingResponse(
+        iter([output.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=statmoose_users_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"}
+    )
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: User = Depends(get_admin_user)):
+    """Get overall platform stats (admin only)"""
+    total_users = await db.users.count_documents({})
+    total_teams = await db.teams.count_documents({})
+    total_games = await db.games.count_documents({})
+    total_events = await db.events.count_documents({})
+    
+    # Get counts by sport
+    basketball_teams = await db.teams.count_documents({"sport": "basketball"})
+    football_teams = await db.teams.count_documents({"sport": "football"})
+    basketball_games = await db.games.count_documents({"sport": "basketball"})
+    football_games = await db.games.count_documents({"sport": "football"})
+    
+    # Get recent signups (last 7 days)
+    week_ago = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    recent_users = await db.users.count_documents({"created_at": {"$gte": week_ago}})
+    
+    return {
+        "total_users": total_users,
+        "total_teams": total_teams,
+        "total_games": total_games,
+        "total_events": total_events,
+        "basketball_teams": basketball_teams,
+        "football_teams": football_teams,
+        "basketball_games": basketball_games,
+        "football_games": football_games,
+        "recent_signups_7d": recent_users,
+        "fetched_at": datetime.now(timezone.utc).isoformat()
+    }
+
+@api_router.get("/admin/check")
+async def check_admin_status(user: User = Depends(get_current_user)):
+    """Check if current user is an admin"""
+    is_admin = user.email.lower() in ADMIN_EMAILS
+    return {"is_admin": is_admin}
+
 # ============ DATA MODELS ============
 
 class Player(BaseModel):
