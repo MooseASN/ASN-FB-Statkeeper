@@ -778,6 +778,19 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [selectedResult, setSelectedResult] = useState(null);
   const [yards, setYards] = useState(0);
   
+  // Run play state
+  const [runCarrierNumber, setRunCarrierNumber] = useState(null);
+  const [runTacklerNumber, setRunTacklerNumber] = useState(null);
+  
+  // Pass play state
+  const [passQBNumber, setPassQBNumber] = useState(null);
+  const [passReceiverNumber, setPassReceiverNumber] = useState(null);
+  const [passDefenderNumber, setPassDefenderNumber] = useState(null);
+  const [interceptionReturnYards, setInterceptionReturnYards] = useState(0);
+  
+  // Play workflow step
+  const [playStep, setPlayStep] = useState(0); // 0=select type, 1=select player, 2=result, 3=yards, 4=tackler
+  
   // Scores
   const [homeScore, setHomeScore] = useState(0);
   const [awayScore, setAwayScore] = useState(0);
