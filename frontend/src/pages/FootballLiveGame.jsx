@@ -1507,6 +1507,9 @@ export default function FootballLiveGame({ user, onLogout }) {
     
     // Reset play state
     resetPlayState();
+    
+    // Update drive stats
+    updateDriveStats(yards);
   };
 
   // Reset play state helper
