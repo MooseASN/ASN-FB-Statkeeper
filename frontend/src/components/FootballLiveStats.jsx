@@ -687,6 +687,7 @@ export default function FootballLiveStats({
                 <TeamStatRow label="Punts" away={teamStats.away.puntCount > 0 ? `${teamStats.away.puntCount}-${(teamStats.away.puntYards / teamStats.away.puntCount).toFixed(1)}` : '0-0.0'} home={teamStats.home.puntCount > 0 ? `${teamStats.home.puntCount}-${(teamStats.home.puntYards / teamStats.home.puntCount).toFixed(1)}` : '0-0.0'} awayColor={awayColor} homeColor={homeColor} expanded />
                 <TeamStatRow label="3rd Down Eff" away={`${teamStats.away.thirdDownConv}-${teamStats.away.thirdDownAtt}`} home={`${teamStats.home.thirdDownConv}-${teamStats.home.thirdDownAtt}`} awayColor={awayColor} homeColor={homeColor} expanded />
                 <TeamStatRow label="4th Down Eff" away={`${teamStats.away.fourthDownConv}-${teamStats.away.fourthDownAtt}`} home={`${teamStats.home.fourthDownConv}-${teamStats.home.fourthDownAtt}`} awayColor={awayColor} homeColor={homeColor} expanded />
+                <TeamStatRow label="Time of Poss." away={formatTOP(awayTimeOfPossession)} home={formatTOP(homeTimeOfPossession)} awayColor={awayColor} homeColor={homeColor} expanded />
               </div>
             </div>
           </div>
