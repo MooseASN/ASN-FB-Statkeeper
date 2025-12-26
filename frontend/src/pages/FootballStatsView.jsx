@@ -24,42 +24,6 @@ export default function FootballStatsView() {
     document.title = "StatMoose FB";
   }, []);
 
-  // Helper to format play description from event data
-  const formatPlayDescription = useCallback((event) => {
-    if (event.description) return event.description;
-    
-    let desc = '';
-    switch (event.event_type) {
-      case 'run':
-        desc = `#${event.carrier || '?'} rush for ${event.yards || 0} yards`;
-        break;
-      case 'pass':
-        if (event.result === 'complete') {
-          desc = `#${event.qb || '?'} pass complete to #${event.receiver || '?'} for ${event.yards || 0} yards`;
-        } else if (event.result === 'incomplete') {
-          desc = `#${event.qb || '?'} pass incomplete`;
-        } else if (event.result === 'intercepted') {
-          desc = `#${event.qb || '?'} pass INTERCEPTED`;
-        }
-        break;
-      case 'punt':
-        desc = `#${event.punter || '?'} punt for ${event.distance || 0} yards`;
-        break;
-      case 'field_goal':
-        desc = `#${event.kicker || '?'} ${event.distance || 0}-yard field goal ${event.result === 'good' ? 'GOOD' : 'NO GOOD'}`;
-        break;
-      case 'extra_point':
-        desc = `Extra point ${event.result === 'good' ? 'GOOD' : 'NO GOOD'}`;
-        break;
-      case 'penalty':
-        desc = `PENALTY: ${event.penalty_name || 'Unknown'} - ${event.yards || 0} yards`;
-        break;
-      default:
-        desc = event.event_type || 'Play';
-    }
-    return desc;
-  }, []);
-
   // Polling interval for live updates
   useEffect(() => {
     const fetchGameData = async () => {
@@ -68,28 +32,34 @@ export default function FootballStatsView() {
         const gameRes = await axios.get(`${API}/games/public/${id}`);
         setGame(gameRes.data);
         
-        // Events are included in the public endpoint response
-        const events = gameRes.data.events || [];
-        const plays = events.map(event => ({
-          id: event.id,
-          quarter: event.quarter || 1,
-          clock: event.timestamp || '0:00',
-          team: event.team,
-          type: event.event_type,
-          result: event.result,
-          yards: event.yards,
-          description: event.description || formatPlayDescription(event),
-          points: event.points || 0,
-          down: event.down,
-          distance: event.distance,
-          ball_on: event.ball_position ? `${event.ball_position}` : null,
-          carrier: event.carrier,
-          qb: event.qb,
-          receiver: event.receiver,
-          tackler: event.tackler,
-          firstDown: event.first_down,
-        }));
-        setPlayLog(plays.reverse());
+        // For football games, play log is stored in football_state.play_log
+        const footballState = gameRes.data.football_state;
+        if (footballState && footballState.play_log) {
+          setPlayLog(footballState.play_log);
+        } else {
+          // Fallback to events for non-football or legacy games
+          const events = gameRes.data.events || [];
+          const plays = events.map(event => ({
+            id: event.id,
+            quarter: event.quarter || 1,
+            clock: event.timestamp || '0:00',
+            team: event.team,
+            type: event.event_type,
+            result: event.result,
+            yards: event.yards,
+            description: event.description,
+            points: event.points || 0,
+            down: event.down,
+            distance: event.distance,
+            ball_on: event.ball_position ? `${event.ball_position}` : null,
+            carrier: event.carrier,
+            qb: event.qb,
+            receiver: event.receiver,
+            tackler: event.tackler,
+            firstDown: event.first_down,
+          }));
+          setPlayLog(plays.reverse());
+        }
         
         setLoading(false);
       } catch (err) {
@@ -101,10 +71,10 @@ export default function FootballStatsView() {
 
     fetchGameData();
     
-    // Poll for updates every 10 seconds for live games
-    const interval = setInterval(fetchGameData, 10000);
+    // Poll for updates every 5 seconds for live games (was 10 seconds)
+    const interval = setInterval(fetchGameData, 5000);
     return () => clearInterval(interval);
-  }, [id, formatPlayDescription]);
+  }, [id]);
 
   if (loading) {
     return (
@@ -131,26 +101,18 @@ export default function FootballStatsView() {
     );
   }
 
-  // Calculate current scores from play log
-  const homeScore = playLog
-    .filter(p => p.team === 'home' && p.points)
-    .reduce((sum, p) => sum + (p.points || 0), 0);
-  const awayScore = playLog
-    .filter(p => p.team === 'away' && p.points)
-    .reduce((sum, p) => sum + (p.points || 0), 0);
-
-  // Get current quarter and clock from most recent play
-  const latestPlay = playLog[0];
-  const currentQuarter = latestPlay?.quarter || 1;
-  const currentClock = latestPlay?.clock || '15:00';
-  
-  // Convert clock string to seconds
-  const clockParts = currentClock.split(':');
-  const clockSeconds = parseInt(clockParts[0]) * 60 + parseInt(clockParts[1] || 0);
+  // Get scores and game state from football_state
+  const footballState = game.football_state || {};
+  const homeScore = game.home_score || footballState.home_score || 0;
+  const awayScore = game.away_score || footballState.away_score || 0;
+  const currentQuarter = footballState.quarter || 1;
+  const clockSeconds = footballState.clock_time || 720;
+  const homeTimeouts = footballState.home_timeouts || 3;
+  const awayTimeouts = footballState.away_timeouts || 3;
   
   // Get time of possession from game data
-  const homeTimeOfPossession = game.home_time_of_possession || 0;
-  const awayTimeOfPossession = game.away_time_of_possession || 0;
+  const homeTimeOfPossession = game.home_time_of_possession || footballState.home_time_of_possession || 0;
+  const awayTimeOfPossession = game.away_time_of_possession || footballState.away_time_of_possession || 0;
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -174,16 +136,18 @@ export default function FootballStatsView() {
 
       <FootballLiveStats
         game={game}
-        homeScore={game.home_score || homeScore}
-        awayScore={game.away_score || awayScore}
+        homeScore={homeScore}
+        awayScore={awayScore}
         quarter={currentQuarter}
         clockTime={clockSeconds}
         playLog={playLog}
         homeColor={game.home_team_color || '#dc2626'}
         awayColor={game.away_team_color || '#2563eb'}
-        possession={game.possession || 'home'}
+        possession={game.possession || footballState.possession || 'home'}
         homeTimeOfPossession={homeTimeOfPossession}
         awayTimeOfPossession={awayTimeOfPossession}
+        homeTimeouts={homeTimeouts}
+        awayTimeouts={awayTimeouts}
       />
     </div>
   );
