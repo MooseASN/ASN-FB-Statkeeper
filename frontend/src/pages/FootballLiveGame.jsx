@@ -889,7 +889,7 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [tempClockMinutes, setTempClockMinutes] = useState(15);
   const [tempClockSeconds, setTempClockSeconds] = useState(0);
 
-  // Clock countdown effect
+  // Clock countdown effect - also updates drive time of possession
   useEffect(() => {
     let interval = null;
     if (clockRunning && clockTime > 0) {
@@ -902,12 +902,27 @@ export default function FootballLiveGame({ user, onLogout }) {
           }
           return prev - 1;
         });
+        
+        // Update drive elapsed time when clock is running
+        if (currentDrive.startTime !== null) {
+          setCurrentDrive(prev => ({
+            ...prev,
+            elapsedTime: prev.elapsedTime + 1
+          }));
+          
+          // Update total time of possession for the team with the ball
+          if (possession === 'home') {
+            setHomeTimeOfPossession(prev => prev + 1);
+          } else {
+            setAwayTimeOfPossession(prev => prev + 1);
+          }
+        }
       }, 1000);
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [clockRunning, clockTime]);
+  }, [clockRunning, clockTime, currentDrive.startTime, possession]);
 
   useEffect(() => {
     fetchGame();
