@@ -93,6 +93,23 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleMigrateTeams = async () => {
+    if (!window.confirm("This will assign all teams/games/events without a sport to 'basketball'. Continue?")) {
+      return;
+    }
+    
+    setMigrating(true);
+    try {
+      const response = await axios.post(`${API}/admin/migrate-teams-sport`);
+      toast.success(`Migration complete! Teams: ${response.data.teams_migrated}, Games: ${response.data.games_migrated}, Events: ${response.data.events_migrated}`);
+      fetchData(); // Refresh data
+    } catch (error) {
+      toast.error("Migration failed: " + (error.response?.data?.detail || error.message));
+    } finally {
+      setMigrating(false);
+    }
+  };
+
   const filteredUsers = users.filter(u => 
     u.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     u.username?.toLowerCase().includes(searchTerm.toLowerCase()) ||
