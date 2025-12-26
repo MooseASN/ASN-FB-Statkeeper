@@ -1,54 +1,54 @@
 {
-  "timestamp": "2025-12-26T23:05:24.442997",
-  "overall_success": false,
+  "timestamp": "2025-12-26T23:07:21.306992",
+  "overall_success": true,
   "test_results": [
     {
       "test": "Authentication",
       "success": true,
       "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
-      "timestamp": "2025-12-26T23:05:24.209775",
+      "timestamp": "2025-12-26T23:07:20.992316",
       "details": null
     },
     {
       "test": "Initial Game State",
       "success": true,
-      "message": "Retrieved initial state - 2 existing plays",
-      "timestamp": "2025-12-26T23:05:24.244375",
+      "message": "Retrieved initial state - 1 existing plays",
+      "timestamp": "2025-12-26T23:07:21.007484",
       "details": null
     },
     {
       "test": "Run Play Submission",
       "success": true,
       "message": "Run play recorded correctly with player names, drive stats, ball position, and down/distance updates",
-      "timestamp": "2025-12-26T23:05:24.276467",
+      "timestamp": "2025-12-26T23:07:21.066598",
       "details": null
     },
     {
       "test": "Pass Play Submission",
       "success": true,
       "message": "Pass play recorded correctly with QB/receiver names and drive stats accumulated",
-      "timestamp": "2025-12-26T23:05:24.341553",
+      "timestamp": "2025-12-26T23:07:21.125258",
       "details": null
     },
     {
       "test": "Touchdown Scenario",
       "success": true,
       "message": "Touchdown (+6), Extra Point (+1), and Kickoff workflow triggered correctly",
-      "timestamp": "2025-12-26T23:05:24.422207",
+      "timestamp": "2025-12-26T23:07:21.240829",
       "details": null
     },
     {
       "test": "Drive Ending Scenarios",
-      "success": false,
-      "message": "No completed drives found: 0 total drives",
-      "timestamp": "2025-12-26T23:05:24.432494",
+      "success": true,
+      "message": "Drive ends on touchdown, new drive starts correctly - 2 total drives saved to backend",
+      "timestamp": "2025-12-26T23:07:21.298446",
       "details": null
     },
     {
       "test": "Public Stats Sync",
-      "success": false,
-      "message": "Drive data not available on public page",
-      "timestamp": "2025-12-26T23:05:24.442814",
+      "success": true,
+      "message": "Plays synced to public stats page - 2 plays, 2 drives, scores and drive tracking data available",
+      "timestamp": "2025-12-26T23:07:21.306811",
       "details": null
     }
   ]
