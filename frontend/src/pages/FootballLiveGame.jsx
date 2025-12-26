@@ -2553,6 +2553,8 @@ export default function FootballLiveGame({ user, onLogout }) {
                 onClick={() => {
                   if (type.id === 'other') {
                     setShowTimeoutDialog(true);
+                  } else if (type.id === 'penalty') {
+                    setShowPenaltyDialog(true);
                   } else {
                     setSelectedPlayType(type.id);
                     setSelectedResult(null);
