@@ -795,6 +795,7 @@ export default function FootballLiveGame({ user, onLogout }) {
 
   useEffect(() => {
     fetchGame();
+    document.title = "StatMoose FB";
   }, [id]);
 
   const fetchGame = async () => {
