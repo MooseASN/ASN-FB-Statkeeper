@@ -2761,6 +2761,17 @@ export default function FootballLiveGame({ user, onLogout }) {
                     <div>
                       <div className="text-sm font-bold">{homeTeamName}</div>
                       <div className="text-2xl font-black">{homeScore}</div>
+                      {/* Timeouts under score */}
+                      <div className="flex gap-1 mt-1">
+                        {[...Array(3)].map((_, i) => (
+                          <div 
+                            key={`h-${i}`}
+                            className={`w-2 h-2 rounded-full ${i < homeTimeouts ? '' : 'opacity-30'}`}
+                            style={{ backgroundColor: i < homeTimeouts ? homeColor : '#666' }}
+                            title={`${homeTeamName} TO`}
+                          />
+                        ))}
+                      </div>
                     </div>
                   </div>
                   
@@ -2792,9 +2803,20 @@ export default function FootballLiveGame({ user, onLogout }) {
                   
                   {/* Away Team */}
                   <div className="flex items-center gap-3">
-                    <div>
-                      <div className="text-sm font-bold text-right">{awayTeamName}</div>
-                      <div className="text-2xl font-black text-right">{awayScore}</div>
+                    <div className="text-right">
+                      <div className="text-sm font-bold">{awayTeamName}</div>
+                      <div className="text-2xl font-black">{awayScore}</div>
+                      {/* Timeouts under score */}
+                      <div className="flex gap-1 mt-1 justify-end">
+                        {[...Array(3)].map((_, i) => (
+                          <div 
+                            key={`a-${i}`}
+                            className={`w-2 h-2 rounded-full ${i < awayTimeouts ? '' : 'opacity-30'}`}
+                            style={{ backgroundColor: i < awayTimeouts ? awayColor : '#666' }}
+                            title={`${awayTeamName} TO`}
+                          />
+                        ))}
+                      </div>
                     </div>
                     <div 
                       className="w-3 h-8 rounded"
@@ -2811,22 +2833,15 @@ export default function FootballLiveGame({ user, onLogout }) {
                     </span>
                     <span className="text-zinc-400">on {getYardLineText()}</span>
                   </div>
-                  <div className="flex gap-1">
-                    {[...Array(3)].map((_, i) => (
-                      <div 
-                        key={`h-${i}`}
-                        className={`w-2 h-2 rounded-full ${i < homeTimeouts ? 'bg-yellow-400' : 'bg-zinc-700'}`}
-                        title={`${homeTeamName} TO`}
-                      />
-                    ))}
-                    <span className="text-zinc-600 mx-1">|</span>
-                    {[...Array(3)].map((_, i) => (
-                      <div 
-                        key={`a-${i}`}
-                        className={`w-2 h-2 rounded-full ${i < awayTimeouts ? 'bg-yellow-400' : 'bg-zinc-700'}`}
-                        title={`${awayTeamName} TO`}
-                      />
-                    ))}
+                  <div 
+                    className="flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium"
+                    style={{ 
+                      backgroundColor: possession === 'home' ? homeColor : awayColor,
+                      opacity: 0.9
+                    }}
+                  >
+                    <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                    {possession === 'home' ? homeTeamName : awayTeamName}
                   </div>
                 </div>
                 
