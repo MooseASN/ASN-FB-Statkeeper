@@ -797,22 +797,32 @@ export default function FootballLiveGame({ user, onLogout }) {
   
   // Play state
   const [possession, setPossession] = useState('home'); // 'home' or 'away'
-  const [ballPosition, setBallPosition] = useState(25); // 0-100 (yard position on field)
+  const [ballPosition, setBallPosition] = useState(25); // 0-100 normalized (0=own goal, 50=midfield, 100=opp goal)
   const [down, setDown] = useState(1);
   const [distance, setDistance] = useState(10);
   const [quarter, setQuarter] = useState(1);
-  const [firstDownMarker, setFirstDownMarker] = useState(35); // Ball position needed for first down
+  const [firstDownMarker, setFirstDownMarker] = useState(35); // Normalized position for first down
   
-  // Current Drive tracking - includes time of possession
+  // Drive tracking - comprehensive data model per specification
   const [currentDrive, setCurrentDrive] = useState({
-    startTime: null,
-    startQuarter: 1,
-    startPosition: 25,
-    plays: 0,
-    yards: 0,
-    team: 'home',
-    elapsedTime: 0 // Track elapsed time for accurate TOP
+    id: `drive-${Date.now()}`,
+    team: 'home',                    // possession_team
+    startPeriod: 1,                  // period at drive start
+    startClock: 900,                 // clock (in seconds) at drive start
+    startPosition: 25,               // normalized 0-100 at drive start
+    startReason: 'kickoff',          // kickoff, punt, turnover, turnover_on_downs, safety_kick, start_of_half, after_score
+    plays: [],                       // array of Play objects
+    playCount: 0,                    // number of actual plays (excludes no-plays)
+    netYards: 0,                     // end_spot - start_spot
+    elapsedTime: 0,                  // TOP in seconds
+    endPeriod: null,                 // period at drive end
+    endClock: null,                  // clock at drive end
+    endPosition: null,               // normalized position at drive end
+    result: null,                    // TD, FG, punt, INT, fumble, downs, safety, end_of_half
   });
+  
+  // All drives history for the game
+  const [allDrives, setAllDrives] = useState([]);
   
   // Time of possession tracking (total for the game)
   const [homeTimeOfPossession, setHomeTimeOfPossession] = useState(0); // in seconds
