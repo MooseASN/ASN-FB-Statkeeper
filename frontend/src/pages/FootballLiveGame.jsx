@@ -1702,7 +1702,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     resetPlayState();
   };
 
-  // Handle Penalty submission
+  // Handle Penalty submission - Enhanced with penalty catalog
   const handleSubmitPenalty = () => {
     const offenseTeam = possession === 'home' ? game?.home_team_name : game?.away_team_name;
     const defenseTeam = possession === 'home' ? game?.away_team_name : game?.home_team_name;
@@ -1766,6 +1766,142 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
     
     resetPlayState();
+  };
+
+  // Handle Enhanced Penalty submission from PenaltyWorkflowDialog
+  const handleEnhancedPenaltySubmit = (penaltyLog) => {
+    const offenseTeamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const defenseTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    
+    // Update ruleset for the game
+    if (penaltyLog.ruleset) {
+      setGameRuleset(penaltyLog.ruleset);
+    }
+    
+    let description = '';
+    let newBallPosition = ballPosition;
+    
+    if (penaltyLog.declined) {
+      description = 'Penalty declined - play stands';
+    } else if (penaltyLog.offsetting) {
+      description = 'Offsetting penalties - replay the down';
+    } else {
+      const teamName = penaltyLog.against_team === 'offense' ? offenseTeamName : defenseTeamName;
+      description = `${penaltyLog.display_name} on ${teamName}`;
+      
+      if (penaltyLog.player_number) {
+        description += ` (#${penaltyLog.player_number})`;
+      }
+      
+      description += ` - ${penaltyLog.yards} yards`;
+      
+      if (penaltyLog.auto_first_down) {
+        description += ' - AUTOMATIC FIRST DOWN';
+      }
+      if (penaltyLog.loss_of_down) {
+        description += ' - Loss of Down';
+      }
+      if (penaltyLog.disqualification === 'ejection') {
+        description += ' - PLAYER EJECTED';
+      }
+      
+      // Calculate new ball position
+      const direction = penaltyLog.against_team === 'offense' 
+        ? (possession === 'home' ? -1 : 1) // Offense penalties move ball backward
+        : (possession === 'home' ? 1 : -1); // Defense penalties move ball forward
+      
+      newBallPosition = Math.max(0, Math.min(100, ballPosition + (penaltyLog.yards * direction)));
+    }
+    
+    // Create play log entry with enhanced penalty data
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: penaltyLog.team,
+      type: 'penalty',
+      result: penaltyLog.declined ? 'declined' : penaltyLog.offsetting ? 'offsetting' : penaltyLog.against_team,
+      penalty_id: penaltyLog.penalty_id,
+      penalty_name: penaltyLog.display_name,
+      ruleset: penaltyLog.ruleset,
+      against_team: penaltyLog.against_team,
+      player_number: penaltyLog.player_number,
+      yards: penaltyLog.yards,
+      auto_first_down: penaltyLog.auto_first_down,
+      loss_of_down: penaltyLog.loss_of_down,
+      disqualification: penaltyLog.disqualification,
+      spot_of_foul: penaltyLog.spot_of_foul,
+      raw_user_text: penaltyLog.raw_user_text,
+      down,
+      distance,
+      ball_on: getYardLineText(),
+      description,
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    // Update game state
+    if (!penaltyLog.declined && !penaltyLog.offsetting) {
+      setBallPosition(newBallPosition);
+      
+      if (penaltyLog.against_team === 'offense') {
+        // Offensive penalty - add yards to distance
+        if (penaltyLog.loss_of_down) {
+          const newDown = down + 1;
+          if (newDown > 4) {
+            setPossession(possession === 'home' ? 'away' : 'home');
+            setDown(1);
+            setDistance(10);
+            const newFDMarker = possession === 'home' 
+              ? Math.max(0, newBallPosition - 10) 
+              : Math.min(100, newBallPosition + 10);
+            setFirstDownMarker(newFDMarker);
+            toast.info('Turnover on downs');
+          } else {
+            setDown(newDown);
+            setDistance(prev => prev + penaltyLog.yards);
+          }
+        } else {
+          // Replay the down with added distance
+          setDistance(prev => prev + penaltyLog.yards);
+        }
+      } else {
+        // Defensive penalty
+        if (penaltyLog.auto_first_down) {
+          setDown(1);
+          setDistance(10);
+          const newFDMarker = possession === 'home' 
+            ? Math.min(100, newBallPosition + 10) 
+            : Math.max(0, newBallPosition - 10);
+          setFirstDownMarker(newFDMarker);
+          toast.success('Automatic First Down!');
+        } else {
+          // Check if penalty yardage exceeds distance needed
+          if (penaltyLog.yards >= distance) {
+            setDown(1);
+            setDistance(10);
+            const newFDMarker = possession === 'home' 
+              ? Math.min(100, newBallPosition + 10) 
+              : Math.max(0, newBallPosition - 10);
+            setFirstDownMarker(newFDMarker);
+            toast.success('First Down!');
+          } else {
+            setDistance(prev => prev - penaltyLog.yards);
+          }
+        }
+      }
+      
+      // Handle ejection notification
+      if (penaltyLog.disqualification === 'ejection') {
+        toast.error(`Player ${penaltyLog.player_number ? '#' + penaltyLog.player_number : ''} has been EJECTED`, {
+          duration: 5000,
+        });
+      }
+    }
+    
+    // Close dialog
+    setShowPenaltyDialog(false);
+    toast.success(`Penalty: ${penaltyLog.display_name || (penaltyLog.declined ? 'Declined' : penaltyLog.offsetting ? 'Offsetting' : 'Applied')}`);
   };
 
   // Change possession
