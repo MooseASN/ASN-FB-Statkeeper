@@ -929,6 +929,13 @@ export default function FootballLiveGame({ user, onLogout }) {
     document.title = "StatMoose FB";
   }, [id]);
 
+  // Auto-save football state when playLog changes
+  useEffect(() => {
+    if (playLog.length > 0 && game) {
+      saveFootballState(playLog, homeScore, awayScore);
+    }
+  }, [playLog, homeScore, awayScore, saveFootballState, game]);
+
   const fetchGame = async () => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
