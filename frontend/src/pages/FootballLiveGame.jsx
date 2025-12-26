@@ -1456,8 +1456,8 @@ export default function FootballLiveGame({ user, onLogout }) {
       // Reset play state and automatically trigger Extra Point workflow
       resetPlayState();
       setTimeout(() => {
-        setShowExtraPointWorkflow(true);
-        setExtraPointStep(1);
+        setSelectedPlayType('extra_point');
+        setPlayStep(0);
       }, 500);
       updateDriveStats(yards);
       return; // Exit early to prevent resetPlayState being called again
