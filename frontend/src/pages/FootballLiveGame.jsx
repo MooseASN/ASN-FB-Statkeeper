@@ -1297,11 +1297,26 @@ export default function FootballLiveGame({ user, onLogout }) {
       }
     }
     
-    // Add kickoff to play log
+    // Calculate new ball position
+    let newBallPos;
+    if (kickoffData.specialResult === 'touchback') {
+      newBallPos = receivingTeam === 'home' ? 25 : 75;
+    } else if (kickoffData.specialResult === 'out_of_bounds') {
+      newBallPos = receivingTeam === 'home' ? 40 : 60;
+    } else if (kickoffData.specialResult === 'touchdown') {
+      newBallPos = receivingTeam === 'home' ? 100 : 0;
+    } else {
+      const yardLine = kickoffData.returnedTo;
+      newBallPos = receivingTeam === 'home' ? yardLine : 100 - yardLine;
+    }
+    
+    // Add kickoff to play log with comprehensive data model
     const kickoffPlay = {
-      id: Date.now(),
-      quarter,
-      clock: formatTime(clockTime),
+      id: `play-${Date.now()}`,
+      play_id: `play-${Date.now()}`,
+      period: quarter,
+      clock_start: clockTime,
+      clock_end: clockTime,
       team: kickingTeam,
       type: 'kickoff',
       kicker: kickoffData.kickerNumber,
@@ -1311,33 +1326,17 @@ export default function FootballLiveGame({ user, onLogout }) {
       returnedTo: kickoffData.returnedTo,
       tackler: kickoffData.tacklerNumber,
       specialResult: kickoffData.specialResult,
+      start_spot: kickingTeam === 'home' ? kickoffData.kickoffYardLine : 100 - kickoffData.kickoffYardLine,
+      end_spot: newBallPos,
       description,
+      no_play: true, // Kickoffs are not counted as offensive plays
+      quarter, // Legacy field for display
+      clock: formatTime(clockTime), // Legacy field for display
     };
     setPlayLog(prev => [kickoffPlay, ...prev]);
     
     // Set game state based on result
     setPossession(receivingTeam);
-    
-    let newBallPos;
-    if (kickoffData.specialResult === 'touchback') {
-      newBallPos = receivingTeam === 'home' ? 25 : 75;
-    } else if (kickoffData.specialResult === 'out_of_bounds') {
-      newBallPos = receivingTeam === 'home' ? 40 : 60;
-    } else if (kickoffData.specialResult === 'touchdown') {
-      // Handle return TD
-      if (receivingTeam === 'home') {
-        setHomeScore(prev => prev + 6);
-      } else {
-        setAwayScore(prev => prev + 6);
-      }
-      newBallPos = receivingTeam === 'home' ? 98 : 2;
-    } else {
-      // Regular return - set ball position
-      // Convert yard line to field position (0-100)
-      const yardLine = kickoffData.returnedTo;
-      newBallPos = receivingTeam === 'home' ? yardLine : 100 - yardLine;
-    }
-    
     setBallPosition(newBallPos);
     setDown(1);
     setDistance(10);
@@ -1347,6 +1346,23 @@ export default function FootballLiveGame({ user, onLogout }) {
       ? Math.min(100, newBallPos + 10) 
       : Math.max(0, newBallPos - 10);
     setFirstDownMarker(newFDMarker);
+    
+    // Handle kickoff return TD
+    if (kickoffData.specialResult === 'touchdown') {
+      if (receivingTeam === 'home') {
+        setHomeScore(prev => prev + 6);
+      } else {
+        setAwayScore(prev => prev + 6);
+      }
+      // After kickoff return TD, go to extra point
+      setTimeout(() => {
+        setSelectedPlayType('extra_point');
+        setPlayStep(0);
+      }, 500);
+    } else {
+      // Start a new drive for the receiving team after kickoff
+      startNewDrive('kickoff', receivingTeam);
+    }
     
     // Close workflow
     setShowKickoffWorkflow(false);
