@@ -17,10 +17,13 @@ import {
 } from "@/components/ui/alert-dialog";
 import { History, ChevronRight, FileDown, Trash2, Search, Filter, Calendar, Clock, PlayCircle } from "lucide-react";
 import Layout from "@/components/Layout";
+import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function GameHistory({ user, onLogout }) {
+  const { selectedSport } = useSport();
+  const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,11 +33,11 @@ export default function GameHistory({ user, onLogout }) {
 
   useEffect(() => {
     fetchGames();
-  }, []);
+  }, [selectedSport]);
 
   const fetchGames = async () => {
     try {
-      const res = await axios.get(`${API}/games`);
+      const res = await axios.get(`${API}/games`, { params: { sport: selectedSport } });
       setGames(res.data);
     } catch (error) {
       toast.error("Failed to load games");
