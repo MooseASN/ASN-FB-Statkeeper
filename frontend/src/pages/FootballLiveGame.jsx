@@ -1396,8 +1396,9 @@ export default function FootballLiveGame({ user, onLogout }) {
     const isFirstDown = (possession === 'home' && newBallPosition >= firstDownMarker) ||
                         (possession === 'away' && newBallPosition <= firstDownMarker);
     
-    // Build play description
-    let description = `#${runCarrierNumber} `;
+    // Build play description with player names
+    const carrierDisplay = formatPlayer(runCarrierNumber, possession);
+    let description = `${carrierDisplay} `;
     if (selectedResult === 'touchdown') {
       description += `rushes for ${yards} yards - TOUCHDOWN!`;
     } else if (selectedResult === 'fumble_lost') {
@@ -1413,7 +1414,8 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
     
     if (runTacklerNumber) {
-      description += `. Tackle by #${runTacklerNumber}`;
+      const tacklerDisplay = formatPlayer(runTacklerNumber, possession === 'home' ? 'away' : 'home');
+      description += `. Tackle by ${tacklerDisplay}`;
     }
     
     if (isFirstDown && selectedResult !== 'touchdown' && selectedResult !== 'fumble_lost') {
