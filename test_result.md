@@ -186,11 +186,14 @@ backend:
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
         comment: "DELETE /api/games/{game_id} endpoint deletes game and associated player stats. Verified via curl."
+      - working: true
+        agent: "testing"
+        comment: "TESTED: Game delete API working correctly - created test game and successfully deleted it via DELETE /api/games/{game_id} endpoint"
 
   - task: "Sponsor Banner CRUD API"
     implemented: true
