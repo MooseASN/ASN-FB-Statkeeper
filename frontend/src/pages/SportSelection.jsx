@@ -28,6 +28,11 @@ export default function SportSelection({ user, onLogout }) {
   const navigate = useNavigate();
   const { selectSport } = useSport();
 
+  // Set document title to StatMoose
+  useEffect(() => {
+    document.title = "StatMoose";
+  }, []);
+
   // Check if user can access football (admins only)
   const canAccessFootball = FOOTBALL_ALLOWED_EMAILS.includes(user?.email?.toLowerCase()) ||
                             FOOTBALL_ALLOWED_USERNAMES.includes(user?.username?.toLowerCase());
