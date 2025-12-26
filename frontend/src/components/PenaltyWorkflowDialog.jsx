@@ -68,32 +68,31 @@ export default function PenaltyWorkflowDialog({
   const [declined, setDeclined] = useState(false);
   const [offsetting, setOffsetting] = useState(false);
 
-  // Reset state when dialog opens/closes
-  useEffect(() => {
-    if (open) {
-      setStep(1);
-      setSearchInput('');
-      setSearchResults([]);
-      setSelectedPenalty(null);
-      setAgainstTeam(null);
-      setPlayerNumber('');
-      setCurrentContextIndex(0);
-      setContextAnswers({});
-      setSpotOfFoulInput(ballPosition);
-      setDeclined(false);
-      setOffsetting(false);
-    }
-  }, [open, ballPosition]);
+  // Reset state when dialog opens - use callback approach instead of useEffect
+  const resetState = useCallback(() => {
+    setStep(1);
+    setSearchInput('');
+    setSearchResults([]);
+    setSelectedPenalty(null);
+    setAgainstTeam(null);
+    setPlayerNumber('');
+    setCurrentContextIndex(0);
+    setContextAnswers({});
+    setSpotOfFoulInput(ballPosition);
+    setDeclined(false);
+    setOffsetting(false);
+  }, [ballPosition]);
 
-  // Search effect
-  useEffect(() => {
-    if (searchInput.length >= 2) {
-      const results = searchPenalties(searchInput, 8);
+  // Handle search input change with immediate results
+  const handleSearchChange = useCallback((value) => {
+    setSearchInput(value);
+    if (value.length >= 2) {
+      const results = searchPenalties(value, 8);
       setSearchResults(results);
     } else {
       setSearchResults([]);
     }
-  }, [searchInput]);
+  }, []);
 
   // Get current variant based on ruleset
   const currentVariant = useMemo(() => {
