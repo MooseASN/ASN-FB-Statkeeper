@@ -903,19 +903,19 @@ export default function FootballLiveGame({ user, onLogout }) {
           return prev - 1;
         });
         
-        // Update drive elapsed time when clock is running
+        // Update drive elapsed time when clock is running and there's an active drive
         if (currentDrive.startTime !== null) {
           setCurrentDrive(prev => ({
             ...prev,
             elapsedTime: prev.elapsedTime + 1
           }));
-          
-          // Update total time of possession for the team with the ball
-          if (possession === 'home') {
-            setHomeTimeOfPossession(prev => prev + 1);
-          } else {
-            setAwayTimeOfPossession(prev => prev + 1);
-          }
+        }
+        
+        // Always update total time of possession when clock is running
+        if (possession === 'home') {
+          setHomeTimeOfPossession(prev => prev + 1);
+        } else {
+          setAwayTimeOfPossession(prev => prev + 1);
         }
       }, 1000);
     }
