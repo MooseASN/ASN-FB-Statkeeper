@@ -4239,7 +4239,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                         <div className="text-sm text-zinc-400 uppercase">PAT Result</div>
                         <div className="grid grid-cols-2 gap-4">
                           <button
-                            onClick={() => { setSelectedResult('good'); handleSubmitExtraPoint(); }}
+                            onClick={() => handleSubmitExtraPoint('good')}
                             className="p-4 bg-green-600/20 hover:bg-green-600/40 rounded-lg border-2 border-green-600"
                           >
                             <div className="text-2xl mb-2">✓</div>
@@ -4247,7 +4247,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                             <div className="text-xs text-zinc-400">+1 Point</div>
                           </button>
                           <button
-                            onClick={() => { setSelectedResult('no_good'); handleSubmitExtraPoint(); }}
+                            onClick={() => handleSubmitExtraPoint('no_good')}
                             className="p-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg border-2 border-red-600"
                           >
                             <div className="text-2xl mb-2">✗</div>
@@ -4266,7 +4266,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                         <div className="text-sm text-zinc-400 uppercase">2-Point Conversion Result</div>
                         <div className="grid grid-cols-2 gap-4">
                           <button
-                            onClick={() => { setSelectedResult('two_point_good'); handleSubmitExtraPoint(); }}
+                            onClick={() => handleSubmitExtraPoint('two_point_good')}
                             className="p-4 bg-green-600/20 hover:bg-green-600/40 rounded-lg border-2 border-green-600"
                           >
                             <div className="text-2xl mb-2">✓</div>
@@ -4274,7 +4274,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                             <div className="text-xs text-zinc-400">+2 Points</div>
                           </button>
                           <button
-                            onClick={() => { setSelectedResult('two_point_no_good'); handleSubmitExtraPoint(); }}
+                            onClick={() => handleSubmitExtraPoint('two_point_no_good')}
                             className="p-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg border-2 border-red-600"
                           >
                             <div className="text-2xl mb-2">✗</div>
