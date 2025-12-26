@@ -336,7 +336,7 @@ export default function PenaltyWorkflowDialog({
               </div>
             ) : searchInput.length >= 2 ? (
               <div className="text-center text-zinc-500 py-4">
-                No penalties found for "{searchInput}"
+                No penalties found for &quot;{searchInput}&quot;
               </div>
             ) : (
               <>
