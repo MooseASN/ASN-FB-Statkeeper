@@ -3891,10 +3891,35 @@ export default function FootballLiveGame({ user, onLogout }) {
                   <div className="space-y-4">
                     <div className="text-lg font-bold text-yellow-500 mb-2">EXTRA POINT / 2-PT CONVERSION</div>
                     
-                    {/* Step 1: Select Kicker (for PAT) */}
+                    {/* Step 1: Select Type */}
                     {playStep === 0 && (
                       <div className="space-y-4">
-                        <div className="text-sm text-zinc-400 uppercase">Select Kicker (for PAT) or skip for 2-PT</div>
+                        <div className="text-sm text-zinc-400 uppercase">Select Attempt Type</div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            onClick={() => { setSelectedResult('pat'); setPlayStep(1); }}
+                            className="p-4 bg-zinc-800 hover:bg-zinc-700 rounded-lg border-2 border-zinc-600 hover:border-yellow-500"
+                          >
+                            <div className="text-2xl mb-2">🏈</div>
+                            <div className="font-bold text-yellow-400">PAT Kick</div>
+                            <div className="text-xs text-zinc-500">1 Point</div>
+                          </button>
+                          <button
+                            onClick={() => { setSelectedResult('two_point'); setPlayStep(3); }}
+                            className="p-4 bg-zinc-800 hover:bg-zinc-700 rounded-lg border-2 border-zinc-600 hover:border-blue-500"
+                          >
+                            <div className="text-2xl mb-2">🎯</div>
+                            <div className="font-bold text-blue-400">2-Point Conversion</div>
+                            <div className="text-xs text-zinc-500">2 Points</div>
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: PAT - Select Kicker */}
+                    {playStep === 1 && selectedResult === 'pat' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Select Kicker</div>
                         <div className="flex gap-3">
                           <input
                             type="text"
@@ -3919,17 +3944,20 @@ export default function FootballLiveGame({ user, onLogout }) {
                             ))}
                           </div>
                         </div>
-                        <Button 
-                          onClick={() => setPlayStep(1)} 
-                          className="bg-yellow-600 hover:bg-yellow-700"
-                        >
-                          Continue →
-                        </Button>
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(2)}
+                            className="bg-yellow-600 hover:bg-yellow-700"
+                          >
+                            Continue →
+                          </Button>
+                        </div>
                       </div>
                     )}
                     
-                    {/* Step 2: Result */}
-                    {playStep === 1 && (
+                    {/* Step 3: PAT - Result */}
+                    {playStep === 2 && selectedResult === 'pat' && (
                       <div className="space-y-4">
                         {kickerNumber && (
                           <div className="text-sm text-zinc-400">
@@ -3937,33 +3965,54 @@ export default function FootballLiveGame({ user, onLogout }) {
                           </div>
                         )}
                         
-                        <div className="text-sm text-zinc-400 uppercase">Result</div>
-                        <div className="flex flex-wrap gap-2">
-                          {PLAY_RESULTS.extra_point.map((result) => (
-                            <button
-                              key={result.id}
-                              onClick={() => setSelectedResult(result.id)}
-                              className={`py-2 px-4 rounded font-medium ${
-                                selectedResult === result.id 
-                                  ? ['good', 'two_point_good'].includes(result.id) ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
-                                  : 'bg-zinc-700 hover:bg-zinc-600'
-                              }`}
-                            >
-                              {result.label}
-                            </button>
-                          ))}
+                        <div className="text-sm text-zinc-400 uppercase">PAT Result</div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            onClick={() => { setSelectedResult('good'); handleSubmitExtraPoint(); }}
+                            className="p-4 bg-green-600/20 hover:bg-green-600/40 rounded-lg border-2 border-green-600"
+                          >
+                            <div className="text-2xl mb-2">✓</div>
+                            <div className="font-bold text-green-400">GOOD</div>
+                            <div className="text-xs text-zinc-400">+1 Point</div>
+                          </button>
+                          <button
+                            onClick={() => { setSelectedResult('no_good'); handleSubmitExtraPoint(); }}
+                            className="p-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg border-2 border-red-600"
+                          >
+                            <div className="text-2xl mb-2">✗</div>
+                            <div className="font-bold text-red-400">NO GOOD</div>
+                            <div className="text-xs text-zinc-400">0 Points</div>
+                          </button>
                         </div>
                         
-                        <div className="flex gap-2 mt-4">
-                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
-                          <Button 
-                            onClick={handleSubmitExtraPoint}
-                            disabled={!selectedResult}
-                            className="bg-green-600 hover:bg-green-700 px-8"
+                        <Button variant="outline" className="border-zinc-600 w-full mt-4" onClick={() => setPlayStep(1)}>← Back</Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 4: 2-Point Conversion - Result */}
+                    {playStep === 3 && selectedResult === 'two_point' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">2-Point Conversion Result</div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <button
+                            onClick={() => { setSelectedResult('two_point_good'); handleSubmitExtraPoint(); }}
+                            className="p-4 bg-green-600/20 hover:bg-green-600/40 rounded-lg border-2 border-green-600"
                           >
-                            Complete Play ✓
-                          </Button>
+                            <div className="text-2xl mb-2">✓</div>
+                            <div className="font-bold text-green-400">GOOD</div>
+                            <div className="text-xs text-zinc-400">+2 Points</div>
+                          </button>
+                          <button
+                            onClick={() => { setSelectedResult('two_point_no_good'); handleSubmitExtraPoint(); }}
+                            className="p-4 bg-red-600/20 hover:bg-red-600/40 rounded-lg border-2 border-red-600"
+                          >
+                            <div className="text-2xl mb-2">✗</div>
+                            <div className="font-bold text-red-400">NO GOOD</div>
+                            <div className="text-xs text-zinc-400">0 Points</div>
+                          </button>
                         </div>
+                        
+                        <Button variant="outline" className="border-zinc-600 w-full mt-4" onClick={() => setPlayStep(0)}>← Back</Button>
                       </div>
                     )}
                   </div>
