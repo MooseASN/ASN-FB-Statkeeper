@@ -1557,11 +1557,13 @@ export default function FootballLiveGame({ user, onLogout }) {
       description += ' - FIRST DOWN';
     }
     
-    // Create play entry
+    // Create play entry with comprehensive data model
     const play = {
-      id: Date.now(),
-      quarter,
-      clock: formatTime(clockTime),
+      id: `play-${Date.now()}`,
+      play_id: `play-${Date.now()}`,
+      period: quarter,
+      clock_start: clockTime,
+      clock_end: clockTime, // Updated after play
       team: possession,
       type: 'run',
       carrier: runCarrierNumber,
@@ -1570,11 +1572,19 @@ export default function FootballLiveGame({ user, onLogout }) {
       yards,
       down,
       distance,
+      start_spot: ballPosition,
+      end_spot: newBallPosition,
       ball_on: getYardLineText(),
       description,
+      no_play: false,
+      quarter, // Legacy field for display
+      clock: formatTime(clockTime), // Legacy field for display
     };
     
     setPlayLog(prev => [play, ...prev]);
+    
+    // Add play to current drive tracking
+    addPlayToDrive(play);
     
     // Update game state
     if (selectedResult === 'touchdown') {
@@ -1588,16 +1598,21 @@ export default function FootballLiveGame({ user, onLogout }) {
       setDistance(0);
       toast.success(`${teamName} TOUCHDOWN!`);
       
+      // End the current drive with TD result
+      endDrive('TD', possession === 'home' ? 100 : 0);
+      
       // Reset play state and automatically trigger Extra Point workflow
       resetPlayState();
       setTimeout(() => {
         setSelectedPlayType('extra_point');
         setPlayStep(0);
       }, 500);
-      updateDriveStats(yards);
       return; // Exit early to prevent resetPlayState being called again
     } else if (selectedResult === 'fumble_lost') {
       setBallPosition(newBallPosition);
+      // End current drive due to fumble
+      endDrive('fumble', newBallPosition);
+      
       // Switch possession and start new drive
       const newPossession = possession === 'home' ? 'away' : 'home';
       setPossession(newPossession);
@@ -1608,13 +1623,8 @@ export default function FootballLiveGame({ user, onLogout }) {
         ? Math.min(100, newBallPosition + 10) 
         : Math.max(0, newBallPosition - 10);
       setFirstDownMarker(newFDMarker);
-      // Start new drive
-      setCurrentDrive({
-        startTime: clockTime,
-        plays: 0,
-        yards: 0,
-        elapsedTime: 0
-      });
+      // Start new drive for receiving team
+      startNewDrive('turnover', newPossession);
       toast.info('Fumble - turnover! New drive started.');
     } else {
       setBallPosition(newBallPosition);
@@ -1633,14 +1643,20 @@ export default function FootballLiveGame({ user, onLogout }) {
         const newDistance = distance - yards;
         
         if (newDown > 4) {
+          // End current drive due to turnover on downs
+          endDrive('downs', newBallPosition);
+          
           // Turnover on downs
-          setPossession(possession === 'home' ? 'away' : 'home');
+          const newPossession = possession === 'home' ? 'away' : 'home';
+          setPossession(newPossession);
           setDown(1);
           setDistance(10);
           const newFDMarker = possession === 'home' 
             ? Math.max(0, newBallPosition - 10) 
             : Math.min(100, newBallPosition + 10);
           setFirstDownMarker(newFDMarker);
+          // Start new drive for receiving team
+          startNewDrive('turnover_on_downs', newPossession);
           toast.info('Turnover on downs');
         } else {
           setDown(newDown);
@@ -1651,9 +1667,6 @@ export default function FootballLiveGame({ user, onLogout }) {
     
     // Reset play state
     resetPlayState();
-    
-    // Update drive stats
-    updateDriveStats(yards);
   };
   const handleSubmitPassPlay = () => {
     const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
