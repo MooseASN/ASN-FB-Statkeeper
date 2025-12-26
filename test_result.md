@@ -406,6 +406,18 @@ frontend:
         agent: "main"
         comment: "Backend endpoint /api/games/{game_id}/email-boxscore sends HTML emails via Resend. Frontend dialog calls backend API with email validation. NOTE: Requires RESEND_API_KEY in backend/.env."
 
+  - task: "Football State Persistence Backend"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: PUT /api/games/{game_id} with football_state field successfully saves to database. GET /api/games/public/{game_id} correctly returns saved football state. Verified play log recording, ball position tracking, down/distance updates, team stats accumulation. All 6 backend tests passed including edge cases."
+
   - task: "Starter Selection Small Roster"
     implemented: true
     working: true
