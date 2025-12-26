@@ -1,0 +1,55 @@
+{
+  "timestamp": "2025-12-26T23:05:24.442997",
+  "overall_success": false,
+  "test_results": [
+    {
+      "test": "Authentication",
+      "success": true,
+      "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
+      "timestamp": "2025-12-26T23:05:24.209775",
+      "details": null
+    },
+    {
+      "test": "Initial Game State",
+      "success": true,
+      "message": "Retrieved initial state - 2 existing plays",
+      "timestamp": "2025-12-26T23:05:24.244375",
+      "details": null
+    },
+    {
+      "test": "Run Play Submission",
+      "success": true,
+      "message": "Run play recorded correctly with player names, drive stats, ball position, and down/distance updates",
+      "timestamp": "2025-12-26T23:05:24.276467",
+      "details": null
+    },
+    {
+      "test": "Pass Play Submission",
+      "success": true,
+      "message": "Pass play recorded correctly with QB/receiver names and drive stats accumulated",
+      "timestamp": "2025-12-26T23:05:24.341553",
+      "details": null
+    },
+    {
+      "test": "Touchdown Scenario",
+      "success": true,
+      "message": "Touchdown (+6), Extra Point (+1), and Kickoff workflow triggered correctly",
+      "timestamp": "2025-12-26T23:05:24.422207",
+      "details": null
+    },
+    {
+      "test": "Drive Ending Scenarios",
+      "success": false,
+      "message": "No completed drives found: 0 total drives",
+      "timestamp": "2025-12-26T23:05:24.432494",
+      "details": null
+    },
+    {
+      "test": "Public Stats Sync",
+      "success": false,
+      "message": "Drive data not available on public page",
+      "timestamp": "2025-12-26T23:05:24.442814",
+      "details": null
+    }
+  ]
+}
