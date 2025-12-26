@@ -592,7 +592,7 @@ function KickoffWorkflowDialog({
                   Out of Bounds
                 </Button>
                 <Button
-                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchdown', returnedTo: 0 }))}
+                  onClick={() => setKickoffData(prev => ({ ...prev, specialResult: 'touchdown', returnedTo: 100 }))}
                   className={`${kickoffData.specialResult === 'touchdown' ? 'bg-green-600' : 'bg-zinc-700 hover:bg-zinc-600'}`}
                 >
                   Touchdown
@@ -600,13 +600,27 @@ function KickoffWorkflowDialog({
               </div>
             </div>
             
-            {/* Returned To - Only show for regular return */}
+            {/* Returned To - Only show for regular return - use full 100 yard scale */}
             {!kickoffData.specialResult && (
-              <YardLineSelector
-                label="Returned To (Yard Line)"
-                value={kickoffData.returnedTo || 25}
-                onChange={(val) => setKickoffData(prev => ({ ...prev, returnedTo: val }))}
-              />
+              <>
+                <YardLineSelector
+                  label="Returned To (Full Field - 0 to 100)"
+                  value={kickoffData.returnedTo || 25}
+                  onChange={(val) => setKickoffData(prev => ({ ...prev, returnedTo: val }))}
+                  maxYards={100}
+                  showSide={true}
+                />
+                {/* Show calculated return yards */}
+                <div className="bg-zinc-800 rounded-lg p-3 text-center">
+                  <div className="text-xs text-zinc-400 uppercase">Return Yards</div>
+                  <div className="text-2xl font-bold text-green-400">
+                    {Math.abs((kickoffData.returnedTo || 25) - (kickoffData.fieldedAt || 5))} yards
+                  </div>
+                  <div className="text-xs text-zinc-500">
+                    (From {kickoffData.fieldedAt || 5} to {kickoffData.returnedTo || 25})
+                  </div>
+                </div>
+              </>
             )}
           </div>
           
