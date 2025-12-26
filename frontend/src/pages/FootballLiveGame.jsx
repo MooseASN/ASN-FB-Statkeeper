@@ -1417,87 +1417,634 @@ export default function FootballLiveGame({ user, onLogout }) {
             {/* Play Result Selection */}
             {selectedPlayType && (
               <div className="bg-zinc-900 rounded-lg p-4">
-                <div className="text-xs text-zinc-500 uppercase tracking-wide mb-3">
-                  {PLAY_TYPES.find(p => p.id === selectedPlayType)?.label} Result
-                </div>
-                <div className="grid grid-cols-4 gap-2">
-                  {PLAY_RESULTS[selectedPlayType]?.map((result) => (
-                    <button
-                      key={result.id}
-                      onClick={() => setSelectedResult(result.id)}
-                      className={`py-2 px-3 rounded text-sm font-medium transition-all ${
-                        selectedResult === result.id 
-                          ? 'bg-blue-600 text-white' 
-                          : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
-                      }`}
-                    >
-                      {result.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Yardage Input */}
-                {selectedResult && !['incomplete', 'dropped', 'broken_up', 'no_good', 'good'].includes(selectedResult) && (
-                  <div className="mt-4 flex items-center justify-center gap-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-zinc-600"
-                      onClick={() => setYards(prev => prev - 5)}
-                    >
-                      -5
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-zinc-600"
-                      onClick={() => setYards(prev => prev - 1)}
-                    >
-                      -1
-                    </Button>
-                    <div className="px-6 py-2 bg-zinc-800 rounded text-center min-w-[100px]">
-                      <div className="text-xs text-zinc-500">Yards</div>
-                      <div className="text-2xl font-bold text-yellow-400">{yards}</div>
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-zinc-600"
-                      onClick={() => setYards(prev => prev + 1)}
-                    >
-                      +1
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="border-zinc-600"
-                      onClick={() => setYards(prev => prev + 5)}
-                    >
-                      +5
-                    </Button>
+                {/* RUN PLAY WORKFLOW */}
+                {selectedPlayType === 'run' && (
+                  <div className="space-y-4">
+                    <div className="text-lg font-bold text-green-400 mb-2">RUN PLAY</div>
+                    
+                    {/* Step 1: Select Ball Carrier */}
+                    {playStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Select Ball Carrier</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={runCarrierNumber || ''}
+                            onChange={(e) => setRunCarrierNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            onKeyPress={(e) => e.key === 'Enter' && runCarrierNumber && setPlayStep(1)}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => { setRunCarrierNumber(player.number); setPlayStep(1); }}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  runCarrierNumber == player.number 
+                                    ? 'bg-green-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => setPlayStep(1)} 
+                          disabled={!runCarrierNumber}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Continue →
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Select Result & Yards */}
+                    {playStep === 1 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Ball Carrier: <span className="text-green-400 font-bold">#{runCarrierNumber}</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Result</div>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: 'gain', label: 'Gain', color: 'bg-green-600' },
+                            { id: 'no_gain', label: 'No Gain', color: 'bg-zinc-600' },
+                            { id: 'loss', label: 'Loss', color: 'bg-red-600' },
+                            { id: 'touchdown', label: 'Touchdown', color: 'bg-yellow-500' },
+                            { id: 'fumble_rec', label: 'Fumble/Rec', color: 'bg-orange-600' },
+                            { id: 'fumble_lost', label: 'Fumble/Lost', color: 'bg-red-700' },
+                          ].map((result) => (
+                            <button
+                              key={result.id}
+                              onClick={() => setSelectedResult(result.id)}
+                              className={`py-2 px-4 rounded font-medium ${
+                                selectedResult === result.id ? result.color + ' text-white' : 'bg-zinc-700 hover:bg-zinc-600'
+                              }`}
+                            >
+                              {result.label}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        {/* Yards */}
+                        {selectedResult && selectedResult !== 'no_gain' && (
+                          <div className="flex items-center justify-center gap-3 mt-4">
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 5)}>-5</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 1)}>-1</Button>
+                            <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                              <div className="text-xs text-zinc-500">Yards</div>
+                              <div className="text-2xl font-bold text-yellow-400">{yards}</div>
+                            </div>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev + 1)}>+1</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev + 5)}>+5</Button>
+                          </div>
+                        )}
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(2)} 
+                            disabled={!selectedResult}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            Continue →
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Select Tackler */}
+                    {playStep === 2 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{runCarrierNumber} - {selectedResult} for {yards} yards
+                          {yards >= distance && <span className="text-green-400 ml-2 font-bold">FIRST DOWN!</span>}
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Tackler</div>
+                        <Button 
+                          onClick={() => { setRunTacklerNumber(null); handleSubmitRunPlay(); }}
+                          className="w-full bg-zinc-700 hover:bg-zinc-600 mb-2"
+                        >
+                          No Tackle / Not Recorded
+                        </Button>
+                        
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={runTacklerNumber || ''}
+                            onChange={(e) => setRunTacklerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setRunTacklerNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  runTacklerNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(1)}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitRunPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
+                
+                {/* PASS PLAY WORKFLOW */}
+                {selectedPlayType === 'pass' && (
+                  <div className="space-y-4">
+                    <div className="text-lg font-bold text-blue-400 mb-2">PASS PLAY</div>
+                    
+                    {/* Step 1: Select QB */}
+                    {playStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Select Quarterback</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passQBNumber || ''}
+                            onChange={(e) => setPassQBNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            onKeyPress={(e) => e.key === 'Enter' && passQBNumber && setPlayStep(1)}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => { setPassQBNumber(player.number); setPlayStep(1); }}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passQBNumber == player.number 
+                                    ? 'bg-blue-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => setPlayStep(1)} 
+                          disabled={!passQBNumber}
+                          className="bg-blue-600 hover:bg-blue-700"
+                        >
+                          Continue →
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Select Result */}
+                    {playStep === 1 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: <span className="text-blue-400 font-bold">#{passQBNumber}</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Result</div>
+                        <div className="flex flex-wrap gap-2">
+                          {[
+                            { id: 'complete', label: 'Complete', color: 'bg-green-600' },
+                            { id: 'incomplete', label: 'Incomplete', color: 'bg-zinc-600' },
+                            { id: 'touchdown', label: 'Touchdown', color: 'bg-yellow-500' },
+                            { id: 'sacked', label: 'Sacked', color: 'bg-red-600' },
+                            { id: 'intercepted', label: 'Intercepted', color: 'bg-red-700' },
+                            { id: 'dropped', label: 'Dropped', color: 'bg-orange-600' },
+                            { id: 'broken_up', label: 'Broken Up', color: 'bg-purple-600' },
+                          ].map((result) => (
+                            <button
+                              key={result.id}
+                              onClick={() => { setSelectedResult(result.id); setPlayStep(2); }}
+                              className={`py-2 px-4 rounded font-medium ${
+                                selectedResult === result.id ? result.color + ' text-white' : 'bg-zinc-700 hover:bg-zinc-600'
+                              }`}
+                            >
+                              {result.label}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Complete/Touchdown - Select Receiver & Yards */}
+                    {playStep === 2 && ['complete', 'touchdown'].includes(selectedResult) && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: #{passQBNumber} - <span className={selectedResult === 'touchdown' ? 'text-yellow-400' : 'text-green-400'}>{selectedResult.toUpperCase()}</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Receiver</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passReceiverNumber || ''}
+                            onChange={(e) => setPassReceiverNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPassReceiverNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passReceiverNumber == player.number 
+                                    ? 'bg-green-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Yards */}
+                        <div className="flex items-center justify-center gap-3 mt-4">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 5)}>-5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 1)}>-1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Yards</div>
+                            <div className="text-2xl font-bold text-yellow-400">{yards}</div>
+                            {yards >= distance && <div className="text-xs text-green-400 font-bold">FIRST DOWN!</div>}
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev + 1)}>+1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev + 5)}>+5</Button>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(1); }}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(3)}
+                            disabled={!passReceiverNumber}
+                            className="bg-green-600 hover:bg-green-700"
+                          >
+                            Continue →
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Sacked - Select Defender & Yards Lost */}
+                    {playStep === 2 && selectedResult === 'sacked' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: #{passQBNumber} - <span className="text-red-400">SACKED</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Defender (Sack by)</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passDefenderNumber || ''}
+                            onChange={(e) => setPassDefenderNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPassDefenderNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passDefenderNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Yards Lost */}
+                        <div className="flex items-center justify-center gap-3 mt-4">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => Math.min(0, prev + 1))}>+1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Yards Lost</div>
+                            <div className="text-2xl font-bold text-red-400">{Math.abs(yards)}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 1)}>-1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 5)}>-5</Button>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(1); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPassPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Intercepted - Select Defender & Return */}
+                    {playStep === 2 && selectedResult === 'intercepted' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: #{passQBNumber} - <span className="text-red-400">INTERCEPTED</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Interceptor</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passDefenderNumber || ''}
+                            onChange={(e) => setPassDefenderNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPassDefenderNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passDefenderNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Return Yards */}
+                        <div className="text-sm text-zinc-400 uppercase mt-4">Return Yards</div>
+                        <div className="flex items-center justify-center gap-3">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setInterceptionReturnYards(prev => Math.max(0, prev - 5))}>-5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setInterceptionReturnYards(prev => Math.max(0, prev - 1))}>-1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Return</div>
+                            <div className="text-2xl font-bold text-yellow-400">{interceptionReturnYards}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setInterceptionReturnYards(prev => prev + 1)}>+1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setInterceptionReturnYards(prev => prev + 5)}>+5</Button>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(1); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPassPlay}
+                            disabled={!passDefenderNumber}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Dropped - Select Target */}
+                    {playStep === 2 && selectedResult === 'dropped' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: #{passQBNumber} - <span className="text-orange-400">DROPPED PASS</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Targeted Receiver</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passReceiverNumber || ''}
+                            onChange={(e) => setPassReceiverNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPassReceiverNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passReceiverNumber == player.number 
+                                    ? 'bg-orange-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(1); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPassPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Broken Up - Select Defender */}
+                    {playStep === 2 && selectedResult === 'broken_up' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: #{passQBNumber} - <span className="text-purple-400">PASS BROKEN UP</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Defender (Broken Up By)</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passDefenderNumber || ''}
+                            onChange={(e) => setPassDefenderNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPassDefenderNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passDefenderNumber == player.number 
+                                    ? 'bg-purple-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(1); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPassPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Incomplete */}
+                    {playStep === 2 && selectedResult === 'incomplete' && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          QB: #{passQBNumber} - <span className="text-zinc-400">INCOMPLETE</span>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(1); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPassPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 4: Tackler for Complete/TD */}
+                    {playStep === 3 && ['complete', 'touchdown'].includes(selectedResult) && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{passQBNumber} → #{passReceiverNumber} for {yards} yards
+                          {yards >= distance && <span className="text-green-400 ml-2 font-bold">FIRST DOWN!</span>}
+                          {selectedResult === 'touchdown' && <span className="text-yellow-400 ml-2 font-bold">TOUCHDOWN!</span>}
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Tackler</div>
+                        <Button 
+                          onClick={() => { setPassDefenderNumber(null); handleSubmitPassPlay(); }}
+                          className="w-full bg-zinc-700 hover:bg-zinc-600 mb-2"
+                        >
+                          No Tackle / Not Recorded
+                        </Button>
+                        
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={passDefenderNumber || ''}
+                            onChange={(e) => setPassDefenderNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPassDefenderNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  passDefenderNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(2)}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPassPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* OTHER PLAY TYPES - Keep original simple flow */}
+                {!['run', 'pass'].includes(selectedPlayType) && (
+                  <>
+                    <div className="text-xs text-zinc-500 uppercase tracking-wide mb-3">
+                      {PLAY_TYPES.find(p => p.id === selectedPlayType)?.label} Result
+                    </div>
+                    <div className="grid grid-cols-4 gap-2">
+                      {PLAY_RESULTS[selectedPlayType]?.map((result) => (
+                        <button
+                          key={result.id}
+                          onClick={() => setSelectedResult(result.id)}
+                          className={`py-2 px-3 rounded text-sm font-medium transition-all ${
+                            selectedResult === result.id 
+                              ? 'bg-blue-600 text-white' 
+                              : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700'
+                          }`}
+                        >
+                          {result.label}
+                        </button>
+                      ))}
+                    </div>
 
-                {/* Submit Button */}
-                <div className="mt-4 flex justify-center gap-2">
-                  <Button
-                    variant="outline"
-                    className="border-zinc-600 text-zinc-300"
-                    onClick={() => {
-                      setSelectedPlayType(null);
-                      setSelectedResult(null);
-                      setYards(0);
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    className="bg-green-600 hover:bg-green-700 px-8"
-                    onClick={handleSubmitPlay}
-                    disabled={!selectedResult}
-                  >
-                    Submit Play
-                  </Button>
+                    {/* Yardage Input */}
+                    {selectedResult && !['incomplete', 'dropped', 'broken_up', 'no_good', 'good'].includes(selectedResult) && (
+                      <div className="mt-4 flex items-center justify-center gap-4">
+                        <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 5)}>-5</Button>
+                        <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev - 1)}>-1</Button>
+                        <div className="px-6 py-2 bg-zinc-800 rounded text-center min-w-[100px]">
+                          <div className="text-xs text-zinc-500">Yards</div>
+                          <div className="text-2xl font-bold text-yellow-400">{yards}</div>
+                        </div>
+                        <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev + 1)}>+1</Button>
+                        <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setYards(prev => prev + 5)}>+5</Button>
+                      </div>
+                    )}
+
+                    {/* Submit Button */}
+                    <div className="mt-4 flex justify-center gap-2">
+                      <Button
+                        variant="outline"
+                        className="border-zinc-600 text-zinc-300"
+                        onClick={() => {
+                          setSelectedPlayType(null);
+                          setSelectedResult(null);
+                          setYards(0);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        className="bg-green-600 hover:bg-green-700 px-8"
+                        onClick={handleSubmitPlay}
+                        disabled={!selectedResult}
+                      >
+                        Submit Play
+                      </Button>
                 </div>
               </div>
             )}
