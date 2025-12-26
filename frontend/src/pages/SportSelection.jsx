@@ -2,13 +2,22 @@ import { useNavigate } from "react-router-dom";
 import { useSport, SPORTS, SPORT_CONFIG } from "@/contexts/SportContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogOut } from "lucide-react";
+import { LogOut, Lock } from "lucide-react";
+
+// Users allowed to access Football
+const FOOTBALL_ALLOWED_EMAILS = ["antlersportsnetwork@gmail.com"];
 
 export default function SportSelection({ user, onLogout }) {
   const navigate = useNavigate();
   const { selectSport } = useSport();
 
+  // Check if user can access football
+  const canAccessFootball = FOOTBALL_ALLOWED_EMAILS.includes(user?.email?.toLowerCase());
+
   const handleSelectSport = (sport) => {
+    if (sport === SPORTS.FOOTBALL && !canAccessFootball) {
+      return; // Don't allow selection
+    }
     selectSport(sport);
     navigate("/");
   };
