@@ -108,6 +108,7 @@ export default function NewGame({ user, onLogout }) {
         simple_mode: statMode === "simple",
         advanced_mode: statMode === "advanced",
         note: gameNote || null,
+        sport: selectedSport,
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
