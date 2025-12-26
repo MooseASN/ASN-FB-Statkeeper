@@ -453,6 +453,206 @@ async def verify_reset_token(token: str):
     
     return {"valid": True}
 
+# ============ ACCOUNT SETTINGS ENDPOINTS ============
+
+@api_router.get("/account/security-question")
+async def get_my_security_question(user: User = Depends(get_current_user)):
+    """Get a random security question for the current user (for account changes)"""
+    import random
+    
+    user_data = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    security_questions = user_data.get("security_questions", [])
+    if not security_questions:
+        return {"question": None, "has_questions": False, "message": "No security questions set for this account"}
+    
+    # Return a random question
+    selected = random.choice(security_questions)
+    return {"question": selected["question"], "has_questions": True}
+
+@api_router.post("/account/verify-security")
+async def verify_my_security_question(data: VerifySecurityRequest, user: User = Depends(get_current_user)):
+    """Verify security question answer for account changes"""
+    user_data = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    security_questions = user_data.get("security_questions", [])
+    
+    # Check answer against all questions (we don't know which one was asked)
+    answer_verified = False
+    for sq in security_questions:
+        if pwd_context.verify(data.answer.lower().strip(), sq["answer_hash"]):
+            answer_verified = True
+            break
+    
+    if not answer_verified:
+        raise HTTPException(status_code=400, detail="Invalid security answer")
+    
+    return {"verified": True, "message": "Security question verified"}
+
+@api_router.get("/account/profile")
+async def get_account_profile(user: User = Depends(get_current_user)):
+    """Get full account profile including security question info"""
+    user_data = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    security_questions = user_data.get("security_questions", [])
+    
+    return {
+        "user_id": user_data["user_id"],
+        "email": user_data["email"],
+        "username": user_data.get("username", ""),
+        "name": user_data.get("name", ""),
+        "picture": user_data.get("picture"),
+        "auth_provider": user_data.get("auth_provider", "local"),
+        "has_security_questions": len(security_questions) > 0,
+        "security_question_count": len(security_questions),
+        "created_at": user_data.get("created_at", "")
+    }
+
+@api_router.put("/account/username")
+async def update_username(data: UpdateUsernameRequest, user: User = Depends(get_current_user)):
+    """Update username with security verification"""
+    user_data = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_data.get("auth_provider") == "google":
+        raise HTTPException(status_code=400, detail="Google accounts cannot change username")
+    
+    # Verify security answer
+    security_questions = user_data.get("security_questions", [])
+    answer_verified = False
+    for sq in security_questions:
+        if pwd_context.verify(data.security_answer.lower().strip(), sq["answer_hash"]):
+            answer_verified = True
+            break
+    
+    if not answer_verified:
+        raise HTTPException(status_code=400, detail="Invalid security answer")
+    
+    # Check if username is already taken
+    new_username = data.new_username.lower().strip()
+    if len(new_username) < 3:
+        raise HTTPException(status_code=400, detail="Username must be at least 3 characters")
+    
+    existing = await db.users.find_one({"username": new_username, "user_id": {"$ne": user.user_id}}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Username already taken")
+    
+    # Update username
+    await db.users.update_one(
+        {"user_id": user.user_id},
+        {"$set": {"username": new_username}}
+    )
+    
+    return {"message": "Username updated successfully", "username": new_username}
+
+@api_router.put("/account/email")
+async def update_email(data: UpdateEmailRequest, user: User = Depends(get_current_user)):
+    """Update email with security verification"""
+    user_data = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_data.get("auth_provider") == "google":
+        raise HTTPException(status_code=400, detail="Google accounts cannot change email")
+    
+    # Verify security answer
+    security_questions = user_data.get("security_questions", [])
+    answer_verified = False
+    for sq in security_questions:
+        if pwd_context.verify(data.security_answer.lower().strip(), sq["answer_hash"]):
+            answer_verified = True
+            break
+    
+    if not answer_verified:
+        raise HTTPException(status_code=400, detail="Invalid security answer")
+    
+    # Validate email format
+    new_email = data.new_email.lower().strip()
+    if "@" not in new_email or "." not in new_email:
+        raise HTTPException(status_code=400, detail="Invalid email format")
+    
+    # Check if email is already taken
+    existing = await db.users.find_one({"email": new_email, "user_id": {"$ne": user.user_id}}, {"_id": 0})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Update email
+    await db.users.update_one(
+        {"user_id": user.user_id},
+        {"$set": {"email": new_email}}
+    )
+    
+    return {"message": "Email updated successfully", "email": new_email}
+
+@api_router.put("/account/password")
+async def update_password(data: UpdatePasswordRequest, user: User = Depends(get_current_user)):
+    """Update password with current password and security verification"""
+    user_data = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    
+    if not user_data:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if user_data.get("auth_provider") == "google":
+        raise HTTPException(status_code=400, detail="Google accounts cannot change password")
+    
+    # Verify current password
+    if not pwd_context.verify(data.current_password, user_data.get("password_hash", "")):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    
+    # Verify security answer
+    security_questions = user_data.get("security_questions", [])
+    answer_verified = False
+    for sq in security_questions:
+        if pwd_context.verify(data.security_answer.lower().strip(), sq["answer_hash"]):
+            answer_verified = True
+            break
+    
+    if not answer_verified:
+        raise HTTPException(status_code=400, detail="Invalid security answer")
+    
+    # Validate new password
+    if len(data.new_password) < 6:
+        raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
+    
+    # Update password
+    hashed_password = pwd_context.hash(data.new_password)
+    await db.users.update_one(
+        {"user_id": user.user_id},
+        {"$set": {"password_hash": hashed_password}}
+    )
+    
+    # Invalidate all other sessions for security
+    await db.user_sessions.delete_many({"user_id": user.user_id})
+    
+    return {"message": "Password updated successfully. Please log in again."}
+
+@api_router.put("/account/name")
+async def update_display_name(data: dict, user: User = Depends(get_current_user)):
+    """Update display name (no security verification needed)"""
+    new_name = data.get("name", "").strip()
+    
+    if not new_name:
+        raise HTTPException(status_code=400, detail="Name cannot be empty")
+    
+    await db.users.update_one(
+        {"user_id": user.user_id},
+        {"$set": {"name": new_name}}
+    )
+    
+    return {"message": "Name updated successfully", "name": new_name}
+
 # ============ DATA MODELS ============
 
 class Player(BaseModel):
