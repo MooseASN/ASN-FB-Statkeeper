@@ -22,7 +22,6 @@ import {
   ChevronRight,
   Undo2,
   Share2,
-  TrendingUp
 } from "lucide-react";
 import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
 import { RULESETS } from "@/data/penaltyCatalog";
