@@ -151,8 +151,10 @@ export default function Teams({ user, onLogout }) {
       <div className="space-y-6" data-testid="teams-page">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000]">Teams</h1>
-            <p className="text-muted-foreground">Manage your basketball teams and rosters</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-[#000000] flex items-center gap-2">
+              <span>{sportConfig.icon}</span> Teams
+            </h1>
+            <p className="text-muted-foreground">Manage your {sportConfig.name.toLowerCase()} teams and rosters</p>
           </div>
           
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -164,7 +166,7 @@ export default function Teams({ user, onLogout }) {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Create New Team</DialogTitle>
+                <DialogTitle>Create New {sportConfig.name} Team</DialogTitle>
               </DialogHeader>
               <div className="space-y-4 pt-4">
                 <div>
