@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import axios from "axios";
+import { SportProvider, useSport } from "@/contexts/SportContext";
+import SportSelection from "@/pages/SportSelection";
 import Dashboard from "@/pages/Dashboard";
 import Teams from "@/pages/Teams";
 import TeamDetail from "@/pages/TeamDetail";
@@ -41,6 +43,7 @@ const clearAuth = () => {
   localStorage.removeItem("remember_me");
   sessionStorage.removeItem("session_token");
   sessionStorage.removeItem("user");
+  sessionStorage.removeItem("selected_sport");
 };
 
 // Configure axios to send credentials and auth header
@@ -53,12 +56,73 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
-// Protected route wrapper
+// Protected route wrapper - requires auth
 function ProtectedRoute({ children, user }) {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
   return children;
+}
+
+// Sport-protected route - requires auth AND sport selection
+function SportProtectedRoute({ children, user }) {
+  const { selectedSport } = useSport();
+  
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (!selectedSport) {
+    return <Navigate to="/select-sport" replace />;
+  }
+  
+  return children;
+}
+
+function AppRoutes({ user, onLogin, onLogout }) {
+  const { selectedSport, clearSport } = useSport();
+
+  const handleLogout = async () => {
+    clearSport(); // Clear sport selection on logout
+    await onLogout();
+  };
+
+  return (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/login" element={user ? <Navigate to="/select-sport" replace /> : <Login onLogin={onLogin} />} />
+      <Route path="/register" element={user ? <Navigate to="/select-sport" replace /> : <Register onLogin={onLogin} />} />
+      <Route path="/forgot-password" element={user ? <Navigate to="/select-sport" replace /> : <ForgotPassword />} />
+      <Route path="/reset-password" element={user ? <Navigate to="/select-sport" replace /> : <ResetPassword />} />
+      
+      {/* Sport selection - requires auth but not sport */}
+      <Route path="/select-sport" element={
+        <ProtectedRoute user={user}>
+          <SportSelection user={user} onLogout={handleLogout} />
+        </ProtectedRoute>
+      } />
+      
+      {/* Protected routes - require both auth and sport selection */}
+      <Route path="/" element={<SportProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/events" element={<SportProtectedRoute user={user}><Events user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/events/:id" element={<SportProtectedRoute user={user}><EventDetail user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/teams" element={<SportProtectedRoute user={user}><Teams user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/teams/:id" element={<SportProtectedRoute user={user}><TeamDetail user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/new-game" element={<SportProtectedRoute user={user}><NewGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/edit-game/:id" element={<SportProtectedRoute user={user}><EditGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/game/:id" element={<SportProtectedRoute user={user}><LiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/game/:id/advanced" element={<SportProtectedRoute user={user}><AdvancedLiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/history" element={<SportProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      
+      {/* Public shareable live stats view */}
+      <Route path="/live/:shareCode" element={<LiveView />} />
+      <Route path="/event/:eventId/live" element={<EventLive />} />
+      
+      {/* Embed view is public - for external embedding */}
+      <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
+      <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
+    </Routes>
+  );
 }
 
 function App() {
@@ -111,36 +175,11 @@ function App() {
 
   return (
     <div className="app-container">
-      <BrowserRouter>
-        <Routes>
-          {/* Public routes */}
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={handleLogin} />} />
-          <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={handleLogin} />} />
-          <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPassword />} />
-          <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPassword />} />
-          
-          {/* Protected routes */}
-          <Route path="/" element={<ProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/events" element={<ProtectedRoute user={user}><Events user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/events/:id" element={<ProtectedRoute user={user}><EventDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/teams" element={<ProtectedRoute user={user}><Teams user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/teams/:id" element={<ProtectedRoute user={user}><TeamDetail user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/new-game" element={<ProtectedRoute user={user}><NewGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/edit-game/:id" element={<ProtectedRoute user={user}><EditGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/game/:id" element={<ProtectedRoute user={user}><LiveGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/game/:id/advanced" element={<ProtectedRoute user={user}><AdvancedLiveGame user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          <Route path="/history" element={<ProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></ProtectedRoute>} />
-          
-          {/* Live view is now protected - only owner can see */}
-          {/* Public shareable live stats view */}
-          <Route path="/live/:shareCode" element={<LiveView />} />
-          <Route path="/event/:eventId/live" element={<EventLive />} />
-          
-          {/* Embed view is public - for external embedding */}
-          <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
-          <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
-        </Routes>
-      </BrowserRouter>
+      <SportProvider>
+        <BrowserRouter>
+          <AppRoutes user={user} onLogin={handleLogin} onLogout={handleLogout} />
+        </BrowserRouter>
+      </SportProvider>
       <Toaster position="top-right" duration={1500} dismissible={true} />
     </div>
   );
