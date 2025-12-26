@@ -2726,6 +2726,15 @@ export default function FootballLiveGame({ user, onLogout }) {
           </div>
           <div className="flex items-center gap-2">
             <Button
+              variant="ghost"
+              size="sm"
+              className="text-zinc-400 hover:text-white"
+              onClick={() => setShowHelpDialog(true)}
+              title="Keyboard shortcuts (?)"
+            >
+              <HelpCircle className="w-4 h-4" />
+            </Button>
+            <Button
               variant="outline"
               size="sm"
               className="border-zinc-600 text-zinc-300 hover:text-white"
