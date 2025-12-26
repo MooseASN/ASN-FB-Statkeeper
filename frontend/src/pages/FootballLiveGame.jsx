@@ -889,6 +889,79 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [tempClockMinutes, setTempClockMinutes] = useState(15);
   const [tempClockSeconds, setTempClockSeconds] = useState(0);
 
+  // Help dialog
+  const [showHelpDialog, setShowHelpDialog] = useState(false);
+
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      switch (e.key.toLowerCase()) {
+        case '\\':
+          e.preventDefault();
+          setClockRunning(prev => !prev);
+          break;
+        case 'r':
+          e.preventDefault();
+          setSelectedPlayType('run');
+          setPlayStep(1);
+          break;
+        case 'p':
+          e.preventDefault();
+          setSelectedPlayType('pass');
+          setPlayStep(1);
+          break;
+        case 'u':
+          e.preventDefault();
+          setShowPuntWorkflow(true);
+          setPuntStep(1);
+          break;
+        case 'k':
+          e.preventDefault();
+          setShowKickoffTeamDialog(true);
+          break;
+        case 'f':
+          e.preventDefault();
+          if (e.shiftKey) {
+            // Shift+F for Personal Foul
+            setShowPenaltyDialog(true);
+          } else {
+            // F for Field Goal
+            setShowFieldGoalWorkflow(true);
+            setFieldGoalStep(1);
+          }
+          break;
+        case 'e':
+          e.preventDefault();
+          setShowExtraPointWorkflow(true);
+          setExtraPointStep(1);
+          break;
+        case 'g':
+          e.preventDefault();
+          setShowPenaltyDialog(true);
+          break;
+        case 't':
+          e.preventDefault();
+          setShowTimeoutDialog(true);
+          break;
+        case '?':
+          e.preventDefault();
+          setShowHelpDialog(true);
+          break;
+        case 'escape':
+          resetPlayState();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Clock countdown effect - also updates drive time of possession
   useEffect(() => {
     let interval = null;
