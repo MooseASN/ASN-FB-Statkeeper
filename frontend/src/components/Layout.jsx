@@ -130,6 +130,15 @@ export default function Layout({ children, user, onLogout }) {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    {ADMIN_EMAILS.includes(user.email?.toLowerCase()) && (
+                      <>
+                        <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer text-amber-600">
+                          <Shield className="w-4 h-4 mr-2" />
+                          Admin Dashboard
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
                     <DropdownMenuItem onClick={() => navigate("/account")} className="cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" />
                       Account Settings
