@@ -492,10 +492,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "XML Box Score Export"
-    - "Email Box Score"
-    - "Starter Selection with Small Rosters"
-    - "Stat Reversal on Play Edit"
+    - "Drive Tracking Integration"
+    - "Punt Workflow Revision"
+    - "Penalty Workflow Revision"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
