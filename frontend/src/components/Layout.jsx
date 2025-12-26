@@ -36,7 +36,6 @@ export default function Layout({ children, user, onLogout }) {
                   alt="StatMoose" 
                   className="w-8 h-8 object-contain"
                 />
-                <span className="text-xl font-bold text-[#000000] hidden sm:block">StatMoose</span>
               </Link>
               
               {/* Sport Badge with Switch Button */}
