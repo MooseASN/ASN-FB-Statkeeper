@@ -1912,6 +1912,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     setPenaltyTeam(null);
     setPenaltyYards(5);
     setPenaltyDescription('');
+    setPenaltyPlayerNumber(null);
   };
 
   // Handle Punt Play submission
