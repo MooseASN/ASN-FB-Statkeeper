@@ -940,7 +940,9 @@ export default function FootballLiveGame({ user, onLogout }) {
         home_timeouts: homeTimeouts,
         away_timeouts: awayTimeouts,
         play_log: newPlayLog,
-        clock_time: clockTime
+        clock_time: clockTime,
+        home_time_of_possession: homeTimeOfPossession,
+        away_time_of_possession: awayTimeOfPossession
       };
       
       await axios.put(`${API}/games/${id}`, {
