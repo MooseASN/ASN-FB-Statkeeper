@@ -1611,11 +1611,12 @@ async def get_event_public(event_id: str):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    # Get all games for this event with their scores and recaps
+    # Get all games for this event with their scores and recaps (batch query optimized)
+    game_ids = event.get("game_ids", [])
+    raw_games = await db.games.find({"id": {"$in": game_ids}}, {"_id": 0}).to_list(None) if game_ids else []
+    
     games = []
-    for game_id in event.get("game_ids", []):
-        game = await db.games.find_one({"id": game_id}, {"_id": 0})
-        if game:
+    for game in raw_games:
             # Calculate scores
             home_score = sum(game.get("quarter_scores", {}).get("home", [0, 0, 0, 0]))
             away_score = sum(game.get("quarter_scores", {}).get("away", [0, 0, 0, 0]))
