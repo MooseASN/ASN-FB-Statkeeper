@@ -3732,7 +3732,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                   Undo
                 </Button>
               </div>
-              <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              <div className="space-y-2 max-h-[500px] overflow-y-auto">
                 {playLog.length === 0 ? (
                   <div className="text-zinc-600 text-sm text-center py-8">
                     No plays recorded yet
@@ -3741,23 +3741,111 @@ export default function FootballLiveGame({ user, onLogout }) {
                   playLog.map((play) => (
                     <div
                       key={play.id}
-                      className="bg-zinc-800 rounded p-2 text-sm"
+                      className={`bg-zinc-800 rounded p-2 text-sm ${editingPlayId === play.id ? 'ring-2 ring-blue-500' : 'hover:bg-zinc-750 cursor-pointer'}`}
+                      onClick={() => editingPlayId !== play.id && handleEditPlay(play)}
                     >
-                      <div className="flex items-center justify-between text-zinc-500 text-xs mb-1">
-                        <span>Q{play.quarter} • {play.clock}</span>
-                        <span 
-                          className="font-bold"
-                          style={{ color: play.team === 'home' ? homeColor : awayColor }}
-                        >
-                          {play.team === 'home' ? homeTeamName?.substring(0, 3).toUpperCase() : awayTeamName?.substring(0, 3).toUpperCase()}
-                        </span>
-                      </div>
-                      <div className="text-zinc-300">{play.description}</div>
-                      {play.ball_on && (
-                        <div className="text-zinc-500 text-xs mt-1">
-                          {play.down && `${play.down === 1 ? '1st' : play.down === 2 ? '2nd' : play.down === 3 ? '3rd' : '4th'} & ${play.distance || 10} • `}
-                          {play.ball_on}
+                      {editingPlayId === play.id ? (
+                        // Edit Mode
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={editPlayData?.quarter || 1}
+                              onChange={(e) => setEditPlayData(prev => ({ ...prev, quarter: parseInt(e.target.value) }))}
+                              className="bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs"
+                            >
+                              {[1, 2, 3, 4].map(q => <option key={q} value={q}>Q{q}</option>)}
+                            </select>
+                            <input
+                              type="text"
+                              value={editPlayData?.clock || ''}
+                              onChange={(e) => setEditPlayData(prev => ({ ...prev, clock: e.target.value }))}
+                              className="bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs w-16"
+                              placeholder="12:00"
+                            />
+                            <select
+                              value={editPlayData?.team || 'home'}
+                              onChange={(e) => setEditPlayData(prev => ({ ...prev, team: e.target.value }))}
+                              className="bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs"
+                            >
+                              <option value="home">{homeTeamName}</option>
+                              <option value="away">{awayTeamName}</option>
+                              <option value="none">None</option>
+                            </select>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <select
+                              value={editPlayData?.type || 'run'}
+                              onChange={(e) => setEditPlayData(prev => ({ ...prev, type: e.target.value }))}
+                              className="bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs"
+                            >
+                              <option value="run">Run</option>
+                              <option value="pass">Pass</option>
+                              <option value="punt">Punt</option>
+                              <option value="kickoff">Kickoff</option>
+                              <option value="field_goal">Field Goal</option>
+                              <option value="extra_point">Extra Point</option>
+                              <option value="penalty">Penalty</option>
+                              <option value="timeout">Timeout</option>
+                            </select>
+                            <input
+                              type="number"
+                              value={editPlayData?.yards || 0}
+                              onChange={(e) => setEditPlayData(prev => ({ ...prev, yards: parseInt(e.target.value) || 0 }))}
+                              className="bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs w-16"
+                              placeholder="Yards"
+                            />
+                          </div>
+                          <textarea
+                            value={editPlayData?.description || ''}
+                            onChange={(e) => setEditPlayData(prev => ({ ...prev, description: e.target.value }))}
+                            className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs"
+                            rows={2}
+                            placeholder="Play description"
+                          />
+                          <div className="flex gap-1">
+                            <Button size="sm" className="h-6 px-2 text-xs bg-green-600 hover:bg-green-700" onClick={handleSaveEditPlay}>
+                              Save
+                            </Button>
+                            <Button size="sm" variant="outline" className="h-6 px-2 text-xs border-zinc-600" onClick={handleCancelEdit}>
+                              Cancel
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="destructive" 
+                              className="h-6 px-2 text-xs ml-auto"
+                              onClick={() => {
+                                setPlayLog(prev => prev.filter(p => p.id !== editingPlayId));
+                                handleCancelEdit();
+                                toast.success('Play deleted');
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
                         </div>
+                      ) : (
+                        // View Mode
+                        <>
+                          <div className="flex items-center justify-between text-zinc-500 text-xs mb-1">
+                            <span>Q{play.quarter} • {play.clock}</span>
+                            <span 
+                              className="font-bold"
+                              style={{ color: play.team === 'home' ? homeColor : play.team === 'away' ? awayColor : '#888' }}
+                            >
+                              {play.team === 'home' ? homeTeamName?.substring(0, 3).toUpperCase() : play.team === 'away' ? awayTeamName?.substring(0, 3).toUpperCase() : '---'}
+                            </span>
+                          </div>
+                          <div className="text-zinc-300">{play.description}</div>
+                          {play.ball_on && (
+                            <div className="text-zinc-500 text-xs mt-1">
+                              {play.down && `${play.down === 1 ? '1st' : play.down === 2 ? '2nd' : play.down === 3 ? '3rd' : '4th'} & ${play.distance || 10} • `}
+                              {play.ball_on}
+                            </div>
+                          )}
+                          <div className="text-zinc-600 text-[10px] mt-1 opacity-0 hover:opacity-100 transition-opacity">
+                            Click to edit
+                          </div>
+                        </>
                       )}
                     </div>
                   ))
