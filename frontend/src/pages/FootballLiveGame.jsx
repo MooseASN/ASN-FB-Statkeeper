@@ -2570,8 +2570,433 @@ export default function FootballLiveGame({ user, onLogout }) {
                   </div>
                 )}
                 
-                {/* OTHER PLAY TYPES - Keep original simple flow */}
-                {!['run', 'pass'].includes(selectedPlayType) && (
+                {/* PUNT PLAY WORKFLOW */}
+                {selectedPlayType === 'punt' && (
+                  <div className="space-y-4">
+                    <div className="text-lg font-bold text-purple-400 mb-2">PUNT PLAY</div>
+                    
+                    {/* Step 1: Select Punter */}
+                    {playStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Select Punter</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={puntPunterNumber || ''}
+                            onChange={(e) => setPuntPunterNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            onKeyPress={(e) => e.key === 'Enter' && puntPunterNumber && setPlayStep(1)}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => { setPuntPunterNumber(player.number); setPlayStep(1); }}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  puntPunterNumber == player.number 
+                                    ? 'bg-purple-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => setPlayStep(1)} 
+                          disabled={!puntPunterNumber}
+                          className="bg-purple-600 hover:bg-purple-700"
+                        >
+                          Continue →
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Result & Distance */}
+                    {playStep === 1 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Punter: <span className="text-purple-400 font-bold">#{puntPunterNumber}</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Result</div>
+                        <div className="flex flex-wrap gap-2">
+                          {PLAY_RESULTS.punt.map((result) => (
+                            <button
+                              key={result.id}
+                              onClick={() => setSelectedResult(result.id)}
+                              className={`py-2 px-4 rounded font-medium ${
+                                selectedResult === result.id ? 'bg-purple-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'
+                              }`}
+                            >
+                              {result.label}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        {/* Punt Distance */}
+                        {selectedResult && selectedResult !== 'blocked' && (
+                          <div className="flex items-center justify-center gap-3 mt-4">
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => Math.max(0, prev - 5))}>-5</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => Math.max(0, prev - 1))}>-1</Button>
+                            <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                              <div className="text-xs text-zinc-500">Punt Distance</div>
+                              <div className="text-2xl font-bold text-purple-400">{puntDistance}</div>
+                            </div>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => prev + 1)}>+1</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => prev + 5)}>+5</Button>
+                          </div>
+                        )}
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
+                          <Button 
+                            onClick={() => ['touchback', 'blocked'].includes(selectedResult) ? handleSubmitPuntPlay() : setPlayStep(2)}
+                            disabled={!selectedResult}
+                            className="bg-purple-600 hover:bg-purple-700"
+                          >
+                            {['touchback', 'blocked'].includes(selectedResult) ? 'Complete Play ✓' : 'Continue →'}
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Returner & Return Yards */}
+                    {playStep === 2 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          #{puntPunterNumber} punt for {puntDistance} yards - {selectedResult}
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Returner</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={puntReturnerNumber || ''}
+                            onChange={(e) => setPuntReturnerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? awayRoster : homeRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPuntReturnerNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  puntReturnerNumber == player.number 
+                                    ? 'bg-yellow-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        {/* Return Yards */}
+                        {selectedResult !== 'fair_catch' && (
+                          <div className="flex items-center justify-center gap-3 mt-4">
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 5))}>-5</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 1))}>-1</Button>
+                            <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                              <div className="text-xs text-zinc-500">Return Yards</div>
+                              <div className="text-2xl font-bold text-yellow-400">{puntReturnYards}</div>
+                            </div>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 1)}>+1</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 5)}>+5</Button>
+                          </div>
+                        )}
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(1)}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPuntPlay}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* FIELD GOAL WORKFLOW */}
+                {selectedPlayType === 'field_goal' && (
+                  <div className="space-y-4">
+                    <div className="text-lg font-bold text-yellow-400 mb-2">FIELD GOAL</div>
+                    
+                    {/* Step 1: Select Kicker */}
+                    {playStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Select Kicker</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={kickerNumber || ''}
+                            onChange={(e) => setKickerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            onKeyPress={(e) => e.key === 'Enter' && kickerNumber && setPlayStep(1)}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => { setKickerNumber(player.number); setPlayStep(1); }}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  kickerNumber == player.number 
+                                    ? 'bg-yellow-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => setPlayStep(1)} 
+                          disabled={!kickerNumber}
+                          className="bg-yellow-600 hover:bg-yellow-700"
+                        >
+                          Continue →
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Distance & Result */}
+                    {playStep === 1 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Kicker: <span className="text-yellow-400 font-bold">#{kickerNumber}</span>
+                        </div>
+                        
+                        {/* FG Distance */}
+                        <div className="flex items-center justify-center gap-3 mt-4">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => Math.max(17, prev - 5))}>-5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => Math.max(17, prev - 1))}>-1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Distance (yards)</div>
+                            <div className="text-2xl font-bold text-yellow-400">{fgDistance}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => prev + 1)}>+1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setFgDistance(prev => prev + 5)}>+5</Button>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase mt-4">Result</div>
+                        <div className="flex flex-wrap gap-2">
+                          {PLAY_RESULTS.field_goal.map((result) => (
+                            <button
+                              key={result.id}
+                              onClick={() => setSelectedResult(result.id)}
+                              className={`py-2 px-4 rounded font-medium ${
+                                selectedResult === result.id 
+                                  ? result.id === 'good' ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                                  : 'bg-zinc-700 hover:bg-zinc-600'
+                              }`}
+                            >
+                              {result.label}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitFieldGoal}
+                            disabled={!selectedResult}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* EXTRA POINT WORKFLOW */}
+                {selectedPlayType === 'extra_point' && (
+                  <div className="space-y-4">
+                    <div className="text-lg font-bold text-yellow-500 mb-2">EXTRA POINT / 2-PT CONVERSION</div>
+                    
+                    {/* Step 1: Select Kicker (for PAT) */}
+                    {playStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Select Kicker (for PAT) or skip for 2-PT</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={kickerNumber || ''}
+                            onChange={(e) => setKickerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(possession === 'home' ? homeRoster : awayRoster).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setKickerNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  kickerNumber == player.number 
+                                    ? 'bg-yellow-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => setPlayStep(1)} 
+                          className="bg-yellow-600 hover:bg-yellow-700"
+                        >
+                          Continue →
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Result */}
+                    {playStep === 1 && (
+                      <div className="space-y-4">
+                        {kickerNumber && (
+                          <div className="text-sm text-zinc-400">
+                            Kicker: <span className="text-yellow-400 font-bold">#{kickerNumber}</span>
+                          </div>
+                        )}
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Result</div>
+                        <div className="flex flex-wrap gap-2">
+                          {PLAY_RESULTS.extra_point.map((result) => (
+                            <button
+                              key={result.id}
+                              onClick={() => setSelectedResult(result.id)}
+                              className={`py-2 px-4 rounded font-medium ${
+                                selectedResult === result.id 
+                                  ? ['good', 'two_point_good'].includes(result.id) ? 'bg-green-600 text-white' : 'bg-red-600 text-white'
+                                  : 'bg-zinc-700 hover:bg-zinc-600'
+                              }`}
+                            >
+                              {result.label}
+                            </button>
+                          ))}
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(0)}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitExtraPoint}
+                            disabled={!selectedResult}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete Play ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* PENALTY WORKFLOW */}
+                {selectedPlayType === 'penalty' && (
+                  <div className="space-y-4">
+                    <div className="text-lg font-bold text-red-400 mb-2">PENALTY</div>
+                    
+                    {/* Step 1: Penalty on which team */}
+                    {playStep === 0 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400 uppercase">Penalty Result</div>
+                        <div className="flex flex-wrap gap-2">
+                          {PLAY_RESULTS.penalty.map((result) => (
+                            <button
+                              key={result.id}
+                              onClick={() => { setSelectedResult(result.id); setPlayStep(1); }}
+                              className={`py-2 px-4 rounded font-medium ${
+                                selectedResult === result.id ? 'bg-red-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'
+                              }`}
+                            >
+                              {result.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Penalty Details */}
+                    {playStep === 1 && ['offense', 'defense'].includes(selectedResult) && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Penalty on: <span className="text-red-400 font-bold">{selectedResult === 'offense' ? 'Offense' : 'Defense'}</span>
+                        </div>
+                        
+                        {/* Penalty Yards */}
+                        <div className="flex items-center justify-center gap-3 mt-4">
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => Math.max(1, prev - 5))}>-5</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => Math.max(1, prev - 1))}>-1</Button>
+                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                            <div className="text-xs text-zinc-500">Yards</div>
+                            <div className="text-2xl font-bold text-red-400">{penaltyYards}</div>
+                          </div>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => prev + 1)}>+1</Button>
+                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => prev + 5)}>+5</Button>
+                        </div>
+                        
+                        {/* Quick Select Common Penalties */}
+                        <div className="flex flex-wrap gap-2 mt-4">
+                          <button onClick={() => setPenaltyYards(5)} className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">5 yds</button>
+                          <button onClick={() => setPenaltyYards(10)} className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">10 yds</button>
+                          <button onClick={() => setPenaltyYards(15)} className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">15 yds</button>
+                        </div>
+                        
+                        {/* Penalty Description (optional) */}
+                        <input
+                          type="text"
+                          placeholder="Penalty description (optional)"
+                          value={penaltyDescription}
+                          onChange={(e) => setPenaltyDescription(e.target.value)}
+                          className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white"
+                        />
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(0); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPenalty}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Apply Penalty ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Declined/Offsetting */}
+                    {playStep === 1 && ['declined', 'offsetting'].includes(selectedResult) && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Result: <span className="text-red-400 font-bold">{selectedResult === 'declined' ? 'Penalty Declined' : 'Offsetting Penalties'}</span>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(0); }}>← Back</Button>
+                          <Button 
+                            onClick={handleSubmitPenalty}
+                            className="bg-green-600 hover:bg-green-700 px-8"
+                          >
+                            Complete ✓
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+                
+                {/* OTHER PLAY TYPES (kickoff, other) - Keep original simple flow */}
+                {!['run', 'pass', 'punt', 'field_goal', 'extra_point', 'penalty'].includes(selectedPlayType) && (
                   <>
                     <div className="text-xs text-zinc-500 uppercase tracking-wide mb-3">
                       {PLAY_TYPES.find(p => p.id === selectedPlayType)?.label} Result
