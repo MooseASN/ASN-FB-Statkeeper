@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Plus, Users, Trash2, ChevronRight, Link as LinkIcon } from "lucide-react";
 import Layout from "@/components/Layout";
 import { ChromePicker } from "react-color";
+import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
