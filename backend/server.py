@@ -142,6 +142,14 @@ async def get_optional_user(request: Request, session_token: Optional[str] = Coo
 @api_router.post("/auth/register")
 async def register(user_data: UserRegister, response: Response):
     """Register a new user with email/username/password and security questions"""
+    # Check for reserved emails (admin accounts)
+    if user_data.email.lower() in RESERVED_EMAILS:
+        raise HTTPException(status_code=400, detail="This email is reserved and cannot be used for registration")
+    
+    # Check for reserved usernames (admin accounts)
+    if user_data.username.lower() in RESERVED_USERNAMES:
+        raise HTTPException(status_code=400, detail="This username is reserved and cannot be used for registration")
+    
     # Check for existing email
     existing_email = await db.users.find_one({"email": user_data.email.lower()}, {"_id": 0})
     if existing_email:
