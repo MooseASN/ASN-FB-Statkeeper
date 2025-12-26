@@ -59,40 +59,43 @@ export default function FootballStatsView() {
   useEffect(() => {
     const fetchGameData = async () => {
       try {
-        const [gameRes, eventsRes] = await Promise.all([
-          axios.get(`${API}/games/${id}`),
-          axios.get(`${API}/games/${id}/events`),
-        ]);
-        
+        // Try to fetch game data (public endpoint)
+        const gameRes = await axios.get(`${API}/games/${id}`);
         setGame(gameRes.data);
         
-        // Transform events to play log format
-        const events = eventsRes.data || [];
-        const plays = events.map(event => ({
-          id: event.id,
-          quarter: event.quarter || 1,
-          clock: event.timestamp || '0:00',
-          team: event.team,
-          type: event.event_type,
-          result: event.result,
-          yards: event.yards,
-          description: event.description || formatPlayDescription(event),
-          points: event.points || 0,
-          down: event.down,
-          distance: event.distance,
-          ball_on: event.ball_position ? `${event.ball_position}` : null,
-          carrier: event.carrier,
-          qb: event.qb,
-          receiver: event.receiver,
-          tackler: event.tackler,
-          firstDown: event.first_down,
-        }));
+        // Try to fetch events (may not exist yet)
+        try {
+          const eventsRes = await axios.get(`${API}/games/${id}/events`);
+          const events = eventsRes.data || [];
+          const plays = events.map(event => ({
+            id: event.id,
+            quarter: event.quarter || 1,
+            clock: event.timestamp || '0:00',
+            team: event.team,
+            type: event.event_type,
+            result: event.result,
+            yards: event.yards,
+            description: event.description || formatPlayDescription(event),
+            points: event.points || 0,
+            down: event.down,
+            distance: event.distance,
+            ball_on: event.ball_position ? `${event.ball_position}` : null,
+            carrier: event.carrier,
+            qb: event.qb,
+            receiver: event.receiver,
+            tackler: event.tackler,
+            firstDown: event.first_down,
+          }));
+          setPlayLog(plays.reverse());
+        } catch {
+          // Events endpoint may not exist - that's okay
+          setPlayLog([]);
+        }
         
-        setPlayLog(plays.reverse()); // Most recent first
         setLoading(false);
       } catch (err) {
         console.error('Error fetching game data:', err);
-        setError('Failed to load game data');
+        setError('Game not found or not accessible');
         setLoading(false);
       }
     };
