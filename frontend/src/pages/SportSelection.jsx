@@ -89,29 +89,51 @@ export default function SportSelection({ user, onLogout }) {
 
           {/* Football Card */}
           <Card
-            className="group cursor-pointer overflow-hidden border-2 border-transparent hover:border-green-500 transition-all duration-300 bg-slate-800/50 hover:bg-slate-800"
+            className={`group overflow-hidden border-2 transition-all duration-300 bg-slate-800/50 ${
+              canAccessFootball 
+                ? "cursor-pointer border-transparent hover:border-green-500 hover:bg-slate-800" 
+                : "cursor-not-allowed border-transparent opacity-70"
+            }`}
             onClick={() => handleSelectSport(SPORTS.FOOTBALL)}
           >
             <CardContent className="p-0">
-              <div className={`bg-gradient-to-br ${SPORT_CONFIG.football.bgGradient} p-8 flex items-center justify-center`}>
-                <span className="text-8xl group-hover:scale-110 transition-transform duration-300">
+              <div className={`bg-gradient-to-br ${SPORT_CONFIG.football.bgGradient} p-8 flex items-center justify-center relative`}>
+                <span className={`text-8xl transition-transform duration-300 ${canAccessFootball ? "group-hover:scale-110" : "grayscale opacity-50"}`}>
                   {SPORT_CONFIG.football.icon}
                 </span>
+                {!canAccessFootball && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <Lock className="w-12 h-12 text-white/80" />
+                  </div>
+                )}
               </div>
               <div className="p-6 text-center">
                 <h2 className="text-2xl font-bold text-white mb-2">
                   {SPORT_CONFIG.football.name}
                 </h2>
-                <p className="text-slate-400 mb-4">
-                  {SPORT_CONFIG.football.description}
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center text-xs">
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Passing</span>
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Rushing</span>
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Receiving</span>
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Defense</span>
-                  <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Special Teams</span>
-                </div>
+                {canAccessFootball ? (
+                  <>
+                    <p className="text-slate-400 mb-4">
+                      {SPORT_CONFIG.football.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center text-xs">
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Passing</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Rushing</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Receiving</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Defense</span>
+                      <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Special Teams</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="py-4">
+                    <p className="text-amber-400 font-semibold mb-2">
+                      Football Coming Soon
+                    </p>
+                    <p className="text-slate-500 text-sm">
+                      Football stat tracking is currently in beta testing
+                    </p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
