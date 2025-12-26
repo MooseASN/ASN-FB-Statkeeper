@@ -33,6 +33,8 @@ export default function FootballLiveStats({
   possession,
   homeTimeOfPossession = 0,
   awayTimeOfPossession = 0,
+  homeTimeouts = 3,
+  awayTimeouts = 3,
 }) {
   const [activeLeaderTab, setActiveLeaderTab] = useState('rushYards');
   const [activeSection, setActiveSection] = useState('summary'); // summary, play-by-play, team-stats, leaders
