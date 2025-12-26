@@ -1768,6 +1768,106 @@ export default function FootballLiveGame({ user, onLogout }) {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
+      {/* Set Clock Dialog */}
+      <Dialog open={showSetClockDialog} onOpenChange={setShowSetClockDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-xl text-center">SET CLOCK</DialogTitle>
+            <DialogDescription className="text-zinc-400 text-center">
+              Enter the time for the game clock
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="flex items-center justify-center gap-4 mt-4">
+            {/* Minutes */}
+            <div className="text-center">
+              <label className="text-xs text-zinc-400 uppercase">Minutes</label>
+              <div className="flex flex-col items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-zinc-600"
+                  onClick={() => setTempClockMinutes(prev => Math.min(99, prev + 1))}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </Button>
+                <input
+                  type="number"
+                  value={tempClockMinutes}
+                  onChange={(e) => setTempClockMinutes(Math.max(0, Math.min(99, parseInt(e.target.value) || 0)))}
+                  className="w-16 bg-zinc-800 border border-zinc-600 rounded px-2 py-2 text-white text-center text-2xl font-mono font-bold"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-zinc-600"
+                  onClick={() => setTempClockMinutes(prev => Math.max(0, prev - 1))}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+            
+            <div className="text-3xl font-bold text-zinc-400">:</div>
+            
+            {/* Seconds */}
+            <div className="text-center">
+              <label className="text-xs text-zinc-400 uppercase">Seconds</label>
+              <div className="flex flex-col items-center gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-zinc-600"
+                  onClick={() => setTempClockSeconds(prev => prev >= 59 ? 0 : prev + 1)}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </Button>
+                <input
+                  type="number"
+                  value={tempClockSeconds.toString().padStart(2, '0')}
+                  onChange={(e) => setTempClockSeconds(Math.max(0, Math.min(59, parseInt(e.target.value) || 0)))}
+                  className="w-16 bg-zinc-800 border border-zinc-600 rounded px-2 py-2 text-white text-center text-2xl font-mono font-bold"
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-zinc-600"
+                  onClick={() => setTempClockSeconds(prev => prev <= 0 ? 59 : prev - 1)}
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </div>
+          
+          {/* Quick Presets */}
+          <div className="flex flex-wrap justify-center gap-2 mt-4">
+            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setTempClockMinutes(15); setTempClockSeconds(0); }}>15:00</Button>
+            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setTempClockMinutes(12); setTempClockSeconds(0); }}>12:00</Button>
+            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setTempClockMinutes(10); setTempClockSeconds(0); }}>10:00</Button>
+            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setTempClockMinutes(5); setTempClockSeconds(0); }}>5:00</Button>
+            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => { setTempClockMinutes(2); setTempClockSeconds(0); }}>2:00</Button>
+          </div>
+          
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" className="border-zinc-600" onClick={() => setShowSetClockDialog(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                const newTime = (tempClockMinutes * 60) + tempClockSeconds;
+                setClockTime(newTime);
+                setShowSetClockDialog(false);
+                toast.success(`Clock set to ${formatTime(newTime)}`);
+              }}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              Set Clock
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Kickoff Team Selection Dialog */}
       <KickoffDialog
         open={showKickoffTeamDialog}
