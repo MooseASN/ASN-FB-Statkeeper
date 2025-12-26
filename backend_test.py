@@ -18,7 +18,7 @@ ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
 ADMIN_PASSWORD = "test123"
 FOOTBALL_GAME_ID = "a640f656-1ea6-4929-8589-82f58a1069d9"
 
-class FootballBackendTester:
+class FootballFeatureTester:
     def __init__(self):
         self.session = requests.Session()
         self.session_token = None
@@ -62,38 +62,50 @@ class FootballBackendTester:
             self.log_test("Admin Authentication", False, f"Authentication error: {str(e)}")
             return False
     
-    def test_game_exists(self):
-        """Test that the football game exists and is accessible"""
+    def test_share_button_api(self):
+        """Test Share Button functionality - verify game is accessible via public endpoint"""
         try:
+            # Test the public endpoint that the share button would link to
             response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
             
             if response.status_code == 200:
                 game_data = response.json()
-                sport = game_data.get("sport", "unknown")
-                status = game_data.get("status", "unknown")
-                home_team = game_data.get("home_team_name", "Unknown")
-                away_team = game_data.get("away_team_name", "Unknown")
                 
-                self.log_test("Football Game Exists", True, 
-                             f"Game found - Sport: {sport}, Status: {status}, Teams: {home_team} vs {away_team}")
-                return game_data
+                # Verify required fields for share functionality
+                required_fields = ["id", "home_team_name", "away_team_name", "status", "sport"]
+                missing_fields = [field for field in required_fields if field not in game_data]
+                
+                if missing_fields:
+                    self.log_test("Share Button API", False, 
+                                 f"Missing required fields for share: {missing_fields}")
+                    return False
+                
+                # Verify it's a football game
+                if game_data.get("sport") != "football":
+                    self.log_test("Share Button API", False, 
+                                 f"Game sport is {game_data.get('sport')}, expected 'football'")
+                    return False
+                
+                self.log_test("Share Button API", True, 
+                             f"Share link endpoint working - Game: {game_data.get('home_team_name')} vs {game_data.get('away_team_name')}")
+                return True
             else:
-                self.log_test("Football Game Exists", False, 
-                             f"Game not found: {response.status_code}", response.text)
-                return None
+                self.log_test("Share Button API", False, 
+                             f"Share link endpoint failed: {response.status_code}", response.text)
+                return False
                 
         except Exception as e:
-            self.log_test("Football Game Exists", False, f"Error checking game: {str(e)}")
-            return None
+            self.log_test("Share Button API", False, f"Error testing share functionality: {str(e)}")
+            return False
     
-    def test_football_state_update(self):
-        """Test updating football state via PUT /api/games/{game_id}"""
+    def test_time_of_possession_backend(self):
+        """Test Time of Possession - verify TOP is saved and retrieved correctly"""
         try:
-            # Create sample football state data
+            # Create football state with time of possession data
             football_state = {
                 "play_log": [
                     {
-                        "id": "play_001",
+                        "id": "play_top_001",
                         "quarter": 1,
                         "down": 1,
                         "distance": 10,
@@ -101,131 +113,70 @@ class FootballBackendTester:
                         "play_type": "RUN",
                         "carrier": "22",
                         "result": "GAIN",
-                        "yards": 7,
-                        "description": "RUN by #22 for 7 yards GAIN",
-                        "timestamp": datetime.now().isoformat()
+                        "yards": 5,
+                        "description": "RUN by #22 for 5 yards GAIN",
+                        "timestamp": datetime.now().isoformat(),
+                        "possession_time": 45  # 45 seconds for this play
                     }
                 ],
                 "scores": {
                     "home": 0,
                     "away": 0
                 },
-                "ball_position": {
-                    "yard_line": 32,
-                    "side": "home"
-                },
-                "down": 2,
-                "distance": 3,
+                "home_time_of_possession": 300,  # 5 minutes
+                "away_time_of_possession": 420,  # 7 minutes
                 "quarter": 1,
-                "clock": "14:53"
+                "clock": "12:15",
+                "possession": "home"
             }
             
-            # Update game with football state
+            # Update game with TOP data
             response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
-                "football_state": football_state
+                "football_state": football_state,
+                "home_time_of_possession": 300,
+                "away_time_of_possession": 420
             })
             
             if response.status_code == 200:
-                # The PUT response doesn't include football_state due to Game model limitations
-                # But we can verify it was saved by checking the public endpoint
+                # Verify TOP was saved by checking public endpoint
                 verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
                 
                 if verify_response.status_code == 200:
                     game_data = verify_response.json()
-                    saved_state = game_data.get("football_state")
+                    saved_state = game_data.get("football_state", {})
                     
-                    if saved_state:
-                        # Verify key fields were saved
-                        play_log = saved_state.get("play_log", [])
-                        scores = saved_state.get("scores", {})
-                        ball_pos = saved_state.get("ball_position", {})
-                        
-                        if (len(play_log) > 0 and 
-                            play_log[0].get("play_type") == "RUN" and
-                            scores.get("home") == 0 and
-                            ball_pos.get("yard_line") == 32):
-                            
-                            self.log_test("Football State Update", True, 
-                                         "Football state successfully saved and verified via public endpoint")
-                            return saved_state
-                        else:
-                            self.log_test("Football State Update", False, 
-                                         "Football state saved but data integrity check failed", 
-                                         f"Saved state: {saved_state}")
-                            return None
-                    else:
-                        self.log_test("Football State Update", False, 
-                                     "Football state not found after update")
-                        return None
-                else:
-                    self.log_test("Football State Update", False, 
-                                 "Failed to verify update via public endpoint")
-                    return None
-            else:
-                self.log_test("Football State Update", False, 
-                             f"Failed to update game: {response.status_code}", response.text)
-                return None
-                
-        except Exception as e:
-            self.log_test("Football State Update", False, f"Error updating football state: {str(e)}")
-            return None
-    
-    def test_football_state_persistence(self):
-        """Test that football state persists when retrieved via public endpoint"""
-        try:
-            response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
-            
-            if response.status_code == 200:
-                game_data = response.json()
-                football_state = game_data.get("football_state")
-                
-                if football_state:
-                    # Check if our test data persisted
-                    play_log = football_state.get("play_log", [])
-                    scores = football_state.get("scores", {})
-                    ball_pos = football_state.get("ball_position", {})
-                    down = football_state.get("down")
-                    distance = football_state.get("distance")
+                    home_top = saved_state.get("home_time_of_possession")
+                    away_top = saved_state.get("away_time_of_possession")
                     
-                    # Verify the data we saved is still there
-                    if (len(play_log) > 0 and 
-                        play_log[0].get("play_type") == "RUN" and
-                        play_log[0].get("carrier") == "22" and
-                        play_log[0].get("yards") == 7 and
-                        scores.get("home") == 0 and
-                        ball_pos.get("yard_line") == 32 and
-                        down == 2 and
-                        distance == 3):
-                        
-                        self.log_test("Football State Persistence", True, 
-                                     "Football state correctly persisted and retrieved from public endpoint")
+                    if home_top == 300 and away_top == 420:
+                        self.log_test("Time of Possession Backend", True, 
+                                     f"TOP correctly saved - Home: {home_top}s, Away: {away_top}s")
                         return True
                     else:
-                        self.log_test("Football State Persistence", False, 
-                                     "Football state retrieved but data doesn't match expected values",
-                                     f"Retrieved state: {football_state}")
+                        self.log_test("Time of Possession Backend", False, 
+                                     f"TOP not saved correctly - Home: {home_top}, Away: {away_top}")
                         return False
                 else:
-                    self.log_test("Football State Persistence", False, 
-                                 "No football state found in public game data")
+                    self.log_test("Time of Possession Backend", False, 
+                                 "Failed to verify TOP via public endpoint")
                     return False
             else:
-                self.log_test("Football State Persistence", False, 
-                             f"Failed to retrieve public game: {response.status_code}", response.text)
+                self.log_test("Time of Possession Backend", False, 
+                             f"Failed to update game with TOP: {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_test("Football State Persistence", False, f"Error checking persistence: {str(e)}")
+            self.log_test("Time of Possession Backend", False, f"Error testing TOP: {str(e)}")
             return False
     
-    def test_football_stats_accumulation(self):
-        """Test that football stats accumulate correctly with multiple plays"""
+    def test_drives_section_data(self):
+        """Test Drives Section - verify drive data is available in API response"""
         try:
-            # Add a second play to test accumulation
+            # Create football state with drive data
             football_state = {
                 "play_log": [
                     {
-                        "id": "play_001",
+                        "id": "drive1_play1",
                         "quarter": 1,
                         "down": 1,
                         "distance": 10,
@@ -235,10 +186,10 @@ class FootballBackendTester:
                         "result": "GAIN",
                         "yards": 7,
                         "description": "RUN by #22 for 7 yards GAIN",
-                        "timestamp": datetime.now().isoformat()
+                        "drive_id": "drive_1"
                     },
                     {
-                        "id": "play_002",
+                        "id": "drive1_play2",
                         "quarter": 1,
                         "down": 2,
                         "distance": 3,
@@ -246,117 +197,319 @@ class FootballBackendTester:
                         "play_type": "PASS",
                         "passer": "12",
                         "receiver": "88",
-                        "result": "COMPLETE",
-                        "yards": 15,
-                        "description": "PASS from #12 to #88 for 15 yards COMPLETE",
-                        "timestamp": datetime.now().isoformat()
+                        "result": "TOUCHDOWN",
+                        "yards": 25,
+                        "description": "PASS from #12 to #88 for 25 yards TOUCHDOWN",
+                        "drive_id": "drive_1"
+                    }
+                ],
+                "drives": [
+                    {
+                        "id": "drive_1",
+                        "team": "home",
+                        "start_yard": 25,
+                        "end_yard": 0,  # Touchdown
+                        "plays": 2,
+                        "yards": 32,
+                        "result": "touchdown",
+                        "time_elapsed": 120
                     }
                 ],
                 "scores": {
                     "home": 7,
                     "away": 0
-                },
-                "ball_position": {
-                    "yard_line": 47,
-                    "side": "home"
-                },
-                "down": 1,
-                "distance": 10,
-                "quarter": 1,
-                "clock": "13:45",
-                "team_stats": {
+                }
+            }
+            
+            # Update game with drive data
+            response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
+                "football_state": football_state
+            })
+            
+            if response.status_code == 200:
+                # Verify drive data is available
+                verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
+                
+                if verify_response.status_code == 200:
+                    game_data = verify_response.json()
+                    saved_state = game_data.get("football_state", {})
+                    
+                    drives = saved_state.get("drives", [])
+                    play_log = saved_state.get("play_log", [])
+                    
+                    if len(drives) > 0 and len(play_log) >= 2:
+                        drive = drives[0]
+                        if (drive.get("plays") == 2 and 
+                            drive.get("yards") == 32 and 
+                            drive.get("result") == "touchdown"):
+                            
+                            self.log_test("Drives Section Data", True, 
+                                         f"Drive data available - {len(drives)} drives, {len(play_log)} plays")
+                            return True
+                        else:
+                            self.log_test("Drives Section Data", False, 
+                                         "Drive data incomplete", f"Drive: {drive}")
+                            return False
+                    else:
+                        self.log_test("Drives Section Data", False, 
+                                     f"Insufficient drive data - {len(drives)} drives, {len(play_log)} plays")
+                        return False
+                else:
+                    self.log_test("Drives Section Data", False, 
+                                 "Failed to retrieve drive data")
+                    return False
+            else:
+                self.log_test("Drives Section Data", False, 
+                             f"Failed to save drive data: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("Drives Section Data", False, f"Error testing drives: {str(e)}")
+            return False
+    
+    def test_box_score_data(self):
+        """Test Box Score Section - verify offense/defense stats are available"""
+        try:
+            # Create football state with detailed player stats for box score
+            football_state = {
+                "play_log": [
+                    {
+                        "id": "box_play1",
+                        "quarter": 1,
+                        "play_type": "PASS",
+                        "passer": "12",
+                        "receiver": "88",
+                        "result": "COMPLETE",
+                        "yards": 15,
+                        "description": "PASS from #12 to #88 for 15 yards COMPLETE"
+                    },
+                    {
+                        "id": "box_play2",
+                        "quarter": 1,
+                        "play_type": "RUN",
+                        "carrier": "22",
+                        "result": "GAIN",
+                        "yards": 8,
+                        "description": "RUN by #22 for 8 yards GAIN"
+                    }
+                ],
+                "player_stats": {
                     "home": {
-                        "rushing_yards": 7,
-                        "passing_yards": 15,
-                        "total_yards": 22,
-                        "first_downs": 1
+                        "passing": {
+                            "12": {
+                                "name": "John Quarterback",
+                                "completions": 1,
+                                "attempts": 1,
+                                "yards": 15,
+                                "touchdowns": 0,
+                                "interceptions": 0
+                            }
+                        },
+                        "rushing": {
+                            "22": {
+                                "name": "Mike Runner",
+                                "carries": 1,
+                                "yards": 8,
+                                "touchdowns": 0
+                            }
+                        },
+                        "receiving": {
+                            "88": {
+                                "name": "Tom Receiver",
+                                "receptions": 1,
+                                "yards": 15,
+                                "touchdowns": 0
+                            }
+                        }
                     },
                     "away": {
-                        "rushing_yards": 0,
+                        "passing": {},
+                        "rushing": {},
+                        "receiving": {}
+                    }
+                },
+                "team_stats": {
+                    "home": {
+                        "passing_yards": 15,
+                        "rushing_yards": 8,
+                        "total_yards": 23,
+                        "first_downs": 2
+                    },
+                    "away": {
                         "passing_yards": 0,
+                        "rushing_yards": 0,
                         "total_yards": 0,
                         "first_downs": 0
                     }
                 }
             }
             
-            # Update with accumulated stats
+            # Update game with box score data
             response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
                 "football_state": football_state
             })
             
             if response.status_code == 200:
-                # Verify the stats were saved
-                response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
-                if response.status_code == 200:
-                    game_data = response.json()
+                # Verify box score data is available
+                verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
+                
+                if verify_response.status_code == 200:
+                    game_data = verify_response.json()
                     saved_state = game_data.get("football_state", {})
-                    team_stats = saved_state.get("team_stats", {})
-                    home_stats = team_stats.get("home", {})
                     
-                    if (home_stats.get("rushing_yards") == 7 and
-                        home_stats.get("passing_yards") == 15 and
-                        home_stats.get("total_yards") == 22 and
-                        len(saved_state.get("play_log", [])) == 2):
+                    player_stats = saved_state.get("player_stats", {})
+                    team_stats = saved_state.get("team_stats", {})
+                    
+                    home_passing = player_stats.get("home", {}).get("passing", {})
+                    home_team_stats = team_stats.get("home", {})
+                    
+                    if (len(home_passing) > 0 and 
+                        home_team_stats.get("passing_yards") == 15 and
+                        home_team_stats.get("rushing_yards") == 8):
                         
-                        self.log_test("Football Stats Accumulation", True, 
-                                     "Football stats correctly accumulated across multiple plays")
+                        self.log_test("Box Score Data", True, 
+                                     "Box score data available - player stats and team stats present")
                         return True
                     else:
-                        self.log_test("Football Stats Accumulation", False, 
-                                     "Stats accumulation failed", 
-                                     f"Home stats: {home_stats}")
+                        self.log_test("Box Score Data", False, 
+                                     "Box score data incomplete", 
+                                     f"Player stats: {len(home_passing)}, Team stats: {home_team_stats}")
                         return False
                 else:
-                    self.log_test("Football Stats Accumulation", False, 
-                                 "Failed to retrieve updated game for verification")
+                    self.log_test("Box Score Data", False, 
+                                 "Failed to retrieve box score data")
                     return False
             else:
-                self.log_test("Football Stats Accumulation", False, 
-                             f"Failed to update game with accumulated stats: {response.status_code}")
+                self.log_test("Box Score Data", False, 
+                             f"Failed to save box score data: {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_test("Football Stats Accumulation", False, f"Error testing stats accumulation: {str(e)}")
+            self.log_test("Box Score Data", False, f"Error testing box score: {str(e)}")
             return False
     
-    def test_public_stats_endpoint(self):
-        """Test that public stats endpoint returns football data correctly"""
+    def test_timeouts_display_data(self):
+        """Test Timeouts Display - verify timeout data is saved and retrieved"""
         try:
-            response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
+            # Create football state with timeout data
+            football_state = {
+                "home_timeouts": 2,  # Used 2 timeouts
+                "away_timeouts": 1,  # Used 1 timeout
+                "quarter": 2,
+                "clock": "8:45"
+            }
+            
+            # Update game with timeout data
+            response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
+                "football_state": football_state
+            })
             
             if response.status_code == 200:
-                game_data = response.json()
+                # Verify timeout data is available
+                verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
                 
-                # Check required fields for public stats display
-                required_fields = ["id", "home_team_name", "away_team_name", "status", "sport"]
-                missing_fields = [field for field in required_fields if field not in game_data]
-                
-                if missing_fields:
-                    self.log_test("Public Stats Endpoint", False, 
-                                 f"Missing required fields: {missing_fields}")
-                    return False
-                
-                # Check if football state is included
-                football_state = game_data.get("football_state")
-                if football_state:
-                    play_log = football_state.get("play_log", [])
-                    team_stats = football_state.get("team_stats", {})
+                if verify_response.status_code == 200:
+                    game_data = verify_response.json()
+                    saved_state = game_data.get("football_state", {})
                     
-                    self.log_test("Public Stats Endpoint", True, 
-                                 f"Public endpoint working - {len(play_log)} plays, stats available: {bool(team_stats)}")
-                    return True
+                    home_timeouts = saved_state.get("home_timeouts")
+                    away_timeouts = saved_state.get("away_timeouts")
+                    
+                    if home_timeouts == 2 and away_timeouts == 1:
+                        self.log_test("Timeouts Display Data", True, 
+                                     f"Timeout data saved correctly - Home: {home_timeouts}, Away: {away_timeouts}")
+                        return True
+                    else:
+                        self.log_test("Timeouts Display Data", False, 
+                                     f"Timeout data incorrect - Home: {home_timeouts}, Away: {away_timeouts}")
+                        return False
                 else:
-                    self.log_test("Public Stats Endpoint", True, 
-                                 "Public endpoint working but no football state (may be expected for new games)")
-                    return True
+                    self.log_test("Timeouts Display Data", False, 
+                                 "Failed to retrieve timeout data")
+                    return False
             else:
-                self.log_test("Public Stats Endpoint", False, 
-                             f"Public endpoint failed: {response.status_code}", response.text)
+                self.log_test("Timeouts Display Data", False, 
+                             f"Failed to save timeout data: {response.status_code}")
                 return False
                 
         except Exception as e:
-            self.log_test("Public Stats Endpoint", False, f"Error testing public endpoint: {str(e)}")
+            self.log_test("Timeouts Display Data", False, f"Error testing timeouts: {str(e)}")
+            return False
+    
+    def test_api_endpoints_comprehensive(self):
+        """Test API endpoints comprehensively - GET public and PUT authenticated"""
+        try:
+            # Test 1: GET /api/games/public/{game_id} - should return football_state with play_log
+            public_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
+            
+            if public_response.status_code != 200:
+                self.log_test("API Endpoints Comprehensive", False, 
+                             f"Public GET failed: {public_response.status_code}")
+                return False
+            
+            public_data = public_response.json()
+            football_state = public_data.get("football_state", {})
+            play_log = football_state.get("play_log", [])
+            
+            if len(play_log) < 1:
+                self.log_test("API Endpoints Comprehensive", False, 
+                             "Public endpoint missing play_log data")
+                return False
+            
+            # Test 2: PUT /api/games/{game_id} - should save football_state with time_of_possession
+            test_state = {
+                "play_log": [
+                    {
+                        "id": "api_test_play",
+                        "quarter": 1,
+                        "play_type": "RUN",
+                        "carrier": "25",
+                        "result": "GAIN",
+                        "yards": 4,
+                        "description": "API test play"
+                    }
+                ],
+                "home_time_of_possession": 600,  # 10 minutes
+                "away_time_of_possession": 300   # 5 minutes
+            }
+            
+            put_response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
+                "football_state": test_state
+            })
+            
+            if put_response.status_code != 200:
+                self.log_test("API Endpoints Comprehensive", False, 
+                             f"PUT request failed: {put_response.status_code}")
+                return False
+            
+            # Verify the PUT worked by checking public endpoint again
+            verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
+            
+            if verify_response.status_code == 200:
+                verify_data = verify_response.json()
+                verify_state = verify_data.get("football_state", {})
+                verify_play_log = verify_state.get("play_log", [])
+                home_top = verify_state.get("home_time_of_possession")
+                away_top = verify_state.get("away_time_of_possession")
+                
+                # Check if our test play was saved
+                test_play_found = any(play.get("id") == "api_test_play" for play in verify_play_log)
+                
+                if test_play_found and home_top == 600 and away_top == 300:
+                    self.log_test("API Endpoints Comprehensive", True, 
+                                 "Both GET public and PUT authenticated endpoints working correctly")
+                    return True
+                else:
+                    self.log_test("API Endpoints Comprehensive", False, 
+                                 f"Data not saved correctly - Play found: {test_play_found}, TOP: {home_top}/{away_top}")
+                    return False
+            else:
+                self.log_test("API Endpoints Comprehensive", False, 
+                             "Failed to verify PUT via public endpoint")
+                return False
+                
+        except Exception as e:
+            self.log_test("API Endpoints Comprehensive", False, f"Error testing API endpoints: {str(e)}")
             return False
     
     def run_all_tests(self):
