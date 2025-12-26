@@ -1876,18 +1876,22 @@ export default function FootballLiveGame({ user, onLogout }) {
   // Handle Extra Point submission
   const handleSubmitExtraPoint = () => {
     const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const scoringTeam = possession; // Store the scoring team before switching
+    
+    // Format kicker display with name
+    const kickerDisplay = kickerNumber ? formatPlayer(kickerNumber, possession) : '';
     
     let description = '';
     
     if (selectedResult === 'good') {
-      description = `#${kickerNumber} extra point - GOOD!`;
+      description = kickerNumber ? `${kickerDisplay} extra point - GOOD!` : 'Extra point - GOOD!';
       if (possession === 'home') {
         setHomeScore(prev => prev + 1);
       } else {
         setAwayScore(prev => prev + 1);
       }
     } else if (selectedResult === 'no_good') {
-      description = `#${kickerNumber} extra point - NO GOOD`;
+      description = kickerNumber ? `${kickerDisplay} extra point - NO GOOD` : 'Extra point - NO GOOD';
     } else if (selectedResult === 'two_point_good') {
       description = `Two-point conversion - GOOD!`;
       if (possession === 'home') {
@@ -1912,16 +1916,20 @@ export default function FootballLiveGame({ user, onLogout }) {
     
     setPlayLog(prev => [play, ...prev]);
     
-    // After PAT, other team gets ball (kickoff)
-    setPossession(possession === 'home' ? 'away' : 'home');
-    const newBallPos = possession === 'home' ? 75 : 25;
-    setBallPosition(newBallPos);
-    setDown(1);
-    setDistance(10);
-    const newFDMarker = possession === 'home' ? 65 : 35;
-    setFirstDownMarker(newFDMarker);
+    // After PAT, other team gets ball (kickoff) - but scoring team kicks
+    // The team that scored will kick off to the other team
+    const kickingTeam = scoringTeam;
+    const receivingTeam = scoringTeam === 'home' ? 'away' : 'home';
     
     resetPlayState();
+    
+    // Automatically trigger Kickoff workflow after a brief delay
+    setTimeout(() => {
+      setKickingTeam(kickingTeam);
+      setShowKickoffWorkflow(true);
+      setKickoffStep(1);
+      toast.info(`${teamName} will kick off to ${receivingTeam === 'home' ? game?.home_team_name : game?.away_team_name}`);
+    }, 500);
   };
 
   // Handle Penalty submission - Enhanced with penalty catalog
