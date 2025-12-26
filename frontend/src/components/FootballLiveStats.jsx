@@ -327,6 +327,8 @@ export default function FootballLiveStats({
           <div className="flex gap-1 overflow-x-auto">
             {[
               { id: 'summary', label: 'Summary' },
+              { id: 'drives', label: 'Drives' },
+              { id: 'box-score', label: 'Box Score' },
               { id: 'play-by-play', label: 'Play-by-Play' },
               { id: 'team-stats', label: 'Team Stats' },
               { id: 'leaders', label: 'Leaders' },
