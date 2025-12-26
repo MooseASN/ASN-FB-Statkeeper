@@ -12,11 +12,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { ArrowLeft, PlayCircle, Users, Calendar, Clock, Timer, FileText } from "lucide-react";
 import Layout from "@/components/Layout";
+import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function NewGame({ user, onLogout }) {
   const navigate = useNavigate();
+  const { selectedSport } = useSport();
+  const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [teams, setTeams] = useState([]);
   const [homeTeamId, setHomeTeamId] = useState("");
   const [awayTeamId, setAwayTeamId] = useState("");
@@ -48,11 +51,11 @@ export default function NewGame({ user, onLogout }) {
 
   useEffect(() => {
     fetchTeams();
-  }, []);
+  }, [selectedSport]);
 
   const fetchTeams = async () => {
     try {
-      const res = await axios.get(`${API}/teams`);
+      const res = await axios.get(`${API}/teams`, { params: { sport: selectedSport } });
       setTeams(res.data);
     } catch (error) {
       toast.error("Failed to load teams");
