@@ -2,11 +2,26 @@ import { useNavigate } from "react-router-dom";
 import { useSport, SPORTS, SPORT_CONFIG } from "@/contexts/SportContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogOut, Lock } from "lucide-react";
+import { LogOut, Lock, User, Settings, Shield } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 
 // Users allowed to access Football (admins)
 const FOOTBALL_ALLOWED_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
 const FOOTBALL_ALLOWED_USERNAMES = ["admin"];
+const ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
+const ADMIN_USERNAMES = ["admin"];
+
+const isAdminUser = (user) => {
+  if (!user) return false;
+  return ADMIN_EMAILS.includes(user.email?.toLowerCase()) || 
+         ADMIN_USERNAMES.includes(user.username?.toLowerCase());
+};
 
 export default function SportSelection({ user, onLogout }) {
   const navigate = useNavigate();
@@ -34,16 +49,38 @@ export default function SportSelection({ user, onLogout }) {
             <span className="text-xl font-black text-white tracking-tight italic">STATMOOSE</span>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-slate-400 text-sm">Welcome, {user?.name || user?.username}</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onLogout}
-              className="text-slate-400 hover:text-white"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              Logout
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="text-slate-300 hover:text-white hover:bg-slate-700">
+                  <User className="w-4 h-4 mr-2" />
+                  {user?.name || user?.username || user?.email}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuItem className="text-sm text-muted-foreground">
+                  {user?.email}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                {isAdminUser(user) && (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer text-amber-600">
+                      <Shield className="w-4 h-4 mr-2" />
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+                <DropdownMenuItem onClick={() => navigate("/account")} className="cursor-pointer">
+                  <Settings className="w-4 h-4 mr-2" />
+                  Account Settings
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={onLogout} className="text-red-600 cursor-pointer">
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </header>
