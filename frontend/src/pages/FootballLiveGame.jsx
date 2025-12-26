@@ -1353,9 +1353,10 @@ export default function FootballLiveGame({ user, onLogout }) {
     
     // Reset play state
     resetPlayState();
+    
+    // Update drive stats
+    updateDriveStats(yards);
   };
-
-  // Handle Pass Play submission
   const handleSubmitPassPlay = () => {
     const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
     const defTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
