@@ -45,6 +45,9 @@ export default function Dashboard({ user, onLogout }) {
   useEffect(() => {
     fetchData();
     fetchSponsorBanners();
+    // Set document title based on sport
+    const sportAbbrev = selectedSport === 'basketball' ? 'BKB' : 'FB';
+    document.title = `StatMoose ${sportAbbrev}`;
   }, [selectedSport]);
 
   const fetchSponsorBanners = async () => {
