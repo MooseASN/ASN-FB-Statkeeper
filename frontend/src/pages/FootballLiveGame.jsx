@@ -1150,16 +1150,43 @@ export default function FootballLiveGame({ user, onLogout }) {
   const homeColor = game?.home_team_color || "#dc2626";
   const awayColor = game?.away_team_color || "#2563eb";
 
+  // Determine kicking/receiving teams for workflow
+  const kickingTeamName = kickingTeam === 'home' ? homeTeamName : awayTeamName;
+  const receivingTeamName = kickingTeam === 'home' ? awayTeamName : homeTeamName;
+  const kickingTeamColor = kickingTeam === 'home' ? homeColor : awayColor;
+  const receivingTeamColor = kickingTeam === 'home' ? awayColor : homeColor;
+  const kickingRoster = kickingTeam === 'home' ? homeRoster : awayRoster;
+  const receivingRoster = kickingTeam === 'home' ? awayRoster : homeRoster;
+
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
-      {/* Kickoff Dialog */}
+      {/* Kickoff Team Selection Dialog */}
       <KickoffDialog
-        open={showKickoffDialog}
+        open={showKickoffTeamDialog}
         homeTeam={homeTeamName}
         awayTeam={awayTeamName}
         homeColor={homeColor}
         awayColor={awayColor}
-        onSelect={handleKickoffSelect}
+        onSelect={handleKickoffTeamSelect}
+      />
+
+      {/* Kickoff Workflow Dialog */}
+      <KickoffWorkflowDialog
+        open={showKickoffWorkflow}
+        step={kickoffStep}
+        kickingTeam={kickingTeam}
+        receivingTeam={kickingTeam === 'home' ? 'away' : 'home'}
+        kickingTeamName={kickingTeamName}
+        receivingTeamName={receivingTeamName}
+        kickingTeamColor={kickingTeamColor}
+        receivingTeamColor={receivingTeamColor}
+        kickingRoster={kickingRoster}
+        receivingRoster={receivingRoster}
+        kickoffData={kickoffData}
+        setKickoffData={setKickoffData}
+        onBack={handleKickoffBack}
+        onNext={handleKickoffNext}
+        onComplete={handleKickoffComplete}
       />
 
       {/* Header */}
