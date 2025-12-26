@@ -779,6 +779,46 @@ async def check_admin_status(user: User = Depends(get_current_user)):
     """Check if current user is an admin"""
     return {"is_admin": is_admin_user(user)}
 
+@api_router.post("/admin/migrate-teams-sport")
+async def migrate_teams_to_basketball(admin: User = Depends(get_admin_user)):
+    """Migrate all teams without a sport field to basketball (admin only)"""
+    # Find teams without sport field or with null/empty sport
+    result = await db.teams.update_many(
+        {"$or": [
+            {"sport": {"$exists": False}},
+            {"sport": None},
+            {"sport": ""}
+        ]},
+        {"$set": {"sport": "basketball"}}
+    )
+    
+    # Also migrate games
+    games_result = await db.games.update_many(
+        {"$or": [
+            {"sport": {"$exists": False}},
+            {"sport": None},
+            {"sport": ""}
+        ]},
+        {"$set": {"sport": "basketball"}}
+    )
+    
+    # Also migrate events
+    events_result = await db.events.update_many(
+        {"$or": [
+            {"sport": {"$exists": False}},
+            {"sport": None},
+            {"sport": ""}
+        ]},
+        {"$set": {"sport": "basketball"}}
+    )
+    
+    return {
+        "message": "Migration complete",
+        "teams_migrated": result.modified_count,
+        "games_migrated": games_result.modified_count,
+        "events_migrated": events_result.modified_count
+    }
+
 # ============ DATA MODELS ============
 
 class Player(BaseModel):
