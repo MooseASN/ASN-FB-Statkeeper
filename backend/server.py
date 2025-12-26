@@ -470,6 +470,7 @@ class GameCreate(BaseModel):
     simple_mode: bool = False  # Simple mode: only track makes, rebounds, assists, fouls
     advanced_mode: bool = False  # Advanced mode: PrestoSports-style interface
     note: Optional[str] = None  # Game note/description
+    sport: str = "basketball"  # "basketball" or "football"
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
