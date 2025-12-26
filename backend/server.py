@@ -441,6 +441,7 @@ class TeamCreate(BaseModel):
     logo_url: Optional[str] = None
     color: str = "#000000"  # Default team color
     roster: List[Player] = []
+    sport: str = "basketball"  # "basketball" or "football"
 
 class Team(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -450,6 +451,7 @@ class Team(BaseModel):
     logo_url: Optional[str] = None
     color: str = "#000000"
     roster: List[Player] = []
+    sport: str = "basketball"  # "basketball" or "football"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class GameCreate(BaseModel):
