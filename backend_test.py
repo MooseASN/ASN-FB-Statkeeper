@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """
 Backend API Testing for StatMoose Football Stat Tracking
-Tests the football state persistence and public stats functionality
+Tests the new football features: Share Button, Time of Possession, Drives, Box Score, Timeouts
 """
 
 import requests
 import json
 import os
+import time
 from datetime import datetime
 
 # Get backend URL from environment
