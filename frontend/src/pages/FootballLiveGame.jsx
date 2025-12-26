@@ -3270,11 +3270,11 @@ export default function FootballLiveGame({ user, onLogout }) {
                 </div>
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div>
-                    <div className="text-lg font-bold">{currentDrive.plays}</div>
+                    <div className="text-lg font-bold">{currentDrive.playCount || currentDrive.plays || 0}</div>
                     <div className="text-[10px] text-zinc-500 uppercase">Plays</div>
                   </div>
                   <div>
-                    <div className="text-lg font-bold">{currentDrive.yards}</div>
+                    <div className="text-lg font-bold">{currentDrive.netYards || currentDrive.yards || 0}</div>
                     <div className="text-[10px] text-zinc-500 uppercase">Yards</div>
                   </div>
                   <div>
@@ -3286,7 +3286,7 @@ export default function FootballLiveGame({ user, onLogout }) {
                   size="sm"
                   variant="outline"
                   className="w-full mt-2 h-6 text-xs border-zinc-600"
-                  onClick={() => startNewDrive(possession)}
+                  onClick={() => startNewDrive('manual', possession)}
                 >
                   New Drive
                 </Button>
