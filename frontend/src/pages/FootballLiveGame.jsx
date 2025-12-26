@@ -1019,10 +1019,6 @@ export default function FootballLiveGame({ user, onLogout }) {
         // New game - show kickoff dialog
         setShowKickoffTeamDialog(true);
       }
-      
-      if (res.data.clock_time !== undefined) {
-        setClockTime(res.data.clock_time);
-      }
     } catch (error) {
       toast.error("Failed to load game");
       navigate("/");
