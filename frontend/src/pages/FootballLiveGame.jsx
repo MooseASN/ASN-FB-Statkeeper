@@ -845,10 +845,15 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [puntReturnerNumber, setPuntReturnerNumber] = useState(null);
   const [puntDistance, setPuntDistance] = useState(40);
   const [puntReturnYards, setPuntReturnYards] = useState(0);
+  const [puntReturnStartYardLine, setPuntReturnStartYardLine] = useState(20); // Where return begins
+  const [puntTacklerNumber, setPuntTacklerNumber] = useState(null);
   
-  // Field Goal / Extra Point state
+  // Field goal state - enhanced with blocked info
   const [kickerNumber, setKickerNumber] = useState(null);
   const [fgDistance, setFgDistance] = useState(30);
+  const [fgBlockerNumber, setFgBlockerNumber] = useState(null);
+  const [fgReturnYards, setFgReturnYards] = useState(0);
+  const [fgNoReturn, setFgNoReturn] = useState(false);
   
   // Penalty state - Enhanced with ruleset support
   const [penaltyTeam, setPenaltyTeam] = useState(null); // 'offense' or 'defense'
