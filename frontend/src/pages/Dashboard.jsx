@@ -116,6 +116,12 @@ export default function Dashboard({ user, onLogout }) {
   };
 
   const fetchData = async () => {
+    // Don't fetch if no sport is selected
+    if (!selectedSport) {
+      setLoading(false);
+      return;
+    }
+    
     try {
       const [gamesRes, teamsRes] = await Promise.all([
         axios.get(`${API}/games`, { params: { sport: selectedSport } }),
