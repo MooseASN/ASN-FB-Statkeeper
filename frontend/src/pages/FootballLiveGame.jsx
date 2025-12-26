@@ -1503,8 +1503,13 @@ export default function FootballLiveGame({ user, onLogout }) {
     setPuntReturnerNumber(null);
     setPuntDistance(40);
     setPuntReturnYards(0);
+    setPuntReturnStartYardLine(20);
+    setPuntTacklerNumber(null);
     setKickerNumber(null);
     setFgDistance(30);
+    setFgBlockerNumber(null);
+    setFgReturnYards(0);
+    setFgNoReturn(false);
     setPenaltyTeam(null);
     setPenaltyYards(5);
     setPenaltyDescription('');
