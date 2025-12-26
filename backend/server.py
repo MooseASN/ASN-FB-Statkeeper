@@ -655,11 +655,19 @@ async def update_display_name(data: dict, user: User = Depends(get_current_user)
 
 # ============ ADMIN ENDPOINTS ============
 
-ADMIN_EMAILS = ["antlersportsnetwork@gmail.com"]
+ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
+ADMIN_USERNAMES = ["admin"]
+RESERVED_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
+RESERVED_USERNAMES = ["admin"]
+
+def is_admin_user(user: User) -> bool:
+    """Check if user has admin privileges"""
+    return (user.email.lower() in ADMIN_EMAILS or 
+            (user.username and user.username.lower() in ADMIN_USERNAMES))
 
 async def get_admin_user(user: User = Depends(get_current_user)) -> User:
     """Verify user is an admin"""
-    if user.email.lower() not in ADMIN_EMAILS:
+    if not is_admin_user(user):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
