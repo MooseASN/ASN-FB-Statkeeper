@@ -15,6 +15,8 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
+  const { selectedSport } = useSport();
+  const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [activeGames, setActiveGames] = useState([]);
   const [scheduledGames, setScheduledGames] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
@@ -43,7 +45,7 @@ export default function Dashboard({ user, onLogout }) {
   useEffect(() => {
     fetchData();
     fetchSponsorBanners();
-  }, []);
+  }, [selectedSport]);
 
   const fetchSponsorBanners = async () => {
     try {
