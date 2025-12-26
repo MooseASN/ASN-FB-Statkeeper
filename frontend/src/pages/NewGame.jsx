@@ -539,9 +539,6 @@ export default function NewGame({ user, onLogout }) {
                       <p className="text-sm text-slate-600">
                         <strong>Preview:</strong> {periodMinutes}:{periodSeconds.toString().padStart(2, '0')} per {periodLabel.toLowerCase()}
                       </p>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Player minutes will be tracked when they are checked in on the floor
-                      </p>
                     </div>
                   </div>
                 )}
