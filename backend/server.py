@@ -1492,8 +1492,9 @@ async def start_game(game_id: str, request: StartGameRequest = None, user: User 
 @api_router.get("/games", response_model=List[Game])
 async def get_games(sport: Optional[str] = None, user: User = Depends(get_current_user)):
     query = {"user_id": user.user_id}
-    if sport:
-        query["sport"] = sport
+    # Only add sport filter if a valid sport is provided
+    if sport and sport.strip():
+        query["sport"] = sport.strip()
     games = await db.games.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
     return games
 
