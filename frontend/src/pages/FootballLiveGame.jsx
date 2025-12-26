@@ -2389,26 +2389,22 @@ export default function FootballLiveGame({ user, onLogout }) {
     setShowAdvanceQuarterDialog(false);
   };
 
-  // Start new drive (NFL rules: drive starts when team gains possession)
-  const startNewDrive = (team) => {
-    setCurrentDrive({
-      startTime: clockTime,
-      startQuarter: quarter,
-      startPosition: ballPosition,
-      plays: 0,
-      yards: 0,
-      team: team,
-      elapsedTime: 0
-    });
-  };
-
-  // Update drive stats when a play is made
-  const updateDriveStats = (yardsGained) => {
-    setCurrentDrive(prev => ({
-      ...prev,
-      plays: prev.plays + 1,
-      yards: prev.yards + yardsGained
-    }));
+  // NOTE: startNewDrive, endDrive, addPlayToDrive are defined above using useCallback
+  // These helper functions use the comprehensive drive tracking data model per specification
+  
+  // Update drive stats when a play is made (legacy wrapper for compatibility)
+  const updateDriveStats = (yardsGained, play = null) => {
+    if (play) {
+      // Use the new comprehensive addPlayToDrive function
+      addPlayToDrive(play);
+    } else {
+      // Legacy fallback - just update counts
+      setCurrentDrive(prev => ({
+        ...prev,
+        playCount: prev.playCount + 1,
+        netYards: prev.netYards + yardsGained
+      }));
+    }
   };
 
   // Calculate drive time - uses elapsed time directly for accuracy
