@@ -358,11 +358,22 @@ export default function FootballLiveStats({
                   className="w-16 h-16 rounded-lg flex items-center justify-center text-2xl font-bold"
                   style={{ backgroundColor: awayColor }}
                 >
-                  {awayAbbrev}
+                  {awayLogo ? (
+                    <img src={awayLogo} alt={awayAbbrev} className="w-full h-full object-cover rounded-lg" />
+                  ) : awayAbbrev}
                 </div>
                 <div>
                   <div className="text-lg font-bold">{awayTeamName}</div>
-                  <div className="text-sm text-zinc-500">{game?.away_record || ''}</div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <span className="text-xs text-zinc-500 mr-1">TO:</span>
+                    {[...Array(3)].map((_, i) => (
+                      <div 
+                        key={i}
+                        className={`w-3 h-3 rounded-full ${i < awayTimeouts ? '' : 'opacity-30'}`}
+                        style={{ backgroundColor: i < awayTimeouts ? awayColor : '#666' }}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -385,13 +396,24 @@ export default function FootballLiveStats({
               <div className="flex items-center gap-4 flex-1 justify-end">
                 <div className="text-right">
                   <div className="text-lg font-bold">{homeTeamName}</div>
-                  <div className="text-sm text-zinc-500">{game?.home_record || ''}</div>
+                  <div className="flex items-center gap-1 mt-1 justify-end">
+                    <span className="text-xs text-zinc-500 mr-1">TO:</span>
+                    {[...Array(3)].map((_, i) => (
+                      <div 
+                        key={i}
+                        className={`w-3 h-3 rounded-full ${i < homeTimeouts ? '' : 'opacity-30'}`}
+                        style={{ backgroundColor: i < homeTimeouts ? homeColor : '#666' }}
+                      />
+                    ))}
+                  </div>
                 </div>
                 <div 
                   className="w-16 h-16 rounded-lg flex items-center justify-center text-2xl font-bold"
                   style={{ backgroundColor: homeColor }}
                 >
-                  {homeAbbrev}
+                  {homeLogo ? (
+                    <img src={homeLogo} alt={homeAbbrev} className="w-full h-full object-cover rounded-lg" />
+                  ) : homeAbbrev}
                 </div>
               </div>
             </div>
