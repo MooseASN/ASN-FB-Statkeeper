@@ -2440,15 +2440,25 @@ export default function FootballLiveGame({ user, onLogout }) {
             <span className="text-2xl">🏈</span>
             <span className="font-bold">FOOTBALL</span>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="text-zinc-400 hover:text-white"
-          >
-            <Share2 className="w-4 h-4 mr-2" />
-            Share
-          </Button>
-        </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-zinc-600 text-zinc-300 hover:text-white"
+              onClick={() => window.open(`/football/${id}/stats`, '_blank')}
+            >
+              <TrendingUp className="w-4 h-4 mr-2" />
+              Live Stats
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-zinc-400 hover:text-white"
+            >
+              <Share2 className="w-4 h-4 mr-2" />
+              Share
+            </Button>
+          </div>
       </header>
 
       {/* Scoreboard */}
