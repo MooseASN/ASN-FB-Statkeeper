@@ -517,120 +517,135 @@ class DriveTrackingTester:
     def test_drive_ending_scenarios(self):
         """Test drive ending and new drive starting"""
         try:
-            # Test drive ending on touchdown (already tested above, but verify data persistence)
-            verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
+            # Create a complete drive scenario with touchdown ending
+            current_time = datetime.now().isoformat()
             
-            if verify_response.status_code == 200:
-                game_data = verify_response.json()
-                saved_state = game_data.get("football_state", {})
+            # Create a complete drive with multiple plays ending in touchdown
+            complete_drive_state = {
+                "play_log": [
+                    {
+                        "id": "drive_end_play1",
+                        "quarter": 1,
+                        "play_type": "RUN",
+                        "carrier": "22",
+                        "carrier_name": "Mike Johnson",
+                        "result": "GAIN",
+                        "yards": 5,
+                        "description": "RUN by #22 Mike Johnson for 5 yards GAIN",
+                        "drive_id": "completed_drive_1"
+                    },
+                    {
+                        "id": "drive_end_play2",
+                        "quarter": 1,
+                        "play_type": "PASS",
+                        "passer": "12",
+                        "passer_name": "Tom Brady",
+                        "receiver": "88",
+                        "receiver_name": "Jerry Rice",
+                        "result": "TOUCHDOWN",
+                        "yards": 20,
+                        "description": "PASS from #12 Tom Brady to #88 Jerry Rice for 20 yards TOUCHDOWN",
+                        "drive_id": "completed_drive_1"
+                    }
+                ],
+                "current_drive": {
+                    "id": "new_drive_after_td",
+                    "team": "away",
+                    "start_yard": 25,
+                    "current_yard": 25,
+                    "playCount": 0,
+                    "netYards": 0,
+                    "result": "ongoing",
+                    "start_time": "12:00"
+                },
+                "all_drives": [
+                    {
+                        "id": "completed_drive_1",
+                        "team": "home",
+                        "start_yard": 25,
+                        "end_yard": 0,
+                        "playCount": 2,
+                        "netYards": 25,
+                        "result": "touchdown",
+                        "start_time": "15:00",
+                        "end_time": "13:30"
+                    },
+                    {
+                        "id": "new_drive_after_td",
+                        "team": "away",
+                        "start_yard": 25,
+                        "current_yard": 25,
+                        "playCount": 0,
+                        "netYards": 0,
+                        "result": "ongoing",
+                        "start_time": "12:00"
+                    }
+                ],
+                "scores": {
+                    "home": 6,
+                    "away": 0
+                },
+                "quarter": 1,
+                "possession": "away",
+                "ball_position": 25,
+                "down": 1,
+                "distance": 10
+            }
+            
+            # Submit the complete drive scenario
+            response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
+                "football_state": complete_drive_state
+            })
+            
+            if response.status_code == 200:
+                # Verify the drive data was saved
+                verify_response = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
                 
-                # Check that drive data is saved to backend
-                all_drives = saved_state.get("all_drives", [])
-                current_drive = saved_state.get("current_drive", {})
-                
-                # Should have at least one completed drive
-                completed_drives = [d for d in all_drives if d.get("result") == "touchdown"]
-                
-                if len(completed_drives) > 0:
-                    completed_drive = completed_drives[0]
+                if verify_response.status_code == 200:
+                    game_data = verify_response.json()
+                    saved_state = game_data.get("football_state", {})
                     
-                    # Verify drive has required fields
-                    required_fields = ["id", "team", "start_yard", "playCount", "netYards", "result"]
-                    missing_fields = [field for field in required_fields if field not in completed_drive]
+                    # Check that drive data is saved to backend
+                    all_drives = saved_state.get("all_drives", [])
+                    current_drive = saved_state.get("current_drive", {})
                     
-                    if not missing_fields:
-                        # Test new drive starting after kickoff
-                        kickoff_play_id = f"test_kickoff_{int(time.time())}"
-                        new_drive_id = f"drive_test_2"
+                    # Should have completed drive and new drive
+                    completed_drives = [d for d in all_drives if d.get("result") == "touchdown"]
+                    ongoing_drives = [d for d in all_drives if d.get("result") == "ongoing"]
+                    
+                    if len(completed_drives) > 0 and len(ongoing_drives) > 0:
+                        completed_drive = completed_drives[0]
                         
-                        kickoff_state = {
-                            "play_log": saved_state.get("play_log", []) + [
-                                {
-                                    "id": kickoff_play_id,
-                                    "play_id": kickoff_play_id,
-                                    "quarter": 1,
-                                    "play_type": "KICKOFF",
-                                    "kicker": "9",
-                                    "kicker_name": "Adam Vinatieri",
-                                    "result": "TOUCHBACK",
-                                    "yards": 65,
-                                    "description": "KICKOFF by #9 Adam Vinatieri for 65 yards TOUCHBACK",
-                                    "timestamp": datetime.now().isoformat()
-                                }
-                            ],
-                            "current_drive": {
-                                "id": new_drive_id,
-                                "team": "away",
-                                "start_yard": 25,
-                                "current_yard": 25,
-                                "playCount": 0,
-                                "netYards": 0,
-                                "result": "ongoing",
-                                "start_time": "13:00",
-                                "plays": []
-                            },
-                            "all_drives": all_drives + [
-                                {
-                                    "id": new_drive_id,
-                                    "team": "away",
-                                    "start_yard": 25,
-                                    "current_yard": 25,
-                                    "playCount": 0,
-                                    "netYards": 0,
-                                    "result": "ongoing",
-                                    "start_time": "13:00",
-                                    "plays": []
-                                }
-                            ],
-                            "possession": "away",
-                            "ball_position": 25,
-                            "down": 1,
-                            "distance": 10
-                        }
+                        # Verify completed drive has required fields
+                        required_fields = ["id", "team", "start_yard", "playCount", "netYards", "result"]
+                        missing_fields = [field for field in required_fields if field not in completed_drive]
                         
-                        # Submit kickoff and new drive
-                        ko_response = self.session.put(f"{BACKEND_URL}/games/{FOOTBALL_GAME_ID}", json={
-                            "football_state": kickoff_state
-                        })
-                        
-                        if ko_response.status_code == 200:
-                            # Verify new drive started
-                            ko_verify = self.session.get(f"{BACKEND_URL}/games/public/{FOOTBALL_GAME_ID}")
-                            
-                            if ko_verify.status_code == 200:
-                                ko_data = ko_verify.json()
-                                ko_saved_state = ko_data.get("football_state", {})
+                        if not missing_fields:
+                            # Verify new drive started correctly
+                            if (current_drive.get("team") == "away" and 
+                                current_drive.get("result") == "ongoing" and
+                                current_drive.get("playCount") == 0):
                                 
-                                new_current_drive = ko_saved_state.get("current_drive", {})
-                                new_all_drives = ko_saved_state.get("all_drives", [])
-                                
-                                if (new_current_drive.get("team") == "away" and 
-                                    new_current_drive.get("result") == "ongoing" and
-                                    len(new_all_drives) >= 2):
-                                    
-                                    self.log_test("Drive Ending Scenarios", True, 
-                                                 "Drive ends on touchdown, new drive starts after kickoff, data persists to backend")
-                                    return True
-                                else:
-                                    self.log_test("Drive Ending Scenarios", False, 
-                                                 f"New drive not started correctly: {new_current_drive}")
-                                    return False
+                                self.log_test("Drive Ending Scenarios", True, 
+                                             f"Drive ends on touchdown, new drive starts correctly - {len(all_drives)} total drives saved to backend")
+                                return True
                             else:
-                                self.log_test("Drive Ending Scenarios", False, "Failed to verify new drive")
+                                self.log_test("Drive Ending Scenarios", False, 
+                                             f"New drive not started correctly: {current_drive}")
                                 return False
                         else:
-                            self.log_test("Drive Ending Scenarios", False, f"Failed to submit kickoff: {ko_response.status_code}")
+                            self.log_test("Drive Ending Scenarios", False, 
+                                         f"Completed drive missing fields: {missing_fields}")
                             return False
                     else:
                         self.log_test("Drive Ending Scenarios", False, 
-                                     f"Completed drive missing fields: {missing_fields}")
+                                     f"Drive data not saved correctly - Completed: {len(completed_drives)}, Ongoing: {len(ongoing_drives)}")
                         return False
                 else:
-                    self.log_test("Drive Ending Scenarios", False, 
-                                 f"No completed drives found: {len(all_drives)} total drives")
+                    self.log_test("Drive Ending Scenarios", False, "Failed to verify drive data")
                     return False
             else:
-                self.log_test("Drive Ending Scenarios", False, "Failed to get game state for drive testing")
+                self.log_test("Drive Ending Scenarios", False, f"Failed to submit drive scenario: {response.status_code}")
                 return False
                 
         except Exception as e:
