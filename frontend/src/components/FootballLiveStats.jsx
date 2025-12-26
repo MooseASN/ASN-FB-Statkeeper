@@ -280,6 +280,32 @@ export default function FootballLiveStats({
   const awayTeamName = game?.away_team_name || 'Away';
   const homeAbbrev = homeTeamName.substring(0, 3).toUpperCase();
   const awayAbbrev = awayTeamName.substring(0, 3).toUpperCase();
+  const homeLogo = game?.home_team_logo || null;
+  const awayLogo = game?.away_team_logo || null;
+
+  // Render team logo or abbreviation
+  const renderTeamLogo = (logo, abbrev, color, size = 'md') => {
+    const sizeClasses = size === 'lg' ? 'w-16 h-16 text-2xl' : size === 'sm' ? 'w-6 h-6 text-xs' : 'w-10 h-10 text-sm';
+    
+    if (logo) {
+      return (
+        <img 
+          src={logo} 
+          alt={abbrev}
+          className={`${sizeClasses} rounded-lg object-cover`}
+        />
+      );
+    }
+    
+    return (
+      <div 
+        className={`${sizeClasses} rounded-lg flex items-center justify-center font-bold`}
+        style={{ backgroundColor: color }}
+      >
+        {abbrev}
+      </div>
+    );
+  };
 
   const leaderTabs = [
     { id: 'tackles', label: 'Tackles' },
