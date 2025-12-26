@@ -433,12 +433,12 @@ export default function NewGame({ user, onLogout }) {
                 
                 {(clockEnabled || selectedSport === "football") && (
                   <div className="space-y-4 pt-2 border-t">
-                    <p className="text-sm text-muted-foreground">
-                      {selectedSport === "football" 
-                        ? "Set your quarter length for this game"
-                        : "Enable clock to track player minutes and manage game time"
-                      }
-                    </p>
+                    {/* Only show description for basketball */}
+                    {selectedSport !== "football" && (
+                      <p className="text-sm text-muted-foreground">
+                        Enable clock to track player minutes and manage game time
+                      </p>
+                    )}
                     
                     {/* Period Duration */}
                     <div>
