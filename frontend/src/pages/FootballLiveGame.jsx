@@ -821,6 +821,29 @@ export default function FootballLiveGame({ user, onLogout }) {
   // Clock
   const [clockTime, setClockTime] = useState(900); // 15 minutes default
   const [clockRunning, setClockRunning] = useState(false);
+  const [showSetClockDialog, setShowSetClockDialog] = useState(false);
+  const [tempClockMinutes, setTempClockMinutes] = useState(15);
+  const [tempClockSeconds, setTempClockSeconds] = useState(0);
+
+  // Clock countdown effect
+  useEffect(() => {
+    let interval = null;
+    if (clockRunning && clockTime > 0) {
+      interval = setInterval(() => {
+        setClockTime(prev => {
+          if (prev <= 1) {
+            setClockRunning(false);
+            toast.info("Quarter ended!");
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [clockRunning, clockTime]);
 
   useEffect(() => {
     fetchGame();
