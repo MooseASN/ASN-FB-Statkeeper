@@ -249,7 +249,13 @@ export default function PenaltyWorkflowDialog({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (isOpen) {
+        resetState();
+      } else {
+        onClose();
+      }
+    }}>
       <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-xl">
         <DialogHeader>
           <DialogTitle className="text-xl text-center flex items-center justify-center gap-2">
