@@ -128,6 +128,10 @@ export default function Layout({ children, user, onLogout }) {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/account")} className="cursor-pointer">
+                      <Settings className="w-4 h-4 mr-2" />
+                      Account Settings
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={handleSwitchSport} className="cursor-pointer">
                       <ArrowLeftRight className="w-4 h-4 mr-2" />
                       Switch Sport
