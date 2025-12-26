@@ -1733,11 +1733,13 @@ export default function FootballLiveGame({ user, onLogout }) {
         description = `Pass play - ${selectedResult}`;
     }
     
-    // Create play entry
+    // Create play entry with comprehensive data model
     const play = {
-      id: Date.now(),
-      quarter,
-      clock: formatTime(clockTime),
+      id: `play-${Date.now()}`,
+      play_id: `play-${Date.now()}`,
+      period: quarter,
+      clock_start: clockTime,
+      clock_end: clockTime,
       team: possession,
       type: 'pass',
       qb: passQBNumber,
@@ -1748,11 +1750,19 @@ export default function FootballLiveGame({ user, onLogout }) {
       interceptionReturn: interceptionReturnYards,
       down,
       distance,
+      start_spot: ballPosition,
+      end_spot: newBallPosition,
       ball_on: getYardLineText(),
       description,
+      no_play: ['incomplete', 'dropped', 'broken_up'].includes(selectedResult) ? false : false,
+      quarter, // Legacy field for display
+      clock: formatTime(clockTime), // Legacy field for display
     };
     
     setPlayLog(prev => [play, ...prev]);
+    
+    // Add play to current drive tracking
+    addPlayToDrive(play);
     
     // Update game state
     if (isTouchdown) {
@@ -1766,16 +1776,21 @@ export default function FootballLiveGame({ user, onLogout }) {
       setDistance(0);
       toast.success(`${teamName} TOUCHDOWN!`);
       
+      // End the current drive with TD result
+      endDrive('TD', possession === 'home' ? 100 : 0);
+      
       // Reset play state and automatically trigger Extra Point workflow
       resetPlayState();
       setTimeout(() => {
         setSelectedPlayType('extra_point');
         setPlayStep(0);
       }, 500);
-      updateDriveStats(yards);
       return; // Exit early
     } else if (turnover) {
       setBallPosition(newBallPosition);
+      // End current drive due to interception
+      endDrive('INT', newBallPosition);
+      
       // Switch possession and start new drive
       const newPossession = possession === 'home' ? 'away' : 'home';
       setPossession(newPossession);
@@ -1786,24 +1801,25 @@ export default function FootballLiveGame({ user, onLogout }) {
         : Math.max(0, newBallPosition - 10);
       setFirstDownMarker(newFDMarker);
       // Start new drive after interception
-      setCurrentDrive({
-        startTime: clockTime,
-        plays: 0,
-        yards: 0,
-        elapsedTime: 0
-      });
+      startNewDrive('turnover', newPossession);
       toast.info(`${defTeamName} interception! New drive started.`);
     } else if (['incomplete', 'dropped', 'broken_up'].includes(selectedResult)) {
       // No yardage change, just advance down
       const newDown = down + 1;
       if (newDown > 4) {
-        setPossession(possession === 'home' ? 'away' : 'home');
+        // End current drive due to turnover on downs
+        endDrive('downs', ballPosition);
+        
+        const newPossession = possession === 'home' ? 'away' : 'home';
+        setPossession(newPossession);
         setDown(1);
         setDistance(10);
         const newFDMarker = possession === 'home' 
           ? Math.max(0, ballPosition - 10) 
           : Math.min(100, ballPosition + 10);
         setFirstDownMarker(newFDMarker);
+        // Start new drive for receiving team
+        startNewDrive('turnover_on_downs', newPossession);
         toast.info('Turnover on downs');
       } else {
         setDown(newDown);
@@ -1825,13 +1841,19 @@ export default function FootballLiveGame({ user, onLogout }) {
         const newDistance = selectedResult === 'sacked' ? distance - yards : distance - yards;
         
         if (newDown > 4) {
-          setPossession(possession === 'home' ? 'away' : 'home');
+          // End current drive due to turnover on downs
+          endDrive('downs', newBallPosition);
+          
+          const newPossession = possession === 'home' ? 'away' : 'home';
+          setPossession(newPossession);
           setDown(1);
           setDistance(10);
           const newFDMarker = possession === 'home' 
             ? Math.max(0, newBallPosition - 10) 
             : Math.min(100, newBallPosition + 10);
           setFirstDownMarker(newFDMarker);
+          // Start new drive for receiving team
+          startNewDrive('turnover_on_downs', newPossession);
           toast.info('Turnover on downs');
         } else {
           setDown(newDown);
