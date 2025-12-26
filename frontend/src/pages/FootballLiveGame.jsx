@@ -1777,14 +1777,170 @@ export default function FootballLiveGame({ user, onLogout }) {
   };
 
   // Handle using a timeout
-  const handleUseTimeout = (team) => {
+  const handleUseTimeout = (team, type = 'regular') => {
+    if (type === 'media') {
+      setClockRunning(false);
+      toast.info('Media Timeout');
+      const play = {
+        id: Date.now(),
+        quarter,
+        clock: formatTime(clockTime),
+        team: 'none',
+        type: 'timeout',
+        description: 'Media Timeout',
+      };
+      setPlayLog(prev => [play, ...prev]);
+      setShowTimeoutDialog(false);
+      return;
+    }
+    
     if (team === 'home' && homeTimeouts > 0) {
       setHomeTimeouts(prev => prev - 1);
+      setClockRunning(false);
       toast.success(`${game?.home_team_name} timeout`);
+      const play = {
+        id: Date.now(),
+        quarter,
+        clock: formatTime(clockTime),
+        team: 'home',
+        type: 'timeout',
+        description: `${game?.home_team_name} Timeout`,
+      };
+      setPlayLog(prev => [play, ...prev]);
     } else if (team === 'away' && awayTimeouts > 0) {
       setAwayTimeouts(prev => prev - 1);
+      setClockRunning(false);
       toast.success(`${game?.away_team_name} timeout`);
+      const play = {
+        id: Date.now(),
+        quarter,
+        clock: formatTime(clockTime),
+        team: 'away',
+        type: 'timeout',
+        description: `${game?.away_team_name} Timeout`,
+      };
+      setPlayLog(prev => [play, ...prev]);
+    } else {
+      toast.error('No timeouts remaining');
     }
+    setShowTimeoutDialog(false);
+  };
+
+  // Spot ball function
+  const handleSpotBall = () => {
+    setBallPosition(spotBallYardLine);
+    setShowSpotBallDialog(false);
+    toast.success(`Ball spotted at ${spotBallYardLine > 50 ? `OPP ${100 - spotBallYardLine}` : spotBallYardLine} yard line`);
+  };
+
+  // Set down and distance manually
+  const handleSetDownDistance = () => {
+    setDown(manualDown);
+    setDistance(manualDistance);
+    // Update first down marker based on new down/distance
+    const newFDMarker = possession === 'home' 
+      ? Math.min(100, ballPosition + manualDistance) 
+      : Math.max(0, ballPosition - manualDistance);
+    setFirstDownMarker(newFDMarker);
+    setShowSetDownDialog(false);
+    toast.success(`Set to ${manualDown}${manualDown === 1 ? 'st' : manualDown === 2 ? 'nd' : manualDown === 3 ? 'rd' : 'th'} & ${manualDistance}`);
+  };
+
+  // Advance quarter
+  const handleAdvanceQuarter = () => {
+    const nextQuarter = quarter + 1;
+    
+    if (quarter === 2) {
+      // Going to halftime
+      setQuarter(nextQuarter);
+      setClockRunning(false);
+      toast.info('Halftime');
+    } else if (quarter === 3) {
+      // Coming out of halftime - ask about resetting timeouts
+      if (window.confirm('Reset timeouts for the second half?')) {
+        setHomeTimeouts(3);
+        setAwayTimeouts(3);
+        toast.success('Timeouts reset for second half');
+      }
+      setQuarter(nextQuarter);
+      // Reset clock to quarter length
+      const quarterLength = game?.clock_settings?.period_duration || 900;
+      setClockTime(quarterLength);
+    } else if (nextQuarter <= 4) {
+      setQuarter(nextQuarter);
+      // Reset clock to quarter length
+      const quarterLength = game?.clock_settings?.period_duration || 900;
+      setClockTime(quarterLength);
+    } else {
+      // Game over
+      toast.info('Game Complete');
+    }
+    
+    setShowAdvanceQuarterDialog(false);
+  };
+
+  // Start new drive
+  const startNewDrive = (team) => {
+    setCurrentDrive({
+      startTime: clockTime,
+      startQuarter: quarter,
+      startPosition: ballPosition,
+      plays: 0,
+      yards: 0,
+      team: team
+    });
+  };
+
+  // Update drive stats when a play is made
+  const updateDriveStats = (yardsGained) => {
+    setCurrentDrive(prev => ({
+      ...prev,
+      plays: prev.plays + 1,
+      yards: prev.yards + yardsGained
+    }));
+  };
+
+  // Calculate drive time
+  const getDriveTime = () => {
+    if (!currentDrive.startTime) return '0:00';
+    
+    let totalSeconds = 0;
+    if (currentDrive.startQuarter === quarter) {
+      totalSeconds = currentDrive.startTime - clockTime;
+    } else {
+      // Multi-quarter drive
+      const quarterLength = game?.clock_settings?.period_duration || 900;
+      const quartersElapsed = quarter - currentDrive.startQuarter;
+      totalSeconds = currentDrive.startTime + ((quartersElapsed - 1) * quarterLength) + (quarterLength - clockTime);
+    }
+    
+    const mins = Math.floor(Math.max(0, totalSeconds) / 60);
+    const secs = Math.max(0, totalSeconds) % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Edit play in log
+  const handleEditPlay = (play) => {
+    setEditingPlayId(play.id);
+    setEditPlayData({ ...play });
+  };
+
+  // Save edited play
+  const handleSaveEditPlay = () => {
+    if (!editPlayData) return;
+    
+    setPlayLog(prev => prev.map(p => 
+      p.id === editingPlayId ? { ...editPlayData } : p
+    ));
+    setEditingPlayId(null);
+    setEditPlayData(null);
+    toast.success('Play updated');
+  };
+
+  // Cancel edit
+  const handleCancelEdit = () => {
+    setEditingPlayId(null);
+    setEditPlayData(null);
   };
 
   // Undo last play
