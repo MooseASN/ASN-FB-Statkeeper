@@ -290,14 +290,14 @@ export default function PenaltyWorkflowDialog({
               <input
                 type="text"
                 value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
+                onChange={(e) => handleSearchChange(e.target.value)}
                 placeholder="Search penalty name or abbreviation..."
                 className="w-full pl-10 pr-4 py-3 bg-zinc-800 border border-zinc-600 rounded-lg text-white placeholder-zinc-500 focus:outline-none focus:border-red-500"
                 autoFocus
               />
               {searchInput && (
                 <button
-                  onClick={() => setSearchInput('')}
+                  onClick={() => handleSearchChange('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300"
                 >
                   <X className="w-4 h-4" />
