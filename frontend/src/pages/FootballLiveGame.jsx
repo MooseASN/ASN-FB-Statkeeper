@@ -999,7 +999,19 @@ export default function FootballLiveGame({ user, onLogout }) {
         setHomeTimeouts(state.home_timeouts ?? 3);
         setAwayTimeouts(state.away_timeouts ?? 3);
         setPlayLog(state.play_log || []);
-        setClockTime(state.clock_time ?? 900);
+        
+        // Handle clock_time - could be stored as seconds (number) or "MM:SS" (string)
+        let clockSecs = 900;
+        if (state.clock_time !== undefined) {
+          if (typeof state.clock_time === 'string' && state.clock_time.includes(':')) {
+            const [mins, secs] = state.clock_time.split(':').map(Number);
+            clockSecs = (mins * 60) + (secs || 0);
+          } else if (typeof state.clock_time === 'number') {
+            clockSecs = state.clock_time;
+          }
+        }
+        setClockTime(clockSecs);
+        
         // Restore Time of Possession
         setHomeTimeOfPossession(state.home_time_of_possession || 0);
         setAwayTimeOfPossession(state.away_time_of_possession || 0);
