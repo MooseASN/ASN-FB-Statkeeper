@@ -485,8 +485,8 @@ export default function FootballLiveGame({ user, onLogout }) {
     setDistance(10);
   };
 
-  // Use timeout
-  const useTimeout = (team) => {
+  // Handle using a timeout
+  const handleUseTimeout = (team) => {
     if (team === 'home' && homeTimeouts > 0) {
       setHomeTimeouts(prev => prev - 1);
       toast.success(`${game?.home_team_name} timeout`);
