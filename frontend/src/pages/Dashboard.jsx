@@ -245,11 +245,11 @@ export default function Dashboard({ user, onLogout }) {
         {/* Hero Section */}
         <div className="bg-gradient-to-r from-[#000000] to-[#333333] rounded-2xl p-8 text-white">
           <div className="flex items-center gap-3 mb-4">
-            <img src="/logo-white.png" alt="StatMoose" className="w-10 h-10 object-contain" />
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">StatMoose Basketball</h1>
+            <span className="text-4xl">{sportConfig.icon}</span>
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">StatMoose {sportConfig.name}</h1>
           </div>
           <p className="text-white/80 text-lg mb-6 max-w-xl">
-            Track basketball statistics in real-time. Share live stats with your audience.
+            Track {sportConfig.name.toLowerCase()} statistics in real-time. Share live stats with your audience.
           </p>
           <div className="flex flex-wrap gap-3">
             <Link to="/new-game">
