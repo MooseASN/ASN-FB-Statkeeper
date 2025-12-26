@@ -1655,6 +1655,7 @@ export default function FootballLiveGame({ user, onLogout }) {
               awayTeam={awayTeamName}
               homeColor={homeColor}
               awayColor={awayColor}
+              firstDownMarker={firstDownMarker}
             />
 
             {/* Ball Position Controls */}
