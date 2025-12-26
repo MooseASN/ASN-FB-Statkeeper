@@ -976,13 +976,11 @@ export default function FootballLiveGame({ user, onLogout }) {
           return prev - 1;
         });
         
-        // Update drive elapsed time when clock is running and there's an active drive
-        if (currentDrive.startTime !== null) {
-          setCurrentDrive(prev => ({
-            ...prev,
-            elapsedTime: prev.elapsedTime + 1
-          }));
-        }
+        // Always update drive elapsed time when clock is running
+        setCurrentDrive(prev => ({
+          ...prev,
+          elapsedTime: prev.elapsedTime + 1
+        }));
         
         // Always update total time of possession when clock is running
         if (possession === 'home') {
@@ -995,7 +993,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [clockRunning, clockTime, currentDrive.startTime, possession]);
+  }, [clockRunning, clockTime, possession]);
 
   // Save football game state to backend
   const saveFootballState = useCallback(async (newPlayLog = playLog, newHomeScore = homeScore, newAwayScore = awayScore) => {
