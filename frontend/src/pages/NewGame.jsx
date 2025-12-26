@@ -74,6 +74,13 @@ export default function NewGame({ user, onLogout }) {
   };
 
   const getTimeoutSettings = () => {
+    // Football always has 3 timeouts per half
+    if (selectedSport === "football") {
+      return {
+        timeout_preset: "custom",
+        custom_timeouts: 3
+      };
+    }
     return {
       timeout_preset: timeoutPreset,
       custom_timeouts: timeoutPreset === "custom" ? customTimeouts : 4
