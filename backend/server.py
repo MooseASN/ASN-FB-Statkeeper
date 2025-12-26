@@ -1595,12 +1595,9 @@ async def get_event(event_id: str, user: User = Depends(get_current_user)):
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
     
-    # Get all games for this event
-    games = []
-    for game_id in event.get("game_ids", []):
-        game = await db.games.find_one({"id": game_id}, {"_id": 0})
-        if game:
-            games.append(game)
+    # Get all games for this event using batch query (optimized)
+    game_ids = event.get("game_ids", [])
+    games = await db.games.find({"id": {"$in": game_ids}}, {"_id": 0}).to_list(None) if game_ids else []
     
     # Sort games by date and time (earliest first)
     games.sort(key=lambda g: (g.get("scheduled_date") or "9999-12-31", g.get("scheduled_time") or "23:59"))
