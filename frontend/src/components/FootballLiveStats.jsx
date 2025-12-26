@@ -278,6 +278,194 @@ export default function FootballLiveStats({
     };
   }, [playLog]);
 
+  // Calculate drives from play log
+  const drives = useMemo(() => {
+    const allDrives = [];
+    let currentDrive = null;
+    
+    // Process plays in reverse order (oldest first)
+    const reversedPlays = [...playLog].reverse();
+    
+    reversedPlays.forEach((play, idx) => {
+      // Start a new drive if this is first play or possession changed
+      const prevPlay = idx > 0 ? reversedPlays[idx - 1] : null;
+      const possessionChanged = prevPlay && prevPlay.team !== play.team;
+      const isKickoff = play.type === 'kickoff';
+      const isPunt = prevPlay?.type === 'punt';
+      const isTurnover = prevPlay?.result === 'intercepted' || prevPlay?.result === 'fumble_lost';
+      const isScoring = prevPlay?.result === 'touchdown' || prevPlay?.type === 'field_goal' || prevPlay?.type === 'extra_point';
+      
+      if (!currentDrive || possessionChanged || isKickoff || isPunt || isTurnover || isScoring) {
+        if (currentDrive && currentDrive.plays.length > 0) {
+          allDrives.push(currentDrive);
+        }
+        currentDrive = {
+          id: `drive-${idx}`,
+          team: play.team,
+          quarter: play.quarter,
+          startYardLine: play.yard_line || play.ball_on || 25,
+          plays: [],
+          totalYards: 0,
+          result: 'In Progress',
+          timeOfPossession: 0
+        };
+      }
+      
+      currentDrive.plays.push(play);
+      currentDrive.totalYards += (play.yards || 0);
+      currentDrive.endYardLine = play.new_ball_position || (currentDrive.startYardLine + currentDrive.totalYards);
+      
+      // Determine drive result
+      if (play.result === 'touchdown') {
+        currentDrive.result = 'TOUCHDOWN';
+      } else if (play.type === 'field_goal' && play.result === 'good') {
+        currentDrive.result = 'FIELD GOAL';
+      } else if (play.result === 'intercepted') {
+        currentDrive.result = 'INTERCEPTION';
+      } else if (play.result === 'fumble_lost') {
+        currentDrive.result = 'FUMBLE';
+      } else if (play.type === 'punt') {
+        currentDrive.result = 'PUNT';
+      } else if (play.type === 'field_goal' && play.result !== 'good') {
+        currentDrive.result = 'MISSED FG';
+      } else if (play.turnover_on_downs) {
+        currentDrive.result = 'TURNOVER ON DOWNS';
+      }
+    });
+    
+    if (currentDrive && currentDrive.plays.length > 0) {
+      allDrives.push(currentDrive);
+    }
+    
+    return allDrives.reverse(); // Most recent first
+  }, [playLog]);
+
+  // Calculate box score stats by player
+  const boxScore = useMemo(() => {
+    const stats = {
+      home: {
+        passing: [],
+        rushing: [],
+        receiving: [],
+        defense: [],
+        specialTeams: []
+      },
+      away: {
+        passing: [],
+        rushing: [],
+        receiving: [],
+        defense: [],
+        specialTeams: []
+      }
+    };
+    
+    // Aggregate stats by player
+    const playerMap = { home: {}, away: {} };
+    
+    playLog.forEach(play => {
+      const team = play.team || 'home';
+      const defTeam = team === 'home' ? 'away' : 'home';
+      
+      // Passing stats
+      if (play.type === 'pass' && play.qb) {
+        if (!playerMap[team][`qb-${play.qb}`]) {
+          playerMap[team][`qb-${play.qb}`] = {
+            number: play.qb,
+            type: 'passing',
+            comp: 0, att: 0, yards: 0, td: 0, int: 0
+          };
+        }
+        const qb = playerMap[team][`qb-${play.qb}`];
+        qb.att++;
+        if (play.result === 'complete' || play.result === 'touchdown') {
+          qb.comp++;
+          qb.yards += play.yards || 0;
+        }
+        if (play.result === 'touchdown') qb.td++;
+        if (play.result === 'intercepted') qb.int++;
+      }
+      
+      // Rushing stats
+      if (play.type === 'run' && play.carrier) {
+        if (!playerMap[team][`rb-${play.carrier}`]) {
+          playerMap[team][`rb-${play.carrier}`] = {
+            number: play.carrier,
+            type: 'rushing',
+            att: 0, yards: 0, td: 0, long: 0
+          };
+        }
+        const rb = playerMap[team][`rb-${play.carrier}`];
+        rb.att++;
+        rb.yards += play.yards || 0;
+        if (play.result === 'touchdown') rb.td++;
+        rb.long = Math.max(rb.long, play.yards || 0);
+      }
+      
+      // Receiving stats
+      if (play.type === 'pass' && play.receiver && (play.result === 'complete' || play.result === 'touchdown')) {
+        if (!playerMap[team][`wr-${play.receiver}`]) {
+          playerMap[team][`wr-${play.receiver}`] = {
+            number: play.receiver,
+            type: 'receiving',
+            rec: 0, yards: 0, td: 0, long: 0
+          };
+        }
+        const wr = playerMap[team][`wr-${play.receiver}`];
+        wr.rec++;
+        wr.yards += play.yards || 0;
+        if (play.result === 'touchdown') wr.td++;
+        wr.long = Math.max(wr.long, play.yards || 0);
+      }
+      
+      // Defensive stats
+      if (play.tackler) {
+        if (!playerMap[defTeam][`def-${play.tackler}`]) {
+          playerMap[defTeam][`def-${play.tackler}`] = {
+            number: play.tackler,
+            type: 'defense',
+            tackles: 0, sacks: 0, tfl: 0, int: 0
+          };
+        }
+        const def = playerMap[defTeam][`def-${play.tackler}`];
+        def.tackles++;
+        if (play.result === 'sack') def.sacks++;
+        if (play.yards < 0) def.tfl++;
+      }
+      
+      if (play.result === 'intercepted' && play.interceptedBy) {
+        if (!playerMap[defTeam][`def-${play.interceptedBy}`]) {
+          playerMap[defTeam][`def-${play.interceptedBy}`] = {
+            number: play.interceptedBy,
+            type: 'defense',
+            tackles: 0, sacks: 0, tfl: 0, int: 0
+          };
+        }
+        playerMap[defTeam][`def-${play.interceptedBy}`].int++;
+      }
+    });
+    
+    // Convert to arrays
+    ['home', 'away'].forEach(team => {
+      Object.values(playerMap[team]).forEach(player => {
+        if (player.type === 'passing') stats[team].passing.push(player);
+        else if (player.type === 'rushing') stats[team].rushing.push(player);
+        else if (player.type === 'receiving') stats[team].receiving.push(player);
+        else if (player.type === 'defense') stats[team].defense.push(player);
+      });
+      
+      // Sort by primary stat
+      stats[team].passing.sort((a, b) => b.yards - a.yards);
+      stats[team].rushing.sort((a, b) => b.yards - a.yards);
+      stats[team].receiving.sort((a, b) => b.yards - a.yards);
+      stats[team].defense.sort((a, b) => b.tackles - a.tackles);
+    });
+    
+    return stats;
+  }, [playLog]);
+
+  // State for hovered drive (for tooltip)
+  const [hoveredDrive, setHoveredDrive] = useState(null);
+
   const homeTeamName = game?.home_team_name || 'Home';
   const awayTeamName = game?.away_team_name || 'Away';
   const homeAbbrev = homeTeamName.substring(0, 3).toUpperCase();
@@ -307,6 +495,21 @@ export default function FootballLiveStats({
         {abbrev}
       </div>
     );
+  };
+
+  // Format TOP display
+  const formatDriveTOP = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Get result color
+  const getResultColor = (result) => {
+    if (result === 'TOUCHDOWN' || result === 'FIELD GOAL') return 'text-green-400';
+    if (result === 'INTERCEPTION' || result === 'FUMBLE') return 'text-red-400';
+    if (result === 'PUNT' || result === 'MISSED FG' || result === 'TURNOVER ON DOWNS') return 'text-yellow-400';
+    return 'text-zinc-400';
   };
 
   const leaderTabs = [
