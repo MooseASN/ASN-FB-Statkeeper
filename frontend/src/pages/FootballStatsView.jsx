@@ -19,6 +19,11 @@ export default function FootballStatsView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Set document title
+  useEffect(() => {
+    document.title = "StatMoose FB";
+  }, []);
+
   // Helper to format play description from event data
   const formatPlayDescription = useCallback((event) => {
     if (event.description) return event.description;
