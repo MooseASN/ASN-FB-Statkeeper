@@ -1118,11 +1118,295 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
   };
 
+  // Handle Run Play submission
+  const handleSubmitRunPlay = () => {
+    const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const direction = possession === 'home' ? 1 : -1;
+    const newBallPosition = Math.max(0, Math.min(100, ballPosition + (yards * direction)));
+    
+    // Check for first down
+    const isFirstDown = (possession === 'home' && newBallPosition >= firstDownMarker) ||
+                        (possession === 'away' && newBallPosition <= firstDownMarker);
+    
+    // Build play description
+    let description = `#${runCarrierNumber} `;
+    if (selectedResult === 'touchdown') {
+      description += `rushes for ${yards} yards - TOUCHDOWN!`;
+    } else if (selectedResult === 'fumble_lost') {
+      description += `fumble lost after ${yards} yards`;
+    } else if (selectedResult === 'fumble_rec') {
+      description += `fumble recovered after ${yards} yards`;
+    } else if (yards > 0) {
+      description += `rushes for ${yards} yards`;
+    } else if (yards < 0) {
+      description += `tackled for loss of ${Math.abs(yards)} yards`;
+    } else {
+      description += `no gain`;
+    }
+    
+    if (runTacklerNumber) {
+      description += `. Tackle by #${runTacklerNumber}`;
+    }
+    
+    if (isFirstDown && selectedResult !== 'touchdown' && selectedResult !== 'fumble_lost') {
+      description += ' - FIRST DOWN';
+    }
+    
+    // Create play entry
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: possession,
+      type: 'run',
+      carrier: runCarrierNumber,
+      tackler: runTacklerNumber,
+      result: selectedResult,
+      yards,
+      down,
+      distance,
+      ball_on: getYardLineText(),
+      description,
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    // Update game state
+    if (selectedResult === 'touchdown') {
+      if (possession === 'home') {
+        setHomeScore(prev => prev + 6);
+      } else {
+        setAwayScore(prev => prev + 6);
+      }
+      setBallPosition(possession === 'home' ? 98 : 2);
+      setDown(1);
+      setDistance(0);
+      toast.success(`${teamName} TOUCHDOWN!`);
+    } else if (selectedResult === 'fumble_lost') {
+      setBallPosition(newBallPosition);
+      setPossession(possession === 'home' ? 'away' : 'home');
+      setDown(1);
+      setDistance(10);
+      // Update first down marker for new possession
+      const newFDMarker = possession === 'home' 
+        ? Math.max(0, newBallPosition - 10) 
+        : Math.min(100, newBallPosition + 10);
+      setFirstDownMarker(newFDMarker);
+      toast.info('Fumble - turnover!');
+    } else {
+      setBallPosition(newBallPosition);
+      
+      if (isFirstDown) {
+        setDown(1);
+        setDistance(10);
+        // Set new first down marker
+        const newFDMarker = possession === 'home' 
+          ? Math.min(100, newBallPosition + 10) 
+          : Math.max(0, newBallPosition - 10);
+        setFirstDownMarker(newFDMarker);
+        toast.success('First Down!');
+      } else {
+        const newDown = down + 1;
+        const newDistance = distance - yards;
+        
+        if (newDown > 4) {
+          // Turnover on downs
+          setPossession(possession === 'home' ? 'away' : 'home');
+          setDown(1);
+          setDistance(10);
+          const newFDMarker = possession === 'home' 
+            ? Math.max(0, newBallPosition - 10) 
+            : Math.min(100, newBallPosition + 10);
+          setFirstDownMarker(newFDMarker);
+          toast.info('Turnover on downs');
+        } else {
+          setDown(newDown);
+          setDistance(Math.max(0, newDistance));
+        }
+      }
+    }
+    
+    // Reset play state
+    resetPlayState();
+  };
+
+  // Handle Pass Play submission
+  const handleSubmitPassPlay = () => {
+    const teamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const defTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    const direction = possession === 'home' ? 1 : -1;
+    
+    let description = '';
+    let newBallPosition = ballPosition;
+    let turnover = false;
+    let isTouchdown = false;
+    let isFirstDown = false;
+    
+    switch (selectedResult) {
+      case 'complete':
+        newBallPosition = Math.max(0, Math.min(100, ballPosition + (yards * direction)));
+        isFirstDown = (possession === 'home' && newBallPosition >= firstDownMarker) ||
+                      (possession === 'away' && newBallPosition <= firstDownMarker);
+        description = `#${passQBNumber} pass to #${passReceiverNumber} for ${yards} yards`;
+        if (passDefenderNumber) description += `. Tackle by #${passDefenderNumber}`;
+        if (isFirstDown) description += ' - FIRST DOWN';
+        break;
+        
+      case 'touchdown':
+        newBallPosition = possession === 'home' ? 100 : 0;
+        isTouchdown = true;
+        description = `#${passQBNumber} pass to #${passReceiverNumber} for ${yards} yards - TOUCHDOWN!`;
+        break;
+        
+      case 'incomplete':
+        description = `#${passQBNumber} pass incomplete`;
+        break;
+        
+      case 'sacked':
+        newBallPosition = Math.max(0, Math.min(100, ballPosition + (yards * direction))); // yards is negative
+        description = `#${passQBNumber} sacked for loss of ${Math.abs(yards)} yards`;
+        if (passDefenderNumber) description += ` by #${passDefenderNumber}`;
+        break;
+        
+      case 'intercepted':
+        turnover = true;
+        const intReturnDir = possession === 'home' ? -1 : 1;
+        newBallPosition = Math.max(0, Math.min(100, ballPosition + (interceptionReturnYards * intReturnDir)));
+        description = `#${passQBNumber} pass INTERCEPTED by #${passDefenderNumber}`;
+        if (interceptionReturnYards > 0) {
+          description += `, returned ${interceptionReturnYards} yards`;
+        }
+        break;
+        
+      case 'dropped':
+        description = `#${passQBNumber} pass to #${passReceiverNumber} DROPPED`;
+        break;
+        
+      case 'broken_up':
+        description = `#${passQBNumber} pass broken up by #${passDefenderNumber}`;
+        break;
+        
+      default:
+        description = `Pass play - ${selectedResult}`;
+    }
+    
+    // Create play entry
+    const play = {
+      id: Date.now(),
+      quarter,
+      clock: formatTime(clockTime),
+      team: possession,
+      type: 'pass',
+      qb: passQBNumber,
+      receiver: passReceiverNumber,
+      defender: passDefenderNumber,
+      result: selectedResult,
+      yards,
+      interceptionReturn: interceptionReturnYards,
+      down,
+      distance,
+      ball_on: getYardLineText(),
+      description,
+    };
+    
+    setPlayLog(prev => [play, ...prev]);
+    
+    // Update game state
+    if (isTouchdown) {
+      if (possession === 'home') {
+        setHomeScore(prev => prev + 6);
+      } else {
+        setAwayScore(prev => prev + 6);
+      }
+      setBallPosition(possession === 'home' ? 98 : 2);
+      setDown(1);
+      setDistance(0);
+      toast.success(`${teamName} TOUCHDOWN!`);
+    } else if (turnover) {
+      setBallPosition(newBallPosition);
+      setPossession(possession === 'home' ? 'away' : 'home');
+      setDown(1);
+      setDistance(10);
+      const newFDMarker = possession === 'home' 
+        ? Math.max(0, newBallPosition - 10) 
+        : Math.min(100, newBallPosition + 10);
+      setFirstDownMarker(newFDMarker);
+      toast.info(`${defTeamName} interception!`);
+    } else if (['incomplete', 'dropped', 'broken_up'].includes(selectedResult)) {
+      // No yardage change, just advance down
+      const newDown = down + 1;
+      if (newDown > 4) {
+        setPossession(possession === 'home' ? 'away' : 'home');
+        setDown(1);
+        setDistance(10);
+        const newFDMarker = possession === 'home' 
+          ? Math.max(0, ballPosition - 10) 
+          : Math.min(100, ballPosition + 10);
+        setFirstDownMarker(newFDMarker);
+        toast.info('Turnover on downs');
+      } else {
+        setDown(newDown);
+      }
+    } else {
+      // Complete or sacked - update position
+      setBallPosition(newBallPosition);
+      
+      if (isFirstDown) {
+        setDown(1);
+        setDistance(10);
+        const newFDMarker = possession === 'home' 
+          ? Math.min(100, newBallPosition + 10) 
+          : Math.max(0, newBallPosition - 10);
+        setFirstDownMarker(newFDMarker);
+        toast.success('First Down!');
+      } else {
+        const newDown = down + 1;
+        const newDistance = selectedResult === 'sacked' ? distance - yards : distance - yards;
+        
+        if (newDown > 4) {
+          setPossession(possession === 'home' ? 'away' : 'home');
+          setDown(1);
+          setDistance(10);
+          const newFDMarker = possession === 'home' 
+            ? Math.max(0, newBallPosition - 10) 
+            : Math.min(100, newBallPosition + 10);
+          setFirstDownMarker(newFDMarker);
+          toast.info('Turnover on downs');
+        } else {
+          setDown(newDown);
+          setDistance(Math.max(0, newDistance));
+        }
+      }
+    }
+    
+    // Reset play state
+    resetPlayState();
+  };
+
+  // Reset play state helper
+  const resetPlayState = () => {
+    setSelectedPlayType(null);
+    setSelectedResult(null);
+    setYards(0);
+    setPlayStep(0);
+    setRunCarrierNumber(null);
+    setRunTacklerNumber(null);
+    setPassQBNumber(null);
+    setPassReceiverNumber(null);
+    setPassDefenderNumber(null);
+    setInterceptionReturnYards(0);
+  };
+
   // Change possession
   const togglePossession = () => {
     setPossession(prev => prev === 'home' ? 'away' : 'home');
     setDown(1);
     setDistance(10);
+    // Update first down marker for new possession
+    const newFDMarker = possession === 'home' 
+      ? Math.max(0, ballPosition - 10) 
+      : Math.min(100, ballPosition + 10);
+    setFirstDownMarker(newFDMarker);
   };
 
   // Handle using a timeout
