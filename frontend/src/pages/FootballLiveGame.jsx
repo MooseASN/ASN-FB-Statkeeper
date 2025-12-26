@@ -3051,7 +3051,9 @@ export default function FootballLiveGame({ user, onLogout }) {
                       >
                         Submit Play
                       </Button>
-                </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
