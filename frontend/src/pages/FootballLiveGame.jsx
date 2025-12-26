@@ -23,6 +23,8 @@ import {
   Undo2,
   Share2
 } from "lucide-react";
+import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
+import { RULESETS } from "@/data/penaltyCatalog";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
