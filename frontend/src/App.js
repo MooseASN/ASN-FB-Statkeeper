@@ -12,6 +12,7 @@ import NewGame from "@/pages/NewGame";
 import EditGame from "@/pages/EditGame";
 import LiveGame from "@/pages/LiveGame";
 import AdvancedLiveGame from "@/pages/AdvancedLiveGame";
+import FootballLiveGame from "@/pages/FootballLiveGame";
 import LiveView from "@/pages/LiveView";
 import EventLive from "@/pages/EventLive";
 import EmbedLiveGame from "@/pages/EmbedLiveGame";
