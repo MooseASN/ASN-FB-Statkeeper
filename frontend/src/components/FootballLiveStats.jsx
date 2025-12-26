@@ -597,6 +597,7 @@ export default function FootballLiveStats({
                 <TeamStatRow label="Passing Yards" away={teamStats.away.passingYards} home={teamStats.home.passingYards} awayColor={awayColor} homeColor={homeColor} />
                 <TeamStatRow label="Total Yards" away={teamStats.away.totalYards} home={teamStats.home.totalYards} awayColor={awayColor} homeColor={homeColor} />
                 <TeamStatRow label="Penalties" away={`${teamStats.away.penalties}-${teamStats.away.penaltyYards}`} home={`${teamStats.home.penalties}-${teamStats.home.penaltyYards}`} awayColor={awayColor} homeColor={homeColor} />
+                <TeamStatRow label="Time of Poss." away={formatTOP(awayTimeOfPossession)} home={formatTOP(homeTimeOfPossession)} awayColor={awayColor} homeColor={homeColor} />
               </div>
             </div>
           </div>
