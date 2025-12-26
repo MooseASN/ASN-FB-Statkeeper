@@ -772,6 +772,7 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [down, setDown] = useState(1);
   const [distance, setDistance] = useState(10);
   const [quarter, setQuarter] = useState(1);
+  const [firstDownMarker, setFirstDownMarker] = useState(35); // Ball position needed for first down
   
   // Current play
   const [selectedPlayType, setSelectedPlayType] = useState(null);
