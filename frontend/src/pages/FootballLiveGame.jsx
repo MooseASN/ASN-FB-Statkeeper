@@ -4571,63 +4571,215 @@ export default function FootballLiveGame({ user, onLogout }) {
                   <div className="space-y-4">
                     <div className="text-lg font-bold text-red-400 mb-2">PENALTY</div>
                     
-                    {/* Step 1: Penalty on which team */}
+                    {/* Step 1: Select Penalty Type */}
                     {playStep === 0 && (
                       <div className="space-y-4">
-                        <div className="text-sm text-zinc-400 uppercase">Penalty Result</div>
-                        <div className="flex flex-wrap gap-2">
-                          {PLAY_RESULTS.penalty.map((result) => (
-                            <button
-                              key={result.id}
-                              onClick={() => { setSelectedResult(result.id); setPlayStep(1); }}
-                              className={`py-2 px-4 rounded font-medium ${
-                                selectedResult === result.id ? 'bg-red-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'
-                              }`}
-                            >
-                              {result.label}
-                            </button>
-                          ))}
+                        <div className="text-sm text-zinc-400 uppercase">Select Penalty</div>
+                        
+                        {/* Quick penalty buttons */}
+                        <div className="grid grid-cols-3 gap-2">
+                          <Button 
+                            onClick={() => { setPenaltyDescription('False Start'); setPenaltyYards(5); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            False Start
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Offsides'); setPenaltyYards(5); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Offsides
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Holding'); setPenaltyYards(10); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Holding
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Personal Foul'); setPenaltyYards(15); setPlayStep(1); }}
+                            className="bg-red-700 hover:bg-red-600 h-12"
+                          >
+                            Personal Foul
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Pass Interference'); setPenaltyYards(15); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Pass Interference
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Delay of Game'); setPenaltyYards(5); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Delay of Game
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Facemask'); setPenaltyYards(15); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Facemask
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription('Illegal Formation'); setPenaltyYards(5); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Illegal Formation
+                          </Button>
+                          <Button 
+                            onClick={() => { setPenaltyDescription(''); setPlayStep(1); }}
+                            className="bg-zinc-700 hover:bg-zinc-600 h-12"
+                          >
+                            Other...
+                          </Button>
+                        </div>
+                        
+                        {/* Declined/Offsetting at bottom */}
+                        <div className="flex gap-2 mt-4 pt-4 border-t border-zinc-700">
+                          <Button 
+                            onClick={() => { setSelectedResult('declined'); setPlayStep(4); }}
+                            variant="outline"
+                            className="flex-1 border-zinc-600"
+                          >
+                            Penalty Declined
+                          </Button>
+                          <Button 
+                            onClick={() => { setSelectedResult('offsetting'); setPlayStep(4); }}
+                            variant="outline"
+                            className="flex-1 border-zinc-600"
+                          >
+                            Offsetting Penalties
+                          </Button>
+                        </div>
+                        
+                        {/* Open Enhanced Dialog */}
+                        <Button
+                          variant="outline"
+                          className="w-full border-zinc-600 mt-2"
+                          onClick={() => setShowPenaltyDialog(true)}
+                        >
+                          Open Full Penalty Catalog →
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 2: Select Team */}
+                    {playStep === 1 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          Penalty: <span className="text-red-400 font-bold">{penaltyDescription || 'Other'}</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Penalty On</div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <Button
+                            onClick={() => { setSelectedResult('offense'); setPlayStep(2); }}
+                            className="h-16 text-lg font-bold"
+                            style={{ backgroundColor: possession === 'home' ? homeColor : awayColor }}
+                          >
+                            Offense
+                          </Button>
+                          <Button
+                            onClick={() => { setSelectedResult('defense'); setPlayStep(2); }}
+                            className="h-16 text-lg font-bold"
+                            style={{ backgroundColor: possession === 'home' ? awayColor : homeColor }}
+                          >
+                            Defense
+                          </Button>
+                        </div>
+                        
+                        <Button variant="outline" className="border-zinc-600" onClick={() => { setPenaltyDescription(''); setPlayStep(0); }}>← Back</Button>
+                      </div>
+                    )}
+                    
+                    {/* Step 3: Select Player (Optional) */}
+                    {playStep === 2 && (
+                      <div className="space-y-4">
+                        <div className="text-sm text-zinc-400">
+                          {penaltyDescription || 'Penalty'} on <span className="text-red-400 font-bold">{selectedResult === 'offense' ? 'Offense' : 'Defense'}</span>
+                        </div>
+                        
+                        <div className="text-sm text-zinc-400 uppercase">Select Player (Optional)</div>
+                        <div className="flex gap-3">
+                          <input
+                            type="text"
+                            placeholder="Enter #"
+                            value={penaltyPlayerNumber || ''}
+                            onChange={(e) => setPenaltyPlayerNumber(e.target.value.replace(/\D/g, '').slice(0, 2))}
+                            className="w-24 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center text-xl font-bold"
+                          />
+                          <div className="flex flex-wrap gap-1 flex-1 max-h-20 overflow-y-auto">
+                            {(selectedResult === 'offense' 
+                              ? (possession === 'home' ? homeRoster : awayRoster)
+                              : (possession === 'home' ? awayRoster : homeRoster)
+                            ).map((player) => (
+                              <button
+                                key={player.id}
+                                onClick={() => setPenaltyPlayerNumber(player.number)}
+                                className={`px-2 py-1 rounded text-sm font-bold ${
+                                  penaltyPlayerNumber == player.number 
+                                    ? 'bg-red-600 text-white' 
+                                    : 'bg-zinc-700 text-zinc-300 hover:bg-zinc-600'
+                                }`}
+                              >
+                                #{player.number}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        
+                        <div className="flex gap-2 mt-4">
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(1)}>← Back</Button>
+                          <Button 
+                            onClick={() => setPlayStep(3)}
+                            className="bg-red-600 hover:bg-red-700"
+                          >
+                            {penaltyPlayerNumber ? 'Continue →' : 'Skip Player →'}
+                          </Button>
                         </div>
                       </div>
                     )}
                     
-                    {/* Step 2: Penalty Details */}
-                    {playStep === 1 && ['offense', 'defense'].includes(selectedResult) && (
+                    {/* Step 4: Enter Penalty Yardage */}
+                    {playStep === 3 && (
                       <div className="space-y-4">
                         <div className="text-sm text-zinc-400">
-                          Penalty on: <span className="text-red-400 font-bold">{selectedResult === 'offense' ? 'Offense' : 'Defense'}</span>
+                          {penaltyDescription || 'Penalty'} on {selectedResult === 'offense' ? 'Offense' : 'Defense'}
+                          {penaltyPlayerNumber && ` (#${penaltyPlayerNumber})`}
                         </div>
                         
-                        {/* Penalty Yards */}
-                        <div className="flex items-center justify-center gap-3 mt-4">
+                        <div className="text-sm text-zinc-400 uppercase">Penalty Yardage</div>
+                        <div className="flex items-center justify-center gap-3">
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => Math.max(1, prev - 5))}>-5</Button>
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => Math.max(1, prev - 1))}>-1</Button>
-                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                          <div className="px-6 py-3 bg-zinc-800 rounded text-center">
                             <div className="text-xs text-zinc-500">Yards</div>
-                            <div className="text-2xl font-bold text-red-400">{penaltyYards}</div>
+                            <div className="text-3xl font-bold text-red-400">{penaltyYards}</div>
                           </div>
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => prev + 1)}>+1</Button>
                           <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPenaltyYards(prev => prev + 5)}>+5</Button>
                         </div>
                         
-                        {/* Quick Select Common Penalties */}
-                        <div className="flex flex-wrap gap-2 mt-4">
-                          <button onClick={() => setPenaltyYards(5)} className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">5 yds</button>
-                          <button onClick={() => setPenaltyYards(10)} className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">10 yds</button>
-                          <button onClick={() => setPenaltyYards(15)} className="px-3 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-sm">15 yds</button>
+                        {/* Quick Select Common Yards */}
+                        <div className="flex flex-wrap gap-2 justify-center">
+                          <button onClick={() => setPenaltyYards(5)} className={`px-4 py-2 rounded font-medium ${penaltyYards === 5 ? 'bg-red-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}>5 yds</button>
+                          <button onClick={() => setPenaltyYards(10)} className={`px-4 py-2 rounded font-medium ${penaltyYards === 10 ? 'bg-red-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}>10 yds</button>
+                          <button onClick={() => setPenaltyYards(15)} className={`px-4 py-2 rounded font-medium ${penaltyYards === 15 ? 'bg-red-600 text-white' : 'bg-zinc-700 hover:bg-zinc-600'}`}>15 yds</button>
                         </div>
                         
-                        {/* Penalty Description (optional) */}
-                        <input
-                          type="text"
-                          placeholder="Penalty description (optional)"
-                          value={penaltyDescription}
-                          onChange={(e) => setPenaltyDescription(e.target.value)}
-                          className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white"
-                        />
+                        {/* Custom description if "Other" was selected */}
+                        {!penaltyDescription && (
+                          <input
+                            type="text"
+                            placeholder="Penalty description (optional)"
+                            value={penaltyDescription}
+                            onChange={(e) => setPenaltyDescription(e.target.value)}
+                            className="w-full bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white"
+                          />
+                        )}
                         
                         <div className="flex gap-2 mt-4">
-                          <Button variant="outline" className="border-zinc-600" onClick={() => { setSelectedResult(null); setPlayStep(0); }}>← Back</Button>
+                          <Button variant="outline" className="border-zinc-600" onClick={() => setPlayStep(2)}>← Back</Button>
                           <Button 
                             onClick={handleSubmitPenalty}
                             className="bg-green-600 hover:bg-green-700 px-8"
@@ -4638,8 +4790,8 @@ export default function FootballLiveGame({ user, onLogout }) {
                       </div>
                     )}
                     
-                    {/* Declined/Offsetting */}
-                    {playStep === 1 && ['declined', 'offsetting'].includes(selectedResult) && (
+                    {/* Step 5: Declined/Offsetting Confirmation */}
+                    {playStep === 4 && ['declined', 'offsetting'].includes(selectedResult) && (
                       <div className="space-y-4">
                         <div className="text-sm text-zinc-400">
                           Result: <span className="text-red-400 font-bold">{selectedResult === 'declined' ? 'Penalty Declined' : 'Offsetting Penalties'}</span>
