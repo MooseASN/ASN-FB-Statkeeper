@@ -1023,7 +1023,10 @@ export default function FootballLiveGame({ user, onLogout }) {
         play_log: newPlayLog,
         clock_time: clockTime,
         home_time_of_possession: homeTimeOfPossession,
-        away_time_of_possession: awayTimeOfPossession
+        away_time_of_possession: awayTimeOfPossession,
+        // Drive tracking data
+        current_drive: currentDrive,
+        all_drives: allDrives,
       };
       
       await axios.put(`${API}/games/${id}`, {
@@ -1037,7 +1040,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     } catch (error) {
       console.error("Failed to save game state:", error);
     }
-  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession]);
+  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession, currentDrive, allDrives]);
 
   useEffect(() => {
     fetchGame();
