@@ -25,6 +25,7 @@ import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import AccountSettings from "@/pages/AccountSettings";
+import AdminDashboard from "@/pages/AdminDashboard";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
