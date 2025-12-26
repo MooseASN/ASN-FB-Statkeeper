@@ -1037,8 +1037,11 @@ async def start_game(game_id: str, request: StartGameRequest = None, user: User 
     return updated
 
 @api_router.get("/games", response_model=List[Game])
-async def get_games(user: User = Depends(get_current_user)):
-    games = await db.games.find({"user_id": user.user_id}, {"_id": 0}).sort("created_at", -1).to_list(100)
+async def get_games(sport: Optional[str] = None, user: User = Depends(get_current_user)):
+    query = {"user_id": user.user_id}
+    if sport:
+        query["sport"] = sport
+    games = await db.games.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
     return games
 
 @api_router.get("/games/{game_id}")
