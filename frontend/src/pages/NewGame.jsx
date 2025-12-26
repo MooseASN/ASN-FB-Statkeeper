@@ -65,12 +65,15 @@ export default function NewGame({ user, onLogout }) {
   };
 
   const getClockSettings = () => {
-    if (!clockEnabled) return {};
-    return {
-      clock_enabled: true,
-      period_duration: (periodMinutes * 60) + periodSeconds,
-      period_label: periodLabel
-    };
+    // Football always has clock enabled
+    if (selectedSport === "football" || clockEnabled) {
+      return {
+        clock_enabled: true,
+        period_duration: (periodMinutes * 60) + periodSeconds,
+        period_label: periodLabel
+      };
+    }
+    return {};
   };
 
   const getTimeoutSettings = () => {
