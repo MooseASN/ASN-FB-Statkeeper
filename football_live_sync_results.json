@@ -1,19 +1,47 @@
 {
-  "timestamp": "2025-12-26T18:34:46.117658",
-  "overall_success": false,
+  "timestamp": "2025-12-26T18:35:23.370671",
+  "overall_success": true,
   "test_results": [
     {
       "test": "Admin Authentication",
       "success": true,
       "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
-      "timestamp": "2025-12-26T18:34:46.106899",
+      "timestamp": "2025-12-26T18:35:23.294633",
       "details": null
     },
     {
       "test": "Backend API State Verification",
-      "success": false,
-      "message": "play_log has 2 plays, expected 3+",
-      "timestamp": "2025-12-26T18:34:46.117514",
+      "success": true,
+      "message": "Game state verified - 3 plays, TOP fields present",
+      "timestamp": "2025-12-26T18:35:23.308318",
+      "details": null
+    },
+    {
+      "test": "Record New Play via API",
+      "success": true,
+      "message": "Successfully added new play and updated score to 14",
+      "timestamp": "2025-12-26T18:35:23.333804",
+      "details": null
+    },
+    {
+      "test": "Verify Public API Returns Updated Data",
+      "success": true,
+      "message": "Public API shows updated data - Test play found, Scores: 14-3",
+      "timestamp": "2025-12-26T18:35:23.341159",
+      "details": null
+    },
+    {
+      "test": "Verify Game Status",
+      "success": true,
+      "message": "Game status is 'active' and appears in active games list",
+      "timestamp": "2025-12-26T18:35:23.357429",
+      "details": null
+    },
+    {
+      "test": "Key Football State Fields",
+      "success": true,
+      "message": "All required fields present. Play log has 4 plays",
+      "timestamp": "2025-12-26T18:35:23.370512",
       "details": null
     }
   ]
