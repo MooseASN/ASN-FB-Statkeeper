@@ -222,7 +222,7 @@ async def register(user_data: UserRegister, response: Response):
 
 @api_router.post("/auth/login")
 async def login(credentials: UserLogin, response: Response):
-    """Login with email OR username and password"""
+    """Login with email OR username and password - works from any device/IP"""
     # Try to find user by email first, then by username
     login_identifier = credentials.email.lower().strip()
     user = await db.users.find_one({"email": login_identifier}, {"_id": 0})
@@ -240,17 +240,17 @@ async def login(credentials: UserLogin, response: Response):
     if not pwd_context.verify(credentials.password, user.get("password_hash", "")):
         raise HTTPException(status_code=401, detail="Invalid email/username or password")
     
-    # Create session
+    # Create session - no IP/device restrictions, just user credentials
     session_token = f"session_{uuid.uuid4().hex}"
     session_doc = {
         "user_id": user["user_id"],
         "session_token": session_token,
-        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=30),  # Extended to 30 days
         "created_at": datetime.now(timezone.utc)
     }
     await db.user_sessions.insert_one(session_doc)
     
-    # Set cookie
+    # Set cookie with settings that work across devices
     response.set_cookie(
         key="session_token",
         value=session_token,
@@ -258,7 +258,7 @@ async def login(credentials: UserLogin, response: Response):
         secure=True,
         samesite="none",
         path="/",
-        max_age=7 * 24 * 60 * 60
+        max_age=30 * 24 * 60 * 60  # 30 days
     )
     
     return {
