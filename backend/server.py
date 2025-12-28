@@ -191,17 +191,17 @@ async def register(user_data: UserRegister, response: Response):
     }
     await db.users.insert_one(user_doc)
     
-    # Create session
+    # Create session - no device/IP restrictions
     session_token = f"session_{uuid.uuid4().hex}"
     session_doc = {
         "user_id": user_id,
         "session_token": session_token,
-        "expires_at": datetime.now(timezone.utc) + timedelta(days=7),
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=30),  # Extended to 30 days
         "created_at": datetime.now(timezone.utc)
     }
     await db.user_sessions.insert_one(session_doc)
     
-    # Set cookie
+    # Set cookie with cross-device compatible settings
     response.set_cookie(
         key="session_token",
         value=session_token,
@@ -209,7 +209,7 @@ async def register(user_data: UserRegister, response: Response):
         secure=True,
         samesite="none",
         path="/",
-        max_age=7 * 24 * 60 * 60
+        max_age=30 * 24 * 60 * 60  # 30 days
     )
     
     return {
