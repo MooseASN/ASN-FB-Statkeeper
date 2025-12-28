@@ -225,19 +225,37 @@ async def login(credentials: UserLogin, response: Response):
     """Login with email OR username and password - works from any device/IP"""
     # Try to find user by email first, then by username
     login_identifier = credentials.email.lower().strip()
+    logging.info(f"Login attempt for: {login_identifier}")
+    
     user = await db.users.find_one({"email": login_identifier}, {"_id": 0})
     
     if not user:
         # Try username
         user = await db.users.find_one({"username": login_identifier}, {"_id": 0})
+        logging.info(f"Tried username lookup, found: {user is not None}")
     
     if not user:
+        logging.warning(f"User not found: {login_identifier}")
         raise HTTPException(status_code=401, detail="Invalid email/username or password")
+    
+    logging.info(f"User found: {user.get('email')}, auth_provider: {user.get('auth_provider')}")
     
     if user.get("auth_provider") == "google":
         raise HTTPException(status_code=400, detail="This account uses Google login. Please sign in with Google.")
     
-    if not pwd_context.verify(credentials.password, user.get("password_hash", "")):
+    # Verify password
+    stored_hash = user.get("password_hash", "")
+    logging.info(f"Verifying password, hash exists: {bool(stored_hash)}, hash length: {len(stored_hash)}")
+    
+    try:
+        password_valid = pwd_context.verify(credentials.password, stored_hash)
+        logging.info(f"Password verification result: {password_valid}")
+    except Exception as e:
+        logging.error(f"Password verification error: {e}")
+        password_valid = False
+    
+    if not password_valid:
+        logging.warning(f"Password mismatch for user: {login_identifier}")
         raise HTTPException(status_code=401, detail="Invalid email/username or password")
     
     # Create session - no IP/device restrictions, just user credentials
@@ -249,6 +267,8 @@ async def login(credentials: UserLogin, response: Response):
         "created_at": datetime.now(timezone.utc)
     }
     await db.user_sessions.insert_one(session_doc)
+    
+    logging.info(f"Login successful for: {login_identifier}")
     
     # Set cookie with settings that work across devices
     response.set_cookie(
