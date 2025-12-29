@@ -3817,6 +3817,16 @@ async def health_check():
 async def api_health_check():
     return {"status": "healthy", "service": "statmoose-api"}
 
+# Health check endpoint that also ensures admin exists (for production init)
+@app.get("/api/init-admin")
+async def init_admin_endpoint():
+    """Initialize admin user - call this after deployment"""
+    try:
+        result = await ensure_admin_user()
+        return {"status": "ok", "admin_user": result, "message": "Admin user ready"}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
+
 app.include_router(api_router)
 
 # Dynamic CORS handling for credentials
