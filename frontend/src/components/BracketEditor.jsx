@@ -221,6 +221,7 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
                           <span>{game.game_time || 'TBD'}</span>
                           <span className="truncate max-w-[100px]">{game.venue || ''}</span>
                           <div className="flex gap-1">
+                            {game.linked_game_id && <Link2 className="w-3 h-3 text-purple-500" title="Linked to game" />}
                             {game.broadcast_link && <Video className="w-3 h-3 text-blue-500" />}
                             {game.live_stats_link && <BarChart3 className="w-3 h-3 text-green-500" />}
                           </div>
