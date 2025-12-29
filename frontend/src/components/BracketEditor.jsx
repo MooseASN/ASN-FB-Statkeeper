@@ -267,12 +267,12 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
                   <div>
                     <Label className="text-xs">Team</Label>
                     <Select
-                      value={selectedGame.team2_id || ''}
+                      value={selectedGame.team2_id || 'none'}
                       onValueChange={(value) => {
                         const team = teams.find(t => t.id === value);
                         setSelectedGame({
                           ...selectedGame,
-                          team2_id: value,
+                          team2_id: value === 'none' ? null : value,
                           team2_name: team?.name || 'TBD'
                         });
                       }}
@@ -281,7 +281,7 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
                         <SelectValue placeholder="Select team" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="">TBD</SelectItem>
+                        <SelectItem value="none">TBD</SelectItem>
                         {teams.map(team => (
                           <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
                         ))}
