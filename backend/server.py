@@ -32,8 +32,19 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-# Password hashing
+# Password hashing - use bcrypt directly for better compatibility
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# Helper function to verify password using bcrypt directly (avoids passlib warning)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    try:
+        return bcrypt_lib.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+    except Exception:
+        return False
+
+# Helper function to hash password
+def hash_password(password: str) -> str:
+    return bcrypt_lib.hashpw(password.encode('utf-8'), bcrypt_lib.gensalt()).decode('utf-8')
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
