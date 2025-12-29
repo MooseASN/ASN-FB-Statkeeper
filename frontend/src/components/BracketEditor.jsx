@@ -131,6 +131,7 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
   }
 
   const hasGames = bracket.games && bracket.games.length > 0;
+  const hasLinkedGames = bracket.games?.some(g => g.linked_game_id);
 
   return (
     <div className="p-4">
@@ -140,6 +141,12 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
           <p className="text-muted-foreground capitalize">{bracket.gender} • {bracket.bracket_type.replace('_', ' ')}</p>
         </div>
         <div className="flex gap-2">
+          {hasLinkedGames && (
+            <Button onClick={syncScores} variant="outline" disabled={syncing}>
+              <RefreshCw className={`w-4 h-4 mr-2 ${syncing ? 'animate-spin' : ''}`} />
+              {syncing ? 'Syncing...' : 'Sync Scores'}
+            </Button>
+          )}
           {!hasGames && (
             <Button onClick={initializeBracket} variant="outline">
               <Plus className="w-4 h-4 mr-2" />
