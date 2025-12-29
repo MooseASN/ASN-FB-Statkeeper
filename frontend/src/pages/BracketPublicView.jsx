@@ -49,7 +49,7 @@ export default function BracketPublicView() {
         <div className="text-white text-center">
           <Trophy className="w-16 h-16 mx-auto mb-4 text-slate-600" />
           <h1 className="text-2xl font-bold mb-2">Bracket Not Found</h1>
-          <p className="text-slate-400">The bracket you're looking for doesn't exist or has been removed.</p>
+          <p className="text-slate-400">The bracket you&apos;re looking for doesn&apos;t exist or has been removed.</p>
         </div>
       </div>
     );
