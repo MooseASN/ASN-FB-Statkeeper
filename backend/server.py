@@ -3861,6 +3861,50 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+@app.on_event("startup")
+async def startup_init():
+    """Initialize admin user on startup if it doesn't exist"""
+    try:
+        # Check if admin user exists
+        admin_user = await db.users.find_one({"email": "antlersportsnetwork@gmail.com"})
+        
+        if not admin_user:
+            # Create admin user with the specified credentials
+            admin_password = "NoahTheJew1997"
+            hashed = hash_password(admin_password)
+            
+            admin_doc = {
+                "user_id": "user_admin_001",
+                "email": "antlersportsnetwork@gmail.com",
+                "username": "admin",
+                "name": "Admin",
+                "password_hash": hashed,
+                "auth_provider": "local",
+                "security_questions": [],
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }
+            await db.users.insert_one(admin_doc)
+            logger.info("Admin user created successfully")
+        else:
+            # Ensure admin user has correct password and auth_provider
+            if admin_user.get("auth_provider") != "local":
+                admin_password = "NoahTheJew1997"
+                hashed = hash_password(admin_password)
+                await db.users.update_one(
+                    {"email": "antlersportsnetwork@gmail.com"},
+                    {"$set": {
+                        "password_hash": hashed,
+                        "auth_provider": "local",
+                        "username": "admin"
+                    }}
+                )
+                logger.info("Admin user updated with correct credentials")
+            else:
+                logger.info("Admin user already exists")
+    except Exception as e:
+        logger.error(f"Error initializing admin user: {e}")
+
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
