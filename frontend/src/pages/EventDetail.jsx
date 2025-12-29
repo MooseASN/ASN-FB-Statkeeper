@@ -369,35 +369,46 @@ export default function EventDetail({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Games Section */}
-        <div>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-semibold">Event Schedule</h2>
-            <div className="flex items-center gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setSortOrder(sortOrder === "oldest" ? "newest" : "oldest")}
-                className="gap-2"
-              >
-                <Clock className="w-4 h-4" />
-                {sortOrder === "oldest" ? "Oldest First" : "Newest First"}
-              </Button>
-              <Button onClick={handleOpenAddGame} className="gap-2" data-testid="add-game-btn">
-                <Plus className="w-4 h-4" />
-                Add Game
-              </Button>
-            </div>
-          </div>
+        {/* Tabs for Games and Brackets */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="games">Games Schedule</TabsTrigger>
+            <TabsTrigger value="brackets">
+              <Trophy className="w-4 h-4 mr-2" />
+              Brackets
+            </TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="games" className="mt-4">
+            {/* Games Section */}
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold">Event Schedule</h2>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => setSortOrder(sortOrder === "oldest" ? "newest" : "oldest")}
+                    className="gap-2"
+                  >
+                    <Clock className="w-4 h-4" />
+                    {sortOrder === "oldest" ? "Oldest First" : "Newest First"}
+                  </Button>
+                  <Button onClick={handleOpenAddGame} className="gap-2" data-testid="add-game-btn">
+                    <Plus className="w-4 h-4" />
+                    Add Game
+                  </Button>
+                </div>
+              </div>
 
-          {event.games?.length === 0 ? (
-            <Card className="text-center py-12">
-              <CardContent>
-                <PlayCircle className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-                <h3 className="text-xl font-semibold mb-2">No Games Yet</h3>
-                <p className="text-muted-foreground mb-4">Add scheduled games to this event</p>
-                <Button onClick={handleOpenAddGame}>
-                  <Plus className="w-4 h-4 mr-2" />
+              {event.games?.length === 0 ? (
+                <Card className="text-center py-12">
+                  <CardContent>
+                    <PlayCircle className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">No Games Yet</h3>
+                    <p className="text-muted-foreground mb-4">Add scheduled games to this event</p>
+                    <Button onClick={handleOpenAddGame}>
+                      <Plus className="w-4 h-4 mr-2" />
                   Add Game
                 </Button>
               </CardContent>
