@@ -260,7 +260,7 @@ async def login(credentials: UserLogin, response: Response):
     logging.info(f"Verifying password, hash exists: {bool(stored_hash)}, hash length: {len(stored_hash)}")
     
     try:
-        password_valid = pwd_context.verify(credentials.password, stored_hash)
+        password_valid = verify_password(credentials.password, stored_hash)
         logging.info(f"Password verification result: {password_valid}")
     except Exception as e:
         logging.error(f"Password verification error: {e}")
