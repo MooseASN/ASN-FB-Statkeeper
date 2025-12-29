@@ -2631,6 +2631,74 @@ async def initialize_16_team_bracket(bracket_id: str, user: User = Depends(get_c
     
     return await db.brackets.find_one({"id": bracket_id}, {"_id": 0})
 
+@api_router.post("/brackets/{bracket_id}/sync-scores")
+async def sync_bracket_scores(bracket_id: str, user: User = Depends(get_current_user)):
+    """Sync bracket game scores from linked scheduled games"""
+    bracket = await db.brackets.find_one({"id": bracket_id, "user_id": user.user_id}, {"_id": 0})
+    if not bracket:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    
+    games = bracket.get("games", [])
+    updated_count = 0
+    
+    for i, game in enumerate(games):
+        linked_game_id = game.get("linked_game_id")
+        if linked_game_id:
+            # Fetch the linked game
+            linked_game = await db.games.find_one({"id": linked_game_id}, {"_id": 0})
+            if linked_game:
+                # Update scores from the linked game
+                home_score = linked_game.get("home_score", 0)
+                away_score = linked_game.get("away_score", 0)
+                status = linked_game.get("status", "scheduled")
+                
+                # Map game status
+                game_status = "scheduled"
+                if status == "active":
+                    game_status = "in_progress"
+                elif status in ["completed", "final"]:
+                    game_status = "final"
+                
+                # Determine winner if game is final
+                winner_id = None
+                if game_status == "final":
+                    if home_score > away_score:
+                        winner_id = game.get("team1_id")  # Home team is team1
+                    elif away_score > home_score:
+                        winner_id = game.get("team2_id")  # Away team is team2
+                
+                games[i]["team1_score"] = home_score
+                games[i]["team2_score"] = away_score
+                games[i]["game_status"] = game_status
+                if winner_id:
+                    games[i]["winner_id"] = winner_id
+                
+                updated_count += 1
+    
+    await db.brackets.update_one(
+        {"id": bracket_id},
+        {"$set": {"games": games, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": f"Synced {updated_count} games", "bracket": await db.brackets.find_one({"id": bracket_id}, {"_id": 0})}
+
+@api_router.get("/brackets/{bracket_id}/available-games")
+async def get_available_games_for_bracket(bracket_id: str, user: User = Depends(get_current_user)):
+    """Get games that can be linked to this bracket"""
+    bracket = await db.brackets.find_one({"id": bracket_id, "user_id": user.user_id}, {"_id": 0})
+    if not bracket:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    
+    event_id = bracket.get("event_id")
+    
+    # Get all user's basketball games
+    games = await db.games.find(
+        {"user_id": user.user_id, "sport": "basketball"},
+        {"_id": 0, "id": 1, "home_team_name": 1, "away_team_name": 1, "scheduled_date": 1, "scheduled_time": 1, "share_code": 1, "status": 1}
+    ).to_list(500)
+    
+    return games
+
 # Bonus endpoint
 class BonusUpdate(BaseModel):
     team: str  # "home" or "away"
