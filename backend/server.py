@@ -2433,6 +2433,200 @@ async def remove_game_from_event(event_id: str, game_id: str, user: User = Depen
     
     return {"message": "Game removed from event"}
 
+# ============ BRACKET ENDPOINTS ============
+
+@api_router.post("/brackets")
+async def create_bracket(bracket_data: BracketCreate, user: User = Depends(get_current_user)):
+    """Create a new tournament bracket"""
+    # Verify event exists and belongs to user
+    event = await db.events.find_one({"id": bracket_data.event_id, "user_id": user.user_id}, {"_id": 0})
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    bracket = Bracket(
+        event_id=bracket_data.event_id,
+        user_id=user.user_id,
+        name=bracket_data.name,
+        bracket_type=bracket_data.bracket_type,
+        gender=bracket_data.gender,
+        games=[g.model_dump() for g in bracket_data.games]
+    )
+    
+    await db.brackets.insert_one(bracket.model_dump())
+    return bracket.model_dump()
+
+@api_router.get("/brackets")
+async def get_brackets(event_id: Optional[str] = None, user: User = Depends(get_current_user)):
+    """Get all brackets for user, optionally filtered by event"""
+    query = {"user_id": user.user_id}
+    if event_id:
+        query["event_id"] = event_id
+    
+    brackets = await db.brackets.find(query, {"_id": 0}).to_list(100)
+    return brackets
+
+@api_router.get("/brackets/{bracket_id}")
+async def get_bracket(bracket_id: str, user: User = Depends(get_current_user)):
+    """Get a specific bracket"""
+    bracket = await db.brackets.find_one({"id": bracket_id, "user_id": user.user_id}, {"_id": 0})
+    if not bracket:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    return bracket
+
+@api_router.get("/brackets/{bracket_id}/public")
+async def get_bracket_public(bracket_id: str):
+    """Get bracket for public viewing (no auth required)"""
+    bracket = await db.brackets.find_one({"id": bracket_id}, {"_id": 0})
+    if not bracket:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    return bracket
+
+@api_router.get("/events/{event_id}/brackets/public")
+async def get_event_brackets_public(event_id: str):
+    """Get all brackets for an event (public)"""
+    brackets = await db.brackets.find({"event_id": event_id}, {"_id": 0}).to_list(100)
+    return brackets
+
+@api_router.put("/brackets/{bracket_id}")
+async def update_bracket(bracket_id: str, bracket_data: BracketCreate, user: User = Depends(get_current_user)):
+    """Update entire bracket"""
+    existing = await db.brackets.find_one({"id": bracket_id, "user_id": user.user_id}, {"_id": 0})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    
+    update_data = {
+        "name": bracket_data.name,
+        "bracket_type": bracket_data.bracket_type,
+        "gender": bracket_data.gender,
+        "games": [g.model_dump() for g in bracket_data.games],
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.brackets.update_one({"id": bracket_id}, {"$set": update_data})
+    return await db.brackets.find_one({"id": bracket_id}, {"_id": 0})
+
+@api_router.put("/brackets/{bracket_id}/games/{game_id}")
+async def update_bracket_game(bracket_id: str, game_id: str, game_data: BracketGameUpdate, user: User = Depends(get_current_user)):
+    """Update a single game within a bracket"""
+    bracket = await db.brackets.find_one({"id": bracket_id, "user_id": user.user_id}, {"_id": 0})
+    if not bracket:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    
+    games = bracket.get("games", [])
+    game_found = False
+    
+    for i, game in enumerate(games):
+        if game.get("game_id") == game_id:
+            # Update only provided fields
+            update_dict = game_data.model_dump(exclude_unset=True)
+            for key, value in update_dict.items():
+                if value is not None:
+                    games[i][key] = value
+            game_found = True
+            break
+    
+    if not game_found:
+        raise HTTPException(status_code=404, detail="Game not found in bracket")
+    
+    await db.brackets.update_one(
+        {"id": bracket_id},
+        {"$set": {"games": games, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return await db.brackets.find_one({"id": bracket_id}, {"_id": 0})
+
+@api_router.delete("/brackets/{bracket_id}")
+async def delete_bracket(bracket_id: str, user: User = Depends(get_current_user)):
+    """Delete a bracket"""
+    result = await db.brackets.delete_one({"id": bracket_id, "user_id": user.user_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    return {"message": "Bracket deleted"}
+
+@api_router.post("/brackets/{bracket_id}/initialize-16-team")
+async def initialize_16_team_bracket(bracket_id: str, user: User = Depends(get_current_user)):
+    """Initialize a 16-team single elimination bracket structure"""
+    bracket = await db.brackets.find_one({"id": bracket_id, "user_id": user.user_id}, {"_id": 0})
+    if not bracket:
+        raise HTTPException(status_code=404, detail="Bracket not found")
+    
+    # Create 16-team bracket structure (15 games total)
+    games = []
+    
+    # Round 1 - First Round (8 games)
+    for i in range(1, 9):
+        games.append({
+            "game_id": f"G{i}",
+            "round_name": "First Round",
+            "round_number": 1,
+            "position": i,
+            "team1_id": None, "team1_name": "TBD", "team1_seed": (i * 2) - 1,
+            "team2_id": None, "team2_name": "TBD", "team2_seed": i * 2,
+            "team1_score": None, "team2_score": None,
+            "winner_id": None,
+            "game_date": None, "game_time": None, "venue": None,
+            "broadcast_link": None, "live_stats_link": None,
+            "game_status": "scheduled",
+            "feeds_into": f"G{8 + ((i + 1) // 2)}"
+        })
+    
+    # Round 2 - Quarterfinals (4 games)
+    for i in range(9, 13):
+        games.append({
+            "game_id": f"G{i}",
+            "round_name": "Quarterfinals",
+            "round_number": 2,
+            "position": i - 8,
+            "team1_id": None, "team1_name": "TBD",
+            "team2_id": None, "team2_name": "TBD",
+            "team1_score": None, "team2_score": None,
+            "winner_id": None,
+            "game_date": None, "game_time": None, "venue": None,
+            "broadcast_link": None, "live_stats_link": None,
+            "game_status": "scheduled",
+            "feeds_into": f"G{12 + ((i - 8 + 1) // 2)}"
+        })
+    
+    # Round 3 - Semifinals (2 games)
+    for i in range(13, 15):
+        games.append({
+            "game_id": f"G{i}",
+            "round_name": "Semifinals",
+            "round_number": 3,
+            "position": i - 12,
+            "team1_id": None, "team1_name": "TBD",
+            "team2_id": None, "team2_name": "TBD",
+            "team1_score": None, "team2_score": None,
+            "winner_id": None,
+            "game_date": None, "game_time": None, "venue": None,
+            "broadcast_link": None, "live_stats_link": None,
+            "game_status": "scheduled",
+            "feeds_into": "G15"
+        })
+    
+    # Round 4 - Championship (1 game)
+    games.append({
+        "game_id": "G15",
+        "round_name": "Championship",
+        "round_number": 4,
+        "position": 1,
+        "team1_id": None, "team1_name": "TBD",
+        "team2_id": None, "team2_name": "TBD",
+        "team1_score": None, "team2_score": None,
+        "winner_id": None,
+        "game_date": None, "game_time": None, "venue": None,
+        "broadcast_link": None, "live_stats_link": None,
+        "game_status": "scheduled",
+        "feeds_into": None
+    })
+    
+    await db.brackets.update_one(
+        {"id": bracket_id},
+        {"$set": {"games": games, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return await db.brackets.find_one({"id": bracket_id}, {"_id": 0})
+
 # Bonus endpoint
 class BonusUpdate(BaseModel):
     team: str  # "home" or "away"
