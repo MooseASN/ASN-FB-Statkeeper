@@ -1131,6 +1131,67 @@ class Event(BaseModel):
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
+# Tournament Bracket Models
+class BracketGame(BaseModel):
+    """Individual game in a bracket"""
+    game_id: str  # Unique ID for this game in the bracket (e.g., "G1", "G2")
+    round_name: str  # "First Round", "Quarterfinals", "Semifinals", "Championship", etc.
+    round_number: int  # 1, 2, 3, 4...
+    position: int  # Position within the round (1, 2, 3...)
+    team1_id: Optional[str] = None  # Team ID or None if TBD
+    team1_name: Optional[str] = None  # Team name for display
+    team1_seed: Optional[int] = None  # Seed number
+    team1_score: Optional[int] = None
+    team2_id: Optional[str] = None
+    team2_name: Optional[str] = None
+    team2_seed: Optional[int] = None
+    team2_score: Optional[int] = None
+    winner_id: Optional[str] = None
+    game_date: Optional[str] = None  # YYYY-MM-DD
+    game_time: Optional[str] = None  # HH:MM
+    venue: Optional[str] = None
+    broadcast_link: Optional[str] = None  # Link to video broadcast
+    live_stats_link: Optional[str] = None  # Link to live stats
+    game_status: str = "scheduled"  # scheduled, in_progress, final
+    feeds_into: Optional[str] = None  # game_id of the next game (e.g., "G9" for winner)
+
+class BracketCreate(BaseModel):
+    event_id: str  # Associated event
+    name: str  # "Boys Gold Bracket", "Girls Gold Bracket", etc.
+    bracket_type: str = "single_elimination"  # single_elimination, double_elimination, round_robin
+    gender: str = "boys"  # "boys" or "girls"
+    games: List[BracketGame] = []
+
+class Bracket(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    event_id: str
+    user_id: str = ""
+    name: str
+    bracket_type: str = "single_elimination"
+    gender: str = "boys"
+    games: List[dict] = []  # List of BracketGame as dicts
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class BracketGameUpdate(BaseModel):
+    """Update a single game in the bracket"""
+    team1_id: Optional[str] = None
+    team1_name: Optional[str] = None
+    team1_seed: Optional[int] = None
+    team1_score: Optional[int] = None
+    team2_id: Optional[str] = None
+    team2_name: Optional[str] = None
+    team2_seed: Optional[int] = None
+    team2_score: Optional[int] = None
+    winner_id: Optional[str] = None
+    game_date: Optional[str] = None
+    game_time: Optional[str] = None
+    venue: Optional[str] = None
+    broadcast_link: Optional[str] = None
+    live_stats_link: Optional[str] = None
+    game_status: Optional[str] = None
+
 # ============ TEAM ENDPOINTS ============
 
 @api_router.post("/teams", response_model=Team)
