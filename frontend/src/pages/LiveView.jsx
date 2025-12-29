@@ -384,9 +384,22 @@ export default function LiveView() {
               <img src="/logo-black.png" alt="StatMoose" className="w-6 h-6 object-contain" />
               <span className="font-bold text-[#000000]">StatMoose</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <RefreshCw className="w-4 h-4" />
-              <span>Auto-refresh</span>
+            <div className="flex items-center gap-4">
+              {/* Export PDF Button */}
+              <Button
+                onClick={handleExportPdf}
+                disabled={exportingPdf}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <FileDown className="w-4 h-4" />
+                {exportingPdf ? 'Exporting...' : 'Export PDF'}
+              </Button>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <RefreshCw className="w-4 h-4" />
+                <span className="hidden sm:inline">Auto-refresh</span>
+              </div>
             </div>
           </div>
         </div>
