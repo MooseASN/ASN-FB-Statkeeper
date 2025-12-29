@@ -1193,6 +1193,8 @@ class BracketGameUpdate(BaseModel):
     broadcast_link: Optional[str] = None
     live_stats_link: Optional[str] = None
     game_status: Optional[str] = None
+    linked_game_id: Optional[str] = None
+    linked_game_share_code: Optional[str] = None
 
 # ============ TEAM ENDPOINTS ============
 
