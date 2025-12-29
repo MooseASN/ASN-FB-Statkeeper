@@ -233,6 +233,41 @@ export default function LiveView() {
     return () => clearInterval(interval);
   }, [fetchGame]);
 
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  // Export PDF box score
+  const handleExportPdf = async () => {
+    if (!game?.id) {
+      toast.error('Game ID not available');
+      return;
+    }
+    
+    setExportingPdf(true);
+    try {
+      const response = await fetch(`${API}/games/${game.id}/boxscore/pdf`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `boxscore_${game.away_team_name || 'Away'}_vs_${game.home_team_name || 'Home'}.pdf`.replace(/\s+/g, '_');
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Box score PDF downloaded!');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to export PDF');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
+
   const calculateScore = (team) => {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
   };
