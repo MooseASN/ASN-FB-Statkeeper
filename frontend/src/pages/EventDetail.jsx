@@ -26,6 +26,15 @@ export default function EventDetail({ user, onLogout }) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [sortOrder, setSortOrder] = useState("oldest"); // "oldest" or "newest"
+  const [activeTab, setActiveTab] = useState("games"); // "games" or "brackets"
+  
+  // Bracket state
+  const [brackets, setBrackets] = useState([]);
+  const [teams, setTeams] = useState([]);
+  const [selectedBracketId, setSelectedBracketId] = useState(null);
+  const [createBracketDialogOpen, setCreateBracketDialogOpen] = useState(false);
+  const [newBracketName, setNewBracketName] = useState("");
+  const [newBracketGender, setNewBracketGender] = useState("boys");
   
   // Edit form state
   const [editName, setEditName] = useState("");
