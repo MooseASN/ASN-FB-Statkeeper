@@ -565,27 +565,40 @@ export default function FootballLiveStats({
       {/* Navigation Tabs */}
       <div className="bg-zinc-900 border-b border-zinc-800">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex gap-1 overflow-x-auto">
-            {[
-              { id: 'summary', label: 'Summary' },
-              { id: 'drives', label: 'Drives' },
-              { id: 'box-score', label: 'Box Score' },
-              { id: 'play-by-play', label: 'Play-by-Play' },
-              { id: 'team-stats', label: 'Team Stats' },
-              { id: 'leaders', label: 'Leaders' },
-            ].map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveSection(tab.id)}
-                className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${
-                  activeSection === tab.id
-                    ? 'border-red-500 text-white bg-zinc-800'
-                    : 'border-transparent text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+          <div className="flex items-center justify-between">
+            <div className="flex gap-1 overflow-x-auto">
+              {[
+                { id: 'summary', label: 'Summary' },
+                { id: 'drives', label: 'Drives' },
+                { id: 'box-score', label: 'Box Score' },
+                { id: 'play-by-play', label: 'Play-by-Play' },
+                { id: 'team-stats', label: 'Team Stats' },
+                { id: 'leaders', label: 'Leaders' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveSection(tab.id)}
+                  className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-all border-b-2 ${
+                    activeSection === tab.id
+                      ? 'border-red-500 text-white bg-zinc-800'
+                      : 'border-transparent text-zinc-400 hover:text-white hover:bg-zinc-800/50'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            {/* Export PDF Button */}
+            <Button
+              onClick={handleExportPdf}
+              disabled={exportingPdf}
+              variant="outline"
+              size="sm"
+              className="ml-4 border-zinc-600 text-zinc-300 hover:text-white hover:bg-zinc-800 flex items-center gap-2"
+            >
+              <FileDown className="w-4 h-4" />
+              {exportingPdf ? 'Exporting...' : 'Export PDF'}
+            </Button>
           </div>
         </div>
       </div>
