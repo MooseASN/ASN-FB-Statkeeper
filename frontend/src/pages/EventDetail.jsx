@@ -493,8 +493,131 @@ export default function EventDetail({ user, onLogout }) {
               ))}
             </div>
           )}
-        </div>
+            </div>
+          </TabsContent>
+          
+          {/* Brackets Tab */}
+          <TabsContent value="brackets" className="mt-4">
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <h2 className="text-xl font-semibold">Tournament Brackets</h2>
+                <Button onClick={() => setCreateBracketDialogOpen(true)} className="gap-2">
+                  <Plus className="w-4 h-4" />
+                  Create Bracket
+                </Button>
+              </div>
+              
+              {brackets.length === 0 ? (
+                <Card className="text-center py-12">
+                  <CardContent>
+                    <Trophy className="w-16 h-16 mx-auto text-slate-300 mb-4" />
+                    <h3 className="text-xl font-semibold mb-2">No Brackets Yet</h3>
+                    <p className="text-muted-foreground mb-4">Create a tournament bracket for this event</p>
+                    <Button onClick={() => setCreateBracketDialogOpen(true)}>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Bracket
+                    </Button>
+                  </CardContent>
+                </Card>
+              ) : selectedBracketId ? (
+                <BracketEditor
+                  bracketId={selectedBracketId}
+                  teams={teams}
+                  onSave={() => fetchBrackets()}
+                  onClose={() => setSelectedBracketId(null)}
+                />
+              ) : (
+                <div className="grid gap-4 md:grid-cols-2">
+                  {brackets.map(bracket => (
+                    <Card 
+                      key={bracket.id} 
+                      className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-blue-400"
+                      onClick={() => setSelectedBracketId(bracket.id)}
+                    >
+                      <CardHeader className="pb-2">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg">{bracket.name}</CardTitle>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-red-500 hover:text-red-700"
+                            onClick={(e) => { e.stopPropagation(); handleDeleteBracket(bracket.id); }}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="capitalize">{bracket.gender}</span>
+                          <span>•</span>
+                          <span>{bracket.games?.length || 0} games</span>
+                          <span>•</span>
+                          <span className="capitalize">{bracket.bracket_type?.replace('_', ' ')}</span>
+                        </div>
+                        <div className="mt-3">
+                          <Link 
+                            to={`/bracket/${bracket.id}`}
+                            target="_blank"
+                            onClick={(e) => e.stopPropagation()}
+                            className="text-sm text-blue-500 hover:underline flex items-center gap-1"
+                          >
+                            <ExternalLink className="w-3 h-3" />
+                            View Public Bracket
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
       </div>
+
+      {/* Create Bracket Dialog */}
+      <Dialog open={createBracketDialogOpen} onOpenChange={setCreateBracketDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Create Tournament Bracket</DialogTitle>
+            <DialogDescription>
+              Create a new bracket for this event. You can add teams and set up matchups after creation.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div>
+              <Label>Bracket Name</Label>
+              <Input
+                value={newBracketName}
+                onChange={(e) => setNewBracketName(e.target.value)}
+                placeholder="e.g., Boys Gold Bracket"
+              />
+            </div>
+            
+            <div>
+              <Label>Gender</Label>
+              <Select value={newBracketGender} onValueChange={setNewBracketGender}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="boys">Boys</SelectItem>
+                  <SelectItem value="girls">Girls</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setCreateBracketDialogOpen(false)}>Cancel</Button>
+            <Button onClick={handleCreateBracket} disabled={saving}>
+              {saving ? 'Creating...' : 'Create Bracket'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Add Game Dialog */}
       <Dialog open={addGameDialogOpen} onOpenChange={setAddGameDialogOpen}>
