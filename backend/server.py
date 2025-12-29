@@ -670,7 +670,7 @@ async def update_password(data: UpdatePasswordRequest, user: User = Depends(get_
         raise HTTPException(status_code=400, detail="Password must be at least 6 characters")
     
     # Update password
-    hashed_password = pwd_context.hash(data.new_password)
+    hashed_password = hash_password(data.new_password)
     await db.users.update_one(
         {"user_id": user.user_id},
         {"$set": {"password_hash": hashed_password}}
