@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from 'sonner';
-import { Save, Plus, Trash2, ExternalLink, Video, BarChart3 } from 'lucide-react';
+import { Save, Plus, Trash2, ExternalLink, Video, BarChart3, RefreshCw, Link2, Unlink } from 'lucide-react';
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -15,11 +15,14 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
   const [bracket, setBracket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [availableGames, setAvailableGames] = useState([]);
 
   useEffect(() => {
     fetchBracket();
+    fetchAvailableGames();
   }, [bracketId]);
 
   const fetchBracket = async () => {
@@ -34,6 +37,35 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
       toast.error('Failed to load bracket');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAvailableGames = async () => {
+    try {
+      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
+      const res = await axios.get(`${API}/brackets/${bracketId}/available-games`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setAvailableGames(res.data);
+    } catch (error) {
+      console.error('Error fetching available games:', error);
+    }
+  };
+
+  const syncScores = async () => {
+    setSyncing(true);
+    try {
+      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
+      const res = await axios.post(`${API}/brackets/${bracketId}/sync-scores`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success(res.data.message);
+      fetchBracket();
+    } catch (error) {
+      console.error('Error syncing scores:', error);
+      toast.error('Failed to sync scores');
+    } finally {
+      setSyncing(false);
     }
   };
 
