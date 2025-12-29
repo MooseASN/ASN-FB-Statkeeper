@@ -67,7 +67,7 @@ export default function BracketView({ bracket, showLinks = true }) {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">{bracket.name}</h1>
-              <p className="text-slate-400 capitalize">{bracket.gender}'s {bracket.bracket_type?.replace('_', ' ')}</p>
+              <p className="text-slate-400 capitalize">{bracket.gender}&apos;s {bracket.bracket_type?.replace('_', ' ')}</p>
             </div>
             <Trophy className="w-10 h-10 text-yellow-500" />
           </div>
