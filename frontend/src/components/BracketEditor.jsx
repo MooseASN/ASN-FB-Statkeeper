@@ -319,14 +319,14 @@ export default function BracketEditor({ bracketId, teams = [], onSave, onClose }
               <div>
                 <Label>Winner</Label>
                 <Select
-                  value={selectedGame.winner_id || ''}
-                  onValueChange={(value) => setSelectedGame({ ...selectedGame, winner_id: value || null })}
+                  value={selectedGame.winner_id || 'none'}
+                  onValueChange={(value) => setSelectedGame({ ...selectedGame, winner_id: value === 'none' ? null : value })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select winner" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Not decided</SelectItem>
+                    <SelectItem value="none">Not decided</SelectItem>
                     {selectedGame.team1_id && (
                       <SelectItem value={selectedGame.team1_id}>{selectedGame.team1_name}</SelectItem>
                     )}
