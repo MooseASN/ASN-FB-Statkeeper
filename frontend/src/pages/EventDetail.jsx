@@ -7,8 +7,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Calendar, MapPin, Image, Plus, X, PlayCircle, Clock, Video, ExternalLink, Link2, Check } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ArrowLeft, Calendar, MapPin, Image, Plus, X, PlayCircle, Clock, Video, ExternalLink, Link2, Check, Trophy } from "lucide-react";
 import Layout from "@/components/Layout";
+import BracketEditor from "@/components/BracketEditor";
+import BracketView from "@/components/BracketView";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
