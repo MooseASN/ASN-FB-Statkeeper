@@ -388,8 +388,11 @@ async def verify_security_question(request: Request, data: SecurityQuestionVerif
         "created_at": datetime.now(timezone.utc)
     })
     
-    # Build reset URL
-    origin = request.headers.get("origin", "http://localhost:3000")
+    # Build reset URL - use origin header or environment variable
+    origin = request.headers.get("origin")
+    if not origin:
+        # Fallback to environment-based URL for production
+        origin = os.environ.get("FRONTEND_URL", "https://gamestats-grid.preview.emergentagent.com")
     reset_url = f"{origin}/reset-password?token={reset_token}"
     
     return {
