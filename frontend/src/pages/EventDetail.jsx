@@ -57,6 +57,8 @@ export default function EventDetail({ user, onLogout }) {
 
   useEffect(() => {
     fetchEvent();
+    fetchBrackets();
+    fetchTeams();
   }, [id]);
 
   const fetchEvent = async () => {
@@ -77,6 +79,82 @@ export default function EventDetail({ user, onLogout }) {
       navigate("/events");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchBrackets = async () => {
+    try {
+      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
+      const res = await axios.get(`${API}/brackets?event_id=${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBrackets(res.data);
+    } catch (error) {
+      console.error("Failed to load brackets:", error);
+    }
+  };
+
+  const fetchTeams = async () => {
+    try {
+      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
+      const res = await axios.get(`${API}/teams?sport=basketball`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setTeams(res.data);
+    } catch (error) {
+      console.error("Failed to load teams:", error);
+    }
+  };
+
+  const handleCreateBracket = async () => {
+    if (!newBracketName.trim()) {
+      toast.error("Please enter a bracket name");
+      return;
+    }
+    
+    setSaving(true);
+    try {
+      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
+      const res = await axios.post(`${API}/brackets`, {
+        event_id: id,
+        name: newBracketName,
+        gender: newBracketGender,
+        bracket_type: "single_elimination",
+        games: []
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      toast.success("Bracket created!");
+      setCreateBracketDialogOpen(false);
+      setNewBracketName("");
+      fetchBrackets();
+      
+      // Auto-select and initialize the new bracket
+      setSelectedBracketId(res.data.id);
+    } catch (error) {
+      console.error("Error creating bracket:", error);
+      toast.error("Failed to create bracket");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteBracket = async (bracketId) => {
+    if (!window.confirm("Are you sure you want to delete this bracket?")) return;
+    
+    try {
+      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
+      await axios.delete(`${API}/brackets/${bracketId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      toast.success("Bracket deleted");
+      if (selectedBracketId === bracketId) {
+        setSelectedBracketId(null);
+      }
+      fetchBrackets();
+    } catch (error) {
+      toast.error("Failed to delete bracket");
     }
   };
 
