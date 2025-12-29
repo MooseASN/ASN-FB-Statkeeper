@@ -3925,16 +3925,6 @@ async def startup_init():
     except Exception as e:
         logger.error(f"Failed to initialize admin user on startup: {e}")
 
-# Health check endpoint that also ensures admin exists
-@api_router.get("/health/init")
-async def health_init():
-    """Health check that also initializes admin user"""
-    try:
-        result = await ensure_admin_user()
-        return {"status": "ok", "admin_user": result}
-    except Exception as e:
-        return {"status": "error", "detail": str(e)}
-
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
