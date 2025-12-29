@@ -42,6 +42,40 @@ export default function FootballLiveStats({
 }) {
   const [activeLeaderTab, setActiveLeaderTab] = useState('rushYards');
   const [activeSection, setActiveSection] = useState('summary'); // summary, play-by-play, team-stats, leaders
+  const [exportingPdf, setExportingPdf] = useState(false);
+
+  // Export PDF box score
+  const handleExportPdf = async () => {
+    if (!game?.id) {
+      toast.error('Game ID not available');
+      return;
+    }
+    
+    setExportingPdf(true);
+    try {
+      const response = await fetch(`${API}/api/games/${game.id}/football-boxscore/pdf`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `boxscore_${game.away_team_name || 'Away'}_vs_${game.home_team_name || 'Home'}.pdf`.replace(/\s+/g, '_');
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success('Box score PDF downloaded!');
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast.error('Failed to export PDF');
+    } finally {
+      setExportingPdf(false);
+    }
+  };
 
   // Format clock time
   const formatTime = (seconds) => {
