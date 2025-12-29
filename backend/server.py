@@ -651,7 +651,7 @@ async def update_password(data: UpdatePasswordRequest, user: User = Depends(get_
         raise HTTPException(status_code=400, detail="Google accounts cannot change password")
     
     # Verify current password
-    if not pwd_context.verify(data.current_password, user_data.get("password_hash", "")):
+    if not verify_password(data.current_password, user_data.get("password_hash", "")):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     
     # Verify security answer
