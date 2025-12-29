@@ -3861,21 +3861,23 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-@app.on_event("startup")
-async def startup_init():
-    """Initialize admin user on startup if it doesn't exist"""
+async def ensure_admin_user():
+    """Ensure admin user exists with correct credentials"""
+    admin_password = "NoahTheJew1997"
+    admin_email = "antlersportsnetwork@gmail.com"
+    
     try:
         # Check if admin user exists
-        admin_user = await db.users.find_one({"email": "antlersportsnetwork@gmail.com"})
+        admin_user = await db.users.find_one({"email": admin_email})
+        
+        # Generate new password hash
+        hashed = hash_password(admin_password)
         
         if not admin_user:
-            # Create admin user with the specified credentials
-            admin_password = "NoahTheJew1997"
-            hashed = hash_password(admin_password)
-            
+            # Create admin user
             admin_doc = {
                 "user_id": "user_admin_001",
-                "email": "antlersportsnetwork@gmail.com",
+                "email": admin_email,
                 "username": "admin",
                 "name": "Admin",
                 "password_hash": hashed,
@@ -3886,24 +3888,42 @@ async def startup_init():
             }
             await db.users.insert_one(admin_doc)
             logger.info("Admin user created successfully")
+            return "created"
         else:
-            # Ensure admin user has correct password and auth_provider
-            if admin_user.get("auth_provider") != "local":
-                admin_password = "NoahTheJew1997"
-                hashed = hash_password(admin_password)
-                await db.users.update_one(
-                    {"email": "antlersportsnetwork@gmail.com"},
-                    {"$set": {
-                        "password_hash": hashed,
-                        "auth_provider": "local",
-                        "username": "admin"
-                    }}
-                )
-                logger.info("Admin user updated with correct credentials")
-            else:
-                logger.info("Admin user already exists")
+            # Always update password to ensure it's correct
+            await db.users.update_one(
+                {"email": admin_email},
+                {"$set": {
+                    "password_hash": hashed,
+                    "auth_provider": "local",
+                    "username": "admin",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            logger.info("Admin user password reset successfully")
+            return "updated"
     except Exception as e:
-        logger.error(f"Error initializing admin user: {e}")
+        logger.error(f"Error ensuring admin user: {e}")
+        raise e
+
+@app.on_event("startup")
+async def startup_init():
+    """Initialize admin user on startup"""
+    try:
+        result = await ensure_admin_user()
+        logger.info(f"Admin user initialization: {result}")
+    except Exception as e:
+        logger.error(f"Failed to initialize admin user on startup: {e}")
+
+# Health check endpoint that also ensures admin exists
+@api_router.get("/health/init")
+async def health_init():
+    """Health check that also initializes admin user"""
+    try:
+        result = await ensure_admin_user()
+        return {"status": "ok", "admin_user": result}
+    except Exception as e:
+        return {"status": "error", "detail": str(e)}
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
