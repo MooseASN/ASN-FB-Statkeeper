@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import ReactPlayer from "react-player";
-import { RefreshCw, ExternalLink, X } from "lucide-react";
+import { RefreshCw, ExternalLink, X, FileDown } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
