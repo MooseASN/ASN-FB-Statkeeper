@@ -1154,6 +1154,8 @@ class BracketGame(BaseModel):
     live_stats_link: Optional[str] = None  # Link to live stats
     game_status: str = "scheduled"  # scheduled, in_progress, final
     feeds_into: Optional[str] = None  # game_id of the next game (e.g., "G9" for winner)
+    linked_game_id: Optional[str] = None  # ID of a scheduled game linked to this bracket slot
+    linked_game_share_code: Optional[str] = None  # Share code for live stats link
 
 class BracketCreate(BaseModel):
     event_id: str  # Associated event
