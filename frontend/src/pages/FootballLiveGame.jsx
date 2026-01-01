@@ -1156,11 +1156,11 @@ export default function FootballLiveGame({ user, onLogout }) {
   }, [clockTime, quarter]);
 
   // Format clock time - declared early for use in formatDriveSummary
-  const formatTime = (seconds) => {
+  const formatTime = useCallback((seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, []);
 
   // Format drive summary for display
   const formatDriveSummary = useCallback((drive) => {
