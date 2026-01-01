@@ -527,9 +527,7 @@ metadata:
   run_ui: true
 
 test_plan:
-  current_focus:
-    - "Bracket System Removal"
-    - "End Game Feature for Both Sports"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
