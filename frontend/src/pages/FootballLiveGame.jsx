@@ -1155,6 +1155,13 @@ export default function FootballLiveGame({ user, onLogout }) {
     return totalTime;
   }, [clockTime, quarter]);
 
+  // Format clock time - declared early for use in formatDriveSummary
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
   // Format drive summary for display
   const formatDriveSummary = useCallback((drive) => {
     const teamName = drive.team === 'home' ? game?.home_team_name : game?.away_team_name;
