@@ -1384,7 +1384,7 @@ export default function AdvancedLiveGame() {
             ))}
           </div>
           {(pendingReboundPlayer?.players || []).length === 0 && (
-            <p className="text-center text-zinc-400 py-4">No players on floor. Mark players as "on floor" first.</p>
+            <p className="text-center text-zinc-400 py-4">No players on floor. Mark players as &quot;on floor&quot; first.</p>
           )}
           <Button
             onClick={() => {
