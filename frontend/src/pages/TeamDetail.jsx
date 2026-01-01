@@ -373,9 +373,23 @@ export default function TeamDetail({ user, onLogout }) {
             
             {/* Save Button - moved here below color selector */}
             <div className="pt-4 border-t">
-              <Button onClick={handleSave} className="w-full bg-[#000000] hover:bg-[#333333]" data-testid="save-team-btn">
-                <Save className="w-4 h-4 mr-2" />
-                Save Changes
+              <Button 
+                onClick={handleSave} 
+                className="w-full bg-[#000000] hover:bg-[#333333]" 
+                data-testid="save-team-btn"
+                disabled={saving}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-4 h-4 mr-2" />
+                    Save Changes
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
