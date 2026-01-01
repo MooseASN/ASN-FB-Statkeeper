@@ -403,8 +403,8 @@ async def verify_security_question(request: Request, data: SecurityQuestionVerif
     # Build reset URL - use origin header or environment variable
     origin = request.headers.get("origin")
     if not origin:
-        # Fallback to environment-based URL for production
-        origin = os.environ.get("FRONTEND_URL", "https://gamestats-tracker-1.preview.emergentagent.com")
+        # Fallback to environment-based URL
+        origin = os.environ.get("FRONTEND_URL", "http://localhost:3000")
     reset_url = f"{origin}/reset-password?token={reset_token}"
     
     return {
@@ -3873,8 +3873,8 @@ logger = logging.getLogger(__name__)
 
 async def ensure_admin_user():
     """Ensure admin user exists with correct credentials"""
-    admin_password = "NoahTheJew1997"
-    admin_email = "antlersportsnetwork@gmail.com"
+    admin_password = os.environ.get("ADMIN_PASSWORD", "changeme")
+    admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com")
     
     try:
         # Check if admin user exists
