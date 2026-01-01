@@ -1336,6 +1336,25 @@ export default function LiveGame() {
         playerName={reboundPlayer?.player_name}
         onOffensive={() => handleReboundResult('offensive')}
         onDefensive={() => handleReboundResult('defensive')}
+        onDeadball={() => {
+          setReboundModalOpen(false);
+          setReboundPlayer(null);
+          toast.info("Deadball rebound noted");
+        }}
+      />
+      
+      {/* Assist Modal - shown after made 2pt/3pt */}
+      <AssistModal
+        isOpen={assistModalOpen}
+        onClose={() => {
+          setAssistModalOpen(false);
+          setAssistTeam(null);
+          setAssistScorer(null);
+        }}
+        teammates={(assistTeam === 'home' ? homeStats : awayStats).filter(p => p.id !== assistScorer?.id)}
+        onSelectAssist={handleAssistSelect}
+        onNoAssist={() => handleAssistSelect(null)}
+        teamColor={assistTeam === 'home' ? homeColor : awayColor}
       />
 
       {/* Side Action Buttons - Flippable with teams */}
