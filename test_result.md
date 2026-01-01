@@ -504,9 +504,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Drive Tracking Integration"
-    - "Punt Workflow Revision"
-    - "Penalty Workflow Revision"
+    - "Bracket System Removal"
+    - "End Game Feature for Both Sports"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
