@@ -933,11 +933,11 @@ export default function LiveGame() {
   };
 
   const handleEndGame = async () => {
-    if (!window.confirm("Are you sure you want to end this game?")) return;
+    if (!window.confirm("Are you sure you want to end this game? This will set the game status to Final.")) return;
     
     try {
-      await axios.put(`${API}/games/${id}`, { status: "completed" });
-      toast.success("Game ended");
+      await axios.put(`${API}/games/${id}`, { status: "final" });
+      toast.success("Game ended - Status: Final");
       fetchGame();
     } catch (error) {
       toast.error("Failed to end game");
