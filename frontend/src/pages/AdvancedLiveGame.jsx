@@ -1271,6 +1271,14 @@ export default function AdvancedLiveGame() {
                 const statType = pendingShotType === 'ft' ? 'ft_missed' : pendingShotType === '2pt' ? 'fg2_missed' : 'fg3_missed';
                 handleStatAction(pendingShotPlayer.id, statType);
                 setShowShotResultDialog(false);
+                
+                // Trigger post-miss rebound flow for field goals (not free throws)
+                if (pendingShotType !== 'ft') {
+                  const shooterTeam = homeStats.find(p => p.id === pendingShotPlayer?.id) ? 'home' : 'away';
+                  setMissedShotTeam(shooterTeam);
+                  setShowPostMissReboundDialog(true);
+                }
+                
                 setPendingShotPlayer(null);
                 setPendingShotType(null);
               }}
