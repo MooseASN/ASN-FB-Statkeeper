@@ -86,7 +86,6 @@ const ColorPicker = ({ value, onChange }) => {
 
 export default function Teams({ user, onLogout }) {
   const navigate = useNavigate();
-  const location = useLocation();
   const { selectedSport } = useSport();
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [teams, setTeams] = useState([]);
@@ -108,10 +107,19 @@ export default function Teams({ user, onLogout }) {
     }
   }, [selectedSport]);
 
-  // Fetch teams when sport changes or when navigating back to this page
+  // Fetch teams on mount and when sport changes
   useEffect(() => {
     fetchTeams();
-  }, [fetchTeams, location.key]);
+  }, [fetchTeams]);
+  
+  // Also refetch when window gains focus (user returns from another page)
+  useEffect(() => {
+    const handleFocus = () => {
+      fetchTeams();
+    };
+    window.addEventListener('focus', handleFocus);
+    return () => window.removeEventListener('focus', handleFocus);
+  }, [fetchTeams]);
 
   const handleCreateTeam = async () => {
     if (!newTeam.name.trim()) {
@@ -127,7 +135,9 @@ export default function Teams({ user, onLogout }) {
       toast.success("Team created successfully");
       setNewTeam({ name: "", logo_url: "", color: "#dc2626" });
       setIsDialogOpen(false);
-      // Navigate directly to the new team's detail page
+      // Refresh the teams list immediately
+      await fetchTeams();
+      // Then navigate to the new team's detail page
       navigate(`/teams/${res.data.id}`);
     } catch (error) {
       toast.error("Failed to create team");
