@@ -20,7 +20,6 @@ import EmbedLatestGame from "@/pages/EmbedLatestGame";
 import GameHistory from "@/pages/GameHistory";
 import Events from "@/pages/Events";
 import EventDetail from "@/pages/EventDetail";
-import BracketPublicView from "@/pages/BracketPublicView";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
