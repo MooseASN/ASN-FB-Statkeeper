@@ -35,12 +35,12 @@ const ColorPicker = ({ value, onChange }) => {
             data-testid="color-picker-trigger"
           />
           {showPicker && (
-            <div className="absolute z-50 top-14 left-0">
+            <div className="absolute z-[100] top-14 left-0">
               <div 
-                className="fixed inset-0" 
+                className="fixed inset-0 z-[99]" 
                 onClick={() => setShowPicker(false)}
               />
-              <div className="relative">
+              <div className="relative z-[100]">
                 <ChromePicker
                   color={value}
                   onChange={(color) => onChange(color.hex)}
@@ -71,7 +71,10 @@ const ColorPicker = ({ value, onChange }) => {
           <button
             key={color}
             type="button"
-            onClick={() => onChange(color)}
+            onClick={() => {
+              onChange(color);
+              setShowPicker(false);  // Close picker when preset is selected
+            }}
             className={`w-7 h-7 rounded-full border-2 transition-all hover:scale-110 ${
               value === color ? 'border-black ring-2 ring-offset-1 ring-black/20' : 'border-white shadow-sm'
             }`}
