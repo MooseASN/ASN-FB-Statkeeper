@@ -1380,13 +1380,6 @@ export default function FootballLiveGame({ user, onLogout }) {
     toast.success(`${receivingTeamName} ball at the ${kickoffData.specialResult === 'touchback' ? 25 : kickoffData.specialResult === 'out_of_bounds' ? 40 : kickoffData.returnedTo} yard line`);
   };
 
-  // Format clock time
-  const formatTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
   // Get player name from roster by number
   const getPlayerName = useCallback((number, team = possession) => {
     const roster = team === 'home' ? homeRoster : awayRoster;
