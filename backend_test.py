@@ -277,11 +277,11 @@ class BracketAndEndGameTester:
 
 def main():
     """Main test runner"""
-    tester = FootballFeatureTester()
+    tester = BracketAndEndGameTester()
     success = tester.run_all_tests()
     
     # Save detailed results
-    with open("/app/football_feature_test_results.json", "w") as f:
+    with open("/app/bracket_endgame_test_results.json", "w") as f:
         json.dump({
             "timestamp": datetime.now().isoformat(),
             "overall_success": success,
