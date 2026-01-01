@@ -484,17 +484,41 @@ frontend:
         agent: "testing"
         comment: "TESTED: Football live sync between stat tracker and public stats page VERIFIED. All 6 tests PASSED: 1) Backend API State Verification - GET /api/games/public/{game_id} returns football_state with 3+ plays and required fields (home_time_of_possession, away_time_of_possession), 2) Record New Play via API - PUT /api/games/{game_id} successfully adds new plays and updates scores, 3) Public API Returns Updated Data - Changes immediately visible on public endpoint, 4) Game Status Verification - Game status 'active' confirmed in both public and authenticated endpoints, 5) Key Football State Fields - All required fields present (play_log, scores, timeouts, time_of_possession, clock_time, quarter, possession, down, distance, ball_position). Live sync working perfectly - changes persist and are immediately available on public stats page."
 
-  - task: "Tournament Bracket System"
+  - task: "Bracket System Removal"
     implemented: true
     working: true
-    file: "/app/frontend/src/pages/EventDetail.jsx"
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
         agent: "testing"
-        comment: "TESTED: Tournament bracket system for Tenaha Holiday Hoops event working perfectly. All 8 major tests PASSED: 1) Authentication with antlersportsnetwork@gmail.com / NoahTheJew1997, 2) Sport selection (orange BASKETBALL card), 3) Events navigation from sidebar, 4) Event access (Tenaha Holiday Hoops), 5) Brackets tab functionality, 6) Bracket cards display (Boys Gold Bracket and Girls Gold Bracket with proper metadata), 7) Bracket editor showing complete 16-team tournament structure (First Round 8 games, Quarterfinals 4 games, Semifinals 2 games, Championship 1 game = 15 total), 8) Game edit dialog with team selection, scores, seeds, winner, date/time, venue, status, and links. Public bracket URL functionality verified with proper error handling. Tournament bracket system fully functional."
+        comment: "TESTED: Bracket system removal verified - POST /api/brackets and GET /api/brackets both correctly return 404 status. Bracket API endpoints have been successfully removed from backend."
+
+  - task: "End Game Feature - Basketball"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: End Game feature for basketball working correctly. Successfully updated basketball game status from 'active' to 'final' via PUT /api/games/{game_id} with status field. Game ID: f5d1bbf0-2ba6-46cb-bf9e-e18ba6c868db"
+
+  - task: "End Game Feature - Football"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "TESTED: End Game feature for football working correctly. Successfully updated football game status from 'active' to 'final' via PUT /api/games/{game_id} with status field. Game ID: a640f656-1ea6-4929-8589-82f58a1069d9"
 
 metadata:
   created_by: "main_agent"
