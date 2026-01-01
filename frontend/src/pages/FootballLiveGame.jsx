@@ -2471,7 +2471,7 @@ export default function FootballLiveGame({ user, onLogout }) {
   };
 
   // Advance quarter
-  const handleAdvanceQuarter = () => {
+  const handleAdvanceQuarter = async () => {
     const nextQuarter = quarter + 1;
     
     if (quarter === 2) {
@@ -2496,11 +2496,29 @@ export default function FootballLiveGame({ user, onLogout }) {
       const quarterLength = game?.clock_settings?.period_duration || 900;
       setClockTime(quarterLength);
     } else {
-      // Game over
-      toast.info('Game Complete');
+      // Game over - set status to final
+      try {
+        await axios.put(`${API}/games/${id}`, { status: "final" });
+        toast.success('Game Complete - Status: Final');
+      } catch (error) {
+        console.error('Failed to set game status:', error);
+        toast.info('Game Complete');
+      }
     }
     
     setShowAdvanceQuarterDialog(false);
+  };
+  
+  // End game manually at any time
+  const handleEndGame = async () => {
+    if (!window.confirm("Are you sure you want to end this game? This will set the game status to Final.")) return;
+    
+    try {
+      await axios.put(`${API}/games/${id}`, { status: "final" });
+      toast.success("Game ended - Status: Final");
+    } catch (error) {
+      toast.error("Failed to end game");
+    }
   };
 
   // NOTE: startNewDrive, endDrive, addPlayToDrive are defined above using useCallback
