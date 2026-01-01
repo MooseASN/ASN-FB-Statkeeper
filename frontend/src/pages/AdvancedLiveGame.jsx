@@ -1289,6 +1289,115 @@ export default function AdvancedLiveGame() {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Post-Miss Rebound Dialog (Advanced Mode Feature) */}
+      <Dialog open={showPostMissReboundDialog} onOpenChange={setShowPostMissReboundDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Rebound - Who got it?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            {/* Rebound Type Selection */}
+            <div className="grid grid-cols-3 gap-2">
+              <Button
+                onClick={() => {
+                  // Show offensive rebound options (shooter's team, on floor only)
+                  const team = missedShotTeam;
+                  const onFloor = team === 'home' ? (game?.home_on_floor || []) : (game?.away_on_floor || []);
+                  const players = (team === 'home' ? homeStats : awayStats).filter(p => onFloor.includes(p.id));
+                  setPendingReboundPlayer({ type: 'oreb', players, teamColor: team === 'home' ? homeColor : awayColor });
+                  setShowPostMissReboundDialog(false);
+                  setShowReboundTypeDialog(true);
+                }}
+                className="h-16 bg-green-600 hover:bg-green-700 flex flex-col items-center justify-center"
+              >
+                <div className="text-lg font-bold">OREB</div>
+                <div className="text-xs opacity-75">Offensive</div>
+              </Button>
+              <Button
+                onClick={() => {
+                  // Show defensive rebound options (defending team, on floor only)
+                  const team = missedShotTeam === 'home' ? 'away' : 'home';
+                  const onFloor = team === 'home' ? (game?.home_on_floor || []) : (game?.away_on_floor || []);
+                  const players = (team === 'home' ? homeStats : awayStats).filter(p => onFloor.includes(p.id));
+                  setPendingReboundPlayer({ type: 'dreb', players, teamColor: team === 'home' ? homeColor : awayColor });
+                  setShowPostMissReboundDialog(false);
+                  setShowReboundTypeDialog(true);
+                }}
+                className="h-16 bg-blue-600 hover:bg-blue-700 flex flex-col items-center justify-center"
+              >
+                <div className="text-lg font-bold">DREB</div>
+                <div className="text-xs opacity-75">Defensive</div>
+              </Button>
+              <Button
+                onClick={() => {
+                  setShowPostMissReboundDialog(false);
+                  toast.info("Deadball rebound noted");
+                }}
+                className="h-16 bg-zinc-600 hover:bg-zinc-700 flex flex-col items-center justify-center"
+              >
+                <div className="text-lg font-bold">DEAD</div>
+                <div className="text-xs opacity-75">Deadball</div>
+              </Button>
+            </div>
+            
+            {/* Skip option */}
+            <Button
+              onClick={() => setShowPostMissReboundDialog(false)}
+              variant="outline"
+              className="w-full border-zinc-700 text-zinc-400"
+            >
+              Skip / No Rebound Recorded
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Rebound Player Selection Dialog */}
+      <Dialog open={showReboundTypeDialog && pendingReboundPlayer?.players} onOpenChange={(open) => {
+        if (!open) {
+          setShowReboundTypeDialog(false);
+          setPendingReboundPlayer(null);
+        }
+      }}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {pendingReboundPlayer?.type === 'oreb' ? 'Offensive Rebound' : 'Defensive Rebound'} - Select Player
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-3 gap-2 mt-4">
+            {(pendingReboundPlayer?.players || []).map(player => (
+              <Button
+                key={player.id}
+                onClick={() => {
+                  handleStatAction(player.id, pendingReboundPlayer?.type);
+                  setShowReboundTypeDialog(false);
+                  setPendingReboundPlayer(null);
+                }}
+                className="h-16 flex flex-col items-center justify-center"
+                style={{ backgroundColor: pendingReboundPlayer?.teamColor }}
+              >
+                <div className="text-xl font-bold">#{player.player_number}</div>
+                <div className="text-xs truncate max-w-full">{player.player_name?.split(' ')[0]}</div>
+              </Button>
+            ))}
+          </div>
+          {(pendingReboundPlayer?.players || []).length === 0 && (
+            <p className="text-center text-zinc-400 py-4">No players on floor. Mark players as "on floor" first.</p>
+          )}
+          <Button
+            onClick={() => {
+              setShowReboundTypeDialog(false);
+              setPendingReboundPlayer(null);
+            }}
+            variant="outline"
+            className="w-full mt-2 border-zinc-700"
+          >
+            Cancel
+          </Button>
+        </DialogContent>
+      </Dialog>
 
       {/* Timeout Dialog */}
       <Dialog open={showTimeoutDialog} onOpenChange={setShowTimeoutDialog}>
