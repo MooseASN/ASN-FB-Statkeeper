@@ -21,11 +21,13 @@ ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
 ADMIN_PASSWORD = "NoahTheJew1997"  # Updated password from review request
 FOOTBALL_GAME_ID = "a640f656-1ea6-4929-8589-82f58a1069d9"
 
-class FootballFeatureTester:
+class BracketAndEndGameTester:
     def __init__(self):
         self.session = requests.Session()
         self.session_token = None
         self.test_results = []
+        self.basketball_game_id = None
+        self.football_game_id = FOOTBALL_GAME_ID
         
     def log_test(self, test_name, success, message, details=None):
         """Log test result"""
