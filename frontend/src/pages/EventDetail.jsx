@@ -7,12 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft, Calendar, MapPin, Image, Plus, X, PlayCircle, Clock, Video, ExternalLink, Link2, Check, Trophy } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Image, Plus, X, PlayCircle, Clock, Video, ExternalLink, Link2, Check } from "lucide-react";
 import Layout from "@/components/Layout";
-import BracketEditor from "@/components/BracketEditor";
-import BracketView from "@/components/BracketView";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -26,15 +22,6 @@ export default function EventDetail({ user, onLogout }) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [sortOrder, setSortOrder] = useState("oldest"); // "oldest" or "newest"
-  const [activeTab, setActiveTab] = useState("games"); // "games" or "brackets"
-  
-  // Bracket state
-  const [brackets, setBrackets] = useState([]);
-  const [teams, setTeams] = useState([]);
-  const [selectedBracketId, setSelectedBracketId] = useState(null);
-  const [createBracketDialogOpen, setCreateBracketDialogOpen] = useState(false);
-  const [newBracketName, setNewBracketName] = useState("");
-  const [newBracketGender, setNewBracketGender] = useState("boys");
   
   // Edit form state
   const [editName, setEditName] = useState("");
@@ -57,8 +44,6 @@ export default function EventDetail({ user, onLogout }) {
 
   useEffect(() => {
     fetchEvent();
-    fetchBrackets();
-    fetchTeams();
   }, [id]);
 
   const fetchEvent = async () => {
@@ -79,82 +64,6 @@ export default function EventDetail({ user, onLogout }) {
       navigate("/events");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchBrackets = async () => {
-    try {
-      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
-      const res = await axios.get(`${API}/brackets?event_id=${id}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setBrackets(res.data);
-    } catch (error) {
-      console.error("Failed to load brackets:", error);
-    }
-  };
-
-  const fetchTeams = async () => {
-    try {
-      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
-      const res = await axios.get(`${API}/teams?sport=basketball`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTeams(res.data);
-    } catch (error) {
-      console.error("Failed to load teams:", error);
-    }
-  };
-
-  const handleCreateBracket = async () => {
-    if (!newBracketName.trim()) {
-      toast.error("Please enter a bracket name");
-      return;
-    }
-    
-    setSaving(true);
-    try {
-      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
-      const res = await axios.post(`${API}/brackets`, {
-        event_id: id,
-        name: newBracketName,
-        gender: newBracketGender,
-        bracket_type: "single_elimination",
-        games: []
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      toast.success("Bracket created!");
-      setCreateBracketDialogOpen(false);
-      setNewBracketName("");
-      fetchBrackets();
-      
-      // Auto-select and initialize the new bracket
-      setSelectedBracketId(res.data.id);
-    } catch (error) {
-      console.error("Error creating bracket:", error);
-      toast.error("Failed to create bracket");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteBracket = async (bracketId) => {
-    if (!window.confirm("Are you sure you want to delete this bracket?")) return;
-    
-    try {
-      const token = localStorage.getItem('session_token') || sessionStorage.getItem('session_token');
-      await axios.delete(`${API}/brackets/${bracketId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      toast.success("Bracket deleted");
-      if (selectedBracketId === bracketId) {
-        setSelectedBracketId(null);
-      }
-      fetchBrackets();
-    } catch (error) {
-      toast.error("Failed to delete bracket");
     }
   };
 
@@ -288,80 +197,67 @@ export default function EventDetail({ user, onLogout }) {
   };
 
   const calculateScore = (game, team) => {
-    return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
+    return game?.quarter_scores?.[team]?.reduce((sum, q) => sum + (q || 0), 0) || 0;
   };
+
+  // Sort games
+  const sortedGames = event?.games ? [...event.games].sort((a, b) => {
+    const dateA = new Date(`${a.scheduled_date || '9999-12-31'}T${a.scheduled_time || '00:00'}`);
+    const dateB = new Date(`${b.scheduled_date || '9999-12-31'}T${b.scheduled_time || '00:00'}`);
+    return sortOrder === "oldest" ? dateA - dateB : dateB - dateA;
+  }) : [];
 
   if (loading) {
     return (
       <Layout user={user} onLogout={onLogout}>
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Loading event...</p>
+        <div className="flex items-center justify-center h-64">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
         </div>
       </Layout>
     );
   }
 
-  if (!event) {
-    return (
-      <Layout user={user} onLogout={onLogout}>
-        <div className="text-center py-12">
-          <p className="text-muted-foreground">Event not found</p>
-        </div>
-      </Layout>
-    );
-  }
+  if (!event) return null;
 
   return (
     <Layout user={user} onLogout={onLogout}>
       <div className="space-y-6">
         {/* Header */}
-        <div className="flex items-start gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/events")}>
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          
-          <div className="flex-1">
-            <div className="flex items-center gap-4">
-              {/* Event Logo */}
-              <div className="w-20 h-20 rounded-lg bg-slate-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                {event.logo_data ? (
-                  <img src={event.logo_data} alt={event.name} className="w-full h-full object-cover" />
-                ) : (
-                  <Calendar className="w-10 h-10 text-slate-400" />
-                )}
-              </div>
-              
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/events")}>
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              {event.logo_data && (
+                <img src={event.logo_data} alt={event.name} className="w-12 h-12 rounded-lg object-cover" />
+              )}
               <div>
-                <h1 className="text-3xl font-bold">{event.name}</h1>
-                <div className="flex items-center gap-4 text-muted-foreground mt-1">
-                  <div className="flex items-center gap-1">
+                <h1 className="text-2xl font-bold">{event.name}</h1>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
                     <Calendar className="w-4 h-4" />
-                    <span>{formatDateRange(event.start_date, event.end_date)}</span>
-                  </div>
+                    {formatDateRange(event.start_date, event.end_date)}
+                  </span>
                   {event.location && (
-                    <div className="flex items-center gap-1">
+                    <span className="flex items-center gap-1">
                       <MapPin className="w-4 h-4" />
-                      <span>{event.location}</span>
-                    </div>
+                      {event.location}
+                    </span>
                   )}
                 </div>
               </div>
             </div>
           </div>
-          
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={copyEventLink}>
-              {linkCopied ? (
-                <>
-                  <Check className="w-4 h-4 mr-2" />
-                  Copied!
-                </>
-              ) : (
-                <>
-                  <Link2 className="w-4 h-4 mr-2" />
-                  Copy Live Link
-                </>
-              )}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={copyEventLink}
+              className="flex items-center gap-2"
+            >
+              {linkCopied ? <Check className="w-4 h-4" /> : <Link2 className="w-4 h-4" />}
+              {linkCopied ? "Copied!" : "Copy Live Link"}
             </Button>
             <Button variant="outline" onClick={() => setEditDialogOpen(true)}>
               Edit Event
@@ -369,255 +265,125 @@ export default function EventDetail({ user, onLogout }) {
           </div>
         </div>
 
-        {/* Tabs for Games and Brackets */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="games">Games Schedule</TabsTrigger>
-            <TabsTrigger value="brackets">
-              <Trophy className="w-4 h-4 mr-2" />
-              Brackets
-            </TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="games" className="mt-4">
-            {/* Games Section */}
-            <div>
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold">Event Schedule</h2>
-                <div className="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    onClick={() => setSortOrder(sortOrder === "oldest" ? "newest" : "oldest")}
-                    className="gap-2"
-                  >
-                    <Clock className="w-4 h-4" />
-                    {sortOrder === "oldest" ? "Oldest First" : "Newest First"}
-                  </Button>
-                  <Button onClick={handleOpenAddGame} className="gap-2" data-testid="add-game-btn">
-                    <Plus className="w-4 h-4" />
-                    Add Game
-                  </Button>
-                </div>
-              </div>
+        {/* Games Section */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold">Games ({event.games?.length || 0})</h2>
+            <div className="flex items-center gap-2">
+              <select
+                value={sortOrder}
+                onChange={(e) => setSortOrder(e.target.value)}
+                className="text-sm border rounded px-2 py-1"
+              >
+                <option value="oldest">Oldest First</option>
+                <option value="newest">Newest First</option>
+              </select>
+              <Button size="sm" onClick={handleOpenAddGame}>
+                <Plus className="w-4 h-4 mr-1" />
+                Add Game
+              </Button>
+            </div>
+          </div>
 
-              {event.games?.length === 0 ? (
-                <Card className="text-center py-12">
-                  <CardContent>
-                    <PlayCircle className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">No Games Yet</h3>
-                    <p className="text-muted-foreground mb-4">Add scheduled games to this event</p>
-                    <Button onClick={handleOpenAddGame}>
-                      <Plus className="w-4 h-4 mr-2" />
-                  Add Game
+          {sortedGames.length === 0 ? (
+            <Card>
+              <CardContent className="py-12 text-center">
+                <p className="text-muted-foreground mb-4">No games in this event yet</p>
+                <Button onClick={handleOpenAddGame}>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add First Game
                 </Button>
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-3">
-              {[...event.games]
-                .sort((a, b) => {
-                  // Sort by date first, then by time
-                  const dateA = a.scheduled_date || '9999-12-31';
-                  const dateB = b.scheduled_date || '9999-12-31';
-                  if (dateA !== dateB) {
-                    return sortOrder === "oldest" 
-                      ? dateA.localeCompare(dateB)
-                      : dateB.localeCompare(dateA);
-                  }
-                  // If same date, sort by time
-                  const timeA = a.scheduled_time || '23:59';
-                  const timeB = b.scheduled_time || '23:59';
-                  return sortOrder === "oldest"
-                    ? timeA.localeCompare(timeB)
-                    : timeB.localeCompare(timeA);
-                })
-                .map(game => (
-                <Card key={game.id} data-testid={`event-game-${game.id}`}>
-                  <CardContent className="py-4">
-                    <div className="flex items-center justify-between">
+            <div className="grid gap-3">
+              {sortedGames.map(game => (
+                <Card key={game.id} className="overflow-hidden">
+                  <div className="flex items-center">
+                    {/* Game Info */}
+                    <div className="flex-1 p-4">
                       <div className="flex items-center gap-4">
-                        {/* Game Status */}
-                        {getGameStatusBadge(game)}
-                        
-                        {/* Teams & Score */}
-                        <div className="flex items-center gap-3">
-                          <span className="font-semibold">{game.home_team_name}</span>
-                          {game.status !== "scheduled" ? (
-                            <span className="text-xl font-bold">
-                              {calculateScore(game, "home")} - {calculateScore(game, "away")}
-                            </span>
-                          ) : (
-                            <span className="text-xl text-slate-400">vs</span>
-                          )}
-                          <span className="font-semibold">{game.away_team_name}</span>
-                        </div>
-                        
-                        {/* Primetime Indicator */}
-                        {game.primetime_enabled && (
-                          <div className="flex items-center gap-1 text-purple-600">
-                            <Video className="w-4 h-4" />
-                            <span className="text-xs font-medium">Primetime</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-3">
-                        {/* Time */}
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Clock className="w-4 h-4" />
-                          <span className="text-sm">{formatGameTime(game.scheduled_date, game.scheduled_time)}</span>
-                        </div>
-                        
-                        {/* Actions */}
                         <div className="flex items-center gap-2">
-                          <Link to={`/live/${game.share_code}`} target="_blank">
-                            <Button variant="outline" size="sm" className="gap-1">
-                              <ExternalLink className="w-3 h-3" />
-                              View
-                            </Button>
-                          </Link>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                            onClick={() => handleRemoveGame(game.id)}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
+                          {getGameStatusBadge(game)}
+                          {game.primetime_enabled && (
+                            <Video className="w-4 h-4 text-purple-500" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              {/* Away Team */}
+                              <div className="flex items-center gap-2">
+                                <div 
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                                  style={{ backgroundColor: game.away_team_color || '#666' }}
+                                >
+                                  {game.away_team_name?.substring(0, 3).toUpperCase() || 'TBD'}
+                                </div>
+                                <span className="font-medium">{game.away_team_name || 'TBD'}</span>
+                                <span className="text-lg font-bold w-8 text-right">{calculateScore(game, 'away')}</span>
+                              </div>
+                              <span className="text-muted-foreground">@</span>
+                              {/* Home Team */}
+                              <div className="flex items-center gap-2">
+                                <span className="text-lg font-bold w-8">{calculateScore(game, 'home')}</span>
+                                <div 
+                                  className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
+                                  style={{ backgroundColor: game.home_team_color || '#666' }}
+                                >
+                                  {game.home_team_name?.substring(0, 3).toUpperCase() || 'TBD'}
+                                </div>
+                                <span className="font-medium">{game.home_team_name || 'TBD'}</span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Clock className="w-4 h-4" />
+                              {formatGameTime(game.scheduled_date, game.scheduled_time)}
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </CardContent>
+                    
+                    {/* Actions */}
+                    <div className="flex items-center gap-1 px-4 border-l">
+                      {game.status === "active" ? (
+                        <Link to={`/game/${game.id}`}>
+                          <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                            <PlayCircle className="w-4 h-4 mr-1" />
+                            Live
+                          </Button>
+                        </Link>
+                      ) : game.status === "scheduled" ? (
+                        <Link to={`/game/${game.id}/edit`}>
+                          <Button size="sm" variant="outline">
+                            Edit
+                          </Button>
+                        </Link>
+                      ) : (
+                        <Link to={`/live/${game.share_code}`} target="_blank">
+                          <Button size="sm" variant="outline">
+                            <ExternalLink className="w-4 h-4 mr-1" />
+                            View
+                          </Button>
+                        </Link>
+                      )}
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        onClick={() => handleRemoveGame(game.id)}
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
                 </Card>
               ))}
             </div>
           )}
-            </div>
-          </TabsContent>
-          
-          {/* Brackets Tab */}
-          <TabsContent value="brackets" className="mt-4">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold">Tournament Brackets</h2>
-                <Button onClick={() => setCreateBracketDialogOpen(true)} className="gap-2">
-                  <Plus className="w-4 h-4" />
-                  Create Bracket
-                </Button>
-              </div>
-              
-              {brackets.length === 0 ? (
-                <Card className="text-center py-12">
-                  <CardContent>
-                    <Trophy className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">No Brackets Yet</h3>
-                    <p className="text-muted-foreground mb-4">Create a tournament bracket for this event</p>
-                    <Button onClick={() => setCreateBracketDialogOpen(true)}>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Bracket
-                    </Button>
-                  </CardContent>
-                </Card>
-              ) : selectedBracketId ? (
-                <BracketEditor
-                  bracketId={selectedBracketId}
-                  teams={teams}
-                  onSave={() => fetchBrackets()}
-                  onClose={() => setSelectedBracketId(null)}
-                />
-              ) : (
-                <div className="grid gap-4 md:grid-cols-2">
-                  {brackets.map(bracket => (
-                    <Card 
-                      key={bracket.id} 
-                      className="cursor-pointer hover:shadow-lg transition-all border-2 hover:border-blue-400"
-                      onClick={() => setSelectedBracketId(bracket.id)}
-                    >
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center justify-between">
-                          <CardTitle className="text-lg">{bracket.name}</CardTitle>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-red-500 hover:text-red-700"
-                            onClick={(e) => { e.stopPropagation(); handleDeleteBracket(bracket.id); }}
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <span className="capitalize">{bracket.gender}</span>
-                          <span>•</span>
-                          <span>{bracket.games?.length || 0} games</span>
-                          <span>•</span>
-                          <span className="capitalize">{bracket.bracket_type?.replace('_', ' ')}</span>
-                        </div>
-                        <div className="mt-3">
-                          <Link 
-                            to={`/bracket/${bracket.id}`}
-                            target="_blank"
-                            onClick={(e) => e.stopPropagation()}
-                            className="text-sm text-blue-500 hover:underline flex items-center gap-1"
-                          >
-                            <ExternalLink className="w-3 h-3" />
-                            View Public Bracket
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </div>
-          </TabsContent>
-        </Tabs>
+        </div>
       </div>
-
-      {/* Create Bracket Dialog */}
-      <Dialog open={createBracketDialogOpen} onOpenChange={setCreateBracketDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create Tournament Bracket</DialogTitle>
-            <DialogDescription>
-              Create a new bracket for this event. You can add teams and set up matchups after creation.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4 py-4">
-            <div>
-              <Label>Bracket Name</Label>
-              <Input
-                value={newBracketName}
-                onChange={(e) => setNewBracketName(e.target.value)}
-                placeholder="e.g., Boys Gold Bracket"
-              />
-            </div>
-            
-            <div>
-              <Label>Gender</Label>
-              <Select value={newBracketGender} onValueChange={setNewBracketGender}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="boys">Boys</SelectItem>
-                  <SelectItem value="girls">Girls</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setCreateBracketDialogOpen(false)}>Cancel</Button>
-            <Button onClick={handleCreateBracket} disabled={saving}>
-              {saving ? 'Creating...' : 'Create Bracket'}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Add Game Dialog */}
       <Dialog open={addGameDialogOpen} onOpenChange={setAddGameDialogOpen}>
