@@ -132,12 +132,15 @@ export default function Teams({ user, onLogout }) {
         ...newTeam,
         sport: selectedSport
       });
+      
+      // Immediately add the new team to the local state
+      setTeams(prevTeams => [...prevTeams, res.data]);
+      
       toast.success("Team created successfully");
       setNewTeam({ name: "", logo_url: "", color: "#dc2626" });
       setIsDialogOpen(false);
-      // Refresh the teams list immediately
-      await fetchTeams();
-      // Then navigate to the new team's detail page
+      
+      // Navigate to the new team's detail page
       navigate(`/teams/${res.data.id}`);
     } catch (error) {
       toast.error("Failed to create team");
