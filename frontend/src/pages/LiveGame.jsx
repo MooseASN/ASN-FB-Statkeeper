@@ -640,6 +640,11 @@ export default function LiveGame() {
   // Timeout state
   const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
   const [timeoutTeam, setTimeoutTeam] = useState(null); // "home" or "away"
+  
+  // Assist flow state (for showing assist modal after made 2pt/3pt)
+  const [assistModalOpen, setAssistModalOpen] = useState(false);
+  const [assistTeam, setAssistTeam] = useState(null);
+  const [assistScorer, setAssistScorer] = useState(null);
 
   const fetchGame = useCallback(async () => {
     try {
