@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Backend API Testing for StatMoose Football Stat Tracking
-Tests the new football features: Share Button, Time of Possession, Drives, Box Score, Timeouts
+Backend API Testing for StatMoose - Bracket System Removal and End Game Features
+Tests:
+1. Bracket System Removal - verify bracket endpoints return 404
+2. End Game Feature for Basketball - verify game status can be set to "final"
+3. End Game Feature for Football - verify game status can be set to "final"
 """
 
 import requests
@@ -15,7 +18,7 @@ BACKEND_URL = "https://gamestats-tracker-1.preview.emergentagent.com/api"
 
 # Test credentials and data
 ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
-ADMIN_PASSWORD = "test123"
+ADMIN_PASSWORD = "NoahTheJew1997"  # Updated password from review request
 FOOTBALL_GAME_ID = "a640f656-1ea6-4929-8589-82f58a1069d9"
 
 class FootballFeatureTester:
