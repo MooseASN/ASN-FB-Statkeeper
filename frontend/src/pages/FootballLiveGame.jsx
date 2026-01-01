@@ -3195,6 +3195,14 @@ export default function FootballLiveGame({ user, onLogout }) {
                   ⏭️ Advance Quarter
                 </Button>
                 <Button
+                  variant="destructive"
+                  size="sm"
+                  className="w-full text-xs"
+                  onClick={handleEndGame}
+                >
+                  🏁 End Game
+                </Button>
+                <Button
                   variant="outline"
                   size="sm"
                   className="w-full border-zinc-600 text-zinc-300 text-xs"
