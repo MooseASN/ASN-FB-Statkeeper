@@ -157,15 +157,46 @@ export default function TeamDetail({ user, onLogout }) {
       return;
     }
 
-    setRoster([...roster, { number: newPlayer.number.trim(), name: newPlayer.name.trim() }]);
+    const updatedRoster = [...roster, { number: newPlayer.number.trim(), name: newPlayer.name.trim() }];
+    setRoster(updatedRoster);
     setNewPlayer({ number: "", name: "" });
+    setHasUnsavedChanges(true);
+    
+    // Auto-save after adding player
+    autoSaveRoster(updatedRoster);
   };
 
   const handleRemovePlayer = (index) => {
-    setRoster(roster.filter((_, i) => i !== index));
+    const updatedRoster = roster.filter((_, i) => i !== index);
+    setRoster(updatedRoster);
+    setHasUnsavedChanges(true);
+    
+    // Auto-save after removing player
+    autoSaveRoster(updatedRoster);
+  };
+  
+  // Auto-save roster changes
+  const autoSaveRoster = async (rosterData) => {
+    try {
+      await axios.put(`${API}/teams/${id}`, {
+        name: teamName,
+        logo_url: teamLogo || null,
+        color: teamColor,
+        roster: rosterData
+      });
+      setHasUnsavedChanges(false);
+    } catch (error) {
+      console.error("Auto-save failed:", error);
+    }
   };
 
   const handleSave = async () => {
+    if (!teamName.trim()) {
+      toast.error("Team name is required");
+      return;
+    }
+    
+    setSaving(true);
     try {
       await axios.put(`${API}/teams/${id}`, {
         name: teamName,
@@ -173,9 +204,12 @@ export default function TeamDetail({ user, onLogout }) {
         color: teamColor,
         roster: roster
       });
-      toast.success("Team updated successfully");
+      setHasUnsavedChanges(false);
+      toast.success("Team saved successfully");
     } catch (error) {
-      toast.error("Failed to update team");
+      toast.error("Failed to save team");
+    } finally {
+      setSaving(false);
     }
   };
 
