@@ -27,6 +27,13 @@ import {
 import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
 import { RULESETS } from "@/data/penaltyCatalog";
 
+// Import extracted football components
+import FootballField from "@/components/football/FootballField";
+import KickoffDialog from "@/components/football/KickoffDialog";
+import PlayerSelector from "@/components/football/PlayerSelector";
+import YardLineSelector from "@/components/football/YardLineSelector";
+import { PLAY_TYPES, PLAY_RESULTS } from "@/components/football/constants";
+
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Football Field Component with StatMoose logo
