@@ -915,8 +915,27 @@ export default function LiveGame() {
     const statType = made ? `${selectedShotType}_made` : `${selectedShotType}_missed`;
     await handleStatUpdate(selectedPlayer.id, statType);
     setShotModalOpen(false);
+    
+    // For made 2pt or 3pt shots (not free throws), show assist modal
+    if (made && (selectedShotType === 'fg2' || selectedShotType === 'fg3')) {
+      const scorerTeam = homeStats.find(p => p.id === selectedPlayer.id) ? 'home' : 'away';
+      setAssistTeam(scorerTeam);
+      setAssistScorer(selectedPlayer);
+      setAssistModalOpen(true);
+    }
+    
     setSelectedPlayer(null);
     setSelectedShotType(null);
+  };
+  
+  // Handle assist selection
+  const handleAssistSelect = async (assister) => {
+    if (assister) {
+      await handleStatUpdate(assister.id, 'assist');
+    }
+    setAssistModalOpen(false);
+    setAssistTeam(null);
+    setAssistScorer(null);
   };
 
   // Rebound click handler for Classic mode
