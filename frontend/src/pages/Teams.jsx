@@ -89,6 +89,7 @@ const ColorPicker = ({ value, onChange }) => {
 
 export default function Teams({ user, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { selectedSport } = useSport();
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [teams, setTeams] = useState([]);
@@ -110,19 +111,10 @@ export default function Teams({ user, onLogout }) {
     }
   }, [selectedSport]);
 
-  // Fetch teams on mount and when sport changes
+  // Fetch teams whenever we navigate to this page (including back button)
   useEffect(() => {
     fetchTeams();
-  }, [fetchTeams]);
-  
-  // Also refetch when window gains focus (user returns from another page)
-  useEffect(() => {
-    const handleFocus = () => {
-      fetchTeams();
-    };
-    window.addEventListener('focus', handleFocus);
-    return () => window.removeEventListener('focus', handleFocus);
-  }, [fetchTeams]);
+  }, [fetchTeams, location.pathname, location.key]);
 
   const handleCreateTeam = async () => {
     if (!newTeam.name.trim()) {
