@@ -404,7 +404,7 @@ async def verify_security_question(request: Request, data: SecurityQuestionVerif
     origin = request.headers.get("origin")
     if not origin:
         # Fallback to environment-based URL for production
-        origin = os.environ.get("FRONTEND_URL", "https://gamestats-grid.preview.emergentagent.com")
+        origin = os.environ.get("FRONTEND_URL", "https://gamestats-tracker-1.preview.emergentagent.com")
     reset_url = f"{origin}/reset-password?token={reset_token}"
     
     return {
