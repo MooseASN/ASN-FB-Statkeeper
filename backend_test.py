@@ -236,8 +236,8 @@ class BracketAndEndGameTester:
             return False
     
     def run_all_tests(self):
-        """Run all football feature tests"""
-        print("🏈 Starting Football Feature Backend API Tests")
+        """Run all bracket removal and end game feature tests"""
+        print("🏀🏈 Starting Bracket Removal and End Game Feature Tests")
         print("=" * 60)
         
         # Test 1: Authentication
@@ -245,27 +245,18 @@ class BracketAndEndGameTester:
             print("❌ Authentication failed - cannot continue with other tests")
             return False
         
-        # Test 2: Share Button API
-        self.test_share_button_api()
+        # Test 2: Bracket System Removal
+        self.test_bracket_system_removal()
         
-        # Test 3: Time of Possession Backend
-        self.test_time_of_possession_backend()
+        # Test 3: End Game Feature - Basketball
+        self.test_end_game_basketball()
         
-        # Test 4: Drives Section Data
-        self.test_drives_section_data()
-        
-        # Test 5: Box Score Data
-        self.test_box_score_data()
-        
-        # Test 6: Timeouts Display Data
-        self.test_timeouts_display_data()
-        
-        # Test 7: API Endpoints Comprehensive
-        self.test_api_endpoints_comprehensive()
+        # Test 4: End Game Feature - Football
+        self.test_end_game_football()
         
         # Summary
         print("\n" + "=" * 60)
-        print("🏈 Football Feature Backend Test Summary")
+        print("🏀🏈 Bracket Removal and End Game Feature Test Summary")
         print("=" * 60)
         
         passed = sum(1 for result in self.test_results if result["success"])
@@ -278,7 +269,7 @@ class BracketAndEndGameTester:
         print(f"\nResults: {passed}/{total} tests passed")
         
         if passed == total:
-            print("🎉 All football feature backend tests PASSED!")
+            print("🎉 All bracket removal and end game feature tests PASSED!")
             return True
         else:
             print(f"⚠️  {total - passed} test(s) FAILED")
