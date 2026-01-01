@@ -138,9 +138,6 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/live/:shareCode" element={<LiveView />} />
       <Route path="/event/:eventId/live" element={<EventLive />} />
       
-      {/* Public bracket view */}
-      <Route path="/bracket/:bracketId" element={<BracketPublicView />} />
-      
       {/* Embed view is public - for external embedding */}
       <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
       <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
