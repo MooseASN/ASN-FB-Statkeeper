@@ -75,6 +75,10 @@ export default function AdvancedLiveGame() {
   const [showReboundTypeDialog, setShowReboundTypeDialog] = useState(false);
   const [pendingReboundPlayer, setPendingReboundPlayer] = useState(null);
   
+  // Post-miss rebound flow (Advanced Mode feature)
+  const [showPostMissReboundDialog, setShowPostMissReboundDialog] = useState(false);
+  const [missedShotTeam, setMissedShotTeam] = useState(null);
+  
   // Foul type dialog
   const [showFoulTypeDialog, setShowFoulTypeDialog] = useState(false);
   const [pendingFoulPlayer, setPendingFoulPlayer] = useState(null);
