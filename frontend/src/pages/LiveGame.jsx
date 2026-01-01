@@ -75,7 +75,7 @@ const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss, simp
 };
 
 // Rebound Selection Modal for Classic Mode
-const ReboundModal = ({ isOpen, onClose, playerName, onOffensive, onDefensive }) => {
+const ReboundModal = ({ isOpen, onClose, playerName, onOffensive, onDefensive, onDeadball }) => {
   if (!isOpen) return null;
   
   return (
@@ -88,22 +88,70 @@ const ReboundModal = ({ isOpen, onClose, playerName, onOffensive, onDefensive })
           </button>
         </div>
         <p className="text-muted-foreground mb-4">{playerName}</p>
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           <button
             onClick={onOffensive}
             className="py-6 rounded-xl bg-green-100 hover:bg-green-200 border-2 border-green-300 hover:border-green-500 font-bold text-green-700 transition-colors"
           >
-            <div className="text-xl">OREB</div>
+            <div className="text-lg">OREB</div>
             <div className="text-xs text-green-600">Offensive</div>
           </button>
           <button
             onClick={onDefensive}
             className="py-6 rounded-xl bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 hover:border-blue-500 font-bold text-blue-700 transition-colors"
           >
-            <div className="text-xl">DREB</div>
+            <div className="text-lg">DREB</div>
             <div className="text-xs text-blue-600">Defensive</div>
           </button>
+          <button
+            onClick={onDeadball}
+            className="py-6 rounded-xl bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-500 font-bold text-gray-700 transition-colors"
+          >
+            <div className="text-lg">DEAD</div>
+            <div className="text-xs text-gray-600">Deadball</div>
+          </button>
         </div>
+      </div>
+    </div>
+  );
+};
+
+// Assist Selection Modal - shown after a made basket
+const AssistModal = ({ isOpen, onClose, teammates, onSelectAssist, onNoAssist, teamColor }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg">Who had the assist?</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="grid grid-cols-3 gap-2 mb-4">
+          {teammates.map(player => (
+            <button
+              key={player.id}
+              onClick={() => onSelectAssist(player)}
+              className="py-4 px-2 rounded-lg border-2 hover:border-opacity-100 transition-colors text-center"
+              style={{ 
+                borderColor: teamColor, 
+                backgroundColor: `${teamColor}10`,
+                color: teamColor 
+              }}
+            >
+              <div className="text-xl font-bold">#{player.player_number}</div>
+              <div className="text-xs truncate">{player.player_name?.split(' ')[0]}</div>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={onNoAssist}
+          className="w-full py-3 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium transition-colors"
+        >
+          No Assist (Unassisted)
+        </button>
       </div>
     </div>
   );
