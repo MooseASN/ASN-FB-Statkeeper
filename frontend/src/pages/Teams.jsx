@@ -86,6 +86,7 @@ const ColorPicker = ({ value, onChange }) => {
 
 export default function Teams({ user, onLogout }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { selectedSport } = useSport();
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   const [teams, setTeams] = useState([]);
@@ -93,11 +94,8 @@ export default function Teams({ user, onLogout }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [newTeam, setNewTeam] = useState({ name: "", logo_url: "", color: "#dc2626" });
 
-  useEffect(() => {
-    fetchTeams();
-  }, [selectedSport]);
-
-  const fetchTeams = async () => {
+  const fetchTeams = useCallback(async () => {
+    setLoading(true);
     try {
       const res = await axios.get(`${API}/teams`, {
         params: { sport: selectedSport }
@@ -108,7 +106,12 @@ export default function Teams({ user, onLogout }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedSport]);
+
+  // Fetch teams when sport changes or when navigating back to this page
+  useEffect(() => {
+    fetchTeams();
+  }, [fetchTeams, location.key]);
 
   const handleCreateTeam = async () => {
     if (!newTeam.name.trim()) {
