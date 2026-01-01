@@ -447,14 +447,6 @@ export default function TeamDetail({ user, onLogout }) {
             </div>
           </CardContent>
         </Card>
-
-        {/* Save Button */}
-        <div className="flex justify-end">
-          <Button onClick={handleSave} className="bg-[#000000] hover:bg-[#333333]" data-testid="save-team-btn">
-            <Save className="w-4 h-4 mr-2" />
-            Save Changes
-          </Button>
-        </div>
       </div>
 
       {/* Bulk Add Dialog */}
