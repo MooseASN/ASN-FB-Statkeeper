@@ -1,0 +1,48 @@
+{
+  "timestamp": "2026-01-01T16:46:48.694773",
+  "overall_success": true,
+  "test_results": [
+    {
+      "test": "Admin Authentication",
+      "success": true,
+      "message": "Successfully authenticated as antlersportsnetwork@gmail.com",
+      "timestamp": "2026-01-01T16:46:48.448689",
+      "details": null
+    },
+    {
+      "test": "Bracket POST Endpoint Removal",
+      "success": true,
+      "message": "POST /api/brackets correctly returns 404",
+      "timestamp": "2026-01-01T16:46:48.459466",
+      "details": null
+    },
+    {
+      "test": "Bracket GET Endpoint Removal",
+      "success": true,
+      "message": "GET /api/brackets correctly returns 404",
+      "timestamp": "2026-01-01T16:46:48.506843",
+      "details": null
+    },
+    {
+      "test": "Find Basketball Game",
+      "success": true,
+      "message": "Found basketball game: f5d1bbf0-2ba6-46cb-bf9e-e18ba6c868db",
+      "timestamp": "2026-01-01T16:46:48.518292",
+      "details": null
+    },
+    {
+      "test": "End Game Basketball",
+      "success": true,
+      "message": "Basketball game status updated from 'active' to 'final'",
+      "timestamp": "2026-01-01T16:46:48.572579",
+      "details": null
+    },
+    {
+      "test": "End Game Football",
+      "success": true,
+      "message": "Football game status updated from 'active' to 'final'",
+      "timestamp": "2026-01-01T16:46:48.694571",
+      "details": null
+    }
+  ]
+}
