@@ -1354,6 +1354,25 @@ export default function AdvancedLiveGame() {
               Reset Team Fouls
             </Button>
             
+            {/* End Game Button */}
+            <Button 
+              onClick={async () => {
+                if (!window.confirm("Are you sure you want to end this game? This will set the game status to Final.")) return;
+                try {
+                  await axios.put(`${API}/games/${id}`, { status: "final" });
+                  toast.success("Game ended - Status: Final");
+                  setShowGameControlDialog(false);
+                  fetchGame();
+                } catch (error) {
+                  toast.error("Failed to end game");
+                }
+              }}
+              variant="destructive"
+              className="w-full"
+            >
+              End Game (Final)
+            </Button>
+            
             {/* Game Notes Section */}
             <div className="border-t border-zinc-700 pt-4 mt-4">
               <Label className="text-sm font-medium text-zinc-400 mb-2 block">Game Notes</Label>
