@@ -1559,6 +1559,46 @@ export default function LiveGame() {
                 </Button>
               )}
             </div>
+            
+            {/* Quick Entry Section - Players On Floor */}
+            {game?.clock_enabled && (teamsFlipped ? game?.away_on_floor : game?.home_on_floor)?.length > 0 && (
+              <div className="mb-3 p-2 bg-green-50 rounded-lg border border-green-200">
+                <div className="text-xs text-green-700 font-medium mb-2 flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  On Floor - Quick Entry
+                </div>
+                <div className="grid grid-cols-5 gap-1">
+                  {(teamsFlipped ? game?.away_on_floor : game?.home_on_floor).map(playerId => {
+                    const player = (teamsFlipped ? awayStats : homeStats).find(p => p.id === playerId);
+                    if (!player) return null;
+                    return (
+                      <div key={playerId} className="flex flex-col items-center">
+                        <div className="text-xs font-bold mb-1" style={{ color: teamsFlipped ? awayColor : homeColor }}>
+                          #{player.player_number}
+                        </div>
+                        <div className="flex gap-0.5">
+                          <button
+                            onClick={() => handleShotClick(player, 'fg2')}
+                            disabled={!isActive}
+                            className="px-1.5 py-1 text-[10px] bg-emerald-100 hover:bg-emerald-200 text-emerald-700 rounded font-medium disabled:opacity-50"
+                          >
+                            2PT
+                          </button>
+                          <button
+                            onClick={() => handleShotClick(player, 'fg3')}
+                            disabled={!isActive}
+                            className="px-1.5 py-1 text-[10px] bg-blue-100 hover:bg-blue-200 text-blue-700 rounded font-medium disabled:opacity-50"
+                          >
+                            3PT
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
             <div className={`space-y-${viewMode === "condensed" ? "1" : "3"}`}>
               {sortByNumber(teamsFlipped ? awayStats : homeStats).map(player => (
                 <PlayerCard 
