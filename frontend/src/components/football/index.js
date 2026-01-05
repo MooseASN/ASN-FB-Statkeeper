@@ -3,6 +3,7 @@ export { default as FootballField } from './FootballField';
 export { default as KickoffDialog } from './KickoffDialog';
 export { default as PlayerSelector } from './PlayerSelector';
 export { default as YardLineSelector } from './YardLineSelector';
+export { FieldViewDialog } from './FieldViewDialog';
 
 // Constants
 export { 
