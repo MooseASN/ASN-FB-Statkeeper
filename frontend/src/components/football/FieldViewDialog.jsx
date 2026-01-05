@@ -132,8 +132,14 @@ export function FieldViewDialog({
   const yardMarkers = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-2xl bg-zinc-900 border-zinc-700">
+    <Dialog 
+      open={isOpen} 
+      onOpenChange={handleOpenChange}
+    >
+      <DialogContent 
+        className="sm:max-w-2xl bg-zinc-900 border-zinc-700"
+        onOpenAutoFocus={() => setEndPosition(currentPosition)}
+      >
         <DialogHeader>
           <DialogTitle className="text-white flex items-center gap-2">
             <MapPin className="w-5 h-5" />
