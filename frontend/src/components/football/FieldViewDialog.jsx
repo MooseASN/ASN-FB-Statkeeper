@@ -402,12 +402,36 @@ export function FieldViewDialog({
             >
               Cancel
             </Button>
-            <Button
-              className={`flex-1 ${yardsGained >= 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
-              onClick={handleConfirm}
-            >
-              Set {Math.abs(yardsGained)} Yards {yardsGained >= 0 ? 'Gain' : 'Loss'}
-            </Button>
+            {isTouchdown && onTouchdown ? (
+              <Button
+                className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
+                onClick={() => {
+                  onTouchdown();
+                  onClose();
+                }}
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                TOUCHDOWN!
+              </Button>
+            ) : isSafety && onSafety ? (
+              <Button
+                className="flex-1 bg-red-600 hover:bg-red-700 font-bold"
+                onClick={() => {
+                  onSafety();
+                  onClose();
+                }}
+              >
+                <Shield className="w-4 h-4 mr-2" />
+                SAFETY (2 pts)
+              </Button>
+            ) : (
+              <Button
+                className={`flex-1 ${yardsGained >= 0 ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
+                onClick={handleConfirm}
+              >
+                Set {Math.abs(yardsGained)} Yards {yardsGained >= 0 ? 'Gain' : 'Loss'}
+              </Button>
+            )}
           </div>
         </div>
       </DialogContent>
