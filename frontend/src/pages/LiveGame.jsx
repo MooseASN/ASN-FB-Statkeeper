@@ -1514,6 +1514,30 @@ export default function LiveGame() {
         onNoAssist={() => handleAssistSelect(null)}
         teamColor={assistTeam === 'home' ? homeColor : awayColor}
       />
+      
+      {/* Post-Miss Rebound Type Modal - shown after missed field goal */}
+      <PostMissReboundModal
+        isOpen={postMissReboundOpen}
+        onClose={() => {
+          setPostMissReboundOpen(false);
+          setMissedShotTeam(null);
+        }}
+        onSelectType={handleReboundTypeSelect}
+      />
+      
+      {/* Rebound Player Selection Modal - shown after selecting rebound type */}
+      <ReboundPlayerModal
+        isOpen={reboundPlayerModalOpen}
+        onClose={() => {
+          setReboundPlayerModalOpen(false);
+          setReboundTypeSelected(null);
+          setMissedShotTeam(null);
+        }}
+        reboundType={reboundTypeSelected}
+        players={getReboundPlayers()}
+        teamColor={getReboundTeamColor()}
+        onSelectPlayer={handleReboundPlayerSelect}
+      />
 
       {/* Side Action Buttons - Flippable with teams */}
       <SideActionButton 
