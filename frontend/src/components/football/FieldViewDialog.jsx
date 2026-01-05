@@ -280,13 +280,45 @@ export function FieldViewDialog({
           
           {/* Yards Display */}
           <div className="text-center py-4 bg-zinc-800 rounded-lg">
-            <div className="text-zinc-500 text-sm mb-1">Yards</div>
-            <div className={`text-4xl font-black ${yardsGained >= 0 ? 'text-green-400' : 'text-red-400'}`}>
-              {yardsGained > 0 ? '+' : ''}{yardsGained}
-            </div>
-            <div className="text-zinc-500 text-xs mt-1">
-              {yardsGained > 0 ? 'GAIN' : yardsGained < 0 ? 'LOSS' : 'NO GAIN'}
-            </div>
+            {isTouchdown ? (
+              <>
+                <div className="text-yellow-400 text-sm mb-1 flex items-center justify-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  TOUCHDOWN!
+                  <Trophy className="w-4 h-4" />
+                </div>
+                <div className="text-4xl font-black text-yellow-400">
+                  🏈 TD 🏈
+                </div>
+                <div className="text-yellow-300 text-xs mt-1">
+                  {Math.abs(yardsGained)} yard {yardsGained >= 0 ? 'gain' : 'run'} into end zone
+                </div>
+              </>
+            ) : isSafety ? (
+              <>
+                <div className="text-red-400 text-sm mb-1 flex items-center justify-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  SAFETY!
+                  <Shield className="w-4 h-4" />
+                </div>
+                <div className="text-4xl font-black text-red-400">
+                  ⚠️ 2 PTS ⚠️
+                </div>
+                <div className="text-red-300 text-xs mt-1">
+                  Tackled in own end zone - {Math.abs(yardsGained)} yard loss
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-zinc-500 text-sm mb-1">Yards</div>
+                <div className={`text-4xl font-black ${yardsGained >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                  {yardsGained > 0 ? '+' : ''}{yardsGained}
+                </div>
+                <div className="text-zinc-500 text-xs mt-1">
+                  {yardsGained > 0 ? 'GAIN' : yardsGained < 0 ? 'LOSS' : 'NO GAIN'}
+                </div>
+              </>
+            )}
           </div>
           
           {/* Slider */}
