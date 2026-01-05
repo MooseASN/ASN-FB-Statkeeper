@@ -1,9 +1,13 @@
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
 import { useSport, SPORTS, SPORT_CONFIG } from "@/contexts/SportContext";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { LogOut, Lock, User, Settings, Shield } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { LogOut, Lock, User, Settings, Shield, Eye, EyeOff } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,9 +16,9 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 
-// Users allowed to access Football (admins)
-const FOOTBALL_ALLOWED_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
-const FOOTBALL_ALLOWED_USERNAMES = ["admin"];
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Admin users who bypass all restrictions
 const ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
 const ADMIN_USERNAMES = ["admin"];
 
@@ -27,22 +31,100 @@ const isAdminUser = (user) => {
 export default function SportSelection({ user, onLogout }) {
   const navigate = useNavigate();
   const { selectSport } = useSport();
+  
+  // Beta mode state
+  const [betaStatus, setBetaStatus] = useState({ basketball_beta: false, football_beta: false });
+  const [loadingBeta, setLoadingBeta] = useState(true);
+  
+  // Password dialog state
+  const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
+  const [selectedBetaSport, setSelectedBetaSport] = useState(null);
+  const [betaPassword, setBetaPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+  
+  // Unlocked sports (stored in session)
+  const [unlockedSports, setUnlockedSports] = useState(() => {
+    const stored = sessionStorage.getItem("unlocked_sports");
+    return stored ? JSON.parse(stored) : [];
+  });
 
   // Set document title to StatMoose
   useEffect(() => {
     document.title = "StatMoose";
   }, []);
+  
+  // Fetch beta status on mount
+  useEffect(() => {
+    const fetchBetaStatus = async () => {
+      try {
+        const res = await axios.get(`${API}/beta-status`);
+        setBetaStatus(res.data);
+      } catch (error) {
+        console.error("Failed to fetch beta status:", error);
+      } finally {
+        setLoadingBeta(false);
+      }
+    };
+    fetchBetaStatus();
+  }, []);
 
-  // Check if user can access football (admins only)
-  const canAccessFootball = FOOTBALL_ALLOWED_EMAILS.includes(user?.email?.toLowerCase()) ||
-                            FOOTBALL_ALLOWED_USERNAMES.includes(user?.username?.toLowerCase());
+  // Check if sport is locked (in beta and not unlocked)
+  const isSportLocked = (sport) => {
+    if (isAdminUser(user)) return false; // Admins bypass all locks
+    if (unlockedSports.includes(sport)) return false; // Already unlocked this session
+    
+    if (sport === "basketball") return betaStatus.basketball_beta;
+    if (sport === "football") return betaStatus.football_beta;
+    return false;
+  };
 
   const handleSelectSport = (sport) => {
-    if (sport === SPORTS.FOOTBALL && !canAccessFootball) {
-      return; // Don't allow selection
+    if (isSportLocked(sport)) {
+      // Show password dialog
+      setSelectedBetaSport(sport);
+      setBetaPassword("");
+      setPasswordDialogOpen(true);
+      return;
     }
+    
     selectSport(sport);
     navigate("/");
+  };
+  
+  const handleVerifyPassword = async () => {
+    if (!betaPassword.trim()) {
+      toast.error("Please enter the beta password");
+      return;
+    }
+    
+    setVerifying(true);
+    try {
+      const res = await axios.post(`${API}/beta-verify`, {
+        sport: selectedBetaSport,
+        password: betaPassword
+      });
+      
+      if (res.data.valid) {
+        // Unlock the sport for this session
+        const newUnlocked = [...unlockedSports, selectedBetaSport];
+        setUnlockedSports(newUnlocked);
+        sessionStorage.setItem("unlocked_sports", JSON.stringify(newUnlocked));
+        
+        setPasswordDialogOpen(false);
+        setBetaPassword("");
+        
+        // Now select the sport
+        selectSport(selectedBetaSport);
+        navigate("/");
+      } else {
+        toast.error("Incorrect beta password");
+      }
+    } catch (error) {
+      toast.error("Failed to verify password");
+    } finally {
+      setVerifying(false);
+    }
   };
 
   return (
@@ -108,29 +190,54 @@ export default function SportSelection({ user, onLogout }) {
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           {/* Basketball Card */}
           <Card
-            className="group cursor-pointer overflow-hidden border-2 border-transparent hover:border-orange-500 transition-all duration-300 bg-slate-800/50 hover:bg-slate-800"
+            className={`group overflow-hidden border-2 transition-all duration-300 bg-slate-800/50 ${
+              isSportLocked("basketball")
+                ? "cursor-pointer border-transparent hover:border-orange-500/50 hover:bg-slate-800"
+                : "cursor-pointer border-transparent hover:border-orange-500 hover:bg-slate-800"
+            }`}
             onClick={() => handleSelectSport(SPORTS.BASKETBALL)}
           >
             <CardContent className="p-0">
-              <div className={`bg-gradient-to-br ${SPORT_CONFIG.basketball.bgGradient} p-8 flex items-center justify-center`}>
-                <span className="text-8xl group-hover:scale-110 transition-transform duration-300">
+              <div className={`bg-gradient-to-br ${SPORT_CONFIG.basketball.bgGradient} p-8 flex items-center justify-center relative`}>
+                <span className={`text-8xl transition-transform duration-300 ${isSportLocked("basketball") ? "" : "group-hover:scale-110"}`}>
                   {SPORT_CONFIG.basketball.icon}
                 </span>
+                {isSportLocked("basketball") && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="text-center">
+                      <Lock className="w-10 h-10 text-white/80 mx-auto mb-2" />
+                      <span className="text-white/80 text-sm font-medium">Beta Access</span>
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="p-6 text-center">
                 <h2 className="text-2xl font-bold text-white mb-2">
                   {SPORT_CONFIG.basketball.name}
                 </h2>
-                <p className="text-slate-400 mb-4">
-                  {SPORT_CONFIG.basketball.description}
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center text-xs">
-                  <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Points</span>
-                  <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Rebounds</span>
-                  <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Assists</span>
-                  <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Steals</span>
-                  <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Blocks</span>
-                </div>
+                {isSportLocked("basketball") ? (
+                  <div className="py-2">
+                    <p className="text-amber-400 font-semibold mb-2">
+                      Beta Access Required
+                    </p>
+                    <p className="text-slate-500 text-sm">
+                      Click to enter beta password
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-slate-400 mb-4">
+                      {SPORT_CONFIG.basketball.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center text-xs">
+                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Points</span>
+                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Rebounds</span>
+                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Assists</span>
+                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Steals</span>
+                      <span className="px-2 py-1 bg-orange-500/20 text-orange-400 rounded-full">Blocks</span>
+                    </div>
+                  </>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -138,20 +245,23 @@ export default function SportSelection({ user, onLogout }) {
           {/* Football Card */}
           <Card
             className={`group overflow-hidden border-2 transition-all duration-300 bg-slate-800/50 ${
-              canAccessFootball 
-                ? "cursor-pointer border-transparent hover:border-green-500 hover:bg-slate-800" 
-                : "cursor-not-allowed border-transparent opacity-70"
+              isSportLocked("football")
+                ? "cursor-pointer border-transparent hover:border-green-500/50 hover:bg-slate-800"
+                : "cursor-pointer border-transparent hover:border-green-500 hover:bg-slate-800"
             }`}
             onClick={() => handleSelectSport(SPORTS.FOOTBALL)}
           >
             <CardContent className="p-0">
               <div className={`bg-gradient-to-br ${SPORT_CONFIG.football.bgGradient} p-8 flex items-center justify-center relative`}>
-                <span className={`text-8xl transition-transform duration-300 ${canAccessFootball ? "group-hover:scale-110" : "grayscale opacity-50"}`}>
+                <span className={`text-8xl transition-transform duration-300 ${isSportLocked("football") ? "" : "group-hover:scale-110"}`}>
                   {SPORT_CONFIG.football.icon}
                 </span>
-                {!canAccessFootball && (
+                {isSportLocked("football") && (
                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                    <Lock className="w-12 h-12 text-white/80" />
+                    <div className="text-center">
+                      <Lock className="w-10 h-10 text-white/80 mx-auto mb-2" />
+                      <span className="text-white/80 text-sm font-medium">Beta Access</span>
+                    </div>
                   </div>
                 )}
               </div>
@@ -159,7 +269,16 @@ export default function SportSelection({ user, onLogout }) {
                 <h2 className="text-2xl font-bold text-white mb-2">
                   {SPORT_CONFIG.football.name}
                 </h2>
-                {canAccessFootball ? (
+                {isSportLocked("football") ? (
+                  <div className="py-2">
+                    <p className="text-amber-400 font-semibold mb-2">
+                      Beta Access Required
+                    </p>
+                    <p className="text-slate-500 text-sm">
+                      Click to enter beta password
+                    </p>
+                  </div>
+                ) : (
                   <>
                     <p className="text-slate-400 mb-4">
                       {SPORT_CONFIG.football.description}
@@ -172,15 +291,6 @@ export default function SportSelection({ user, onLogout }) {
                       <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Special Teams</span>
                     </div>
                   </>
-                ) : (
-                  <div className="py-4">
-                    <p className="text-amber-400 font-semibold mb-2">
-                      Football Coming Soon
-                    </p>
-                    <p className="text-slate-500 text-sm">
-                      Football stat tracking is currently in beta testing
-                    </p>
-                  </div>
                 )}
               </div>
             </CardContent>
@@ -191,6 +301,61 @@ export default function SportSelection({ user, onLogout }) {
           You can switch sports at any time from the dashboard
         </p>
       </main>
+      
+      {/* Beta Password Dialog */}
+      <Dialog open={passwordDialogOpen} onOpenChange={setPasswordDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              Beta Access Required
+            </DialogTitle>
+            <DialogDescription>
+              {selectedBetaSport === "basketball" ? "Basketball" : "Football"} is currently in beta testing. 
+              Enter the beta password to access.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter beta password"
+                value={betaPassword}
+                onChange={(e) => setBetaPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleVerifyPassword();
+                  }
+                }}
+                className="pr-10"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setPasswordDialogOpen(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleVerifyPassword}
+                disabled={verifying || !betaPassword.trim()}
+                className="flex-1"
+              >
+                {verifying ? "Verifying..." : "Unlock Access"}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
