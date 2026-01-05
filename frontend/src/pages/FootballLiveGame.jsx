@@ -4811,6 +4811,18 @@ export default function FootballLiveGame({ user, onLogout }) {
         currentPosition={ballPosition}
         possession={possession}
         onYardsChange={(newYards) => setYards(newYards)}
+        onTouchdown={() => {
+          // Set result to touchdown and max yards
+          setSelectedResult('touchdown');
+          const maxYards = possession === 'home' ? (100 - ballPosition) : ballPosition;
+          setYards(maxYards);
+        }}
+        onSafety={() => {
+          // Set result to safety (loss into own end zone)
+          setSelectedResult('safety');
+          const lossYards = possession === 'home' ? -ballPosition : -(100 - ballPosition);
+          setYards(lossYards);
+        }}
         homeTeamName={game?.home_team_name}
         awayTeamName={game?.away_team_name}
         homeTeamColor={game?.home_team_color || "#dc2626"}
