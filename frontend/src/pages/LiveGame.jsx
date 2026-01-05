@@ -697,6 +697,12 @@ export default function LiveGame() {
   const [reboundModalOpen, setReboundModalOpen] = useState(false);
   const [reboundPlayer, setReboundPlayer] = useState(null);
   
+  // Post-miss rebound flow state
+  const [postMissReboundOpen, setPostMissReboundOpen] = useState(false);
+  const [missedShotTeam, setMissedShotTeam] = useState(null); // 'home' or 'away' - team that missed the shot
+  const [reboundTypeSelected, setReboundTypeSelected] = useState(null); // 'offensive' or 'defensive'
+  const [reboundPlayerModalOpen, setReboundPlayerModalOpen] = useState(false);
+  
   // Reset stats state
   const [resetStatsOpen, setResetStatsOpen] = useState(false);
   const [resetting, setResetting] = useState(false);
