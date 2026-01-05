@@ -284,6 +284,98 @@ export default function AdminDashboard({ user, onLogout }) {
             </CardContent>
           </Card>
         )}
+        
+        {/* Beta Mode Settings */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5" />
+              Beta Mode Settings
+            </CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Lock sports behind a password for beta testing. Users without the password cannot access that sport.
+            </p>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Basketball Beta */}
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏀</span>
+                  <div>
+                    <Label className="text-base font-medium">Basketball Beta Mode</Label>
+                    <p className="text-sm text-muted-foreground">Require password to access basketball</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={betaSettings.basketball_beta}
+                  onCheckedChange={(checked) => setBetaSettings(prev => ({ ...prev, basketball_beta: checked }))}
+                />
+              </div>
+              {betaSettings.basketball_beta && (
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showBasketballPassword ? "text" : "password"}
+                      placeholder="Enter beta password"
+                      value={betaSettings.basketball_password}
+                      onChange={(e) => setBetaSettings(prev => ({ ...prev, basketball_password: e.target.value }))}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowBasketballPassword(!showBasketballPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showBasketballPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Football Beta */}
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">🏈</span>
+                  <div>
+                    <Label className="text-base font-medium">Football Beta Mode</Label>
+                    <p className="text-sm text-muted-foreground">Require password to access football</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={betaSettings.football_beta}
+                  onCheckedChange={(checked) => setBetaSettings(prev => ({ ...prev, football_beta: checked }))}
+                />
+              </div>
+              {betaSettings.football_beta && (
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showFootballPassword ? "text" : "password"}
+                      placeholder="Enter beta password"
+                      value={betaSettings.football_password}
+                      onChange={(e) => setBetaSettings(prev => ({ ...prev, football_password: e.target.value }))}
+                      className="pr-10"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowFootballPassword(!showFootballPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showFootballPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            <Button onClick={handleSaveBetaSettings} disabled={savingBeta} className="w-full">
+              {savingBeta ? "Saving..." : "Save Beta Settings"}
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Users Table */}
         <Card>
