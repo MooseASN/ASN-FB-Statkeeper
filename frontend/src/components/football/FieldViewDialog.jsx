@@ -2,7 +2,7 @@ import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
-import { MapPin } from "lucide-react";
+import { MapPin, Shield, Trophy } from "lucide-react";
 
 /**
  * FieldViewDialog - A miniature football field view for visualizing yardage
@@ -14,6 +14,8 @@ import { MapPin } from "lucide-react";
  * - currentPosition: number - Current ball position (0-100 normalized)
  * - possession: 'home' | 'away' - Which team has possession
  * - onYardsChange: (yards: number) => void - Callback with calculated yards
+ * - onTouchdown: () => void - Optional callback when touchdown is selected
+ * - onSafety: () => void - Optional callback when safety is selected
  * - homeTeamName: string - Home team name
  * - awayTeamName: string - Away team name
  * - homeTeamColor: string - Home team color
@@ -25,6 +27,8 @@ export function FieldViewDialog({
   currentPosition,
   possession,
   onYardsChange,
+  onTouchdown,
+  onSafety,
   homeTeamName = "HOME",
   awayTeamName = "AWAY",
   homeTeamColor = "#dc2626",
@@ -47,6 +51,27 @@ export function FieldViewDialog({
   const handleDialogOpen = useCallback(() => {
     setEndPosition(currentPosition);
   }, [currentPosition]);
+
+  /**
+   * Check if position is in the end zone
+   * For home team: 100 = opponent's end zone (touchdown), 0 = own end zone (safety)
+   * For away team: 0 = opponent's end zone (touchdown), 100 = own end zone (safety)
+   */
+  const isTouchdown = useMemo(() => {
+    if (possession === 'home') {
+      return endPosition >= 100;
+    } else {
+      return endPosition <= 0;
+    }
+  }, [endPosition, possession]);
+
+  const isSafety = useMemo(() => {
+    if (possession === 'home') {
+      return endPosition <= 0;
+    } else {
+      return endPosition >= 100;
+    }
+  }, [endPosition, possession]);
 
   /**
    * Convert normalized position (0-100) to actual yard line
