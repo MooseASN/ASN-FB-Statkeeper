@@ -1017,16 +1017,73 @@ export default function LiveGame() {
     await handleStatUpdate(selectedPlayer.id, statType);
     setShotModalOpen(false);
     
+    // Determine which team the shooter is on
+    const shooterTeam = homeStats.find(p => p.id === selectedPlayer.id) ? 'home' : 'away';
+    
     // For made 2pt or 3pt shots (not free throws), show assist modal
     if (made && (selectedShotType === 'fg2' || selectedShotType === 'fg3')) {
-      const scorerTeam = homeStats.find(p => p.id === selectedPlayer.id) ? 'home' : 'away';
-      setAssistTeam(scorerTeam);
+      setAssistTeam(shooterTeam);
       setAssistScorer(selectedPlayer);
       setAssistModalOpen(true);
     }
     
+    // For missed field goals (not free throws), show rebound options
+    if (!made && (selectedShotType === 'fg2' || selectedShotType === 'fg3')) {
+      setMissedShotTeam(shooterTeam);
+      setPostMissReboundOpen(true);
+    }
+    
     setSelectedPlayer(null);
     setSelectedShotType(null);
+  };
+  
+  // Handle rebound type selection after missed shot
+  const handleReboundTypeSelect = (type) => {
+    setPostMissReboundOpen(false);
+    
+    if (type === 'deadball') {
+      // Deadball - no rebound recorded
+      setMissedShotTeam(null);
+      toast.info("Deadball - no rebound");
+      return;
+    }
+    
+    setReboundTypeSelected(type);
+    setReboundPlayerModalOpen(true);
+  };
+  
+  // Handle player selection for rebound
+  const handleReboundPlayerSelect = async (player) => {
+    const statType = reboundTypeSelected === 'offensive' ? 'oreb' : 'dreb';
+    await handleStatUpdate(player.id, statType);
+    
+    setReboundPlayerModalOpen(false);
+    setReboundTypeSelected(null);
+    setMissedShotTeam(null);
+  };
+  
+  // Get players for rebound selection based on type
+  const getReboundPlayers = () => {
+    if (!missedShotTeam || !reboundTypeSelected) return [];
+    
+    if (reboundTypeSelected === 'offensive') {
+      // Offensive rebound - players from the team that shot
+      return missedShotTeam === 'home' ? homeStats : awayStats;
+    } else {
+      // Defensive rebound - players from the defending team
+      return missedShotTeam === 'home' ? awayStats : homeStats;
+    }
+  };
+  
+  // Get team color for rebound modal
+  const getReboundTeamColor = () => {
+    if (!missedShotTeam || !reboundTypeSelected) return '#666';
+    
+    if (reboundTypeSelected === 'offensive') {
+      return missedShotTeam === 'home' ? homeColor : awayColor;
+    } else {
+      return missedShotTeam === 'home' ? awayColor : homeColor;
+    }
   };
   
   // Handle assist selection
