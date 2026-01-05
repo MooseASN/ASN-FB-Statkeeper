@@ -44,15 +44,28 @@ export default function AdminDashboard({ user, onLogout }) {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [migrating, setMigrating] = useState(false);
+  
+  // Beta mode settings
+  const [betaSettings, setBetaSettings] = useState({
+    basketball_beta: false,
+    basketball_password: "",
+    football_beta: false,
+    football_password: ""
+  });
+  const [savingBeta, setSavingBeta] = useState(false);
+  const [showBasketballPassword, setShowBasketballPassword] = useState(false);
+  const [showFootballPassword, setShowFootballPassword] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes] = await Promise.all([
+      const [usersRes, statsRes, betaRes] = await Promise.all([
         axios.get(`${API}/admin/users`),
-        axios.get(`${API}/admin/stats`)
+        axios.get(`${API}/admin/stats`),
+        axios.get(`${API}/admin/beta-settings`)
       ]);
       setUsers(usersRes.data.users);
       setStats(statsRes.data);
+      setBetaSettings(betaRes.data);
       setLastUpdated(new Date());
     } catch (error) {
       if (error.response?.status === 403) {
@@ -76,6 +89,18 @@ export default function AdminDashboard({ user, onLogout }) {
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, [autoRefresh, fetchData]);
+  
+  const handleSaveBetaSettings = async () => {
+    setSavingBeta(true);
+    try {
+      await axios.put(`${API}/admin/beta-settings`, betaSettings);
+      toast.success("Beta mode settings saved");
+    } catch (error) {
+      toast.error("Failed to save beta settings");
+    } finally {
+      setSavingBeta(false);
+    }
+  };
 
   const handleExportCSV = async () => {
     try {
