@@ -74,7 +74,102 @@ const ShotModal = ({ isOpen, onClose, shotType, playerName, onMake, onMiss, simp
   );
 };
 
-// Rebound Selection Modal for Classic Mode
+// Rebound Type Selection Modal - shown after a missed shot
+const PostMissReboundModal = ({ isOpen, onClose, onSelectType }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-white rounded-xl p-6 max-w-sm w-full mx-4 shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg">Rebound?</h3>
+          <button onClick={onClose} className="p-1 hover:bg-slate-100 rounded">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-muted-foreground mb-4">Who got the rebound?</p>
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <button
+            onClick={() => onSelectType('offensive')}
+            className="py-6 rounded-xl bg-green-100 hover:bg-green-200 border-2 border-green-300 hover:border-green-500 font-bold text-green-700 transition-colors"
+          >
+            <div className="text-lg">OREB</div>
+            <div className="text-xs text-green-600">Offensive</div>
+          </button>
+          <button
+            onClick={() => onSelectType('defensive')}
+            className="py-6 rounded-xl bg-blue-100 hover:bg-blue-200 border-2 border-blue-300 hover:border-blue-500 font-bold text-blue-700 transition-colors"
+          >
+            <div className="text-lg">DREB</div>
+            <div className="text-xs text-blue-600">Defensive</div>
+          </button>
+          <button
+            onClick={() => onSelectType('deadball')}
+            className="py-6 rounded-xl bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 hover:border-gray-500 font-bold text-gray-700 transition-colors"
+          >
+            <div className="text-lg">DEAD</div>
+            <div className="text-xs text-gray-600">Deadball</div>
+          </button>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 font-medium"
+        >
+          Skip
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Rebound Player Selection Modal - shown after selecting rebound type
+const ReboundPlayerModal = ({ isOpen, onClose, reboundType, players, teamColor, onSelectPlayer }) => {
+  if (!isOpen) return null;
+  
+  const typeLabel = reboundType === 'offensive' ? 'Offensive Rebound' : 'Defensive Rebound';
+  const bgColor = reboundType === 'offensive' ? 'bg-green-50' : 'bg-blue-50';
+  
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
+      <div className={`${bgColor} rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl`} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="font-bold text-lg">{typeLabel}</h3>
+          <button onClick={onClose} className="p-1 hover:bg-white/50 rounded">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <p className="text-muted-foreground mb-4">Select the player who got the rebound</p>
+        <div className="grid grid-cols-3 gap-2 mb-4 max-h-64 overflow-y-auto">
+          {players.map(player => (
+            <button
+              key={player.id}
+              onClick={() => onSelectPlayer(player)}
+              className="py-4 px-2 rounded-lg border-2 hover:border-opacity-100 transition-colors text-center bg-white"
+              style={{ 
+                borderColor: teamColor, 
+                color: teamColor 
+              }}
+            >
+              <div className="text-xl font-bold">#{player.player_number}</div>
+              <div className="text-xs truncate">{player.player_name?.split(' ')[0]}</div>
+            </button>
+          ))}
+        </div>
+        {players.length === 0 && (
+          <p className="text-center text-slate-500 py-4">No players available</p>
+        )}
+        <button
+          onClick={onClose}
+          className="w-full py-3 rounded-lg bg-white hover:bg-slate-100 text-slate-600 font-medium border"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Legacy Rebound Selection Modal for manual rebound clicks (kept for compatibility)
 const ReboundModal = ({ isOpen, onClose, playerName, onOffensive, onDefensive, onDeadball }) => {
   if (!isOpen) return null;
   
