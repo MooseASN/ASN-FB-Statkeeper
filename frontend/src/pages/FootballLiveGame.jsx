@@ -4803,6 +4803,19 @@ export default function FootballLiveGame({ user, onLogout }) {
           </div>
         </DialogContent>
       </Dialog>
+      
+      {/* Field View Dialog for Yardage Calculation */}
+      <FieldViewDialog
+        isOpen={showFieldViewDialog}
+        onClose={() => setShowFieldViewDialog(false)}
+        currentPosition={ballPosition}
+        possession={possession}
+        onYardsChange={(newYards) => setYards(newYards)}
+        homeTeamName={game?.home_team_name}
+        awayTeamName={game?.away_team_name}
+        homeTeamColor={game?.home_team_color || "#dc2626"}
+        awayTeamColor={game?.away_team_color || "#2563eb"}
+      />
     </div>
   );
 }
