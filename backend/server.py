@@ -868,6 +868,81 @@ async def check_admin_status(user: User = Depends(get_current_user)):
     """Check if current user is an admin"""
     return {"is_admin": is_admin_user(user)}
 
+# ============ BETA MODE SETTINGS ============
+
+class BetaModeSettings(BaseModel):
+    basketball_beta: bool = False
+    basketball_password: str = ""
+    football_beta: bool = False
+    football_password: str = ""
+
+@api_router.get("/admin/beta-settings")
+async def get_beta_settings(admin: User = Depends(get_admin_user)):
+    """Get beta mode settings (admin only)"""
+    settings = await db.settings.find_one({"type": "beta_mode"}, {"_id": 0})
+    if not settings:
+        return {
+            "basketball_beta": False,
+            "basketball_password": "",
+            "football_beta": False,
+            "football_password": ""
+        }
+    return {
+        "basketball_beta": settings.get("basketball_beta", False),
+        "basketball_password": settings.get("basketball_password", ""),
+        "football_beta": settings.get("football_beta", False),
+        "football_password": settings.get("football_password", "")
+    }
+
+@api_router.put("/admin/beta-settings")
+async def update_beta_settings(settings: BetaModeSettings, admin: User = Depends(get_admin_user)):
+    """Update beta mode settings (admin only)"""
+    await db.settings.update_one(
+        {"type": "beta_mode"},
+        {"$set": {
+            "type": "beta_mode",
+            "basketball_beta": settings.basketball_beta,
+            "basketball_password": settings.basketball_password,
+            "football_beta": settings.football_beta,
+            "football_password": settings.football_password,
+            "updated_at": datetime.now(timezone.utc).isoformat()
+        }},
+        upsert=True
+    )
+    return {"message": "Beta settings updated", "settings": settings.model_dump()}
+
+@api_router.get("/beta-status")
+async def get_beta_status():
+    """Get public beta status (no auth required) - returns which sports are in beta mode"""
+    settings = await db.settings.find_one({"type": "beta_mode"}, {"_id": 0})
+    if not settings:
+        return {
+            "basketball_beta": False,
+            "football_beta": False
+        }
+    return {
+        "basketball_beta": settings.get("basketball_beta", False),
+        "football_beta": settings.get("football_beta", False)
+    }
+
+@api_router.post("/beta-verify")
+async def verify_beta_password(sport: str = Body(...), password: str = Body(...)):
+    """Verify beta password for a sport (no auth required)"""
+    settings = await db.settings.find_one({"type": "beta_mode"}, {"_id": 0})
+    if not settings:
+        return {"valid": True}
+    
+    if sport == "basketball":
+        if not settings.get("basketball_beta", False):
+            return {"valid": True}
+        return {"valid": password == settings.get("basketball_password", "")}
+    elif sport == "football":
+        if not settings.get("football_beta", False):
+            return {"valid": True}
+        return {"valid": password == settings.get("football_password", "")}
+    
+    return {"valid": False, "error": "Invalid sport"}
+
 @api_router.post("/admin/migrate-teams-sport")
 async def migrate_teams_to_basketball(admin: User = Depends(get_admin_user)):
     """Migrate all teams without a sport field to basketball (admin only)"""
