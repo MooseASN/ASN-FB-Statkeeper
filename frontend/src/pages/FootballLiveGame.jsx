@@ -547,6 +547,9 @@ export default function FootballLiveGame({ user, onLogout }) {
 
   // Help dialog
   const [showHelpDialog, setShowHelpDialog] = useState(false);
+  
+  // Field View Dialog for yardage calculation
+  const [showFieldViewDialog, setShowFieldViewDialog] = useState(false);
 
   // Keyboard shortcuts
   useEffect(() => {
