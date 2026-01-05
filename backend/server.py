@@ -3060,7 +3060,7 @@ def calculate_team_totals(stats_list: list):
 
 @api_router.get("/games/{game_id}/boxscore/pdf")
 async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_user)):
-    """Generate a simple college-style box score PDF"""
+    """Generate a simple college-style box score PDF - fits on portrait letter paper"""
     game = await db.games.find_one({"id": game_id, "user_id": user.user_id}, {"_id": 0})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
@@ -3080,12 +3080,13 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     ties = game_stats.get("ties", 0)
     
     buffer = io.BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.4*inch, bottomMargin=0.4*inch, leftMargin=0.4*inch, rightMargin=0.4*inch)
+    # Portrait letter: 8.5 x 11 inches, with tight margins to fit content
+    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.3*inch, bottomMargin=0.3*inch, leftMargin=0.3*inch, rightMargin=0.3*inch)
     elements = []
     
     # Game Title at the top
     styles = getSampleStyleSheet()
-    title_style = ParagraphStyle('GameTitle', parent=styles['Heading1'], fontSize=14, alignment=1, spaceAfter=12)
+    title_style = ParagraphStyle('GameTitle', parent=styles['Heading1'], fontSize=12, alignment=1, spaceAfter=8)
     
     game_title = f"{game['home_team_name']} vs {game['away_team_name']}"
     if game.get('note'):
@@ -3096,11 +3097,11 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     # Check if clock was enabled for this game
     clock_enabled = game.get("clock_enabled", False)
     
-    # Column headers matching the college box score style
+    # Compact column headers - abbreviated for portrait fit
     if clock_enabled:
-        headers = ["", "MIN", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+        headers = ["PLAYER", "MIN", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "REB", "AST", "PF", "STL", "TO", "BLK", "PTS"]
     else:
-        headers = ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+        headers = ["PLAYER", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "REB", "AST", "PF", "STL", "TO", "BLK", "PTS"]
     
     def format_minutes(seconds):
         """Format seconds as MM:SS"""
@@ -3109,21 +3110,23 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         return f"{mins}:{secs:02d}"
     
     def create_team_table(team_name: str, team_label: str, stats_list: list, team_totals: dict):
-        """Create a team's box score table in college style"""
+        """Create a compact team box score table for portrait letter paper"""
         # Sort players by jersey number
         sorted_stats = sorted(stats_list, key=lambda x: int(x.get("player_number", "0")) if x.get("player_number", "0").isdigit() else 0)
         
-        # Team header row - adjust column count based on clock
+        # Team header row
         num_cols = 17 if clock_enabled else 16
         data = [[f"{team_label}: {team_name}"] + [""] * (num_cols - 1)]
         # Column headers
         data.append(headers)
         
-        # Player rows - format: "# Name"
+        # Player rows - compact format: "#Name" (no space to save width)
         total_team_seconds = 0
         for s in sorted_stats:
             totals = calculate_player_totals(s)
-            player_label = f"{s['player_number']} {s['player_name']}"
+            # Truncate long names to fit
+            name = s['player_name'][:12] if len(s['player_name']) > 12 else s['player_name']
+            player_label = f"{s['player_number']} {name}"
             seconds_played = s.get("seconds_played", 0)
             total_team_seconds += seconds_played
             
@@ -3171,7 +3174,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         # Totals row
         if clock_enabled:
             data.append([
-                "",
+                "TOTALS",
                 format_minutes(total_team_seconds),
                 team_totals['fg_made'],
                 team_totals['fg_att'],
@@ -3191,7 +3194,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             ])
         else:
             data.append([
-                "",
+                "TOTALS",
                 team_totals['fg_made'],
                 team_totals['fg_att'],
                 team_totals['fg3_made'],
@@ -3209,99 +3212,60 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
                 team_totals['pts']
             ])
         
-        # Percentage row - aligned under the correct columns
-        # Headers: ["", "MIN", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
-        # Or without clock: ["", "FG", "FGA", "3P", "3PA", "FT", "FTA", "OR", "DR", "TOT", "A", "PF", "ST", "TO", "BLKS", "PTS"]
+        # Shooting percentages row
         if clock_enabled:
-            # With clock: col 0=name, 1=MIN, 2=FG, 3=FGA, 4=3P, 5=3PA, 6=FT, 7=FTA, ...
             data.append([
-                "",                              # 0: name
-                "",                              # 1: MIN
-                f"{team_totals['fg_pct']}%",     # 2: FG (percentage here)
-                "",                              # 3: FGA
-                f"{team_totals['fg3_pct']}%",    # 4: 3P (percentage here)
-                "",                              # 5: 3PA
-                f"{team_totals['ft_pct']}%",     # 6: FT (percentage here)
-                "",                              # 7: FTA
-                f"TM REB: {team_totals['reb']}", # 8: OR
-                "",                              # 9: DR
-                "",                              # 10: TOT
-                "",                              # 11: A
-                "",                              # 12: PF
-                "",                              # 13: ST
-                "",                              # 14: TO
-                "",                              # 15: BLKS
-                ""                               # 16: PTS
+                f"FG: {team_totals['fg_pct']}%  3PT: {team_totals['fg3_pct']}%  FT: {team_totals['ft_pct']}%",
+                "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
             ])
-            col_widths = [1.4*inch, 0.38*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
+            # Compact column widths for portrait - total ~7.9 inches (letter width - margins)
+            col_widths = [1.15*inch, 0.32*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.28*inch, 0.28*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.26*inch, 0.30*inch]
         else:
-            # Without clock: col 0=name, 1=FG, 2=FGA, 3=3P, 4=3PA, 5=FT, 6=FTA, ...
             data.append([
-                "",                              # 0: name
-                f"{team_totals['fg_pct']}%",     # 1: FG (percentage here)
-                "",                              # 2: FGA
-                f"{team_totals['fg3_pct']}%",    # 3: 3P (percentage here)
-                "",                              # 4: 3PA
-                f"{team_totals['ft_pct']}%",     # 5: FT (percentage here)
-                "",                              # 6: FTA
-                f"TM REB: {team_totals['reb']}", # 7: OR
-                "",                              # 8: DR
-                "",                              # 9: TOT
-                "",                              # 10: A
-                "",                              # 11: PF
-                "",                              # 12: ST
-                "",                              # 13: TO
-                "",                              # 14: BLKS
-                ""                               # 15: PTS
+                f"FG: {team_totals['fg_pct']}%  3PT: {team_totals['fg3_pct']}%  FT: {team_totals['ft_pct']}%",
+                "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
             ])
-            col_widths = [1.6*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.32*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.35*inch, 0.35*inch]
+            # Compact column widths for portrait without MIN column
+            col_widths = [1.25*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.30*inch, 0.30*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.28*inch, 0.32*inch]
         
         table = Table(data, colWidths=col_widths)
         
         num_rows = len(data)
         
-        # Adjust span indices based on clock_enabled
-        # Only span the TM REB cells, percentages stay in their own columns
-        if clock_enabled:
-            pct_spans = [
-                ('SPAN', (8, num_rows-1), (11, num_rows-1)), # TM REB spans OR/DR/TOT/A
-            ]
-        else:
-            pct_spans = [
-                ('SPAN', (7, num_rows-1), (10, num_rows-1)),  # TM REB spans OR/DR/TOT/A
-            ]
-        
         table.setStyle(TableStyle([
-            # Team header row
+            # Team header row - span all columns
             ('SPAN', (0, 0), (-1, 0)),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-            ('TOPPADDING', (0, 0), (-1, 0), 6),
+            ('FONTSIZE', (0, 0), (-1, 0), 9),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 4),
+            ('TOPPADDING', (0, 0), (-1, 0), 4),
             ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.Color(0.9, 0.9, 0.9)),
             
             # Column headers
             ('FONTNAME', (0, 1), (-1, 1), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 1), (-1, 1), 8),
-            ('LINEBELOW', (0, 1), (-1, 1), 1, colors.black),
+            ('FONTSIZE', (0, 1), (-1, 1), 7),
+            ('LINEBELOW', (0, 1), (-1, 1), 0.5, colors.black),
             
-            # Player rows
+            # Player rows - smaller font for compactness
             ('FONTNAME', (0, 2), (0, num_rows-3), 'Helvetica'),
-            ('FONTSIZE', (0, 2), (-1, num_rows-3), 8),
+            ('FONTSIZE', (0, 2), (-1, num_rows-3), 7),
             ('ALIGN', (1, 1), (-1, -1), 'CENTER'),
             ('ALIGN', (0, 0), (0, -1), 'LEFT'),
             
             # Totals row
             ('LINEABOVE', (0, num_rows-2), (-1, num_rows-2), 1, colors.black),
             ('FONTNAME', (0, num_rows-2), (-1, num_rows-2), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, num_rows-2), (-1, num_rows-2), 7),
             
-            # Percentage row spans
-            *pct_spans,
-            ('FONTSIZE', (0, num_rows-1), (-1, num_rows-1), 8),
+            # Percentage row - span all columns
+            ('SPAN', (0, num_rows-1), (-1, num_rows-1)),
+            ('FONTSIZE', (0, num_rows-1), (-1, num_rows-1), 7),
+            ('ALIGN', (0, num_rows-1), (-1, num_rows-1), 'LEFT'),
             
-            # Padding
-            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            # Tight padding for compactness
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
             ('LEFTPADDING', (0, 0), (-1, -1), 2),
             ('RIGHTPADDING', (0, 0), (-1, -1), 2),
         ]))
@@ -3323,7 +3287,7 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     home_total = sum(home_scores)
     away_total = sum(away_scores)
     
-    # Quarter-by-Quarter Score Table
+    # Quarter-by-Quarter Score Table - compact
     def get_quarter_label(q):
         label = game.get("period_label", "Quarter")
         prefix = "P" if label == "Period" else "Q"
@@ -3331,45 +3295,43 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
             return f"{prefix}{q}"
         return f"OT{q-4}"
     
-    quarter_headers = ["TEAM"] + [get_quarter_label(i+1) for i in range(total_quarters)] + ["TOTAL"]
+    quarter_headers = ["TEAM"] + [get_quarter_label(i+1) for i in range(total_quarters)] + ["T"]
     quarter_data = [
         quarter_headers,
-        [game['away_team_name']] + away_scores + [away_total],
-        [game['home_team_name']] + home_scores + [home_total]
+        [game['away_team_name'][:20]] + away_scores + [away_total],
+        [game['home_team_name'][:20]] + home_scores + [home_total]
     ]
     
-    q_col_widths = [1.5*inch] + [0.4*inch] * total_quarters + [0.5*inch]
+    q_col_widths = [1.4*inch] + [0.35*inch] * total_quarters + [0.4*inch]
     quarter_table = Table(quarter_data, colWidths=q_col_widths)
     quarter_table.setStyle(TableStyle([
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
         ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
         ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-        ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
-        ('LINEBELOW', (0, -1), (-1, -1), 1, colors.black),
+        ('LINEBELOW', (0, 0), (-1, 0), 0.5, colors.black),
+        ('LINEBELOW', (0, -1), (-1, -1), 0.5, colors.black),
         ('FONTNAME', (-1, 1), (-1, -1), 'Helvetica-Bold'),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
     ]))
     
     elements.append(quarter_table)
-    elements.append(Spacer(1, 15))
+    elements.append(Spacer(1, 10))
     
     # Away team (VISITOR) first
     away_table = create_team_table(game['away_team_name'], "VISITOR", away_stats, away_totals)
     elements.append(away_table)
-    elements.append(Spacer(1, 20))
+    elements.append(Spacer(1, 12))
     
     # Home team
     home_table = create_team_table(game['home_team_name'], "HOME", home_stats, home_totals)
     elements.append(home_table)
-    elements.append(Spacer(1, 20))
+    elements.append(Spacer(1, 10))
     
-    # Game Flow Stats
-    styles = getSampleStyleSheet()
-    flow_style = ParagraphStyle('Flow', parent=styles['Normal'], fontSize=9, spaceAfter=4)
-    elements.append(Paragraph("<b>GAME FLOW</b>", flow_style))
-    elements.append(Paragraph(f"Lead Changes: {lead_changes}  |  Times Tied: {ties}  |  {game['home_team_name']} Largest Lead: {home_largest_lead}  |  {game['away_team_name']} Largest Lead: {away_largest_lead}", flow_style))
+    # Game Flow Stats - compact single line
+    flow_style = ParagraphStyle('Flow', parent=styles['Normal'], fontSize=8, spaceAfter=2)
+    elements.append(Paragraph(f"<b>GAME FLOW:</b> Lead Changes: {lead_changes} | Times Tied: {ties} | {game['home_team_name'][:10]} Largest Lead: {home_largest_lead} | {game['away_team_name'][:10]} Largest Lead: {away_largest_lead}", flow_style))
     
     doc.build(elements)
     buffer.seek(0)
