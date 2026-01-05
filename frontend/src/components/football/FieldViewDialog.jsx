@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Slider } from "@/components/ui/slider";
@@ -30,14 +30,23 @@ export function FieldViewDialog({
   homeTeamColor = "#dc2626",
   awayTeamColor = "#2563eb",
 }) {
+  // Initialize to currentPosition, reset on open via key prop pattern
   const [endPosition, setEndPosition] = useState(currentPosition);
-
-  // Reset end position when dialog opens
-  useEffect(() => {
-    if (isOpen) {
-      setEndPosition(currentPosition);
+  
+  // Reset position when currentPosition changes (dialog reopens with new position)
+  const initialPosition = useMemo(() => currentPosition, [currentPosition]);
+  
+  // Handle resetting when dialog opens - use callback in onOpenChange
+  const handleOpenChange = useCallback((open) => {
+    if (!open) {
+      onClose();
     }
-  }, [isOpen, currentPosition]);
+  }, [onClose]);
+  
+  // Reset end position when dialog opens
+  const handleDialogOpen = useCallback(() => {
+    setEndPosition(currentPosition);
+  }, [currentPosition]);
 
   /**
    * Convert normalized position (0-100) to actual yard line
