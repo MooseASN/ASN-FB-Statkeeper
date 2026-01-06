@@ -1654,10 +1654,23 @@ async def get_game_by_share_code(share_code: str):
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
     
+    # Fetch player stats
     player_stats = await db.player_stats.find({"game_id": game["id"]}, {"_id": 0}).to_list(100)
     
     home_stats = [s for s in player_stats if s["team_id"] == game["home_team_id"]]
     away_stats = [s for s in player_stats if s["team_id"] == game["away_team_id"]]
+    
+    # Fetch team data for logos and rosters
+    home_team = await db.teams.find_one({"id": game["home_team_id"]}, {"_id": 0})
+    away_team = await db.teams.find_one({"id": game["away_team_id"]}, {"_id": 0})
+    
+    # Add team logos to game data
+    if home_team:
+        game["home_team_logo"] = home_team.get("logo_url") or home_team.get("logo")
+        game["home_team_roster"] = home_team.get("roster", [])
+    if away_team:
+        game["away_team_logo"] = away_team.get("logo_url") or away_team.get("logo")
+        game["away_team_roster"] = away_team.get("roster", [])
     
     return {
         **game,
