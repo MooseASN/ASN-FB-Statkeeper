@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
-import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus, Minimize2, Maximize2, Code, RotateCcw, Pencil, Play, Pause, ChevronUp, ChevronDown, Coffee, SkipForward, StickyNote, Trash2, ArrowLeftRight } from "lucide-react";
+import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, X, Plus, Minimize2, Maximize2, Code, RotateCcw, Pencil, Play, Pause, ChevronUp, ChevronDown, Coffee, SkipForward, StickyNote, Trash2, ArrowLeftRight, FileText } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
