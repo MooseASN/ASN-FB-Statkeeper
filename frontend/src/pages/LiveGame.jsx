@@ -1239,6 +1239,17 @@ export default function LiveGame() {
     }
   };
 
+  // Get live CSV link for team comparison
+  const getCSVLink = () => {
+    return `${API}/games/${id}/team-comparison/csv`;
+  };
+
+  const copyCSVLink = () => {
+    const csvUrl = getCSVLink();
+    navigator.clipboard.writeText(csvUrl);
+    toast.success("CSV link copied! This link updates live.");
+  };
+
   const copyShareLink = () => {
     const shareUrl = `${window.location.origin}/live/${game.share_code}`;
     navigator.clipboard.writeText(shareUrl);
