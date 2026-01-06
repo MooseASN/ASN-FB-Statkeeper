@@ -116,6 +116,14 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Team selection displays correct yardage for each team (e.g., Holding: 10 yds offense, 5 yds + auto 1st defense)
   - Old duplicate entries hidden from search and category lists
 - ✅ Game recaps auto-generated on LiveView event ticker (basketball)
+- ✅ **Jumbotron Output Page** - Full-screen presentation view for basketball games
+  - Route: `/jumbotron/:shareCode` (public, no auth required)
+  - Charcoal background (zinc-800) with two team panels side-by-side
+  - Displays: team logos, names, colors, scores, clock time, current period
+  - Shows timeout indicators, team fouls, and bonus status
+  - Stats table for on-floor players (5 max per team): PTS, FG, FT, REB, A, PF
+  - Auto-refresh every 2 seconds for live updates
+  - Accessible via "Jumbotron" button in Classic LiveGame header and Advanced LiveGame Export tab
 
 ## Architecture
 
