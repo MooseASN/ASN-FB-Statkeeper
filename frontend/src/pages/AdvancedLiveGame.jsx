@@ -1220,6 +1220,16 @@ export default function AdvancedLiveGame() {
                       setShowPlayerSelect(false);
                       setPlayerNumberInput("");
                       setShowShotResultDialog(true);
+                    } else if (activeAction === 'block') {
+                      // Block triggers rebound flow (blocker's team is defense, so their opponent shot)
+                      handleStatAction(player.id, activeAction);
+                      setShowPlayerSelect(false);
+                      setPlayerNumberInput("");
+                      // Determine which team shot (opposite of blocker's team)
+                      const blockerTeam = homeStats.find(p => p.id === player.id) ? 'home' : 'away';
+                      const shooterTeam = blockerTeam === 'home' ? 'away' : 'home';
+                      setMissedShotTeam(shooterTeam);
+                      setShowPostMissReboundDialog(true);
                     } else {
                       handleStatAction(player.id, activeAction);
                       setShowPlayerSelect(false);
@@ -1251,6 +1261,16 @@ export default function AdvancedLiveGame() {
                       setShowPlayerSelect(false);
                       setPlayerNumberInput("");
                       setShowShotResultDialog(true);
+                    } else if (activeAction === 'block') {
+                      // Block triggers rebound flow
+                      handleStatAction(player.id, activeAction);
+                      setShowPlayerSelect(false);
+                      setPlayerNumberInput("");
+                      // Determine which team shot (opposite of blocker's team)
+                      const blockerTeam = homeStats.find(p => p.id === player.id) ? 'home' : 'away';
+                      const shooterTeam = blockerTeam === 'home' ? 'away' : 'home';
+                      setMissedShotTeam(shooterTeam);
+                      setShowPostMissReboundDialog(true);
                     } else {
                       handleStatAction(player.id, activeAction);
                       setShowPlayerSelect(false);
