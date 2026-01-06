@@ -173,14 +173,14 @@ const TeamPanel = ({ team, teamName, teamLogo, teamColor, score, timeoutsUsed, t
 };
 
 export default function Jumbotron() {
-  const { gameId } = useParams();
+  const { shareCode } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   const fetchGame = useCallback(async () => {
     try {
-      const res = await axios.get(`${API}/games/${gameId}`);
+      const res = await axios.get(`${API}/games/share/${shareCode}`);
       setGame(res.data);
       setError(null);
     } catch (err) {
@@ -188,7 +188,7 @@ export default function Jumbotron() {
     } finally {
       setLoading(false);
     }
-  }, [gameId]);
+  }, [shareCode]);
 
   useEffect(() => {
     fetchGame();
