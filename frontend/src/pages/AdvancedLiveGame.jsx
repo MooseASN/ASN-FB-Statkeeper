@@ -1089,6 +1089,18 @@ export default function AdvancedLiveGame() {
                   className="h-20 flex-col gap-2" 
                   variant="outline"
                   onClick={() => {
+                    const csvUrl = `${API}/games/${id}/team-comparison/csv`;
+                    navigator.clipboard.writeText(csvUrl);
+                    toast.success("CSV link copied! This link updates live.");
+                  }}
+                >
+                  <FileText className="w-6 h-6" />
+                  <span>Live CSV Link</span>
+                </Button>
+                <Button 
+                  className="h-20 flex-col gap-2" 
+                  variant="outline"
+                  onClick={() => {
                     const url = `${window.location.origin}/live/${game.share_code}`;
                     navigator.clipboard.writeText(url);
                     toast.success("Live stats link copied!");
