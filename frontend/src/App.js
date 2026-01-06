@@ -144,7 +144,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
       
       {/* Jumbotron display - public full-screen view */}
-      <Route path="/jumbotron/:gameId" element={<Jumbotron />} />
+      <Route path="/jumbotron/:shareCode" element={<Jumbotron />} />
     </Routes>
   );
 }
