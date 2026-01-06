@@ -34,6 +34,7 @@ const HOTKEYS = {
   'v': 'away_possession', 'V': 'away_possession',
   'p': 'foul', 'P': 'foul',
   '\\': 'toggle_clock',
+  ' ': 'toggle_clock', // Spacebar
 };
 
 export default function AdvancedLiveGame() {
