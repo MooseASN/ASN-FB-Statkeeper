@@ -1265,6 +1265,19 @@ export default function AdvancedLiveGame() {
                 const statType = pendingShotType === 'ft' ? 'ft_made' : pendingShotType === '2pt' ? 'fg2_made' : 'fg3_made';
                 handleStatAction(pendingShotPlayer.id, statType);
                 setShowShotResultDialog(false);
+                
+                // For made field goals (not FT), show assist dialog and flip possession
+                if (pendingShotType !== 'ft') {
+                  const shooterTeam = homeStats.find(p => p.id === pendingShotPlayer?.id) ? 'home' : 'away';
+                  setMadeBasketPlayer(pendingShotPlayer);
+                  setMadeBasketTeam(shooterTeam);
+                  setShowAssistDialog(true);
+                  
+                  // Auto-flip possession to the other team (after made basket)
+                  const newPossession = shooterTeam === 'home' ? 'away' : 'home';
+                  handlePossessionChange(newPossession);
+                }
+                
                 setPendingShotPlayer(null);
                 setPendingShotType(null);
               }}
@@ -1291,6 +1304,62 @@ export default function AdvancedLiveGame() {
               className="h-20 text-xl bg-red-600 hover:bg-red-700"
             >
               MISSED
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Assist Dialog (After Made Basket) */}
+      <Dialog open={showAssistDialog} onOpenChange={setShowAssistDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Assist on {madeBasketPlayer?.player_name}'s Basket?</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <p className="text-sm text-zinc-400">Select the player who assisted, or click No Assist</p>
+            
+            {/* Players on floor for the scoring team */}
+            <div className="grid grid-cols-3 gap-2">
+              {(() => {
+                const onFloor = madeBasketTeam === 'home' 
+                  ? (game?.home_on_floor || []) 
+                  : (game?.away_on_floor || []);
+                const teamStats = madeBasketTeam === 'home' ? homeStats : awayStats;
+                const teamColor = madeBasketTeam === 'home' ? homeColor : awayColor;
+                const eligiblePlayers = teamStats
+                  .filter(p => onFloor.includes(p.id) && p.id !== madeBasketPlayer?.id);
+                
+                return eligiblePlayers.map(player => (
+                  <Button
+                    key={player.id}
+                    onClick={() => {
+                      handleStatAction(player.id, 'assist');
+                      setShowAssistDialog(false);
+                      setMadeBasketPlayer(null);
+                      setMadeBasketTeam(null);
+                    }}
+                    className="h-16 flex flex-col items-center justify-center"
+                    style={{ backgroundColor: teamColor }}
+                  >
+                    <div className="text-xl font-bold">#{player.player_number}</div>
+                    <div className="text-xs truncate max-w-full">{player.player_name?.split(' ')[0]}</div>
+                  </Button>
+                ));
+              })()}
+            </div>
+            
+            {/* No Assist option */}
+            <Button
+              onClick={() => {
+                setShowAssistDialog(false);
+                setMadeBasketPlayer(null);
+                setMadeBasketTeam(null);
+                toast.info("Unassisted basket");
+              }}
+              variant="outline"
+              className="w-full border-zinc-700 text-zinc-400"
+            >
+              No Assist (Unassisted)
             </Button>
           </div>
         </DialogContent>
