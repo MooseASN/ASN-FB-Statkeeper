@@ -1350,7 +1350,7 @@ export default function AdvancedLiveGame() {
       <Dialog open={showAssistDialog} onOpenChange={setShowAssistDialog}>
         <DialogContent className="bg-zinc-900 border-zinc-800 text-white max-w-lg">
           <DialogHeader>
-            <DialogTitle>Assist on {madeBasketPlayer?.player_name}'s Basket?</DialogTitle>
+            <DialogTitle>Assist on {madeBasketPlayer?.player_name}&apos;s Basket?</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
             <p className="text-sm text-zinc-400">Select the player who assisted, or click No Assist</p>
