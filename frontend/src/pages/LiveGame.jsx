@@ -1706,7 +1706,7 @@ export default function LiveGame() {
               <Button 
                 variant="ghost" 
                 size="sm" 
-                onClick={() => window.open(`/jumbotron/${id}`, '_blank')} 
+                onClick={() => window.open(`/jumbotron/${game.share_code}`, '_blank')} 
                 className="text-white hover:bg-white/10" 
                 data-testid="jumbotron-btn"
               >
