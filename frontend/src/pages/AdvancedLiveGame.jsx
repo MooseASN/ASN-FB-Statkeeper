@@ -318,6 +318,23 @@ export default function AdvancedLiveGame() {
       };
       
       toast.success(`${player.player_name} - ${actionLabels[action] || action.toUpperCase()}`);
+      
+      // Auto-flip possession for turnovers and steals
+      if (action === 'turnover') {
+        // Turnover by player - flip possession to the other team
+        const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
+        const newPossession = playerTeam === 'home' ? 'away' : 'home';
+        handlePossessionChange(newPossession);
+      } else if (action === 'steal') {
+        // Steal - the player who stole it's team now has possession
+        const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
+        handlePossessionChange(playerTeam);
+      } else if (action === 'dreb') {
+        // Defensive rebound - the rebounding team gets possession
+        const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
+        handlePossessionChange(playerTeam);
+      }
+      
       fetchGame();
     } catch (error) {
       console.error("Stat error:", error.response?.data || error);
