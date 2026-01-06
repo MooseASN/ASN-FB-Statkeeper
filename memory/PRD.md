@@ -64,16 +64,13 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - ✅ Tournament bracket system REMOVED per user request
 - ✅ Custom hooks created for football game management (useGameClock, useDriveState, useTimeouts)
 - ✅ Football component extraction (FootballField, KickoffDialog, PlayerSelector, YardLineSelector)
-- ✅ **NEW: Field View Dialog** - Miniature football field visualization for yardage calculation
+- ✅ **Field View Dialog** - Miniature football field visualization for yardage calculation
   - Shows current ball position and allows sliding to set end position
   - Proper NFL/college yardage calculation (50-yard line crossing handled correctly)
   - Available in Run Play, Pass Play (completion), and Sack yards sections
-- ✅ Basketball Advanced Mode: Post-miss rebound dialog
-- ✅ Quick Entry section for players on floor (Classic mode)
-- ✅ Auto-save for team information with debouncing
-- ✅ Tournament bracket system REMOVED per user request
-- ✅ Custom hooks created for football game management (useGameClock, useDriveState, useTimeouts)
-- ✅ Football component extraction (FootballField, KickoffDialog, PlayerSelector, YardLineSelector)
+  - **TOUCHDOWN detection**: Shows TD UI and button when slider reaches opponent's end zone
+  - **SAFETY detection**: Shows Safety UI and button when slider reaches own end zone
+- ✅ Game recaps auto-generated on LiveView event ticker (basketball)
 
 ## Architecture
 
