@@ -74,6 +74,15 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Clock initializes to configured time (e.g., 8:00, 10:00, 12:00) instead of hardcoded 15:00
   - Quarter advancement resets clock to correct period_duration
   - Clock time persists correctly when saving/reloading game state
+- ✅ **Football Field Visual Enhancements**
+  - Blue Line of Scrimmage (LOS) with label at ball position
+  - Yellow First Down Line with "1st" label
+  - Sideline hash marks (every yard, longer marks every 5 yards)
+  - Field position indicator at bottom of field
+- ✅ **Penalty Direction Fix** - Penalties now correctly move ball based on possession
+  - Defensive penalties move ball FORWARD (toward defense's goal)
+  - Offensive penalties move ball BACKWARD (toward offense's goal)
+  - Properly accounts for home team (0→100) vs away team (100→0) direction
 - ✅ Game recaps auto-generated on LiveView event ticker (basketball)
 
 ## Architecture
