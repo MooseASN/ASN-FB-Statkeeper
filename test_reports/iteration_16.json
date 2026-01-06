@@ -1,0 +1,113 @@
+{
+  "summary": "Jumbotron Output page for basketball games tested successfully. All features working as expected - page loads at /jumbotron/:shareCode, displays team info, scores, clock, timeouts, fouls, bonus status, and on-floor player stats. Jumbotron buttons work in both Classic and Advanced LiveGame pages.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_16.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (Public API /api/games/share/{share_code} working)",
+    "frontend": "100% (All Jumbotron features verified)"
+  },
+  "test_credentials": {
+    "admin_email": "antlersportsnetwork@gmail.com",
+    "admin_password": "NoahTheJew1997",
+    "test_game_share_code": "advtest01"
+  },
+  "seed_data_creation": "Used existing games: test-advanced-game-001 (Advanced Mode with share_code: advtest01), 2d43db80-dc75-4b8c-a1c6-b1cc4115c97e (Classic Mode with share_code: 5718741c)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Jumbotron feature is fully functional. The /jumbotron/:shareCode route displays a full-screen presentation view for basketball games. Jumbotron buttons are available in both Classic LiveGame (header toolbar) and Advanced LiveGame (Export tab).",
+  "features_tested": {
+    "jumbotron_page_route": {
+      "status": "PASS",
+      "description": "Page loads at /jumbotron/:shareCode route without authentication"
+    },
+    "jumbotron_team_display": {
+      "status": "PASS",
+      "tests": [
+        "Team logos displayed (placeholder 'A' when no logo set)",
+        "Team names displayed (Advanced Home, Advanced Away)",
+        "Team colors displayed (red for home, blue for away)",
+        "Team scores displayed (5-2)"
+      ]
+    },
+    "jumbotron_game_status": {
+      "status": "PASS",
+      "tests": [
+        "Clock time displayed (11:59)",
+        "Quarter/Period indicator displayed (Q1 in green)",
+        "LIVE indicator displayed (red dot with 'LIVE' text)",
+        "StatMoose branding in header"
+      ]
+    },
+    "jumbotron_team_stats": {
+      "status": "PASS",
+      "tests": [
+        "Timeout indicators (TO: with dots)",
+        "Team Fouls displayed (0 for both teams)",
+        "Bonus status area present"
+      ]
+    },
+    "jumbotron_player_stats_table": {
+      "status": "PASS",
+      "tests": [
+        "Stats table headers: #, PLAYER, PTS, FG, FT, REB, A, PF",
+        "5 on-floor players displayed per team",
+        "Player stats calculated correctly (PTS, FG made-att, FT made-att, REB, AST, PF)"
+      ]
+    },
+    "jumbotron_design": {
+      "status": "PASS",
+      "tests": [
+        "Charcoal background (rgb(39, 39, 42) / zinc-800)",
+        "Full-screen layout with two team panels",
+        "Footer with score summary"
+      ]
+    },
+    "jumbotron_auto_refresh": {
+      "status": "PASS",
+      "description": "Auto-refresh every 2 seconds via setInterval"
+    },
+    "classic_livegame_jumbotron_button": {
+      "status": "PASS",
+      "tests": [
+        "Button visible in header toolbar",
+        "Button has data-testid='jumbotron-btn'",
+        "Button text: 'Jumbotron' with Monitor icon",
+        "Clicking opens jumbotron page in new tab"
+      ]
+    },
+    "advanced_livegame_jumbotron_button": {
+      "status": "PASS",
+      "tests": [
+        "Button visible in Export tab",
+        "Button has data-testid='jumbotron-btn'",
+        "Button text: 'JUMBOTRON' with Monitor icon",
+        "Clicking opens jumbotron page in new tab"
+      ]
+    }
+  },
+  "jumbotron_page_elements_verified": {
+    "header": "StatMoose logo, clock time, quarter indicator, LIVE indicator",
+    "home_panel": "Logo, team name, score, team color, timeout dots, team fouls, bonus status, player stats table",
+    "away_panel": "Logo, team name, score, team color, timeout dots, team fouls, bonus status, player stats table",
+    "footer": "Score summary (Team Name: Score | Team Name: Score)"
+  },
+  "notes": [
+    "Jumbotron page is public (no authentication required)",
+    "Uses the same /api/games/share/{share_code} endpoint as LiveView",
+    "Auto-refresh interval is 2 seconds for live updates",
+    "Player stats table shows only on-floor players (5 per team max)"
+  ]
+}
