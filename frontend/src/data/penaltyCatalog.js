@@ -1179,7 +1179,17 @@ export function calculatePenaltyEnforcement(penalty, ruleset, againstTeam, conte
   }
   
   // Direction: penalties against offense move ball back, against defense move forward
-  const direction = againstTeam === 'offense' ? -1 : 1;
+  // Must account for which team has possession:
+  // - Home team moves left to right (0 → 100)
+  // - Away team moves right to left (100 → 0)
+  let direction;
+  if (againstTeam === 'offense') {
+    // Offense penalty moves ball backward (toward their own goal)
+    direction = possession === 'home' ? -1 : 1;
+  } else {
+    // Defense penalty moves ball forward (toward defense's goal)
+    direction = possession === 'home' ? 1 : -1;
+  }
   
   // Calculate new ball position (simplified - real implementation would need goal line logic)
   let newPosition = enforcementSpot + (yardsApplied * direction);
