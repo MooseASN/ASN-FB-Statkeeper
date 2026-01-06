@@ -183,19 +183,24 @@ export default function Jumbotron() {
       const res = await axios.get(`${API}/games/share/${shareCode}`);
       setGame(res.data);
       setError(null);
-    } catch (err) {
-      setError("Game not found");
-    } finally {
       setLoading(false);
+    } catch (err) {
+      console.error("Jumbotron fetch error:", err);
+      // Only set error if we don't have game data yet
+      if (!game) {
+        setError("Game not found");
+        setLoading(false);
+      }
+      // If we already have game data, keep showing it (network blip)
     }
-  }, [shareCode]);
+  }, [shareCode, game]);
 
   useEffect(() => {
     fetchGame();
     // Auto-refresh every 2 seconds for live updates
     const interval = setInterval(fetchGame, 2000);
     return () => clearInterval(interval);
-  }, [fetchGame]);
+  }, [shareCode]); // Only depend on shareCode, not fetchGame
 
   // Calculate score from quarter scores
   const calculateScore = (team) => {
