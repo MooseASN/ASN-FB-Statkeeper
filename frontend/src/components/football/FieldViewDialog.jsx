@@ -170,6 +170,9 @@ export function FieldViewDialog({
             <MapPin className="w-5 h-5" />
             Field View - Set End Position
           </DialogTitle>
+          <DialogDescription className="text-zinc-400">
+            Drag the slider or use buttons to set where the play ends on the field
+          </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-6 py-4">
