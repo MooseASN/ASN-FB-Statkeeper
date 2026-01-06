@@ -778,14 +778,14 @@ export default function LiveView() {
             
             <TeamTable 
               teamName={game.home_team_name} 
-              stats={homeStats} 
+              stats={mergedHomeStats} 
               totals={homeTotals}
               teamColor={homeColor}
             />
             
             <TeamTable 
               teamName={game.away_team_name} 
-              stats={awayStats} 
+              stats={mergedAwayStats} 
               totals={awayTotals}
               teamColor={awayColor}
             />
