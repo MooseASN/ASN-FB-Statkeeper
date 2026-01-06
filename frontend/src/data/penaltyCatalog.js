@@ -293,12 +293,79 @@ export const PENALTY_CATALOG = [
   },
 
   // === BLOCKING PENALTIES ===
+  // Unified Holding penalty - rules differ based on which team commits it
+  {
+    penalty_id: 'holding',
+    display_name: 'Holding',
+    aliases: ['holding', 'hold', 'h'],
+    category: PENALTY_CATEGORIES.BLOCKING,
+    requires_context: [],
+    can_be_committed_by: 'both', // Can be offense or defense
+    team_variants: {
+      offense: {
+        NFHS: {
+          yards: 10,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: false,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Enforced from previous spot',
+        },
+        NCAA: {
+          yards: 10,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: false,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Enforced from previous spot',
+        },
+      },
+      defense: {
+        NFHS: {
+          yards: 5,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: true,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Automatic first down',
+        },
+        NCAA: {
+          yards: 10,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: true,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Automatic first down',
+        },
+      },
+    },
+    // Legacy variants field for backwards compatibility
+    variants: {
+      NFHS: {
+        yards: 10,
+        enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+        auto_first_down: false,
+        loss_of_down: false,
+        disqualification: 'none',
+        notes: 'Select team to see specific yardage',
+      },
+      NCAA: {
+        yards: 10,
+        enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+        auto_first_down: false,
+        loss_of_down: false,
+        disqualification: 'none',
+        notes: 'Select team to see specific yardage',
+      },
+    },
+  },
   {
     penalty_id: 'holding_offense',
     display_name: 'Holding (Offense)',
-    aliases: ['holding', 'offensive holding', 'hold', 'oh', 'o holding'],
+    aliases: ['offensive holding', 'oh', 'o holding', 'off holding'],
     category: PENALTY_CATEGORIES.BLOCKING,
     requires_context: [],
+    hidden: true, // Hide from main list, use unified 'holding' instead
     variants: {
       NFHS: {
         yards: 10,
@@ -324,6 +391,7 @@ export const PENALTY_CATALOG = [
     aliases: ['defensive holding', 'dh', 'd holding', 'def holding'],
     category: PENALTY_CATEGORIES.BLOCKING,
     requires_context: [],
+    hidden: true, // Hide from main list, use unified 'holding' instead
     variants: {
       NFHS: {
         yards: 5,
@@ -340,6 +408,71 @@ export const PENALTY_CATALOG = [
         loss_of_down: false,
         disqualification: 'none',
         notes: 'Automatic first down',
+      },
+    },
+  },
+  // Unified Pass Interference - rules differ based on which team commits it
+  {
+    penalty_id: 'pass_interference',
+    display_name: 'Pass Interference',
+    aliases: ['pass interference', 'pi', 'interference', 'dpi', 'opi'],
+    category: PENALTY_CATEGORIES.PASSING,
+    requires_context: ['spot_of_foul'],
+    can_be_committed_by: 'both',
+    team_variants: {
+      offense: {
+        NFHS: {
+          yards: 15,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: false,
+          loss_of_down: true,
+          disqualification: 'none',
+          notes: 'Loss of down',
+        },
+        NCAA: {
+          yards: 15,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: false,
+          loss_of_down: true,
+          disqualification: 'none',
+          notes: 'Loss of down',
+        },
+      },
+      defense: {
+        NFHS: {
+          yards: 15,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: true,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Automatic first down (NFHS is 15 yards)',
+        },
+        NCAA: {
+          yards: 'spot',
+          enforcement: ENFORCEMENT_TYPES.SPOT_OF_FOUL,
+          auto_first_down: true,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Spot foul, automatic first down',
+        },
+      },
+    },
+    variants: {
+      NFHS: {
+        yards: 15,
+        enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+        auto_first_down: true,
+        loss_of_down: false,
+        disqualification: 'none',
+        notes: 'Select team to see specific enforcement',
+      },
+      NCAA: {
+        yards: 15,
+        enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+        auto_first_down: true,
+        loss_of_down: false,
+        disqualification: 'none',
+        notes: 'Select team to see specific enforcement',
       },
     },
   },
