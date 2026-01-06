@@ -1191,8 +1191,24 @@ export const PENALTY_CATALOG = [
  * Get penalty variant for a specific ruleset
  * NAIA follows NCAA unless explicitly defined
  */
-export function getPenaltyVariant(penalty, ruleset) {
-  if (!penalty || !penalty.variants) return null;
+export function getPenaltyVariant(penalty, ruleset, againstTeam = null) {
+  if (!penalty) return null;
+  
+  // If penalty has team-specific variants and a team is specified, use those
+  if (againstTeam && penalty.team_variants && penalty.team_variants[againstTeam]) {
+    const teamVariants = penalty.team_variants[againstTeam];
+    if (teamVariants[ruleset]) {
+      return teamVariants[ruleset];
+    }
+    // NAIA defaults to NCAA
+    if (ruleset === 'NAIA' && teamVariants.NCAA) {
+      return teamVariants.NCAA;
+    }
+    return teamVariants.NFHS || null;
+  }
+  
+  // Fall back to regular variants
+  if (!penalty.variants) return null;
   
   // Check for explicit variant
   if (penalty.variants[ruleset]) {
