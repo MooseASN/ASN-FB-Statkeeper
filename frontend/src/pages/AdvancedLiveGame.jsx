@@ -88,6 +88,11 @@ export default function AdvancedLiveGame() {
   const [showEditPlayDialog, setShowEditPlayDialog] = useState(false);
   const [editingPlay, setEditingPlay] = useState(null);
   
+  // Post-made assist dialog
+  const [showAssistDialog, setShowAssistDialog] = useState(false);
+  const [madeBasketPlayer, setMadeBasketPlayer] = useState(null);
+  const [madeBasketTeam, setMadeBasketTeam] = useState(null);
+  
   // Player number input for quick selection
   const [playerNumberInput, setPlayerNumberInput] = useState("");
   
