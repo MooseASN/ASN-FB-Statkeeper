@@ -2141,13 +2141,13 @@ export default function FootballLiveGame({ user, onLogout }) {
         toast.success('Timeouts reset for second half');
       }
       setQuarter(nextQuarter);
-      // Reset clock to quarter length
-      const quarterLength = game?.clock_settings?.period_duration || 900;
+      // Reset clock to quarter length (period_duration is stored directly on game object)
+      const quarterLength = game?.period_duration || 900;
       setClockTime(quarterLength);
     } else if (nextQuarter <= 4) {
       setQuarter(nextQuarter);
       // Reset clock to quarter length
-      const quarterLength = game?.clock_settings?.period_duration || 900;
+      const quarterLength = game?.period_duration || 900;
       setClockTime(quarterLength);
     } else {
       // Game over - set status to final
