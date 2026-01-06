@@ -142,6 +142,9 @@ function AppRoutes({ user, onLogin, onLogout }) {
       {/* Embed view is public - for external embedding */}
       <Route path="/embed/:shareCode" element={<EmbedLiveGame />} />
       <Route path="/embed/latest/:userId" element={<EmbedLatestGame />} />
+      
+      {/* Jumbotron display - public full-screen view */}
+      <Route path="/jumbotron/:gameId" element={<Jumbotron />} />
     </Routes>
   );
 }
