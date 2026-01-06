@@ -176,31 +176,43 @@ export default function Jumbotron() {
   const { shareCode } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [initialLoadFailed, setInitialLoadFailed] = useState(false);
 
   const fetchGame = useCallback(async () => {
     try {
       const res = await axios.get(`${API}/games/share/${shareCode}`);
       setGame(res.data);
-      setError(null);
+      setInitialLoadFailed(false);
       setLoading(false);
     } catch (err) {
-      console.error("Jumbotron fetch error:", err);
-      // Only set error if we don't have game data yet
-      if (!game) {
-        setError("Game not found");
+      // Only show error on initial load - subsequent failures just keep showing last data
+      if (loading) {
+        setInitialLoadFailed(true);
         setLoading(false);
       }
-      // If we already have game data, keep showing it (network blip)
+      // Otherwise silently ignore - keeps showing last successful data
     }
-  }, [shareCode, game]);
+  }, [shareCode, loading]);
 
   useEffect(() => {
+    setLoading(true);
+    setInitialLoadFailed(false);
     fetchGame();
+    
     // Auto-refresh every 2 seconds for live updates
-    const interval = setInterval(fetchGame, 2000);
+    const interval = setInterval(() => {
+      axios.get(`${API}/games/share/${shareCode}`)
+        .then(res => {
+          setGame(res.data);
+          setInitialLoadFailed(false);
+        })
+        .catch(() => {
+          // Silently ignore refresh errors - keep showing last data
+        });
+    }, 2000);
+    
     return () => clearInterval(interval);
-  }, [shareCode]); // Only depend on shareCode, not fetchGame
+  }, [shareCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Calculate score from quarter scores
   const calculateScore = (team) => {
