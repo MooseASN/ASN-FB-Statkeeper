@@ -1109,6 +1109,15 @@ export default function AdvancedLiveGame() {
                   <ChevronRight className="w-6 h-6" />
                   <span>Live Stats Link</span>
                 </Button>
+                <Button 
+                  className="h-20 flex-col gap-2" 
+                  variant="outline"
+                  onClick={() => window.open(`/jumbotron/${id}`, '_blank')}
+                  data-testid="jumbotron-btn"
+                >
+                  <Monitor className="w-6 h-6" />
+                  <span>Jumbotron</span>
+                </Button>
               </div>
             </div>
           )}
