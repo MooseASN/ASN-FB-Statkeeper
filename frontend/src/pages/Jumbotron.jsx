@@ -249,12 +249,23 @@ export default function Jumbotron() {
     );
   }
 
-  if (error || !game) {
+  if (initialLoadFailed && !game) {
     return (
       <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Game Not Found</h2>
           <p className="text-zinc-400">Unable to load game data.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!game) {
+    return (
+      <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
+        <div className="text-center">
+          <RefreshCw className="w-10 h-10 animate-spin mx-auto text-zinc-400" />
+          <p className="mt-4 text-zinc-400">Loading...</p>
         </div>
       </div>
     );
