@@ -1,0 +1,97 @@
+{
+  "summary": "Unified penalty buttons feature tested successfully. All 8 test cases PASSED. Holding and Pass Interference now show as single unified buttons with ★ indicator, team selection displays correct yardage for each team, old separate buttons are hidden, and penalty enforcement uses correct team-specific yardage.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "PenaltyWorkflowDialog",
+        "issues": ["Console warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent} - minor accessibility issue"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/frontend/src/data/penaltyCatalog.js",
+    "/app/frontend/src/components/PenaltyWorkflowDialog.jsx"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (all unified penalty button tests passed)"
+  },
+  "test_credentials": {
+    "admin": {"username": "admin", "password": "NoahTheJew1997"}
+  },
+  "seed_data_creation": "Used existing game from live games list",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Unified penalty buttons feature is working correctly. The ★ indicator shows for penalties that can be committed by either team. Team selection shows correct yardage based on NFHS ruleset.",
+  "features_tested": {
+    "unified_holding_button": {
+      "status": "PASS",
+      "description": "Unified 'Holding' button appears in Common Penalties section with ★ indicator"
+    },
+    "unified_pass_interference_button": {
+      "status": "PASS",
+      "description": "Unified 'Pass Interference' button appears in Common Penalties section with ★ indicator"
+    },
+    "holding_team_selection_yardage": {
+      "status": "PASS",
+      "description": "When clicking Holding, team selection shows '10 yds' for Offense and '5 yds • Auto 1st' for Defense (NFHS ruleset)"
+    },
+    "pass_interference_team_selection_yardage": {
+      "status": "PASS",
+      "description": "When clicking Pass Interference, team selection shows '15 yds • Loss of Down' for Offense and '15 yds • Auto 1st' for Defense (NFHS ruleset)"
+    },
+    "old_holding_buttons_hidden": {
+      "status": "PASS",
+      "description": "Old separate 'Holding (Offense)' and 'Holding (Defense)' buttons are hidden from Common Penalties and search results"
+    },
+    "blocking_category_count": {
+      "status": "PASS",
+      "description": "Category count for Blocking is 4 penalties (reduced from having duplicate holding entries)"
+    },
+    "search_holding_returns_unified": {
+      "status": "PASS",
+      "description": "Search for 'holding' returns only the unified Holding penalty, not the hidden separate entries"
+    },
+    "penalty_enforcement_correct_yardage": {
+      "status": "PASS",
+      "description": "Penalty enforcement uses correct team-specific yardage when applied. Defensive Holding moved ball from TES 15 to TES 20 (+5 yards) with automatic first down"
+    }
+  },
+  "test_flow": [
+    "1. Logged in with admin credentials",
+    "2. Selected Football sport",
+    "3. Clicked on a live game",
+    "4. Opened Penalty Dialog",
+    "5. Verified unified Holding button with ★ indicator in Common Penalties",
+    "6. Verified unified Pass Interference button with ★ indicator in Common Penalties",
+    "7. Clicked Holding - verified team selection shows 10 yds for Offense, 5 yds • Auto 1st for Defense",
+    "8. Clicked Pass Interference - verified team selection shows 15 yds • Loss of Down for Offense, 15 yds • Auto 1st for Defense",
+    "9. Verified old Holding (Offense) and Holding (Defense) buttons are NOT visible",
+    "10. Verified Blocking category shows 4 penalties",
+    "11. Searched for 'holding' - verified only unified Holding appears in results",
+    "12. Applied Defensive Holding penalty - verified ball moved +5 yards with automatic first down"
+  ],
+  "code_review_verified": {
+    "penaltyCatalog.js": {
+      "unified_holding": "Lines 296-361: Unified 'holding' penalty with can_be_committed_by: 'both' and team_variants for offense/defense",
+      "unified_pass_interference": "Lines 414-478: Unified 'pass_interference' penalty with can_be_committed_by: 'both' and team_variants",
+      "hidden_old_entries": "Lines 362-413: Old 'holding_offense' and 'holding_defense' entries marked with hidden: true",
+      "search_excludes_hidden": "Lines 1231-1271: searchPenalties() function skips penalties with hidden: true",
+      "getPenaltyVariant_team_support": "Lines 1194-1225: getPenaltyVariant() accepts optional againstTeam parameter for team-specific variants"
+    },
+    "PenaltyWorkflowDialog.jsx": {
+      "star_indicator": "Lines 245-249: Shows ★ for penalties with can_be_committed_by === 'both'",
+      "team_specific_yardage": "Lines 421-449: Team selection buttons show team-specific yardage from team_variants",
+      "common_penalties_unified": "Lines 226-229: Common penalties list uses unified IDs ('holding' instead of 'holding_offense')"
+    }
+  }
+}
