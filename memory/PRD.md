@@ -59,6 +59,12 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - ✅ Basketball PDF box score formatting (portrait letter page)
 - ✅ Basketball Classic Mode: Assist modal, rebound selection flow (Off/Def/Deadball) - **VERIFIED**
 - ✅ Basketball Advanced Mode: Post-miss rebound dialog - **VERIFIED**
+- ✅ **Basketball Advanced Mode Enhancements:**
+  - Spacebar and backslash (\\) hotkeys to toggle game clock
+  - Assist dialog appears after made field goals (shows 5 players on floor, excludes shooter)
+  - Rebound dialog triggers after missed shots AND blocks
+  - Auto-flip possession after: made baskets, turnovers, steals, defensive rebounds
+  - Team turnover now correctly charges the team with current possession
 - ✅ Quick Entry section for players on floor (Classic mode) - **VERIFIED**
 - ✅ Auto-save for team information with debouncing
 - ✅ Tournament bracket system REMOVED per user request
