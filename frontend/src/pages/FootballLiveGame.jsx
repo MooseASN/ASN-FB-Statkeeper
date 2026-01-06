@@ -788,8 +788,8 @@ export default function FootballLiveGame({ user, onLogout }) {
       return drive.startClock - endClock;
     }
     
-    // Cross-period calculation (15:00 per quarter = 900 seconds)
-    const periodLength = 900; // 15 minutes
+    // Cross-period calculation - use game's period_duration
+    const periodLength = game?.period_duration || 900;
     let totalTime = drive.startClock; // Time from start to end of start period
     
     // Add full periods in between
@@ -801,7 +801,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     totalTime += (periodLength - endClock);
     
     return totalTime;
-  }, [clockTime, quarter]);
+  }, [clockTime, quarter, game]);
 
   // Format clock time - declared early for use in formatDriveSummary
   const formatTime = useCallback((seconds) => {
