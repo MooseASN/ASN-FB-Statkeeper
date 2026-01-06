@@ -59,7 +59,8 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - ✅ Basketball PDF box score formatting (portrait letter page) - **VERIFIED WORKING**
   - Classic Mode: PDF button in header toolbar
   - Advanced Mode: PDF Box Score button in Export tab
-  - Both generate valid PDF files with team names, scores, and player statistics
+  - **LiveView (Public)**: Export PDF button works without authentication
+  - All generate valid PDF files with team names, scores, and player statistics
 - ✅ Basketball Classic Mode: Assist modal, rebound selection flow (Off/Def/Deadball) - **VERIFIED**
   - Assist dialog shows only players ON FLOOR (excluding scorer)
   - "No Assist (Unassisted)" option available
