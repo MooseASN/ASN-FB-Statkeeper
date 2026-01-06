@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { 
   ArrowLeft, Play, Pause, Settings, HelpCircle, FileDown, Users, 
   RotateCcw, ChevronRight, AlertCircle, X, Plus, Link as LinkIcon, 
-  UserPlus, Trash2, Loader2, Mail, Edit
+  UserPlus, Trash2, Loader2, Mail, Edit, FileText
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
