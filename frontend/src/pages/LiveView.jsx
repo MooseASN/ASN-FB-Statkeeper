@@ -244,7 +244,8 @@ export default function LiveView() {
     
     setExportingPdf(true);
     try {
-      const response = await fetch(`${API}/games/${game.id}/boxscore/pdf`);
+      // Use public PDF endpoint (no auth required)
+      const response = await fetch(`${API}/games/${game.id}/boxscore/public-pdf`);
       
       if (!response.ok) {
         throw new Error('Failed to generate PDF');
