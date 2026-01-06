@@ -1112,7 +1112,7 @@ export default function AdvancedLiveGame() {
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
-                  onClick={() => window.open(`/jumbotron/${id}`, '_blank')}
+                  onClick={() => window.open(`/jumbotron/${game.share_code}`, '_blank')}
                   data-testid="jumbotron-btn"
                 >
                   <Monitor className="w-6 h-6" />
