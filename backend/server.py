@@ -3419,6 +3419,163 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+# Public basketball PDF endpoint for LiveView (no auth required)
+@api_router.get("/games/{game_id}/boxscore/public-pdf")
+async def generate_public_boxscore_pdf(game_id: str):
+    """Generate a simple college-style box score PDF - PUBLIC endpoint for LiveView"""
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    player_stats = await db.player_stats.find({"game_id": game_id}, {"_id": 0}).to_list(100)
+    home_stats = [s for s in player_stats if s["team_id"] == game["home_team_id"]]
+    away_stats = [s for s in player_stats if s["team_id"] == game["away_team_id"]]
+    
+    home_totals = calculate_team_totals(home_stats)
+    away_totals = calculate_team_totals(away_stats)
+    
+    # Get game flow stats
+    game_flow = game.get("game_flow", {"plays": []})
+    
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter, 
+                           leftMargin=0.4*inch, rightMargin=0.4*inch,
+                           topMargin=0.4*inch, bottomMargin=0.4*inch)
+    
+    styles = getSampleStyleSheet()
+    elements = []
+    
+    # Title
+    title_style = ParagraphStyle('Title', parent=styles['Heading1'], fontSize=14, alignment=1, spaceAfter=6)
+    elements.append(Paragraph(f"{game['away_team_name']} vs {game['home_team_name']}", title_style))
+    
+    # Game Info
+    info_style = ParagraphStyle('Info', parent=styles['Normal'], fontSize=9, alignment=1, spaceAfter=8)
+    game_date = game.get('scheduled_date', 'TBD')
+    game_time = game.get('scheduled_time', '')
+    status = game.get('status', 'Scheduled')
+    quarter = game.get('quarter', 1)
+    elements.append(Paragraph(f"Date: {game_date} {game_time} | Status: {status} | Quarter: {quarter}", info_style))
+    
+    # Score
+    home_score = sum(game.get('home_quarter_scores', [0, 0, 0, 0]))
+    away_score = sum(game.get('away_quarter_scores', [0, 0, 0, 0]))
+    score_style = ParagraphStyle('Score', parent=styles['Heading2'], fontSize=12, alignment=1, spaceAfter=10)
+    elements.append(Paragraph(f"SCORE: {game['away_team_name']} {away_score} - {game['home_team_name']} {home_score}", score_style))
+    
+    # Quarter scores table
+    quarter_data = [['Team', 'Q1', 'Q2', 'Q3', 'Q4', 'Total']]
+    home_qs = game.get('home_quarter_scores', [0, 0, 0, 0])
+    away_qs = game.get('away_quarter_scores', [0, 0, 0, 0])
+    quarter_data.append([game['away_team_name'][:12]] + [str(q) for q in away_qs] + [str(away_score)])
+    quarter_data.append([game['home_team_name'][:12]] + [str(q) for q in home_qs] + [str(home_score)])
+    
+    quarter_table = Table(quarter_data, colWidths=[1.3*inch, 0.5*inch, 0.5*inch, 0.5*inch, 0.5*inch, 0.6*inch])
+    quarter_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#333333')),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
+    ]))
+    elements.append(quarter_table)
+    elements.append(Spacer(1, 10))
+    
+    # Box score headers - compact column widths
+    headers = ['#', 'Player', 'MIN', 'FG', '3PT', 'FT', 'OREB', 'DREB', 'REB', 'AST', 'STL', 'BLK', 'TO', 'PF', 'PTS']
+    col_widths = [0.25*inch, 1.0*inch, 0.35*inch, 0.45*inch, 0.45*inch, 0.45*inch, 0.35*inch, 0.35*inch, 0.35*inch, 0.3*inch, 0.3*inch, 0.3*inch, 0.3*inch, 0.3*inch, 0.35*inch]
+    
+    def create_team_table(team_name, stats, totals):
+        data = [[team_name.upper()] + [''] * 14]
+        data.append(headers)
+        
+        sorted_stats = sorted(stats, key=lambda x: int(x.get('player_number', '0') or '0'))
+        
+        for p in sorted_stats:
+            fg2_m, fg2_a = p.get('fg2_made', 0), p.get('fg2_made', 0) + p.get('fg2_missed', 0)
+            fg3_m, fg3_a = p.get('fg3_made', 0), p.get('fg3_made', 0) + p.get('fg3_missed', 0)
+            ft_m, ft_a = p.get('ft_made', 0), p.get('ft_made', 0) + p.get('ft_missed', 0)
+            fg_m, fg_a = fg2_m + fg3_m, fg2_a + fg3_a
+            oreb, dreb = p.get('oreb', 0), p.get('dreb', 0)
+            pts = (fg2_m * 2) + (fg3_m * 3) + ft_m
+            
+            row = [
+                p.get('player_number', ''),
+                (p.get('player_name', '')[:10]),
+                str(p.get('minutes', 0)),
+                f"{fg_m}-{fg_a}",
+                f"{fg3_m}-{fg3_a}",
+                f"{ft_m}-{ft_a}",
+                str(oreb),
+                str(dreb),
+                str(oreb + dreb),
+                str(p.get('assist', 0)),
+                str(p.get('steal', 0)),
+                str(p.get('block', 0)),
+                str(p.get('turnover', 0)),
+                str(p.get('foul', 0)),
+                str(pts)
+            ]
+            data.append(row)
+        
+        # Totals row
+        totals_row = [
+            '', 'TOTALS', '',
+            f"{totals['fg_made']}-{totals['fg_att']}",
+            f"{totals['fg3_made']}-{totals['fg3_att']}",
+            f"{totals['ft_made']}-{totals['ft_att']}",
+            str(totals['oreb']),
+            str(totals['dreb']),
+            str(totals['reb']),
+            str(totals['ast']),
+            str(totals['stl']),
+            str(totals['blk']),
+            str(totals['to']),
+            str(totals['pf']),
+            str(totals['pts'])
+        ]
+        data.append(totals_row)
+        
+        table = Table(data, colWidths=col_widths)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a1a1a')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
+            ('SPAN', (0, 0), (-1, 0)),
+            ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+            ('BACKGROUND', (0, 1), (-1, 1), colors.HexColor('#333333')),
+            ('TEXTCOLOR', (0, 1), (-1, 1), colors.white),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (1, 2), (1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 1), 'Helvetica-Bold'),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('GRID', (0, 1), (-1, -1), 0.5, colors.grey),
+            ('LINEBELOW', (0, -1), (-1, -1), 1, colors.black),
+        ]))
+        return table
+    
+    # Away team box score
+    elements.append(create_team_table(game['away_team_name'], away_stats, away_totals))
+    elements.append(Spacer(1, 8))
+    
+    # Home team box score
+    elements.append(create_team_table(game['home_team_name'], home_stats, home_totals))
+    
+    doc.build(elements)
+    buffer.seek(0)
+    
+    filename = f"boxscore_{game['home_team_name']}_vs_{game['away_team_name']}.pdf".replace(" ", "_")
+    
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # ============ FOOTBALL BOX SCORE PDF ============
 
 @api_router.get("/games/{game_id}/football-boxscore/pdf")
