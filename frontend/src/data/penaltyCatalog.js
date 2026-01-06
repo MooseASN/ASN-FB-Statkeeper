@@ -1293,7 +1293,8 @@ export function getPenaltiesByCategory(category) {
  * @returns {Object} Enforcement result with yards, new position, flags
  */
 export function calculatePenaltyEnforcement(penalty, ruleset, againstTeam, context = {}) {
-  const variant = getPenaltyVariant(penalty, ruleset);
+  // Use team-specific variant if available
+  const variant = getPenaltyVariant(penalty, ruleset, againstTeam);
   if (!variant) return null;
   
   const { 
