@@ -221,9 +221,10 @@ export default function PenaltyWorkflowDialog({
 
   // Render common penalties quick access
   const renderCommonPenalties = () => {
+    // Use unified penalty IDs where available
     const common = [
-      'false_start', 'offside', 'holding_offense', 'holding_defense',
-      'pass_interference_defensive', 'facemask', 'delay_of_game', 'illegal_motion'
+      'false_start', 'offside', 'holding', 'pass_interference',
+      'facemask', 'delay_of_game', 'illegal_motion', 'encroachment'
     ];
     
     return (
@@ -240,10 +241,14 @@ export default function PenaltyWorkflowDialog({
                 className="px-2 py-1 bg-zinc-700 hover:bg-zinc-600 rounded text-xs text-zinc-300"
               >
                 {penalty.display_name}
+                {penalty.can_be_committed_by === 'both' && (
+                  <span className="ml-1 text-zinc-500">★</span>
+                )}
               </button>
             );
           })}
         </div>
+        <div className="text-[10px] text-zinc-600">★ = Can be offense or defense</div>
       </div>
     );
   };
