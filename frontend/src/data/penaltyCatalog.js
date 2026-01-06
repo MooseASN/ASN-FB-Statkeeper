@@ -1235,6 +1235,9 @@ export function searchPenalties(input, limit = 5) {
   const results = [];
   
   for (const penalty of PENALTY_CATALOG) {
+    // Skip hidden penalties (they're superseded by unified versions)
+    if (penalty.hidden) continue;
+    
     // Check display name
     const displayNameLower = penalty.display_name.toLowerCase();
     if (displayNameLower.includes(searchLower) || searchLower.includes(displayNameLower)) {
