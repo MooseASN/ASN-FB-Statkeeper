@@ -1509,7 +1509,14 @@ export default function LiveGame() {
           setAssistTeam(null);
           setAssistScorer(null);
         }}
-        teammates={(assistTeam === 'home' ? homeStats : awayStats).filter(p => p.id !== assistScorer?.id)}
+        teammates={(() => {
+          // Filter to only players on floor, excluding the scorer
+          const onFloor = assistTeam === 'home' 
+            ? (game?.home_on_floor || []) 
+            : (game?.away_on_floor || []);
+          const teamStats = assistTeam === 'home' ? homeStats : awayStats;
+          return teamStats.filter(p => onFloor.includes(p.id) && p.id !== assistScorer?.id);
+        })()}
         onSelectAssist={handleAssistSelect}
         onNoAssist={() => handleAssistSelect(null)}
         teamColor={assistTeam === 'home' ? homeColor : awayColor}
