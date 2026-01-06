@@ -83,6 +83,10 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Defensive penalties move ball FORWARD (toward defense's goal)
   - Offensive penalties move ball BACKWARD (toward offense's goal)
   - Properly accounts for home team (0→100) vs away team (100→0) direction
+- ✅ **Unified Penalty Buttons** - Penalties like Holding and Pass Interference now show as single buttons
+  - ★ indicator shows penalties that can be committed by either team
+  - Team selection displays correct yardage for each team (e.g., Holding: 10 yds offense, 5 yds + auto 1st defense)
+  - Old duplicate entries hidden from search and category lists
 - ✅ Game recaps auto-generated on LiveView event ticker (basketball)
 
 ## Architecture
