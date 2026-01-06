@@ -142,13 +142,14 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Prioritized Backlog
 
-### P0 (Completed this session)
+### P0 (Completed)
 - [x] Test Beta Mode feature end-to-end
 - [x] Create custom hooks for football game management
+- [x] Admin login verification - **ALL TESTS PASS** (7 backend, 6 frontend)
 
-### P1 (Next)
-- [ ] Verify basketball stat tracker improvements with active game rosters
-- [ ] Admin login verification (pending user confirmation after deployment)
+### P1 (Completed)
+- [x] Verify basketball stat tracker improvements - **ALL TESTS PASS**
+- [x] Admin login reliability - **VERIFIED WORKING** (both username and email login methods)
 
 ### P2 (Future)
 - [ ] Further refactor FootballLiveGame.jsx using the new custom hooks
