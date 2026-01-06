@@ -3601,6 +3601,79 @@ async def generate_public_boxscore_pdf(game_id: str):
         headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
 
+# ============ BASKETBALL TEAM COMPARISON CSV ============
+
+@api_router.get("/games/{game_id}/team-comparison/csv")
+async def generate_team_comparison_csv(game_id: str):
+    """Generate a live CSV of team stats comparison (public endpoint)
+    Format: 3 rows - Home Total, Stat Title, Away Total
+    """
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Fetch player stats
+    player_stats = await db.player_stats.find({"game_id": game_id}, {"_id": 0}).to_list(100)
+    home_stats = [s for s in player_stats if s["team_id"] == game["home_team_id"]]
+    away_stats = [s for s in player_stats if s["team_id"] == game["away_team_id"]]
+    
+    # Calculate totals
+    home_totals = calculate_team_totals(home_stats)
+    away_totals = calculate_team_totals(away_stats)
+    
+    # Get quarter scores for points
+    home_pts = sum(game.get('home_quarter_scores', [0, 0, 0, 0]))
+    away_pts = sum(game.get('away_quarter_scores', [0, 0, 0, 0]))
+    
+    # Calculate largest leads (from game state if available)
+    home_largest_lead = game.get('home_largest_lead', 0)
+    away_largest_lead = game.get('away_largest_lead', 0)
+    
+    # Build CSV content
+    # Row 1: Home team name as header, stats as values
+    # Row 2: Stat titles
+    # Row 3: Away team name as header, stats as values
+    
+    csv_buffer = io.StringIO()
+    writer = csv.writer(csv_buffer)
+    
+    # Stat columns
+    stat_titles = [
+        "FG", "3PT", "FT", "REBOUNDS", "TURNOVERS", "LARGEST LEAD"
+    ]
+    
+    # Home row values
+    home_fg = f"{home_totals['fg_made']}/{home_totals['fg_att']}"
+    home_3pt = f"{home_totals['fg3_made']}/{home_totals['fg3_att']}"
+    home_ft = f"{home_totals['ft_made']}/{home_totals['ft_att']}"
+    home_reb = str(home_totals['reb'])
+    home_to = str(home_totals['to'])
+    home_lead = str(home_largest_lead)
+    
+    # Away row values
+    away_fg = f"{away_totals['fg_made']}/{away_totals['fg_att']}"
+    away_3pt = f"{away_totals['fg3_made']}/{away_totals['fg3_att']}"
+    away_ft = f"{away_totals['ft_made']}/{away_totals['ft_att']}"
+    away_reb = str(away_totals['reb'])
+    away_to = str(away_totals['to'])
+    away_lead = str(away_largest_lead)
+    
+    # Write rows
+    writer.writerow([game.get('home_team_name', 'Home')] + [home_fg, home_3pt, home_ft, home_reb, home_to, home_lead])
+    writer.writerow(['Stat'] + stat_titles)
+    writer.writerow([game.get('away_team_name', 'Away')] + [away_fg, away_3pt, away_ft, away_reb, away_to, away_lead])
+    
+    csv_content = csv_buffer.getvalue()
+    csv_buffer.close()
+    
+    filename = f"team_comparison_{game.get('home_team_name', 'Home')}_vs_{game.get('away_team_name', 'Away')}.csv".replace(" ", "_")
+    
+    return Response(
+        content=csv_content,
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # ============ FOOTBALL BOX SCORE PDF ============
 
 @api_router.get("/games/{game_id}/football-boxscore/pdf")
