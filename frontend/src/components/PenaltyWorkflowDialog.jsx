@@ -203,7 +203,8 @@ export default function PenaltyWorkflowDialog({
         <div className="text-xs text-zinc-500 uppercase tracking-wide">Browse by Category</div>
         <div className="grid grid-cols-2 gap-2">
           {categories.map(([key, name]) => {
-            const penaltiesInCategory = PENALTY_CATALOG.filter(p => p.category === name);
+            // Filter out hidden penalties from count
+            const penaltiesInCategory = PENALTY_CATALOG.filter(p => p.category === name && !p.hidden);
             return (
               <button
                 key={key}
