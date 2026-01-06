@@ -236,7 +236,8 @@ export default function Jumbotron() {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  if (loading) {
+  // Show loading only on initial load
+  if (loading && !game) {
     return (
       <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
         <div className="text-center">
@@ -247,27 +248,19 @@ export default function Jumbotron() {
     );
   }
 
-  if (initialLoadFailed && !game) {
+  // Show error only if we never got any data
+  if (!game) {
     return (
       <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-white mb-2">Game Not Found</h2>
-          <p className="text-zinc-400">Unable to load game data.</p>
+          <p className="text-zinc-400">Unable to load game data for share code: {shareCode}</p>
         </div>
       </div>
     );
   }
 
-  if (!game) {
-    return (
-      <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-10 h-10 animate-spin mx-auto text-zinc-400" />
-          <p className="mt-4 text-zinc-400">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // If we have game data, ALWAYS show it (never show error if we have data)
 
   const homeStats = game.home_player_stats || [];
   const awayStats = game.away_player_stats || [];
