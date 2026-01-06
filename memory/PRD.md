@@ -147,7 +147,10 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - `GET/POST /api/teams` - Team management
 - `GET/POST /api/games` - Game management
 - `PUT /api/games/{id}` - Update game (including End Game)
-- `GET /api/games/{id}/boxscore/pdf` - PDF export
+- `GET /api/games/{id}/boxscore/pdf` - PDF export (auth required)
+- `GET /api/games/{id}/boxscore/public-pdf` - PDF export (public)
+- `GET /api/games/{id}/team-comparison/csv` - Live CSV team comparison (public)
+- `GET /api/games/share/{share_code}` - Public game data (used by LiveView and Jumbotron)
 
 ## Database Schema
 
