@@ -176,43 +176,41 @@ export default function Jumbotron() {
   const { shareCode } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [initialLoadFailed, setInitialLoadFailed] = useState(false);
-
-  const fetchGame = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API}/games/share/${shareCode}`);
-      setGame(res.data);
-      setInitialLoadFailed(false);
-      setLoading(false);
-    } catch (err) {
-      // Only show error on initial load - subsequent failures just keep showing last data
-      if (loading) {
-        setInitialLoadFailed(true);
-        setLoading(false);
-      }
-      // Otherwise silently ignore - keeps showing last successful data
-    }
-  }, [shareCode, loading]);
+  const hasLoadedOnce = React.useRef(false);
 
   useEffect(() => {
+    let mounted = true;
+    hasLoadedOnce.current = false;
     setLoading(true);
-    setInitialLoadFailed(false);
-    fetchGame();
     
-    // Auto-refresh every 2 seconds for live updates
-    const interval = setInterval(() => {
-      axios.get(`${API}/games/share/${shareCode}`)
-        .then(res => {
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`${API}/games/share/${shareCode}`);
+        if (mounted) {
           setGame(res.data);
-          setInitialLoadFailed(false);
-        })
-        .catch(() => {
-          // Silently ignore refresh errors - keep showing last data
-        });
-    }, 2000);
+          hasLoadedOnce.current = true;
+          setLoading(false);
+        }
+      } catch (err) {
+        if (mounted && !hasLoadedOnce.current) {
+          // Only set loading false on first failed attempt
+          setLoading(false);
+        }
+        // If we've loaded once, silently ignore errors (keep showing last data)
+      }
+    };
     
-    return () => clearInterval(interval);
-  }, [shareCode]); // eslint-disable-line react-hooks/exhaustive-deps
+    // Initial fetch
+    fetchData();
+    
+    // Auto-refresh every 2 seconds
+    const interval = setInterval(fetchData, 2000);
+    
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [shareCode]);
 
   // Calculate score from quarter scores
   const calculateScore = (team) => {
