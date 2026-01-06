@@ -1696,6 +1696,18 @@ async def get_latest_active_game(user_id: str):
     home_stats = [s for s in player_stats if s["team_id"] == game["home_team_id"]]
     away_stats = [s for s in player_stats if s["team_id"] == game["away_team_id"]]
     
+    # Fetch team data for logos and rosters
+    home_team = await db.teams.find_one({"id": game["home_team_id"]}, {"_id": 0})
+    away_team = await db.teams.find_one({"id": game["away_team_id"]}, {"_id": 0})
+    
+    # Add team logos to game data
+    if home_team:
+        game["home_team_logo"] = home_team.get("logo_url") or home_team.get("logo")
+        game["home_team_roster"] = home_team.get("roster", [])
+    if away_team:
+        game["away_team_logo"] = away_team.get("logo_url") or away_team.get("logo")
+        game["away_team_roster"] = away_team.get("roster", [])
+    
     return {
         **game,
         "home_player_stats": home_stats,
