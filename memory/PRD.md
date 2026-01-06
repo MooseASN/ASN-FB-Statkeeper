@@ -57,9 +57,9 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - ✅ End Game functionality for both sports
 - ✅ Team creation bug fixes (z-index, back button navigation)
 - ✅ Basketball PDF box score formatting (portrait letter page)
-- ✅ Basketball Classic Mode: Assist modal, rebound selection flow (Off/Def/Deadball)
-- ✅ Basketball Advanced Mode: Post-miss rebound dialog
-- ✅ Quick Entry section for players on floor (Classic mode)
+- ✅ Basketball Classic Mode: Assist modal, rebound selection flow (Off/Def/Deadball) - **VERIFIED**
+- ✅ Basketball Advanced Mode: Post-miss rebound dialog - **VERIFIED**
+- ✅ Quick Entry section for players on floor (Classic mode) - **VERIFIED**
 - ✅ Auto-save for team information with debouncing
 - ✅ Tournament bracket system REMOVED per user request
 - ✅ Custom hooks created for football game management (useGameClock, useDriveState, useTimeouts)
@@ -67,7 +67,7 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - ✅ **Field View Dialog** - Miniature football field visualization for yardage calculation
   - Shows current ball position and allows sliding to set end position
   - Proper NFL/college yardage calculation (50-yard line crossing handled correctly)
-  - Available in Run Play, Pass Play (completion), and Sack yards sections
+  - Available in Run Play, Pass Play (completion), Sack yards, and **Punt Return yards** sections
   - **TOUCHDOWN detection**: Shows TD UI and button when slider reaches opponent's end zone
   - **SAFETY detection**: Shows Safety UI and button when slider reaches own end zone
 - ✅ **Clock Initialization Fix** - Football games now use the game's period_duration setting
@@ -83,6 +83,11 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Defensive penalties move ball FORWARD (toward defense's goal)
   - Offensive penalties move ball BACKWARD (toward offense's goal)
   - Properly accounts for home team (0→100) vs away team (100→0) direction
+- ✅ **Unified Penalty Buttons** - Penalties that can be committed by either team now show as single buttons
+  - ★ indicator shows penalties that can be committed by either team
+  - Team selection displays correct yardage for each team
+  - Unified: Holding, Pass Interference, Illegal Use of Hands
+  - Old duplicate entries hidden from search and category lists
 - ✅ **Unified Penalty Buttons** - Penalties like Holding and Pass Interference now show as single buttons
   - ★ indicator shows penalties that can be committed by either team
   - Team selection displays correct yardage for each team (e.g., Holding: 10 yds offense, 5 yds + auto 1st defense)
