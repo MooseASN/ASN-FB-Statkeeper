@@ -391,11 +391,17 @@ export default function PenaltyWorkflowDialog({
           <div className="space-y-4 mt-4">
             <div className="text-center mb-4">
               <div className="text-lg font-bold text-red-400">{selectedPenalty.display_name}</div>
-              <div className="text-sm text-zinc-500">
-                {currentVariant?.yards === 'spot' ? 'Spot foul' : `${currentVariant?.yards} yards`}
-                {currentVariant?.auto_first_down && ' • Auto First Down'}
-                {currentVariant?.loss_of_down && ' • Loss of Down'}
-              </div>
+              {selectedPenalty.can_be_committed_by === 'both' ? (
+                <div className="text-sm text-yellow-500">
+                  Select which team committed the foul to see yardage
+                </div>
+              ) : (
+                <div className="text-sm text-zinc-500">
+                  {currentVariant?.yards === 'spot' ? 'Spot foul' : `${currentVariant?.yards} yards`}
+                  {currentVariant?.auto_first_down && ' • Auto First Down'}
+                  {currentVariant?.loss_of_down && ' • Loss of Down'}
+                </div>
+              )}
             </div>
             
             <div className="text-sm text-zinc-400 uppercase text-center mb-2">Penalty Against</div>
@@ -412,6 +418,13 @@ export default function PenaltyWorkflowDialog({
                 <div className="text-sm text-zinc-400">
                   {possession === 'home' ? homeTeamName : awayTeamName}
                 </div>
+                {/* Show offense-specific penalty info if available */}
+                {selectedPenalty.team_variants?.offense && (
+                  <div className="text-xs text-red-400 mt-2">
+                    {getPenaltyVariant(selectedPenalty, ruleset, 'offense')?.yards} yds
+                    {getPenaltyVariant(selectedPenalty, ruleset, 'offense')?.loss_of_down && ' • Loss of Down'}
+                  </div>
+                )}
               </button>
               
               <button
@@ -425,6 +438,15 @@ export default function PenaltyWorkflowDialog({
                 <div className="text-sm text-zinc-400">
                   {possession === 'home' ? awayTeamName : homeTeamName}
                 </div>
+                {/* Show defense-specific penalty info if available */}
+                {selectedPenalty.team_variants?.defense && (
+                  <div className="text-xs text-green-400 mt-2">
+                    {getPenaltyVariant(selectedPenalty, ruleset, 'defense')?.yards === 'spot' 
+                      ? 'Spot foul' 
+                      : `${getPenaltyVariant(selectedPenalty, ruleset, 'defense')?.yards} yds`}
+                    {getPenaltyVariant(selectedPenalty, ruleset, 'defense')?.auto_first_down && ' • Auto 1st'}
+                  </div>
+                )}
               </button>
             </div>
             
