@@ -2213,8 +2213,8 @@ export default function FootballLiveGame({ user, onLogout }) {
         const secs = totalSeconds % 60;
         return `${mins}:${secs.toString().padStart(2, '0')}`;
       } else {
-        // Cross-period - for simplicity just show elapsed from start period
-        const periodLength = 900; // 15 minutes
+        // Cross-period - use game's period_duration
+        const periodLength = game?.period_duration || 900;
         let totalTime = currentDrive.startClock;
         for (let p = currentDrive.startPeriod + 1; p < quarter; p++) {
           totalTime += periodLength;
