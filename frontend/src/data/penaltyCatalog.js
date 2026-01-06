@@ -559,6 +559,7 @@ export const PENALTY_CATALOG = [
     aliases: ['opi', 'offensive pi', 'offensive pass interference', 'push off', 'off pi'],
     category: PENALTY_CATEGORIES.PASSING,
     requires_context: [],
+    hidden: true, // Use unified 'pass_interference' instead
     variants: {
       NFHS: {
         yards: 15,
@@ -581,9 +582,10 @@ export const PENALTY_CATALOG = [
   {
     penalty_id: 'pass_interference_defensive',
     display_name: 'Defensive Pass Interference',
-    aliases: ['dpi', 'pi', 'pass interference', 'defensive pi', 'def pi', 'interference'],
+    aliases: ['dpi', 'defensive pi', 'def pi'],
     category: PENALTY_CATEGORIES.PASSING,
     requires_context: ['spot_of_foul'],
+    hidden: true, // Use unified 'pass_interference' instead
     variants: {
       NFHS: {
         yards: 15,
