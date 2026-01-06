@@ -94,11 +94,12 @@ export default function PenaltyWorkflowDialog({
     }
   }, []);
 
-  // Get current variant based on ruleset
+  // Get current variant based on ruleset and selected team
   const currentVariant = useMemo(() => {
     if (!selectedPenalty) return null;
-    return getPenaltyVariant(selectedPenalty, ruleset);
-  }, [selectedPenalty, ruleset]);
+    // Pass againstTeam to get team-specific variant if available
+    return getPenaltyVariant(selectedPenalty, ruleset, againstTeam);
+  }, [selectedPenalty, ruleset, againstTeam]);
 
   // Get required context questions for selected penalty
   const contextQuestions = useMemo(() => {
