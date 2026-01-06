@@ -854,6 +854,9 @@ export default function FootballLiveGame({ user, onLogout }) {
         console.log("Could not fetch rosters", e);
       }
       
+      // Get the period duration from game settings (default to 900 = 15 min for football)
+      const gamePeriodDuration = res.data.period_duration || 900;
+      
       // Initialize from game state if exists
       if (res.data.football_state) {
         const state = res.data.football_state;
@@ -869,7 +872,8 @@ export default function FootballLiveGame({ user, onLogout }) {
         setPlayLog(state.play_log || []);
         
         // Handle clock_time - could be stored as seconds (number) or "MM:SS" (string)
-        let clockSecs = 900;
+        // If no clock_time in state, use the game's period_duration
+        let clockSecs = gamePeriodDuration;
         if (state.clock_time !== undefined) {
           if (typeof state.clock_time === 'string' && state.clock_time.includes(':')) {
             const [mins, secs] = state.clock_time.split(':').map(Number);
@@ -884,7 +888,9 @@ export default function FootballLiveGame({ user, onLogout }) {
         setHomeTimeOfPossession(state.home_time_of_possession || 0);
         setAwayTimeOfPossession(state.away_time_of_possession || 0);
       } else {
-        // New game - show kickoff dialog
+        // New game - initialize clock to game's period duration setting
+        setClockTime(gamePeriodDuration);
+        // Show kickoff dialog
         setShowKickoffTeamDialog(true);
       }
     } catch (error) {
