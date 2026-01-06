@@ -1743,6 +1743,11 @@ export default function AdvancedLiveGame() {
             <DialogTitle>Turnover</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 mt-4">
+            <p className="text-sm text-zinc-400">
+              Turnover will be charged to: <span className="font-bold" style={{ color: possession === 'home' ? homeColor : awayColor }}>
+                {possession === 'home' ? game?.home_team_name : game?.away_team_name}
+              </span>
+            </p>
             <Button 
               onClick={() => {
                 setActiveAction('turnover');
@@ -1751,17 +1756,23 @@ export default function AdvancedLiveGame() {
               }}
               className="w-full bg-red-600 hover:bg-red-700"
             >
-              Player Turnover
+              Player Turnover (Select Player)
             </Button>
             <Button 
-              onClick={() => {
-                handleTeamStat(possession, 'team_turnover');
+              onClick={async () => {
+                // Team turnover - charge to the team with possession
+                await handleTeamStat(possession, 'team_turnover');
                 setShowTurnoverDialog(false);
+                
+                // Flip possession to the other team after turnover
+                const newPossession = possession === 'home' ? 'away' : 'home';
+                handlePossessionChange(newPossession);
+                toast.success(`Team turnover - ${possession === 'home' ? game?.home_team_name : game?.away_team_name}`);
               }}
               variant="outline"
               className="w-full border-zinc-700"
             >
-              Team Turnover
+              Team Turnover ({possession === 'home' ? game?.home_team_name : game?.away_team_name})
             </Button>
           </div>
         </DialogContent>
