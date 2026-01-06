@@ -526,12 +526,78 @@ export const PENALTY_CATALOG = [
       },
     },
   },
+  // Unified Illegal Use of Hands - can be offense or defense
   {
-    penalty_id: 'illegal_use_of_hands',
+    penalty_id: 'illegal_hands',
     display_name: 'Illegal Use of Hands',
-    aliases: ['illegal hands', 'illegal use of hands', 'hands to face', 'iuh', 'hands'],
+    aliases: ['illegal hands', 'hands to face', 'iuh', 'hands', 'illegal use of hands'],
     category: PENALTY_CATEGORIES.BLOCKING,
     requires_context: [],
+    can_be_committed_by: 'both',
+    team_variants: {
+      offense: {
+        NFHS: {
+          yards: 10,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: false,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Offensive penalty',
+        },
+        NCAA: {
+          yards: 10,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: false,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Offensive penalty',
+        },
+      },
+      defense: {
+        NFHS: {
+          yards: 5,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: true,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Automatic first down',
+        },
+        NCAA: {
+          yards: 5,
+          enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+          auto_first_down: true,
+          loss_of_down: false,
+          disqualification: 'none',
+          notes: 'Automatic first down',
+        },
+      },
+    },
+    variants: {
+      NFHS: {
+        yards: 10,
+        enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+        auto_first_down: false,
+        loss_of_down: false,
+        disqualification: 'none',
+        notes: 'Select team to see specific yardage',
+      },
+      NCAA: {
+        yards: 10,
+        enforcement: ENFORCEMENT_TYPES.PREVIOUS_SPOT,
+        auto_first_down: false,
+        loss_of_down: false,
+        disqualification: 'none',
+        notes: 'Select team to see specific yardage',
+      },
+    },
+  },
+  {
+    penalty_id: 'illegal_use_of_hands',
+    display_name: 'Illegal Use of Hands (Old)',
+    aliases: [],
+    category: PENALTY_CATEGORIES.BLOCKING,
+    requires_context: [],
+    hidden: true, // Use unified 'illegal_hands' instead
     variants: {
       NFHS: {
         yards: 10,
