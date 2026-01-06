@@ -393,9 +393,9 @@ export default function LiveView() {
           fg2_made: 0, fg2_missed: 0,
           fg3_made: 0, fg3_missed: 0,
           ft_made: 0, ft_missed: 0,
-          oreb: 0, dreb: 0,
-          assist: 0, steal: 0, block: 0,
-          turnover: 0, foul: 0, minutes: 0
+          offensive_rebounds: 0, defensive_rebounds: 0,
+          assists: 0, steals: 0, blocks: 0,
+          turnovers: 0, fouls: 0, minutes: 0
         });
         addedNumbers.add(player.number);
       }
