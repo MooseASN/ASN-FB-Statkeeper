@@ -27,6 +27,7 @@ import ResetPassword from "@/pages/ResetPassword";
 import AccountSettings from "@/pages/AccountSettings";
 import AdminDashboard from "@/pages/AdminDashboard";
 import FootballStatsView from "@/pages/FootballStatsView";
+import Jumbotron from "@/pages/Jumbotron";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
