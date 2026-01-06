@@ -226,7 +226,7 @@ export default function PenaltyWorkflowDialog({
     // Use unified penalty IDs where available
     const common = [
       'false_start', 'offside', 'holding', 'pass_interference',
-      'facemask', 'delay_of_game', 'illegal_motion', 'encroachment'
+      'facemask', 'delay_of_game', 'illegal_hands', 'encroachment'
     ];
     
     return (
