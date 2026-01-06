@@ -202,8 +202,8 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - Admin credentials: admin / NoahTheJew1997
 
 ## Known Issues
-- Admin login unreliability: Awaiting user verification after deployment
 - FootballLiveGame.jsx: Still large (~4700 lines), needs more refactoring
+- Custom hooks (useGameClock, useDriveState, useTimeouts) created but not integrated
 
 ## Third-Party Integrations
 - react-player: Video embedding
