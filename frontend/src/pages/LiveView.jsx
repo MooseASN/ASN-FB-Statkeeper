@@ -362,7 +362,59 @@ export default function LiveView() {
 
   const homeStats = game.home_player_stats || [];
   const awayStats = game.away_player_stats || [];
-  const homeTotals = calculateTeamTotals(homeStats);
+  
+  // Merge roster with stats to show all players (even those with 0 stats)
+  const homeRoster = game.home_team_roster || [];
+  const awayRoster = game.away_team_roster || [];
+  
+  // Create a merged stats array that includes all roster players
+  const mergeRosterWithStats = (roster, stats) => {
+    // Create a map of existing stats by player number
+    const statsMap = new Map();
+    stats.forEach(s => {
+      statsMap.set(s.player_number, s);
+    });
+    
+    // Create merged array with all roster players
+    const merged = [];
+    const addedNumbers = new Set();
+    
+    // First add all players from roster
+    roster.forEach(player => {
+      const existingStats = statsMap.get(player.number);
+      if (existingStats) {
+        merged.push(existingStats);
+        addedNumbers.add(player.number);
+      } else {
+        // Create empty stats for roster player
+        merged.push({
+          player_name: player.name,
+          player_number: player.number,
+          fg2_made: 0, fg2_missed: 0,
+          fg3_made: 0, fg3_missed: 0,
+          ft_made: 0, ft_missed: 0,
+          oreb: 0, dreb: 0,
+          assist: 0, steal: 0, block: 0,
+          turnover: 0, foul: 0, minutes: 0
+        });
+        addedNumbers.add(player.number);
+      }
+    });
+    
+    // Add any stats for players not in roster (shouldn't happen, but just in case)
+    stats.forEach(s => {
+      if (!addedNumbers.has(s.player_number)) {
+        merged.push(s);
+      }
+    });
+    
+    return merged;
+  };
+  
+  const mergedHomeStats = mergeRosterWithStats(homeRoster, homeStats);
+  const mergedAwayStats = mergeRosterWithStats(awayRoster, awayStats);
+  
+  const homeTotals = calculateTeamTotals(homeStats); // Use original stats for totals
   const awayTotals = calculateTeamTotals(awayStats);
   const playByPlay = game.play_by_play || [];
   
