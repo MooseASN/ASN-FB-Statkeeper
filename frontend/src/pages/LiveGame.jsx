@@ -1703,6 +1703,16 @@ export default function LiveGame() {
                 <FileText className="w-4 h-4 mr-1" />
                 CSV Link
               </Button>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => window.open(`/jumbotron/${id}`, '_blank')} 
+                className="text-white hover:bg-white/10" 
+                data-testid="jumbotron-btn"
+              >
+                <Monitor className="w-4 h-4 mr-1" />
+                Jumbotron
+              </Button>
               <Button variant="ghost" size="sm" onClick={openNoteDialog} className="text-white hover:bg-white/10" data-testid="note-btn">
                 <StickyNote className="w-4 h-4 mr-1" />
                 Note
