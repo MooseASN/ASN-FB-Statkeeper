@@ -3864,15 +3864,25 @@ export default function FootballLiveGame({ user, onLogout }) {
                         </div>
                         
                         <div className="text-sm text-zinc-400 uppercase">Yardline Return Stops At</div>
-                        <div className="flex items-center justify-center gap-3 mt-2">
-                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 5))}>-5</Button>
-                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 1))}>-1</Button>
-                          <div className="px-4 py-2 bg-zinc-800 rounded text-center">
-                            <div className="text-xs text-zinc-500">Yard Line</div>
-                            <div className="text-2xl font-bold text-yellow-400">{puntReturnStartYardLine + puntReturnYards}</div>
+                        <div className="space-y-3">
+                          <div className="flex items-center justify-center gap-3 mt-2">
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 5))}>-5</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => Math.max(0, prev - 1))}>-1</Button>
+                            <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                              <div className="text-xs text-zinc-500">Yard Line</div>
+                              <div className="text-2xl font-bold text-yellow-400">{puntReturnStartYardLine + puntReturnYards}</div>
+                            </div>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 1)}>+1</Button>
+                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 5)}>+5</Button>
                           </div>
-                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 1)}>+1</Button>
-                          <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntReturnYards(prev => prev + 5)}>+5</Button>
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="w-full border-green-600 text-green-400 hover:bg-green-900/30"
+                            onClick={() => setShowFieldViewDialog(true)}
+                          >
+                            🏈 Field View
+                          </Button>
                         </div>
                         <div className="flex flex-wrap gap-2 justify-center mt-2">
                           {[0, 5, 10, 15, 20, 25, 30, 35, 40].map(y => (
