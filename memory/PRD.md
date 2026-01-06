@@ -70,6 +70,10 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Available in Run Play, Pass Play (completion), and Sack yards sections
   - **TOUCHDOWN detection**: Shows TD UI and button when slider reaches opponent's end zone
   - **SAFETY detection**: Shows Safety UI and button when slider reaches own end zone
+- ✅ **Clock Initialization Fix** - Football games now use the game's period_duration setting
+  - Clock initializes to configured time (e.g., 8:00, 10:00, 12:00) instead of hardcoded 15:00
+  - Quarter advancement resets clock to correct period_duration
+  - Clock time persists correctly when saving/reloading game state
 - ✅ Game recaps auto-generated on LiveView event ticker (basketball)
 
 ## Architecture
