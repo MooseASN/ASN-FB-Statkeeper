@@ -14,6 +14,8 @@ import {
   RotateCcw, ChevronRight, AlertCircle, X, Plus, Link as LinkIcon, 
   UserPlus, Trash2, Loader2, Mail, Edit, FileText, Monitor
 } from "lucide-react";
+import { useOfflineQueue } from "@/hooks/useOfflineQueue";
+import ConnectionStatus from "@/components/ConnectionStatus";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
