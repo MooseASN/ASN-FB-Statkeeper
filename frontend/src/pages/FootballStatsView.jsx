@@ -26,54 +26,68 @@ export default function FootballStatsView() {
 
   // Polling interval for live updates
   useEffect(() => {
+    let mounted = true;
+    let hasLoadedOnce = false;
+    
     const fetchGameData = async () => {
       try {
         // Try to fetch game data (public endpoint)
         const gameRes = await axios.get(`${API}/games/public/${id}`);
-        setGame(gameRes.data);
-        
-        // For football games, play log is stored in football_state.play_log
-        const footballState = gameRes.data.football_state;
-        if (footballState && footballState.play_log) {
-          setPlayLog(footballState.play_log);
-        } else {
-          // Fallback to events for non-football or legacy games
-          const events = gameRes.data.events || [];
-          const plays = events.map(event => ({
-            id: event.id,
-            quarter: event.quarter || 1,
-            clock: event.timestamp || '0:00',
-            team: event.team,
-            type: event.event_type,
-            result: event.result,
-            yards: event.yards,
-            description: event.description,
-            points: event.points || 0,
-            down: event.down,
-            distance: event.distance,
-            ball_on: event.ball_position ? `${event.ball_position}` : null,
-            carrier: event.carrier,
-            qb: event.qb,
-            receiver: event.receiver,
-            tackler: event.tackler,
-            firstDown: event.first_down,
-          }));
-          setPlayLog(plays.reverse());
+        if (mounted) {
+          setGame(gameRes.data);
+          hasLoadedOnce = true;
+          
+          // For football games, play log is stored in football_state.play_log
+          const footballState = gameRes.data.football_state;
+          if (footballState && footballState.play_log) {
+            setPlayLog(footballState.play_log);
+          } else {
+            // Fallback to events for non-football or legacy games
+            const events = gameRes.data.events || [];
+            const plays = events.map(event => ({
+              id: event.id,
+              quarter: event.quarter || 1,
+              clock: event.timestamp || '0:00',
+              team: event.team,
+              type: event.event_type,
+              result: event.result,
+              yards: event.yards,
+              description: event.description,
+              points: event.points || 0,
+              down: event.down,
+              distance: event.distance,
+              ball_on: event.ball_position ? `${event.ball_position}` : null,
+              carrier: event.carrier,
+              qb: event.qb,
+              receiver: event.receiver,
+              tackler: event.tackler,
+              firstDown: event.first_down,
+            }));
+            setPlayLog(plays.reverse());
+          }
+          
+          setLoading(false);
+          setError(null);
         }
-        
-        setLoading(false);
       } catch (err) {
         console.error('Error fetching game data:', err);
-        setError('Game not found or not accessible');
-        setLoading(false);
+        // Only show error on initial load
+        if (mounted && !hasLoadedOnce) {
+          setError('Game not found or not accessible');
+          setLoading(false);
+        }
+        // Silently ignore refresh errors
       }
     };
 
     fetchGameData();
     
-    // Poll for updates every 5 seconds for live games (was 10 seconds)
+    // Poll for updates every 5 seconds for live games
     const interval = setInterval(fetchGameData, 5000);
-    return () => clearInterval(interval);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
   }, [id]);
 
   if (loading) {
