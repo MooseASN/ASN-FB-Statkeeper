@@ -660,38 +660,43 @@ export default function FootballLiveGame({ user, onLogout }) {
   const saveFootballState = useCallback(async (newPlayLog = playLog, newHomeScore = homeScore, newAwayScore = awayScore) => {
     if (!id) return;
     
+    const footballState = {
+      possession,
+      ball_position: ballPosition,
+      down,
+      distance,
+      quarter,
+      home_score: newHomeScore,
+      away_score: newAwayScore,
+      home_timeouts: homeTimeouts,
+      away_timeouts: awayTimeouts,
+      play_log: newPlayLog,
+      clock_time: clockTime,
+      home_time_of_possession: homeTimeOfPossession,
+      away_time_of_possession: awayTimeOfPossession,
+      // Drive tracking data
+      current_drive: currentDrive,
+      all_drives: allDrives,
+    };
+    
+    const gameData = {
+      football_state: footballState,
+      home_score: newHomeScore,
+      away_score: newAwayScore,
+      possession,
+      home_time_of_possession: homeTimeOfPossession,
+      away_time_of_possession: awayTimeOfPossession
+    };
+    
     try {
-      const footballState = {
-        possession,
-        ball_position: ballPosition,
-        down,
-        distance,
-        quarter,
-        home_score: newHomeScore,
-        away_score: newAwayScore,
-        home_timeouts: homeTimeouts,
-        away_timeouts: awayTimeouts,
-        play_log: newPlayLog,
-        clock_time: clockTime,
-        home_time_of_possession: homeTimeOfPossession,
-        away_time_of_possession: awayTimeOfPossession,
-        // Drive tracking data
-        current_drive: currentDrive,
-        all_drives: allDrives,
-      };
-      
-      await axios.put(`${API}/games/${id}`, {
-        football_state: footballState,
-        home_score: newHomeScore,
-        away_score: newAwayScore,
-        possession,
-        home_time_of_possession: homeTimeOfPossession,
-        away_time_of_possession: awayTimeOfPossession
-      });
+      await axios.put(`${API}/games/${id}`, gameData);
     } catch (error) {
       console.error("Failed to save game state:", error);
+      // Queue for sync when online
+      queuePlay({ type: 'game-state', data: gameData });
+      toast.warning("Play saved locally - will sync when online");
     }
-  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession, currentDrive, allDrives]);
+  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession, currentDrive, allDrives, queuePlay]);
 
   useEffect(() => {
     fetchGame();
