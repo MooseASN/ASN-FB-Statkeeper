@@ -167,6 +167,35 @@ export default function AdvancedLiveGame() {
     }
   }, [id, navigate]);
 
+  // Ref for fetchGame to avoid circular dependency
+  const fetchGameRef = useRef(fetchGame);
+  fetchGameRef.current = fetchGame;
+
+  // Sync function for offline queue
+  const syncPlay = useCallback(async (playData) => {
+    if (playData.type === 'stat') {
+      await axios.post(`${API}/games/${id}/stats`, playData.data);
+    } else if (playData.type === 'play-by-play') {
+      await axios.post(`${API}/games/${id}/play-by-play`, playData.data);
+    } else if (playData.type === 'possession') {
+      await axios.post(`${API}/games/${id}/possession`, playData.data);
+    } else if (playData.type === 'clock') {
+      await axios.post(`${API}/games/${id}/clock/set`, playData.data);
+    }
+    if (fetchGameRef.current) {
+      fetchGameRef.current(false);
+    }
+  }, [id]);
+
+  // Offline queue hook
+  const { 
+    isOnline, 
+    pendingCount, 
+    isSyncing, 
+    queuePlay, 
+    syncPendingPlays 
+  } = useOfflineQueue(id, syncPlay);
+
   useEffect(() => {
     fetchGame(true); // Initial load
     document.title = "StatMoose BKB";
