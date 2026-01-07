@@ -723,6 +723,12 @@ export default function AdvancedLiveGame() {
 
           {/* Right: Menu Tabs */}
           <div className="flex items-center gap-2">
+            <ConnectionStatus 
+              isOnline={isOnline}
+              pendingCount={pendingCount}
+              isSyncing={isSyncing}
+              onSync={syncPendingPlays}
+            />
             <Button 
               variant={activeTab === "addplay" ? "default" : "outline"}
               size="sm"
