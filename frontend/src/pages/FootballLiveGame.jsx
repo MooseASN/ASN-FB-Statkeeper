@@ -909,6 +909,29 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
   };
 
+  // Ref for fetchGame to avoid circular dependency
+  const fetchGameRef = useRef(fetchGame);
+  fetchGameRef.current = fetchGame;
+
+  // Sync function for offline queue
+  const syncPlay = useCallback(async (playData) => {
+    if (playData.type === 'game-state') {
+      await axios.put(`${API}/games/${id}`, playData.data);
+    }
+    if (fetchGameRef.current) {
+      fetchGameRef.current(false);
+    }
+  }, [id]);
+
+  // Offline queue hook
+  const { 
+    isOnline, 
+    pendingCount, 
+    isSyncing, 
+    queuePlay, 
+    syncPendingPlays 
+  } = useOfflineQueue(id, syncPlay);
+
   // Handle kickoff team selection (step 0)
   const handleKickoffTeamSelect = (team) => {
     setKickingTeam(team);
