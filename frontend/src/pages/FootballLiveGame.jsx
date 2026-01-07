@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
@@ -26,6 +26,8 @@ import {
 } from "lucide-react";
 import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
 import { RULESETS } from "@/data/penaltyCatalog";
+import { useOfflineQueue } from "@/hooks/useOfflineQueue";
+import ConnectionStatus from "@/components/ConnectionStatus";
 
 // Import extracted football components
 import FootballField from "@/components/football/FootballField";
