@@ -178,6 +178,7 @@ export default function LiveView() {
   
   // Primetime video ref
   const videoContainerRef = useRef(null);
+  const hasLoadedOnce = useRef(false);
 
   const fetchGame = useCallback(async () => {
     try {
@@ -185,6 +186,8 @@ export default function LiveView() {
       setGame(res.data);
       setLastUpdated(new Date());
       setError(null);
+      hasLoadedOnce.current = true;
+      setLoading(false);
       
       // Fetch sponsor banners for this game's user
       if (res.data.user_id) {
@@ -221,17 +224,22 @@ export default function LiveView() {
         setEventInfo(null);
       }
     } catch (err) {
-      setError("Game not found");
-    } finally {
-      setLoading(false);
+      // Only show error if we haven't loaded data yet
+      if (!hasLoadedOnce.current) {
+        setError("Game not found");
+        setLoading(false);
+      }
+      // Silently ignore refresh errors - keep showing last data
     }
   }, [shareCode]);
 
   useEffect(() => {
+    hasLoadedOnce.current = false;
+    setLoading(true);
     fetchGame();
     const interval = setInterval(fetchGame, 3000);
     return () => clearInterval(interval);
-  }, [fetchGame]);
+  }, [shareCode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const [exportingPdf, setExportingPdf] = useState(false);
 
