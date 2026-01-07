@@ -310,86 +310,107 @@ export default function AdvancedLiveGame() {
     const player = [...homeStats, ...awayStats].find(p => p.id === playerId);
     if (!player) return;
     
+    // Map frontend action names to backend stat_type
+    const statTypeMap = {
+      'steal': 'steal',
+      'assist': 'assist',
+      'block': 'block',
+      'turnover': 'turnover',
+      'ft_made': 'ft_made',
+      'ft_missed': 'ft_missed',
+      'fg2_made': 'fg2_made',
+      'fg2_missed': 'fg2_missed',
+      'fg3_made': 'fg3_made',
+      'fg3_missed': 'fg3_missed',
+      'oreb': 'oreb',
+      'dreb': 'dreb',
+      'foul': 'foul',
+      'tech_foul': 'foul' // Technical fouls also count as fouls
+    };
+    
+    const statType = statTypeMap[action] || action;
+    const statData = {
+      player_id: playerId,
+      stat_type: statType,
+      increment: extra.increment || 1
+    };
+    
+    const actionLabels = {
+      'steal': 'Steal',
+      'assist': 'Assist', 
+      'block': 'Block',
+      'turnover': 'Turnover',
+      'ft_made': 'FT Made',
+      'ft_missed': 'FT Missed',
+      'fg2_made': '2PT Made',
+      'fg2_missed': '2PT Missed',
+      'fg3_made': '3PT Made',
+      'fg3_missed': '3PT Missed',
+      'oreb': 'Off. Rebound',
+      'dreb': 'Def. Rebound',
+      'foul': 'Foul',
+      'tech_foul': 'Technical Foul'
+    };
+    
+    // Optimistically update local stats
+    const updatePlayerStats = (stats) => stats.map(p => {
+      if (p.id === playerId) {
+        const currentValue = p[statType] || 0;
+        return { ...p, [statType]: currentValue + (extra.increment || 1) };
+      }
+      return p;
+    });
+    
+    setHomeStats(prev => updatePlayerStats(prev));
+    setAwayStats(prev => updatePlayerStats(prev));
+    
     try {
-      // Map frontend action names to backend stat_type
-      const statTypeMap = {
-        'steal': 'steal',
-        'assist': 'assist',
-        'block': 'block',
-        'turnover': 'turnover',
-        'ft_made': 'ft_made',
-        'ft_missed': 'ft_missed',
-        'fg2_made': 'fg2_made',
-        'fg2_missed': 'fg2_missed',
-        'fg3_made': 'fg3_made',
-        'fg3_missed': 'fg3_missed',
-        'oreb': 'oreb',
-        'dreb': 'dreb',
-        'foul': 'foul',
-        'tech_foul': 'foul' // Technical fouls also count as fouls
-      };
-      
-      const statType = statTypeMap[action] || action;
-      
-      await axios.post(`${API}/games/${id}/stats`, {
-        player_id: playerId,
-        stat_type: statType,
-        increment: extra.increment || 1
-      });
-      
-      const actionLabels = {
-        'steal': 'Steal',
-        'assist': 'Assist', 
-        'block': 'Block',
-        'turnover': 'Turnover',
-        'ft_made': 'FT Made',
-        'ft_missed': 'FT Missed',
-        'fg2_made': '2PT Made',
-        'fg2_missed': '2PT Missed',
-        'fg3_made': '3PT Made',
-        'fg3_missed': '3PT Missed',
-        'oreb': 'Off. Rebound',
-        'dreb': 'Def. Rebound',
-        'foul': 'Foul',
-        'tech_foul': 'Technical Foul'
-      };
+      await axios.post(`${API}/games/${id}/stats`, statData);
       
       toast.success(`${player.player_name} - ${actionLabels[action] || action.toUpperCase()}`);
       
       // Auto-flip possession for turnovers and steals
       if (action === 'turnover') {
-        // Turnover by player - flip possession to the other team
         const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
         const newPossession = playerTeam === 'home' ? 'away' : 'home';
         handlePossessionChange(newPossession);
       } else if (action === 'steal') {
-        // Steal - the player who stole it's team now has possession
         const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
         handlePossessionChange(playerTeam);
       } else if (action === 'dreb') {
-        // Defensive rebound - the rebounding team gets possession
         const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
         handlePossessionChange(playerTeam);
       }
       
-      fetchGame();
+      fetchGame(false);
     } catch (error) {
       console.error("Stat error:", error.response?.data || error);
-      toast.error("Failed to record stat");
+      // Queue for sync when online
+      queuePlay({ type: 'stat', data: statData });
+      toast.warning(`${player.player_name} - ${actionLabels[action] || action.toUpperCase()} (saved locally)`);
+      
+      // Still handle possession changes locally
+      if (action === 'turnover') {
+        const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
+        setPossession(playerTeam === 'home' ? 'away' : 'home');
+      } else if (action === 'steal' || action === 'dreb') {
+        const playerTeam = homeStats.find(p => p.id === playerId) ? 'home' : 'away';
+        setPossession(playerTeam);
+      }
     }
   };
 
   // Team rebound/turnover
   const handleTeamStat = async (team, statType) => {
+    const statData = { team, stat_type: statType };
+    
     try {
-      await axios.post(`${API}/games/${id}/team-stats`, {
-        team,
-        stat_type: statType
-      });
+      await axios.post(`${API}/games/${id}/team-stats`, statData);
       toast.success(`Team ${statType}`);
-      fetchGame();
+      fetchGame(false);
     } catch (error) {
-      toast.error("Failed to record team stat");
+      queuePlay({ type: 'team-stat', data: statData });
+      toast.warning(`Team ${statType} (saved locally)`);
     }
   };
 
