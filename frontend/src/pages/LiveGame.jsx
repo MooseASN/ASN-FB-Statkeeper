@@ -747,7 +747,7 @@ export default function LiveGame() {
   const [assistTeam, setAssistTeam] = useState(null);
   const [assistScorer, setAssistScorer] = useState(null);
 
-  const fetchGame = useCallback(async () => {
+  const fetchGame = useCallback(async (isInitialLoad = false) => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
@@ -758,19 +758,25 @@ export default function LiveGame() {
         return;
       }
     } catch (error) {
-      toast.error("Failed to load game");
-      navigate("/");
+      // Only navigate away on initial load failure, not on refresh failures
+      if (isInitialLoad) {
+        toast.error("Failed to load game");
+        navigate("/");
+      }
+      // Silently ignore refresh errors - keep showing last data
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
     }
   }, [id, navigate]);
 
   useEffect(() => {
-    fetchGame();
+    fetchGame(true); // Initial load
     document.title = "StatMoose BKB";
-    const interval = setInterval(fetchGame, 5000);
+    const interval = setInterval(() => fetchGame(false), 5000); // Refresh
     return () => clearInterval(interval);
-  }, [fetchGame]);
+  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clock control functions - use useCallback for stable references (must be defined before useEffect that uses them)
   const handleStartClock = useCallback(async () => {
