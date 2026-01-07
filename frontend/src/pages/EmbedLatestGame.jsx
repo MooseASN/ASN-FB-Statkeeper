@@ -41,29 +41,54 @@ export default function EmbedLatestGame() {
     return () => window.removeEventListener('resize', calculateScale);
   }, [customWidth, customHeight]);
 
-  const fetchLatestGame = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API}/games/latest/active/${userId}`);
-      if (res.data) {
-        setGame(res.data);
-        setNoGame(false);
-      } else {
-        setGame(null);
-        setNoGame(true);
-      }
-    } catch (err) {
-      setGame(null);
-      setNoGame(true);
-    } finally {
-      setLoading(false);
-    }
-  }, [userId]);
-
   useEffect(() => {
-    fetchLatestGame();
-    const interval = setInterval(fetchLatestGame, 5000); // Auto-refresh every 5 seconds
-    return () => clearInterval(interval);
-  }, [fetchLatestGame]);
+    let mounted = true;
+    
+    // Initial fetch
+    const initialFetch = async () => {
+      try {
+        const res = await axios.get(`${API}/games/latest/active/${userId}`);
+        if (mounted) {
+          if (res.data) {
+            setGame(res.data);
+            setNoGame(false);
+          } else {
+            setGame(null);
+            setNoGame(true);
+          }
+        }
+      } catch (err) {
+        if (mounted) {
+          setGame(null);
+          setNoGame(true);
+        }
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+    initialFetch();
+    
+    // Auto-refresh every 5 seconds - only update if we get valid data
+    const interval = setInterval(async () => {
+      try {
+        const res = await axios.get(`${API}/games/latest/active/${userId}`);
+        if (mounted) {
+          if (res.data) {
+            setGame(res.data);
+            setNoGame(false);
+          }
+          // Don't clear game on refresh failure - keep showing last data
+        }
+      } catch (err) {
+        // Silently ignore refresh errors
+      }
+    }, 5000);
+    
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [userId]);
 
   const calculateScore = (team) => {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
