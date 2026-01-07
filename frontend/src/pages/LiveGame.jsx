@@ -1390,10 +1390,6 @@ export default function LiveGame() {
       toast.warning("Team turnover saved locally - will sync when online");
     }
   };
-    } catch (error) {
-      toast.error("Failed to record team turnover");
-    }
-  };
 
   const handleResetStats = async () => {
     setResetting(true);
