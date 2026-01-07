@@ -41,23 +41,51 @@ export default function EmbedLiveGame() {
     return () => window.removeEventListener('resize', calculateScale);
   }, [customWidth, customHeight]);
 
-  const fetchGame = useCallback(async () => {
+  const fetchGame = useCallback(async (isInitialLoad = false) => {
     try {
       const res = await axios.get(`${API}/games/share/${shareCode}`);
       setGame(res.data);
       setError(null);
+      if (isInitialLoad) setLoading(false);
     } catch (err) {
-      setError("Game not found");
-    } finally {
-      setLoading(false);
+      // Only show error if we don't have data yet
+      if (!game) {
+        setError("Game not found");
+      }
+      if (isInitialLoad) setLoading(false);
     }
-  }, [shareCode]);
+  }, [shareCode, game]);
 
   useEffect(() => {
-    fetchGame();
-    const interval = setInterval(fetchGame, 5000); // Auto-refresh every 5 seconds
+    setLoading(true);
+    setError(null);
+    
+    // Initial fetch
+    const initialFetch = async () => {
+      try {
+        const res = await axios.get(`${API}/games/share/${shareCode}`);
+        setGame(res.data);
+        setError(null);
+      } catch (err) {
+        setError("Game not found");
+      } finally {
+        setLoading(false);
+      }
+    };
+    initialFetch();
+    
+    // Auto-refresh every 5 seconds - silently ignore errors
+    const interval = setInterval(async () => {
+      try {
+        const res = await axios.get(`${API}/games/share/${shareCode}`);
+        setGame(res.data);
+        setError(null);
+      } catch (err) {
+        // Silently ignore refresh errors
+      }
+    }, 5000);
     return () => clearInterval(interval);
-  }, [fetchGame]);
+  }, [shareCode]);
 
   const calculateScore = (team) => {
     return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
