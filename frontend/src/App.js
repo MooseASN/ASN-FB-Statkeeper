@@ -165,8 +165,17 @@ function App() {
           const res = await axios.get(`${API}/auth/me`);
           setUser(res.data);
         } catch (error) {
-          // Token invalid, clear storage
-          clearAuth();
+          // Only clear auth on 401 (unauthorized) - not on network errors
+          if (error.response && error.response.status === 401) {
+            clearAuth();
+          } else {
+            // Network error - trust the stored user data
+            try {
+              setUser(JSON.parse(savedUser));
+            } catch (e) {
+              clearAuth();
+            }
+          }
         }
       }
       setLoading(false);
