@@ -837,7 +837,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     }
   }, [playLog, homeScore, awayScore, saveFootballState, game]);
 
-  const fetchGame = async () => {
+  const fetchGame = async (isInitialLoad = true) => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
@@ -894,10 +894,16 @@ export default function FootballLiveGame({ user, onLogout }) {
         setShowKickoffTeamDialog(true);
       }
     } catch (error) {
-      toast.error("Failed to load game");
-      navigate("/");
+      // Only navigate away on initial load failure
+      if (isInitialLoad) {
+        toast.error("Failed to load game");
+        navigate("/");
+      }
+      // Silently ignore refresh errors
     } finally {
-      setLoading(false);
+      if (isInitialLoad) {
+        setLoading(false);
+      }
     }
   };
 
