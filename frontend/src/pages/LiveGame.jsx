@@ -1340,24 +1340,56 @@ export default function LiveGame() {
 
   // Quick team stat handlers - now use team-stats endpoint instead of individual players
   const handleTeamRebound = async (team, type) => {
+    const statData = { team, stat_type: type };
+    
+    // Optimistically update local state
+    setGame(prevGame => {
+      if (!prevGame) return prevGame;
+      const teamKey = `${team}_team_stats`;
+      const currentStats = prevGame[teamKey] || {};
+      return {
+        ...prevGame,
+        [teamKey]: {
+          ...currentStats,
+          [type]: (currentStats[type] || 0) + 1
+        }
+      };
+    });
+    
     try {
-      await axios.post(`${API}/games/${id}/team-stats`, {
-        team,
-        stat_type: type
-      });
-      fetchGame();
+      await axios.post(`${API}/games/${id}/team-stats`, statData);
+      fetchGame(false);
     } catch (error) {
-      toast.error("Failed to record team rebound");
+      queuePlay({ type: 'team-stat', data: statData });
+      toast.warning("Team rebound saved locally - will sync when online");
     }
   };
 
   const handleTeamTurnover = async (team) => {
+    const statData = { team, stat_type: "turnover" };
+    
+    // Optimistically update local state
+    setGame(prevGame => {
+      if (!prevGame) return prevGame;
+      const teamKey = `${team}_team_stats`;
+      const currentStats = prevGame[teamKey] || {};
+      return {
+        ...prevGame,
+        [teamKey]: {
+          ...currentStats,
+          turnovers: (currentStats.turnovers || 0) + 1
+        }
+      };
+    });
+    
     try {
-      await axios.post(`${API}/games/${id}/team-stats`, {
-        team,
-        stat_type: "turnover"
-      });
-      fetchGame();
+      await axios.post(`${API}/games/${id}/team-stats`, statData);
+      fetchGame(false);
+    } catch (error) {
+      queuePlay({ type: 'team-stat', data: statData });
+      toast.warning("Team turnover saved locally - will sync when online");
+    }
+  };
     } catch (error) {
       toast.error("Failed to record team turnover");
     }
