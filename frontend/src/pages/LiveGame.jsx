@@ -1027,16 +1027,40 @@ export default function LiveGame() {
   };
 
   const handleStatUpdate = async (playerId, statType, increment = 1) => {
-    try {
-      setLastAction({ playerId, statType, increment });
-      await axios.post(`${API}/games/${id}/stats`, {
-        player_id: playerId,
-        stat_type: statType,
-        increment: increment
+    const statData = {
+      player_id: playerId,
+      stat_type: statType,
+      increment: increment
+    };
+    
+    setLastAction({ playerId, statType, increment });
+    
+    // Optimistically update local state
+    setGame(prevGame => {
+      if (!prevGame) return prevGame;
+      
+      const updateStats = (stats) => stats.map(player => {
+        if (player.id === playerId) {
+          const currentValue = player[statType] || 0;
+          return { ...player, [statType]: currentValue + increment };
+        }
+        return player;
       });
-      fetchGame();
+      
+      return {
+        ...prevGame,
+        home_player_stats: updateStats(prevGame.home_player_stats || []),
+        away_player_stats: updateStats(prevGame.away_player_stats || [])
+      };
+    });
+    
+    try {
+      await axios.post(`${API}/games/${id}/stats`, statData);
+      fetchGame(false);
     } catch (error) {
-      toast.error("Failed to update stat");
+      // Queue the play for sync when connection is restored
+      queuePlay({ type: 'stat', data: statData });
+      toast.warning("Stat saved locally - will sync when online");
     }
   };
 
