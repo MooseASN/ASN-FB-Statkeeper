@@ -2788,6 +2788,12 @@ export default function FootballLiveGame({ user, onLogout }) {
           <div className="flex items-center gap-2">
             <span className="text-2xl">🏈</span>
             <span className="font-bold">FOOTBALL</span>
+            <ConnectionStatus 
+              isOnline={isOnline}
+              pendingCount={pendingCount}
+              isSyncing={isSyncing}
+              onSync={syncPendingPlays}
+            />
           </div>
           <div className="flex items-center gap-2">
             <Button
