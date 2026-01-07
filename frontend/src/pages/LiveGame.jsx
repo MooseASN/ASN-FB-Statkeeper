@@ -749,6 +749,32 @@ export default function LiveGame() {
   const [assistTeam, setAssistTeam] = useState(null);
   const [assistScorer, setAssistScorer] = useState(null);
 
+  // Sync function for offline queue
+  const syncPlay = useCallback(async (playData) => {
+    if (playData.type === 'stat') {
+      await axios.post(`${API}/games/${id}/stats`, playData.data);
+    } else if (playData.type === 'team-stat') {
+      await axios.post(`${API}/games/${id}/team-stats`, playData.data);
+    } else if (playData.type === 'clock') {
+      await axios.post(`${API}/games/${id}/clock/set`, playData.data);
+    } else if (playData.type === 'timeout') {
+      await axios.post(`${API}/games/${id}/timeout`, playData.data);
+    } else if (playData.type === 'bonus') {
+      await axios.post(`${API}/games/${id}/bonus`, playData.data);
+    }
+    // Refresh game data after sync
+    fetchGame(false);
+  }, [id, fetchGame]);
+
+  // Offline queue hook
+  const { 
+    isOnline, 
+    pendingCount, 
+    isSyncing, 
+    queuePlay, 
+    syncPendingPlays 
+  } = useOfflineQueue(id, syncPlay);
+
   const fetchGame = useCallback(async (isInitialLoad = false) => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
