@@ -1718,8 +1718,15 @@ export default function LiveGame() {
               </p>
             </div>
             
-            {/* Spacer for balance */}
-            <div className="w-24"></div>
+            {/* Connection Status */}
+            <div className="w-24 flex justify-end">
+              <ConnectionStatus 
+                isOnline={isOnline}
+                pendingCount={pendingCount}
+                isSyncing={isSyncing}
+                onSync={syncPendingPlays}
+              />
+            </div>
           </div>
         </div>
         
