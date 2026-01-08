@@ -2617,7 +2617,7 @@ export default function LiveGame() {
       <AlertDialog open={showPeriodEndDialog} onOpenChange={setShowPeriodEndDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>End of {game?.period_label || "Quarter"} {game?.current_quarter}</AlertDialogTitle>
+            <AlertDialogTitle>End of {getQuarterLabel(game?.current_quarter || 1)}</AlertDialogTitle>
             <AlertDialogDescription>
               The clock has reached 0:00. What would you like to do?
             </AlertDialogDescription>
@@ -2634,7 +2634,8 @@ export default function LiveGame() {
           </div>
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel>Continue Playing</AlertDialogCancel>
-            {game?.current_quarter === 2 && (
+            {((game?.period_label === "Half" && game?.current_quarter === 1) || 
+              (game?.period_label !== "Half" && game?.current_quarter === 2)) && (
               <Button
                 onClick={handleHalftime}
                 variant="outline"
@@ -2649,7 +2650,7 @@ export default function LiveGame() {
               className="bg-green-600 hover:bg-green-700 gap-2"
             >
               <SkipForward className="w-4 h-4" />
-              Next {game?.period_label || "Quarter"}
+              Next {game?.period_label === "Half" ? "Half" : (game?.period_label || "Quarter")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
