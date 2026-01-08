@@ -608,6 +608,19 @@ export default function AdvancedLiveGame() {
   const currentTeamName = possession === "home" ? game.home_team_name : game.away_team_name;
   const currentTeamColor = possession === "home" ? homeColor : awayColor;
 
+  // Helper to get quarter/period/half label
+  const getQuarterLabel = (q) => {
+    const periodLabelType = game?.period_label;
+    
+    if (periodLabelType === "Half") {
+      if (q === 1) return "1st Half";
+      if (q === 2) return "2nd Half";
+      return `OT${q - 2}`;
+    }
+    
+    return `${periodLabelType || "Quarter"} ${q}${q > 4 ? ' (OT)' : ''}`;
+  };
+
   return (
     <div className="min-h-screen bg-black text-white" data-testid="advanced-live-game">
       {/* Top Header Bar */}
