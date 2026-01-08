@@ -431,6 +431,48 @@ export default function NewGame({ user, onLogout }) {
                   <p className="text-xs text-amber-600">Clock is required for Advanced Mode and has been enabled.</p>
                 )}
                 
+                {/* Period Label - always shown for basketball (all 3 modes) */}
+                {selectedSport !== "football" && (
+                  <div className="pt-2 border-t">
+                    <Label className="text-sm font-medium">Period Label</Label>
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      <Button
+                        type="button"
+                        variant={periodLabel === "Quarter" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPeriodLabel("Quarter")}
+                        className={periodLabel === "Quarter" ? "bg-black hover:bg-gray-800" : ""}
+                        data-testid="label-quarter"
+                      >
+                        Quarters (4)
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={periodLabel === "Period" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPeriodLabel("Period")}
+                        className={periodLabel === "Period" ? "bg-black hover:bg-gray-800" : ""}
+                        data-testid="label-period"
+                      >
+                        Periods (4)
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={periodLabel === "Half" ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setPeriodLabel("Half")}
+                        className={periodLabel === "Half" ? "bg-black hover:bg-gray-800" : ""}
+                        data-testid="label-half"
+                      >
+                        Halves (2)
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {periodLabel === "Half" ? "Game will have 2 regulation halves (1st Half, 2nd Half)" : "Game will have 4 regulation periods"}
+                    </p>
+                  </div>
+                )}
+                
                 {(clockEnabled || selectedSport === "football") && (
                   <div className="space-y-4 pt-2 border-t">
                     {/* Only show description for basketball */}
@@ -505,45 +547,6 @@ export default function NewGame({ user, onLogout }) {
                         </div>
                       )}
                     </div>
-                    
-                    {/* Period Label - for basketball */}
-                    {selectedSport !== "football" && (
-                    <div>
-                      <Label className="text-sm font-medium">Period Label</Label>
-                      <div className="flex gap-2 mt-2 flex-wrap">
-                        <Button
-                          type="button"
-                          variant={periodLabel === "Quarter" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setPeriodLabel("Quarter")}
-                          className={periodLabel === "Quarter" ? "bg-black hover:bg-gray-800" : ""}
-                          data-testid="label-quarter"
-                        >
-                          Quarters (NBA/HS)
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={periodLabel === "Period" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setPeriodLabel("Period")}
-                          className={periodLabel === "Period" ? "bg-black hover:bg-gray-800" : ""}
-                          data-testid="label-period"
-                        >
-                          Periods (College)
-                        </Button>
-                        <Button
-                          type="button"
-                          variant={periodLabel === "Half" ? "default" : "outline"}
-                          size="sm"
-                          onClick={() => setPeriodLabel("Half")}
-                          className={periodLabel === "Half" ? "bg-black hover:bg-gray-800" : ""}
-                          data-testid="label-half"
-                        >
-                          Halves (2 periods)
-                        </Button>
-                      </div>
-                    </div>
-                    )}
                     
                     <div className="p-3 bg-slate-50 rounded-lg">
                       <p className="text-sm text-slate-600">
