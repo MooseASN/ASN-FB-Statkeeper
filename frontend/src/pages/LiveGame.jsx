@@ -2661,7 +2661,7 @@ export default function LiveGame() {
           <AlertDialogHeader>
             <AlertDialogTitle>Exit Halftime</AlertDialogTitle>
             <AlertDialogDescription>
-              Select which {game?.period_label?.toLowerCase() || "quarter"} to start.
+              Select which {game?.period_label === "Half" ? "half" : (game?.period_label?.toLowerCase() || "quarter")} to start.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="flex flex-wrap gap-2 py-4 justify-center">
@@ -2669,13 +2669,10 @@ export default function LiveGame() {
               <Button
                 key={q}
                 onClick={() => handleExitHalftime(q)}
-                variant={q === 3 ? "default" : "outline"}
+                variant={q === (game?.period_label === "Half" ? 2 : 3) ? "default" : "outline"}
                 className="w-16 h-12"
               >
-                {q <= totalQuarters 
-                  ? `${game?.period_label === "Period" ? "P" : "Q"}${q}`
-                  : `OT${q - totalQuarters}`
-                }
+                {getQuarterLabel(q)}
               </Button>
             ))}
           </div>
