@@ -506,11 +506,11 @@ export default function NewGame({ user, onLogout }) {
                       )}
                     </div>
                     
-                    {/* Period Label - only for basketball */}
+                    {/* Period Label - for basketball */}
                     {selectedSport !== "football" && (
                     <div>
                       <Label className="text-sm font-medium">Period Label</Label>
-                      <div className="flex gap-2 mt-2">
+                      <div className="flex gap-2 mt-2 flex-wrap">
                         <Button
                           type="button"
                           variant={periodLabel === "Quarter" ? "default" : "outline"}
@@ -530,6 +530,16 @@ export default function NewGame({ user, onLogout }) {
                           data-testid="label-period"
                         >
                           Periods (College)
+                        </Button>
+                        <Button
+                          type="button"
+                          variant={periodLabel === "Half" ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => setPeriodLabel("Half")}
+                          className={periodLabel === "Half" ? "bg-black hover:bg-gray-800" : ""}
+                          data-testid="label-half"
+                        >
+                          Halves (2 periods)
                         </Button>
                       </div>
                     </div>
