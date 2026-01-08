@@ -662,7 +662,7 @@ export default function AdvancedLiveGame() {
               {formatTime(game.clock_time || 0)}
             </button>
             <div className="text-lg font-semibold bg-zinc-800 px-3 py-2 rounded">
-              {game.period_label} {game.current_quarter}
+              {getQuarterLabel(game.current_quarter)}
             </div>
             <Button 
               variant="outline" 
