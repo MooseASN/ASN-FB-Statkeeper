@@ -1535,7 +1535,16 @@ export default function LiveGame() {
   };
 
   const getQuarterLabel = (q) => {
-    const label = game?.period_label === "Period" ? "P" : "Q";
+    const periodLabelType = game?.period_label;
+    
+    if (periodLabelType === "Half") {
+      // For halves: 1 = "1st Half", 2 = "2nd Half", 3+ = "OT"
+      if (q === 1) return "1st Half";
+      if (q === 2) return "2nd Half";
+      return `OT${q - 2}`;
+    }
+    
+    const label = periodLabelType === "Period" ? "P" : "Q";
     if (q <= 4) return `${label}${q}`;
     return `OT${q - 4}`;
   };
