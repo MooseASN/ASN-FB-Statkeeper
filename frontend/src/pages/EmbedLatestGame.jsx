@@ -95,7 +95,15 @@ export default function EmbedLatestGame() {
   };
 
   const getQuarterLabel = (q) => {
-    const label = game?.period_label === "Period" ? "P" : "Q";
+    const periodLabelType = game?.period_label;
+    
+    if (periodLabelType === "Half") {
+      if (q === 1) return "1st Half";
+      if (q === 2) return "2nd Half";
+      return `OT${q - 2}`;
+    }
+    
+    const label = periodLabelType === "Period" ? "P" : "Q";
     if (q <= 4) return `${label}${q}`;
     return `OT${q - 4}`;
   };
