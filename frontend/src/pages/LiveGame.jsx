@@ -1584,9 +1584,10 @@ export default function LiveGame() {
   const awayColor = game.away_team_color || "#7c3aed";
   
   // Determine number of quarters to show
-  const homeScores = game.quarter_scores?.home || [0, 0, 0, 0];
-  const awayScores = game.quarter_scores?.away || [0, 0, 0, 0];
-  const totalQuarters = Math.max(4, homeScores.length, game.current_quarter);
+  const homeScores = game.quarter_scores?.home || (game.period_label === "Half" ? [0, 0] : [0, 0, 0, 0]);
+  const awayScores = game.quarter_scores?.away || (game.period_label === "Half" ? [0, 0] : [0, 0, 0, 0]);
+  const regulationPeriods = game.period_label === "Half" ? 2 : 4;
+  const totalQuarters = Math.max(regulationPeriods, homeScores.length, game.current_quarter);
 
   return (
     <div className="min-h-screen bg-slate-100" data-testid="live-game-page">
