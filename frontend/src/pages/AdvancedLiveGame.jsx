@@ -1648,7 +1648,7 @@ export default function AdvancedLiveGame() {
           <div className="space-y-4 mt-4">
             <div className="grid grid-cols-2 gap-2">
               <Button onClick={handleAdvanceQuarter} className="bg-blue-600 hover:bg-blue-700">
-                Next {game.period_label}
+                Next {game.period_label === "Half" ? "Half" : game.period_label}
               </Button>
               <Button onClick={() => {
                 handleResetQuarter(1);
@@ -1657,8 +1657,8 @@ export default function AdvancedLiveGame() {
                 Reset to 1st
               </Button>
             </div>
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map(q => (
+            <div className={`grid gap-2 ${game.period_label === "Half" ? "grid-cols-2" : "grid-cols-4"}`}>
+              {(game.period_label === "Half" ? [1, 2] : [1, 2, 3, 4]).map(q => (
                 <Button 
                   key={q}
                   onClick={() => {
@@ -1668,7 +1668,7 @@ export default function AdvancedLiveGame() {
                   variant={game.current_quarter === q ? "default" : "outline"}
                   className={game.current_quarter === q ? "bg-orange-500" : "border-zinc-700"}
                 >
-                  {game.period_label} {q}
+                  {getQuarterLabel(q)}
                 </Button>
               ))}
             </div>
