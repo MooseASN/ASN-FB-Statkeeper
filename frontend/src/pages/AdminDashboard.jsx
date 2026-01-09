@@ -818,6 +818,54 @@ export default function AdminDashboard({ user, onLogout }) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete User Confirmation Dialog */}
+      <Dialog open={showDeleteUserDialog} onOpenChange={setShowDeleteUserDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-red-600">
+              <Trash2 className="w-5 h-5" />
+              Delete User Account
+            </DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. This will permanently delete the user account.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {deletingUser && (
+            <div className="py-4 space-y-2">
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="font-medium text-red-800">{deletingUser.name || deletingUser.username || "Unknown User"}</p>
+                <p className="text-sm text-red-600">{deletingUser.email}</p>
+                <p className="text-xs text-red-500 font-mono mt-1">{deletingUser.user_id}</p>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                The user will no longer be able to log in. Any teams, games, or data created by this user will remain but will be unassigned.
+              </p>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowDeleteUserDialog(false);
+                setDeletingUser(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteUser}
+              data-testid="confirm-delete-user-btn"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Delete User
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
