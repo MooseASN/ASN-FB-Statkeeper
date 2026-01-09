@@ -716,7 +716,7 @@ export default function SeasonManagement() {
                 value={gameForm.opponent_team_id}
                 onValueChange={(v) => setGameForm(prev => ({ ...prev, opponent_team_id: v }))}
               >
-                <SelectTrigger className="bg-slate-900 border-slate-600">
+                <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
                   <SelectValue placeholder="Select opponent" />
                 </SelectTrigger>
                 <SelectContent>
@@ -743,7 +743,7 @@ export default function SeasonManagement() {
                   type="date"
                   value={gameForm.scheduled_date}
                   onChange={(e) => setGameForm(prev => ({ ...prev, scheduled_date: e.target.value }))}
-                  className="bg-slate-900 border-slate-600"
+                  className="bg-slate-900 border-slate-600 text-white"
                 />
               </div>
               <div>
@@ -752,7 +752,7 @@ export default function SeasonManagement() {
                   type="time"
                   value={gameForm.scheduled_time}
                   onChange={(e) => setGameForm(prev => ({ ...prev, scheduled_time: e.target.value }))}
-                  className="bg-slate-900 border-slate-600"
+                  className="bg-slate-900 border-slate-600 text-white"
                 />
               </div>
             </div>
