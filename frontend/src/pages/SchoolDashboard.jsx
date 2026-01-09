@@ -565,19 +565,46 @@ export default function SchoolDashboard() {
                       {todayGames.map(game => {
                         // Find the season for this game
                         const gameSeason = (seasons || []).find(s => s.season_id === game.season_id);
+                        const isInProgress = game.status === "active";
                         
                         return (
-                          <div key={game.id} className="bg-slate-900/70 rounded-lg p-4">
-                            {/* Matchup */}
+                          <div key={game.id} className={`rounded-lg p-4 ${isInProgress ? 'bg-green-900/30 border border-green-500/30' : 'bg-slate-900/70'}`}>
+                            {/* Live Badge for in-progress games */}
+                            {isInProgress && (
+                              <div className="flex justify-center mb-3">
+                                <Badge className="bg-green-500 animate-pulse">
+                                  <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse" />
+                                  LIVE NOW
+                                </Badge>
+                              </div>
+                            )}
+                            
+                            {/* Matchup with Scores for in-progress games */}
                             <div className="flex items-center justify-center gap-4 mb-3">
                               <div className="text-center">
                                 <div className="text-lg font-bold text-white">{game.home_team_name}</div>
-                                <div className="text-xs text-slate-400">Home</div>
+                                {isInProgress ? (
+                                  <div className="text-3xl font-bold text-white mt-1">{game.home_score || 0}</div>
+                                ) : (
+                                  <div className="text-xs text-slate-400">Home</div>
+                                )}
                               </div>
-                              <div className="text-2xl font-bold text-orange-500">VS</div>
+                              <div className="text-center">
+                                {isInProgress ? (
+                                  <div className="text-sm text-green-400 font-semibold">
+                                    {game.current_period ? `Q${game.current_period}` : 'Q1'}
+                                  </div>
+                                ) : (
+                                  <div className="text-2xl font-bold text-orange-500">VS</div>
+                                )}
+                              </div>
                               <div className="text-center">
                                 <div className="text-lg font-bold text-white">{game.away_team_name}</div>
-                                <div className="text-xs text-slate-400">Away</div>
+                                {isInProgress ? (
+                                  <div className="text-3xl font-bold text-white mt-1">{game.away_score || 0}</div>
+                                ) : (
+                                  <div className="text-xs text-slate-400">Away</div>
+                                )}
                               </div>
                             </div>
                             
@@ -588,10 +615,12 @@ export default function SchoolDashboard() {
                                   {gameSeason.name}
                                 </Badge>
                               )}
-                              <div className="text-sm text-slate-300">
-                                {game.scheduled_time ? formatTime12Hour(game.scheduled_time) : "Time TBD"}
-                                {game.location && ` • ${game.location}`}
-                              </div>
+                              {!isInProgress && (
+                                <div className="text-sm text-slate-300">
+                                  {game.scheduled_time ? formatTime12Hour(game.scheduled_time) : "Time TBD"}
+                                  {game.location && ` • ${game.location}`}
+                                </div>
+                              )}
                               {game.note && (
                                 <div className="text-xs text-orange-400 mt-1">{game.note}</div>
                               )}
@@ -613,7 +642,7 @@ export default function SchoolDashboard() {
                               </Button>
                               <Button
                                 onClick={() => handleGameClick(game)}
-                                className="bg-orange-500 hover:bg-orange-600"
+                                className={isInProgress ? "bg-green-600 hover:bg-green-700" : "bg-orange-500 hover:bg-orange-600"}
                                 data-testid="gameday-tracker-btn"
                               >
                                 {game.status === "active" ? (
@@ -634,10 +663,9 @@ export default function SchoolDashboard() {
                                 )}
                               </Button>
                             </div>
-                            
-                            {/* Status Badge */}
-                            {game.status === "active" && (
-                              <div className="text-center mt-3">
+                          </div>
+                        );
+                      })}
                                 <Badge className="bg-green-500 animate-pulse">LIVE NOW</Badge>
                               </div>
                             )}
