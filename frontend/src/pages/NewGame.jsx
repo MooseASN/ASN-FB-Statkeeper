@@ -710,6 +710,38 @@ export default function NewGame({ user, onLogout }) {
                 />
               </div>
 
+              {/* Season Linking (for school users) */}
+              {schoolInfo && seasons.length > 0 && (
+                <div className="border border-orange-200 bg-orange-50 rounded-lg p-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-orange-600" />
+                    <Label className="text-base font-semibold text-orange-900">Add to School Season (Optional)</Label>
+                  </div>
+                  <p className="text-sm text-orange-700">
+                    Link this game to one of your school's seasons to track it in the school dashboard.
+                  </p>
+                  <Select
+                    value={selectedSeasonId}
+                    onValueChange={setSelectedSeasonId}
+                  >
+                    <SelectTrigger className="bg-white border-orange-300" data-testid="season-select">
+                      <SelectValue placeholder="Select a season (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">None - Don't link to a season</SelectItem>
+                      {seasons.map(season => (
+                        <SelectItem key={season.season_id} value={season.season_id}>
+                          {season.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-orange-600">
+                    School: {schoolInfo.name}
+                  </p>
+                </div>
+              )}
+
               {/* Start/Schedule Tabs */}
               <Tabs value={gameMode} onValueChange={setGameMode} className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
