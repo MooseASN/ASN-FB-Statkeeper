@@ -677,7 +677,7 @@ export default function SeasonManagement() {
                 value={opponentForm.name}
                 onChange={(e) => setOpponentForm(prev => ({ ...prev, name: e.target.value }))}
                 placeholder="e.g., Central High School"
-                className="bg-slate-900 border-slate-600"
+                className="bg-slate-900 border-slate-600 text-white"
               />
             </div>
             <div>
@@ -692,7 +692,7 @@ export default function SeasonManagement() {
                 <Input
                   value={opponentForm.color}
                   onChange={(e) => setOpponentForm(prev => ({ ...prev, color: e.target.value }))}
-                  className="bg-slate-900 border-slate-600"
+                  className="bg-slate-900 border-slate-600 text-white"
                 />
               </div>
             </div>
