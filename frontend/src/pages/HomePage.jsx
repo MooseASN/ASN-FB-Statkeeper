@@ -142,7 +142,17 @@ const FeatureSlideshow = ({ features }) => {
 // Sport Card Component
 const SportCard = ({ sport, index }) => {
   const [ref, isInView] = useInView();
+  const navigate = useNavigate();
   const delay = index * 150;
+
+  const handleViewDemo = (e) => {
+    e.stopPropagation();
+    if (sport.name === "Basketball") {
+      navigate("/demo/basketball");
+    } else if (sport.name === "Football") {
+      navigate("/demo/football");
+    }
+  };
 
   return (
     <div 
@@ -171,7 +181,7 @@ const SportCard = ({ sport, index }) => {
         >
           {sport.name}
         </h3>
-        {sport.comingSoon && (
+        {sport.comingSoon ? (
           <span 
             className={`mt-3 px-4 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm uppercase tracking-wider transition-all duration-1000 ${
               isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -180,6 +190,16 @@ const SportCard = ({ sport, index }) => {
           >
             Coming Soon
           </span>
+        ) : (
+          <button
+            onClick={handleViewDemo}
+            className={`mt-4 px-6 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold uppercase tracking-wider rounded-lg transition-all duration-1000 ${
+              isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: `${delay + 200}ms` }}
+          >
+            View Demo
+          </button>
         )}
       </div>
     </div>
