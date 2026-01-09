@@ -294,18 +294,63 @@ export default function SchoolDashboard() {
 
   const handleGameClick = (game) => {
     setSelectedGame(game);
+    // Reset game setup based on sport
+    if (game.sport === "football") {
+      setGameSetup({
+        statMode: "classic",
+        clockEnabled: true, // Always on for football
+        periodMinutes: 12,
+        periodLabel: "Quarter",
+        timeoutPreset: "custom",
+        customTimeouts: 3
+      });
+    } else {
+      setGameSetup({
+        statMode: "classic",
+        clockEnabled: false,
+        periodMinutes: 12,
+        periodLabel: "Quarter",
+        timeoutPreset: "college",
+        customTimeouts: 4
+      });
+    }
     setShowGameStartDialog(true);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     if (!selectedGame) return;
+    
+    // If game is not started yet, update it with game settings
+    if (selectedGame.status === "scheduled") {
+      try {
+        // Update the game with setup options
+        await axios.put(`${API}/games/${selectedGame.id}`, {
+          status: "active",
+          simple_mode: gameSetup.statMode === "simple",
+          advanced_mode: gameSetup.statMode === "advanced",
+          clock_enabled: selectedGame.sport === "football" ? true : gameSetup.clockEnabled,
+          period_duration: gameSetup.clockEnabled || selectedGame.sport === "football" 
+            ? gameSetup.periodMinutes * 60 
+            : 0,
+          period_label: gameSetup.periodLabel,
+          timeout_preset: gameSetup.timeoutPreset,
+          custom_timeouts: gameSetup.timeoutPreset === "custom" ? gameSetup.customTimeouts : 4
+        });
+      } catch (error) {
+        console.error("Error updating game:", error);
+        toast.error("Failed to start game");
+        return;
+      }
+    }
     
     // Select the sport first (required by SportProtectedRoute)
     selectSport(selectedGame.sport);
     
-    // Navigate to stat tracker
+    // Navigate to stat tracker based on mode
     if (selectedGame.sport === "football") {
       navigate(`/football/${selectedGame.id}`);
+    } else if (gameSetup.statMode === "advanced") {
+      navigate(`/game/${selectedGame.id}/advanced`);
     } else {
       navigate(`/game/${selectedGame.id}`);
     }
