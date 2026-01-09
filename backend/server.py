@@ -4783,8 +4783,8 @@ async def add_demo_play(game_type: str, data: dict = Body(...)):
 # ============= CONTACT FORM =============
 import resend
 
-# Initialize Resend with API key
-resend.api_key = "re_K4JVCrGY_N921Pipek7MDokBey5gQmmaH"
+# Initialize Resend with API key from environment variable
+resend.api_key = os.environ.get("RESEND_API_KEY", "")
 
 class ContactFormRequest(BaseModel):
     name: str
