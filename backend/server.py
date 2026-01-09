@@ -1537,6 +1537,177 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
         "found_count": len(unique_roster)
     }
 
+
+class ScrapeRosterRequest(BaseModel):
+    url: str
+
+
+@api_router.post("/team/scrape-roster")
+async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(get_current_user)):
+    """Scrape roster from any athletic website URL. Returns roster data without saving to a team."""
+    url = request.url.strip()
+    
+    if not url:
+        raise HTTPException(status_code=400, detail="Please provide a roster URL")
+    
+    # Ensure URL has protocol
+    if not url.startswith('http'):
+        url = 'https://' + url
+    
+    try:
+        async with httpx.AsyncClient(timeout=30.0, follow_redirects=True) as client:
+            headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+            }
+            response = await client.get(url, headers=headers)
+            response.raise_for_status()
+    except httpx.HTTPStatusError as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch page: HTTP {e.response.status_code}")
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Failed to fetch page: {str(e)}")
+    
+    soup = BeautifulSoup(response.text, 'lxml')
+    roster = []
+    
+    # Helper function to clean player names
+    def clean_name(name_text):
+        if not name_text:
+            return ""
+        cleaned = ' '.join(name_text.split())
+        cleaned = cleaned.strip()
+        import re as re_inner
+        cleaned = re_inner.sub(r'^\d{1,3}\s+', '', cleaned)
+        return cleaned
+    
+    # Helper function to extract position and class/year
+    def extract_position_class(row, headers=None, cells=None):
+        position = ""
+        player_class = ""
+        
+        position_patterns = ['pos', 'position', 'pos.']
+        class_patterns = ['class', 'yr', 'year', 'cl', 'el', 'elig', 'academic']
+        
+        if headers and cells:
+            for i, h in enumerate(headers):
+                h_lower = h.lower()
+                if any(p in h_lower for p in position_patterns) and i < len(cells):
+                    position = cells[i].get_text(strip=True)
+                if any(p in h_lower for p in class_patterns) and i < len(cells):
+                    player_class = cells[i].get_text(strip=True)
+                    class_map = {
+                        'fr': 'FR', 'freshman': 'FR', 'fr.': 'FR', '1': 'FR',
+                        'so': 'SO', 'sophomore': 'SO', 'so.': 'SO', '2': 'SO',
+                        'jr': 'JR', 'junior': 'JR', 'jr.': 'JR', '3': 'JR',
+                        'sr': 'SR', 'senior': 'SR', 'sr.': 'SR', '4': 'SR',
+                        'gr': 'GR', 'graduate': 'GR', 'grad': 'GR', 'rs': 'GR', '5': 'GR'
+                    }
+                    player_class = class_map.get(player_class.lower().strip(), player_class.upper()[:2])
+        
+        if not position:
+            pos_elem = row.select_one('[class*="position"], [class*="pos"], .sidearm-roster-player-position')
+            if pos_elem:
+                position = pos_elem.get_text(strip=True)
+        
+        if not player_class:
+            class_elem = row.select_one('[class*="class"], [class*="year"], .sidearm-roster-player-class')
+            if class_elem:
+                raw_class = class_elem.get_text(strip=True)
+                class_map = {
+                    'fr': 'FR', 'freshman': 'FR',
+                    'so': 'SO', 'sophomore': 'SO',
+                    'jr': 'JR', 'junior': 'JR',
+                    'sr': 'SR', 'senior': 'SR',
+                    'gr': 'GR', 'graduate': 'GR'
+                }
+                player_class = class_map.get(raw_class.lower().strip(), raw_class.upper()[:2] if raw_class else "")
+        
+        return position, player_class
+    
+    # Try PrestoSports/Sidearm roster patterns
+    presto_rows = soup.select('.sidearm-roster-player, .roster-player, [class*="roster"] tr, .s-person-card')
+    for row in presto_rows:
+        number = ""
+        name = ""
+        
+        num_elem = row.select_one('.sidearm-roster-player-jersey-number, [class*="jersey"], [class*="number"]:not([class*="phone"])')
+        name_elem = row.select_one('.sidearm-roster-player-name a, [class*="player-name"], .s-person-details__personal-single-line a')
+        
+        if num_elem:
+            number = num_elem.get_text(strip=True).replace('#', '')
+        if name_elem:
+            name = clean_name(name_elem.get_text())
+        
+        if not name:
+            name_elem = row.select_one('a[href*="bio"], a[href*="player"], h3, h4, .name')
+            if name_elem:
+                name = clean_name(name_elem.get_text())
+        
+        position, player_class = extract_position_class(row)
+        
+        if name:
+            roster.append({
+                "number": number,
+                "name": name,
+                "position": position,
+                "playerClass": player_class
+            })
+    
+    # Try generic table rows if no PrestoSports results
+    if not roster:
+        tables = soup.find_all('table')
+        for table in tables:
+            headers = []
+            header_row = table.find('tr')
+            if header_row:
+                header_cells = header_row.find_all(['th', 'td'])
+                headers = [h.get_text(strip=True).lower() for h in header_cells]
+            
+            for tr in table.find_all('tr')[1:]:
+                cells = tr.find_all('td')
+                if len(cells) >= 2:
+                    number = ""
+                    name = ""
+                    
+                    for i, h in enumerate(headers):
+                        if any(x in h for x in ['#', 'no', 'number', 'jersey']) and i < len(cells):
+                            number = cells[i].get_text(strip=True).replace('#', '')
+                        if any(x in h for x in ['name', 'player', 'athlete']) and i < len(cells):
+                            name = clean_name(cells[i].get_text())
+                    
+                    if not name and len(cells) >= 2:
+                        potential_name = cells[1].get_text(strip=True) if len(cells) > 1 else cells[0].get_text(strip=True)
+                        if potential_name and not potential_name.isdigit() and len(potential_name) > 2:
+                            name = clean_name(potential_name)
+                        if not number and cells[0].get_text(strip=True).isdigit():
+                            number = cells[0].get_text(strip=True)
+                    
+                    position, player_class = extract_position_class(tr, headers, cells)
+                    
+                    if name:
+                        roster.append({
+                            "number": number,
+                            "name": name,
+                            "position": position,
+                            "playerClass": player_class
+                        })
+    
+    # Remove duplicates
+    seen = set()
+    unique_roster = []
+    for player in roster:
+        key = (player["number"], player["name"])
+        if key not in seen and player["name"]:
+            seen.add(key)
+            unique_roster.append(player)
+    
+    return {
+        "roster": unique_roster,
+        "count": len(unique_roster),
+        "message": f"Found {len(unique_roster)} players"
+    }
+
 # ============ GAME ENDPOINTS ============
 
 @api_router.post("/games", response_model=Game)
