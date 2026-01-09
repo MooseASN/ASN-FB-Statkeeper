@@ -272,6 +272,89 @@ export default function SeasonManagement() {
     }
   };
 
+  // Edit opponent handlers
+  const handleOpenEditOpponent = async (team) => {
+    setEditOpponentForm({
+      id: team.id,
+      name: team.name,
+      color: team.color || "#666666",
+      logo_url: team.logo_url || ""
+    });
+    setOpponentRoster(team.roster || []);
+    setShowEditOpponentDialog(true);
+  };
+
+  const handleUpdateOpponent = async () => {
+    if (!editOpponentForm.name.trim()) {
+      toast.error("Please enter opponent name");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      await axios.put(
+        `${API}/schools/${school.school_id}/teams/${editOpponentForm.id}`,
+        {
+          name: editOpponentForm.name,
+          color: editOpponentForm.color,
+          logo_url: editOpponentForm.logo_url || null
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("Opponent updated!");
+      setShowEditOpponentDialog(false);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update opponent");
+    }
+  };
+
+  // Opponent roster handlers
+  const handleOpenOpponentRoster = () => {
+    setShowEditOpponentDialog(false);
+    setShowOpponentRosterDialog(true);
+  };
+
+  const handleAddOpponentPlayer = () => {
+    if (!newOpponentPlayer.number || !newOpponentPlayer.name) {
+      toast.error("Please enter player number and name");
+      return;
+    }
+    
+    const player = {
+      id: `player_${Date.now()}`,
+      number: newOpponentPlayer.number,
+      name: newOpponentPlayer.name,
+      position: newOpponentPlayer.position || "",
+      playerClass: newOpponentPlayer.playerClass || ""
+    };
+    
+    setOpponentRoster(prev => [...prev, player]);
+    setNewOpponentPlayer({ number: "", name: "", position: "", playerClass: "" });
+  };
+
+  const handleRemoveOpponentPlayer = (id) => {
+    setOpponentRoster(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handleSaveOpponentRoster = async () => {
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      await axios.put(
+        `${API}/schools/${school.school_id}/teams/${editOpponentForm.id}`,
+        { roster: opponentRoster },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("Opponent roster saved!");
+      setShowOpponentRosterDialog(false);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to save roster");
+    }
+  };
+
   // Game handlers
   const handleCreateGame = async () => {
     if (!gameForm.opponent_team_id || !gameForm.scheduled_date) {
