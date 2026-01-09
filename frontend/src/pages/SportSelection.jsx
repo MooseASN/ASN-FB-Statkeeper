@@ -7,7 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { LogOut, Lock, User, Settings, Shield, Eye, EyeOff } from "lucide-react";
+import { LogOut, Lock, User, Settings, Shield, Eye, EyeOff, Building2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -35,6 +35,7 @@ export default function SportSelection({ user, onLogout }) {
   // Beta mode state
   const [betaStatus, setBetaStatus] = useState({ basketball_beta: false, football_beta: false });
   const [loadingBeta, setLoadingBeta] = useState(true);
+  const [schoolInfo, setSchoolInfo] = useState(null);
   
   // Password dialog state
   const [passwordDialogOpen, setPasswordDialogOpen] = useState(false);
@@ -53,6 +54,21 @@ export default function SportSelection({ user, onLogout }) {
   useEffect(() => {
     document.title = "StatMoose";
   }, []);
+
+  // Check if user belongs to a school
+  useEffect(() => {
+    const checkSchool = async () => {
+      try {
+        const res = await axios.get(`${API}/schools/my-school`);
+        setSchoolInfo(res.data);
+      } catch (error) {
+        setSchoolInfo(null);
+      }
+    };
+    if (user) {
+      checkSchool();
+    }
+  }, [user]);
   
   // Fetch beta status on mount
   useEffect(() => {
