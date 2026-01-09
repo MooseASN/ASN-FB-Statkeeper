@@ -35,6 +35,12 @@ import SchoolDashboard from "@/pages/SchoolDashboard";
 import SchoolJoin from "@/pages/SchoolJoin";
 import SeasonManagement from "@/pages/SeasonManagement";
 import SeasonStats from "@/pages/SeasonStats";
+// Demo pages
+import BasketballDemoSelector from "@/pages/BasketballDemoSelector";
+import DemoLiveGameClassic from "@/pages/DemoLiveGameClassic";
+import DemoLiveGameAdvanced from "@/pages/DemoLiveGameAdvanced";
+import DemoLiveGameQuick from "@/pages/DemoLiveGameQuick";
+import DemoFootballLiveGame from "@/pages/DemoFootballLiveGame";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
