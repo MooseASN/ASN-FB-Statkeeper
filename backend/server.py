@@ -4612,6 +4612,15 @@ async def register_school(data: SchoolRegister, response: Response):
     user_id = f"user_{uuid.uuid4().hex[:12]}"
     invite_code = secrets.token_urlsafe(16)
     
+    # Validate and set classification
+    valid_classifications = ["high_school", "college", "prep", "other"]
+    if data.classification not in valid_classifications:
+        raise HTTPException(status_code=400, detail="Invalid classification")
+    
+    classification_display = data.classification
+    if data.classification == "other" and data.classification_other:
+        classification_display = data.classification_other.strip()
+    
     # Create the school
     school_doc = {
         "school_id": school_id,
@@ -4619,6 +4628,8 @@ async def register_school(data: SchoolRegister, response: Response):
         "name": data.school_name.strip(),
         "name_lower": data.school_name.lower().strip(),
         "state": data.state,
+        "classification": data.classification,
+        "classification_display": classification_display,
         "logo_url": data.logo_url,
         "invite_code": invite_code,
         "created_by": user_id,
