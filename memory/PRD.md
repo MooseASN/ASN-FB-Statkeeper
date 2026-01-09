@@ -12,6 +12,33 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
+### January 9, 2026 - Priority Features Batch
+- **School Creation Beta Mode** - COMPLETED
+  - Admin can toggle beta mode requiring password for new school signups
+  - Toggle visible in Admin Dashboard under Beta Mode Settings
+  - Password input appears when toggle enabled
+  - SchoolSignUp.jsx shows beta access dialog when mode is active
+  - Password verification via /api/beta-verify endpoint
+  
+- **Admin Account Deletion** - COMPLETED
+  - Admin can delete user accounts from Admin Dashboard
+  - Delete button (Trash2 icon) appears in users table for each user
+  - Main admin account (antlersportsnetwork@gmail.com) cannot be deleted
+  - Confirmation dialog shows user details before deletion
+  - DELETE /api/admin/users/{user_id} endpoint with proper auth
+  
+- **School Exists Check** - VERIFIED WORKING (already implemented)
+  - Prevents duplicate school names during registration
+  - Case-insensitive name check via /api/schools/check-name/{name}
+  - Shows availability status in real-time while typing
+  
+- **Roster Duplication** - COMPLETED
+  - "Duplicate Roster" button in SeasonManagement.jsx Team Roster tab
+  - Shows dialog with previous seasons and their rosters
+  - Displays: season name, sport emoji, gender/level, player count
+  - Preview shows first 6 players when season selected
+  - GET /api/schools/{school_id}/rosters endpoint returns all previous rosters
+
 ### January 9, 2026 - Gameday Section & UI Improvements
 - **Gameday Section** - COMPLETED
   - Shows only when games are scheduled for today
