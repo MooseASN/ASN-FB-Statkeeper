@@ -484,7 +484,17 @@ export default function AdminDashboard({ user, onLogout }) {
                               </div>
                             )}
                             <div>
-                              <div className="font-medium">{school.name}</div>
+                              <div className="font-medium flex items-center gap-2">
+                                {school.name}
+                                {school.classification_display && (
+                                  <Badge variant="outline" className="text-xs font-normal">
+                                    {school.classification_display === "high_school" ? "High School" :
+                                     school.classification_display === "college" ? "College" :
+                                     school.classification_display === "prep" ? "Prep" :
+                                     school.classification_display}
+                                  </Badge>
+                                )}
+                              </div>
                               <div className="text-sm text-muted-foreground">
                                 <span className="font-mono text-orange-600">{school.school_code}</span>
                                 {school.state && <span> • {school.state}</span>}
