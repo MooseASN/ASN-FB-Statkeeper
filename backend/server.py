@@ -1913,6 +1913,7 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
                             number = cells[0].get_text(strip=True)
                     
                     position, player_class = extract_position_class(tr, headers, cells)
+                    position = clean_position(position)
                     
                     if name:
                         roster.append({
