@@ -5025,6 +5025,83 @@ async def debug_auth_status():
             "error": str(e)
         }
 
+@app.get("/api/debug/login-test-page")
+async def debug_login_test_page():
+    """Returns an HTML page for testing login from any browser"""
+    html = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>StatMoose Login Debug</title>
+        <style>
+            body { font-family: Arial, sans-serif; max-width: 600px; margin: 50px auto; padding: 20px; }
+            input, button { padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+            button { background: #f97316; color: white; border: none; cursor: pointer; }
+            pre { background: #f0f0f0; padding: 15px; overflow-x: auto; white-space: pre-wrap; }
+            .success { color: green; }
+            .error { color: red; }
+        </style>
+    </head>
+    <body>
+        <h1>StatMoose Login Debug</h1>
+        <p>This page tests login directly without any caching or frontend issues.</p>
+        
+        <input type="text" id="email" placeholder="Email or Username" value="antlersportsnetwork@gmail.com">
+        <input type="password" id="password" placeholder="Password" value="NoahTheJew1997">
+        <button onclick="testLogin()">Test Login</button>
+        
+        <h3>Result:</h3>
+        <pre id="result">Click "Test Login" to test...</pre>
+        
+        <h3>Request Details:</h3>
+        <pre id="request">Will show request details...</pre>
+        
+        <script>
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultEl = document.getElementById('result');
+            const requestEl = document.getElementById('request');
+            
+            const requestBody = JSON.stringify({ email, password });
+            requestEl.textContent = 'URL: ' + window.location.origin + '/api/auth/login\\n';
+            requestEl.textContent += 'Method: POST\\n';
+            requestEl.textContent += 'Body: ' + requestBody + '\\n';
+            requestEl.textContent += 'Password length: ' + password.length + '\\n';
+            requestEl.textContent += 'Password chars: ' + password.split('').map(c => c.charCodeAt(0)).join(',');
+            
+            resultEl.textContent = 'Testing...';
+            resultEl.className = '';
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: requestBody,
+                    credentials: 'include'
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.session_token) {
+                    resultEl.className = 'success';
+                    resultEl.textContent = 'SUCCESS!\\n\\n' + JSON.stringify(data, null, 2);
+                } else {
+                    resultEl.className = 'error';
+                    resultEl.textContent = 'FAILED: ' + response.status + '\\n\\n' + JSON.stringify(data, null, 2);
+                }
+            } catch (error) {
+                resultEl.className = 'error';
+                resultEl.textContent = 'NETWORK ERROR:\\n' + error.message;
+            }
+        }
+        </script>
+    </body>
+    </html>
+    """
+    from fastapi.responses import HTMLResponse
+    return HTMLResponse(content=html)
+
 @app.post("/api/debug/test-login")
 async def debug_test_login(credentials: UserLogin):
     """Debug endpoint to test login and return detailed diagnostics"""
