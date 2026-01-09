@@ -46,7 +46,7 @@ export default function SeasonManagement() {
   
   // Form states
   const [rosterMethod, setRosterMethod] = useState("manual");
-  const [newPlayer, setNewPlayer] = useState({ number: "", name: "", position: "", playerClass: "" });
+  const [newPlayer, setNewPlayer] = useState({ number: "", name: "", position: "", playerClass: "", isRedshirt: false });
   const [roster, setRoster] = useState([]);
   const [csvFile, setCsvFile] = useState(null);
   const [websiteUrl, setWebsiteUrl] = useState("");
