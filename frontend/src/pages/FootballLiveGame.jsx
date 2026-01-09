@@ -981,15 +981,20 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   const fetchGameRef = useRef(fetchGame);
   fetchGameRef.current = fetchGame;
 
-  // Sync function for offline queue
+  // Sync function for offline queue - in demo mode, no API calls
   const syncPlay = useCallback(async (playData) => {
+    if (demoMode) {
+      // In demo mode, state is already updated locally
+      return;
+    }
+    
     if (playData.type === 'game-state') {
       await axios.put(`${API}/games/${id}`, playData.data);
     }
     if (fetchGameRef.current) {
       fetchGameRef.current(false);
     }
-  }, [id]);
+  }, [id, demoMode]);
 
   // Offline queue hook
   const { 
