@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Zap, BarChart3, Gauge } from "lucide-react";
 
 // Demo mode bar component
 export const DemoModeBar = () => (
@@ -14,59 +14,99 @@ const modes = [
   {
     id: "classic",
     name: "Classic Mode",
-    description: "Traditional stat tracking with a clean, straightforward interface. Perfect for beginners or quick games.",
-    features: ["Simple player selection", "Basic stat buttons", "Quick scoring", "Easy to learn"],
-    image: "/demo-screenshots/classic-mode.png",
+    icon: BarChart3,
+    description: "Full-featured stat tracking with player cards showing all statistics. Great for detailed game tracking.",
+    features: [
+      "Individual player stat cards",
+      "Make/Miss shot tracking",
+      "Rebounds, assists, steals, blocks",
+      "Substitution management",
+      "Live clock control"
+    ],
+    color: "emerald",
     route: "/demo/basketball/classic"
   },
   {
     id: "advanced",
     name: "Advanced Mode",
-    description: "Full-featured stat tracking with detailed play-by-play logging and advanced analytics.",
-    features: ["Play-by-play logging", "Shot location tracking", "Detailed box scores", "Export options"],
-    image: "/demo-screenshots/advanced-mode.png",
+    icon: Gauge,
+    description: "Professional-grade tracking with play-by-play logging, shot charts, and detailed analytics.",
+    features: [
+      "Play-by-play logging",
+      "Shot location tracking",
+      "Assist attribution",
+      "Detailed box scores",
+      "Advanced statistics"
+    ],
+    color: "blue",
     route: "/demo/basketball/advanced"
   },
   {
-    id: "quick",
-    name: "Quick Mode",
-    description: "Streamlined interface for fast-paced tracking. Focus on the essentials with minimal clicks.",
-    features: ["Minimal interface", "One-tap scoring", "Speed optimized", "Live display ready"],
-    image: "/demo-screenshots/quick-mode.png",
-    route: "/demo/basketball/quick"
+    id: "simple",
+    name: "Simple Mode",
+    icon: Zap,
+    description: "Streamlined interface focused on scoring. Perfect for fast-paced tracking with minimal clicks.",
+    features: [
+      "Quick scoring buttons",
+      "Simplified stats",
+      "Faster input",
+      "Essential tracking only",
+      "Great for beginners"
+    ],
+    color: "purple",
+    route: "/demo/basketball/simple"
   }
 ];
 
 const ModeCard = ({ mode }) => {
   const navigate = useNavigate();
+  const Icon = mode.icon;
+  
+  const colorClasses = {
+    emerald: {
+      bg: "bg-emerald-500/10",
+      border: "border-emerald-500/30 hover:border-emerald-500",
+      icon: "bg-emerald-500/20 text-emerald-500",
+      button: "bg-emerald-500 hover:bg-emerald-600",
+      dot: "bg-emerald-500"
+    },
+    blue: {
+      bg: "bg-blue-500/10",
+      border: "border-blue-500/30 hover:border-blue-500",
+      icon: "bg-blue-500/20 text-blue-500",
+      button: "bg-blue-500 hover:bg-blue-600",
+      dot: "bg-blue-500"
+    },
+    purple: {
+      bg: "bg-purple-500/10",
+      border: "border-purple-500/30 hover:border-purple-500",
+      icon: "bg-purple-500/20 text-purple-500",
+      button: "bg-purple-500 hover:bg-purple-600",
+      dot: "bg-purple-500"
+    }
+  };
+  
+  const colors = colorClasses[mode.color];
 
   return (
-    <div className="bg-gray-800 border border-gray-700 rounded-xl overflow-hidden hover:border-orange-500/50 transition-all group">
-      {/* Screenshot placeholder */}
-      <div className="relative h-48 bg-gray-900 overflow-hidden">
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900">
-          <div className="text-center">
-            <div className="text-6xl mb-2">
-              {mode.id === "classic" && "📊"}
-              {mode.id === "advanced" && "📈"}
-              {mode.id === "quick" && "⚡"}
-            </div>
-            <p className="text-gray-500 text-sm">{mode.name} Interface</p>
-          </div>
+    <div className={`bg-gray-800 border ${colors.border} rounded-xl overflow-hidden transition-all group`}>
+      {/* Mode Preview */}
+      <div className={`relative h-40 ${colors.bg} flex items-center justify-center`}>
+        <div className={`w-20 h-20 rounded-2xl ${colors.icon} flex items-center justify-center`}>
+          <Icon className="w-10 h-10" />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-800 to-transparent" />
       </div>
 
       {/* Content */}
       <div className="p-6">
         <h3 className="text-2xl font-bold text-white mb-2">{mode.name}</h3>
-        <p className="text-gray-400 mb-4">{mode.description}</p>
+        <p className="text-gray-400 mb-4 text-sm">{mode.description}</p>
         
         {/* Features */}
         <ul className="space-y-2 mb-6">
           {mode.features.map((feature, index) => (
             <li key={index} className="flex items-center text-gray-300 text-sm">
-              <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mr-2" />
+              <span className={`w-1.5 h-1.5 ${colors.dot} rounded-full mr-2`} />
               {feature}
             </li>
           ))}
@@ -74,7 +114,7 @@ const ModeCard = ({ mode }) => {
 
         <Button 
           onClick={() => navigate(mode.route)}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold"
+          className={`w-full ${colors.button} text-white font-semibold`}
         >
           Try {mode.name}
         </Button>
@@ -124,24 +164,24 @@ export default function BasketballDemoSelector() {
 
           {/* Team Info */}
           <div className="bg-gray-800/50 border border-gray-700 rounded-xl p-6 mb-12">
-            <h2 className="text-lg font-semibold text-white mb-4">Demo Teams</h2>
+            <h2 className="text-lg font-semibold text-white mb-4 text-center">Demo Teams</h2>
             <div className="flex flex-col md:flex-row items-center justify-center gap-8">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-orange-500 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-orange-500 flex items-center justify-center">
                   <span className="text-white font-bold text-xl">NT</span>
                 </div>
                 <div>
-                  <p className="text-white font-semibold">Northside Tigers</p>
+                  <p className="text-white font-semibold text-lg">Northside Tigers</p>
                   <p className="text-gray-400 text-sm">Home Team • 10 Players</p>
                 </div>
               </div>
-              <span className="text-gray-500 font-bold text-xl">VS</span>
+              <span className="text-gray-500 font-bold text-2xl">VS</span>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-lg bg-blue-500 flex items-center justify-center">
+                <div className="w-14 h-14 rounded-xl bg-blue-500 flex items-center justify-center">
                   <span className="text-white font-bold text-xl">EE</span>
                 </div>
                 <div>
-                  <p className="text-white font-semibold">Eastwood Eagles</p>
+                  <p className="text-white font-semibold text-lg">Eastwood Eagles</p>
                   <p className="text-gray-400 text-sm">Away Team • 10 Players</p>
                 </div>
               </div>
