@@ -122,11 +122,12 @@ export default function SeasonManagement() {
       id: `player_${Date.now()}`,
       number: newPlayer.number,
       name: newPlayer.name,
-      position: newPlayer.position || ""
+      position: newPlayer.position || "",
+      playerClass: newPlayer.playerClass || ""
     };
     
     setRoster(prev => [...prev, player]);
-    setNewPlayer({ number: "", name: "", position: "" });
+    setNewPlayer({ number: "", name: "", position: "", playerClass: "" });
   };
 
   const handleRemovePlayer = (id) => {
