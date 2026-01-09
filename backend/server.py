@@ -1472,7 +1472,8 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                                 name = text
                     
                     if number and name:
-                        roster.append({"number": number, "name": name})
+                        position, player_class = extract_position_class(row)
+                        roster.append({"number": number, "name": name, "position": position, "playerClass": player_class})
     
     # Method 4: Look for player cards/list items
     if not roster:
@@ -1500,7 +1501,8 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                         break
             
             if number and name:
-                roster.append({"number": number, "name": name})
+                position, player_class = extract_position_class(card)
+                roster.append({"number": number, "name": name, "position": position, "playerClass": player_class})
     
     if not roster:
         raise HTTPException(status_code=400, detail="Could not find roster data. Please ensure you're using a direct roster page URL.")
