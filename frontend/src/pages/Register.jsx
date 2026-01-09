@@ -156,17 +156,10 @@ export default function Register({ onLogin }) {
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             <img 
-              src="/logo192.png" 
+              src="/logo-black.png" 
               alt="StatMoose" 
-              className="w-16 h-16"
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.nextSibling.style.display = 'flex';
-              }}
+              className="w-16 h-16 object-contain"
             />
-            <div className="w-16 h-16 bg-orange-500 rounded-full items-center justify-center hidden">
-              <span className="text-white font-bold text-2xl">SM</span>
-            </div>
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>Start tracking your basketball stats</CardDescription>
