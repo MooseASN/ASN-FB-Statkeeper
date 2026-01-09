@@ -645,7 +645,7 @@ export default function SeasonManagement() {
             <Label className="text-slate-200">Current Roster ({roster.length} players)</Label>
             <ScrollArea className="h-48 mt-2 border border-slate-700 rounded">
               {roster.length === 0 ? (
-                <div className="p-4 text-center text-slate-400">No players added</div>
+                <div className="p-4 text-center text-slate-300">No players added</div>
               ) : (
                 <div className="p-2 space-y-1">
                   {roster.map((player, idx) => (
@@ -654,10 +654,10 @@ export default function SeasonManagement() {
                         <span className="text-orange-400 font-bold w-8">#{player.number}</span>
                         <span className="text-white">{player.name}</span>
                         {player.position && (
-                          <Badge variant="outline" className="text-xs border-slate-600">{player.position}</Badge>
+                          <Badge variant="outline" className="text-xs border-slate-500 text-white">{player.position}</Badge>
                         )}
                         {player.playerClass && (
-                          <Badge variant="secondary" className="text-xs bg-slate-700">{player.playerClass}</Badge>
+                          <Badge variant="secondary" className="text-xs bg-slate-700 text-white">{player.playerClass}</Badge>
                         )}
                       </div>
                       <Button
