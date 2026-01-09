@@ -608,7 +608,7 @@ export default function SeasonManagement() {
             </TabsContent>
             
             <TabsContent value="csv" className="space-y-4">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-300">
                 Upload a CSV file with columns: Number, Name, Position, Class
               </p>
               <Input
