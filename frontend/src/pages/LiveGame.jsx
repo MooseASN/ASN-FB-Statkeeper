@@ -1623,7 +1623,10 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   const totalQuarters = Math.max(regulationPeriods, homeScores.length, game.current_quarter);
 
   return (
-    <div className="min-h-screen bg-slate-100" data-testid="live-game-page">
+    <div className={`min-h-screen bg-slate-100 ${demoMode ? 'pt-10' : ''}`} data-testid="live-game-page">
+      {/* Demo Mode Bar */}
+      {demoMode && <DemoModeBar />}
+      
       {/* Shot Modal */}
       <ShotModal
         isOpen={shotModalOpen}
