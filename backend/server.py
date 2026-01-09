@@ -4689,6 +4689,12 @@ async def create_season(school_id: str, data: SeasonCreate, current_user: User =
     if data.sport not in ["basketball", "football"]:
         raise HTTPException(status_code=400, detail="Sport must be 'basketball' or 'football'")
     
+    if data.gender not in ["men", "women"]:
+        raise HTTPException(status_code=400, detail="Gender must be 'men' or 'women'")
+    
+    if data.level not in ["varsity", "subvarsity"]:
+        raise HTTPException(status_code=400, detail="Level must be 'varsity' or 'subvarsity'")
+    
     season_id = f"season_{uuid.uuid4().hex[:12]}"
     
     season_doc = {
@@ -4696,6 +4702,8 @@ async def create_season(school_id: str, data: SeasonCreate, current_user: User =
         "school_id": school_id,
         "name": data.name,
         "sport": data.sport,
+        "gender": data.gender or "men",
+        "level": data.level or "varsity",
         "team_id": None,  # Will be set when roster is uploaded
         "created_by": current_user.user_id,
         "created_at": datetime.now(timezone.utc).isoformat(),
