@@ -983,6 +983,64 @@ async def migrate_teams_to_basketball(admin: User = Depends(get_admin_user)):
         "events_migrated": events_result.modified_count
     }
 
+@api_router.get("/admin/schools")
+async def get_all_schools(admin: User = Depends(get_admin_user)):
+    """Get all schools for admin view (sorted alphabetically)"""
+    schools = await db.schools.find(
+        {},
+        {"_id": 0, "school_id": 1, "school_code": 1, "name": 1, "state": 1, 
+         "logo_url": 1, "primary_color": 1, "created_at": 1}
+    ).sort("name", 1).to_list(500)
+    
+    # Get member counts and season counts for each school
+    for school in schools:
+        member_count = await db.users.count_documents({"school_id": school["school_id"]})
+        season_count = await db.seasons.count_documents({"school_id": school["school_id"]})
+        school["member_count"] = member_count
+        school["season_count"] = season_count
+    
+    return {"schools": schools, "total": len(schools)}
+
+@api_router.get("/admin/schools/{school_id}")
+async def get_school_details(school_id: str, admin: User = Depends(get_admin_user)):
+    """Get detailed info for a specific school (admin only)"""
+    school = await db.schools.find_one(
+        {"school_id": school_id},
+        {"_id": 0}
+    )
+    
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+    
+    # Get all members with their details
+    members = await db.users.find(
+        {"school_id": school_id},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1, "username": 1, 
+         "school_role": 1, "created_at": 1}
+    ).to_list(100)
+    
+    # Get all seasons with sport info
+    seasons = await db.seasons.find(
+        {"school_id": school_id},
+        {"_id": 0, "season_id": 1, "name": 1, "sport": 1, "gender": 1, 
+         "level": 1, "created_at": 1}
+    ).to_list(50)
+    
+    # Count games per season
+    for season in seasons:
+        game_count = await db.games.count_documents({"season_id": season["season_id"]})
+        season["game_count"] = game_count
+    
+    # Get unique sports being used
+    sports_used = list(set(s.get("sport", "unknown") for s in seasons))
+    
+    return {
+        "school": school,
+        "members": members,
+        "seasons": seasons,
+        "sports_used": sports_used
+    }
+
 # ============ DATA MODELS ============
 
 class Player(BaseModel):
