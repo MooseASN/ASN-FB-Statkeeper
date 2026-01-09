@@ -292,8 +292,13 @@ export default function SchoolDashboard() {
   };
 
   const handleLogout = () => {
+    // Clear both storages
+    localStorage.removeItem("session_token");
+    localStorage.removeItem("user");
+    localStorage.removeItem("remember_me");
     sessionStorage.removeItem("session_token");
     sessionStorage.removeItem("user");
+    sessionStorage.removeItem("selected_sport");
     navigate("/login");
   };
 
