@@ -875,6 +875,8 @@ class BetaModeSettings(BaseModel):
     basketball_password: str = ""
     football_beta: bool = False
     football_password: str = ""
+    school_creation_beta: bool = False
+    school_creation_password: str = ""
 
 @api_router.get("/admin/beta-settings")
 async def get_beta_settings(admin: User = Depends(get_admin_user)):
@@ -885,13 +887,17 @@ async def get_beta_settings(admin: User = Depends(get_admin_user)):
             "basketball_beta": False,
             "basketball_password": "",
             "football_beta": False,
-            "football_password": ""
+            "football_password": "",
+            "school_creation_beta": False,
+            "school_creation_password": ""
         }
     return {
         "basketball_beta": settings.get("basketball_beta", False),
         "basketball_password": settings.get("basketball_password", ""),
         "football_beta": settings.get("football_beta", False),
-        "football_password": settings.get("football_password", "")
+        "football_password": settings.get("football_password", ""),
+        "school_creation_beta": settings.get("school_creation_beta", False),
+        "school_creation_password": settings.get("school_creation_password", "")
     }
 
 @api_router.put("/admin/beta-settings")
@@ -905,6 +911,8 @@ async def update_beta_settings(settings: BetaModeSettings, admin: User = Depends
             "basketball_password": settings.basketball_password,
             "football_beta": settings.football_beta,
             "football_password": settings.football_password,
+            "school_creation_beta": settings.school_creation_beta,
+            "school_creation_password": settings.school_creation_password,
             "updated_at": datetime.now(timezone.utc).isoformat()
         }},
         upsert=True
