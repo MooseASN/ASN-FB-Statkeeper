@@ -215,9 +215,60 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 ## Known Issues
 - FootballLiveGame.jsx: Still large (~4700 lines), needs more refactoring
 - Custom hooks (useGameClock, useDriveState, useTimeouts) created but not integrated
+- server.py: ~5000 lines, needs to be split into domain-specific routers
 
 ## Third-Party Integrations
 - react-player: Video embedding
 - beautifulsoup4/lxml: Web scraping for roster import
 - reportlab: PDF generation
 - resend: Email service (configured but not fully implemented)
+
+## School/Organization Feature (January 2026)
+
+### Database Schema Additions
+```json
+// schools collection
+{
+  "school_id": "school_xxx",
+  "name": "Moose Academy",
+  "name_lower": "moose academy",
+  "state": "Texas",
+  "logo_url": null,
+  "invite_code": "Xcgg1Nk_IElbmEC7JO3uNw"
+}
+
+// users collection (new fields)
+{
+  "school_id": "school_xxx",
+  "school_role": "admin" | "member"
+}
+
+// seasons collection
+{
+  "season_id": "season_xxx",
+  "school_id": "school_xxx",
+  "name": "2025-26 Basketball",
+  "sport": "basketball",
+  "team_id": "team_xxx"
+}
+```
+
+### API Endpoints
+- `POST /api/schools/register` - Create school with admin
+- `GET /api/schools/my-school` - Get user's school
+- `GET /api/schools/check-name/{name}` - Name availability
+- `GET/POST /api/schools/{id}/seasons` - Season management
+- `GET/POST /api/schools/{id}/teams` - Team/opponent management
+- `POST /api/schools/{id}/seasons/{id}/games` - Schedule games
+- `GET /api/schools/{id}/calendar` - Calendar data
+- `GET /api/schools/{id}/members` - Member list
+- `PUT /api/schools/{id}/members/{id}/role` - Update member role
+- `POST /api/schools/{id}/regenerate-invite` - New invite code
+- `GET /api/schools/invite/{code}` - Get school by invite
+- `POST /api/schools/join/{code}` - Join school
+
+### Frontend Routes
+- `/school/signup` - School registration
+- `/school-dashboard` - School admin dashboard
+- `/school/season/:seasonId` - Season management
+- `/school/join/:inviteCode` - Join via invite
