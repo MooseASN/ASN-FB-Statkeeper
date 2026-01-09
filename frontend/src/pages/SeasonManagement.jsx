@@ -581,13 +581,13 @@ export default function SeasonManagement() {
             
             <TabsContent value="csv" className="space-y-4">
               <p className="text-sm text-slate-400">
-                Upload a CSV file with columns: Number, Name, Position
+                Upload a CSV file with columns: Number, Name, Position, Class
               </p>
               <Input
                 type="file"
                 accept=".csv"
                 onChange={handleCsvUpload}
-                className="bg-slate-900 border-slate-600"
+                className="bg-slate-900 border-slate-600 text-white"
               />
             </TabsContent>
             
