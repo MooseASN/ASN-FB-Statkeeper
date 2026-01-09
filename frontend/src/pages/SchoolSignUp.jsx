@@ -7,7 +7,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ArrowLeft, Building2, Upload, Link as LinkIcon, Check, X } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { ArrowLeft, Building2, Upload, Link as LinkIcon, Check, X, Lock, Eye, EyeOff } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -18,6 +19,14 @@ export default function SchoolSignUp() {
   const [securityQuestions, setSecurityQuestions] = useState([]);
   const [nameAvailable, setNameAvailable] = useState(null);
   const [checkingName, setCheckingName] = useState(false);
+  
+  // Beta mode state
+  const [betaMode, setBetaMode] = useState(false);
+  const [showBetaDialog, setShowBetaDialog] = useState(false);
+  const [betaPassword, setBetaPassword] = useState("");
+  const [showBetaPassword, setShowBetaPassword] = useState(false);
+  const [betaVerifying, setBetaVerifying] = useState(false);
+  const [betaVerified, setBetaVerified] = useState(false);
   
   // Logo options
   const [logoType, setLogoType] = useState("url"); // "url" or "upload"
@@ -40,15 +49,22 @@ export default function SchoolSignUp() {
   });
 
   useEffect(() => {
-    // Fetch US states and security questions
+    // Fetch US states, security questions, and beta status
     const fetchData = async () => {
       try {
-        const [statesRes, questionsRes] = await Promise.all([
+        const [statesRes, questionsRes, betaRes] = await Promise.all([
           axios.get(`${API}/states`),
-          axios.get(`${API}/security-questions`)
+          axios.get(`${API}/security-questions`),
+          axios.get(`${API}/beta-status`)
         ]);
         setStates(statesRes.data);
         setSecurityQuestions(questionsRes.data);
+        
+        // Check if school creation beta mode is enabled
+        if (betaRes.data.school_creation_beta) {
+          setBetaMode(true);
+          setShowBetaDialog(true);
+        }
       } catch (error) {
         console.error("Failed to fetch data:", error);
       }
