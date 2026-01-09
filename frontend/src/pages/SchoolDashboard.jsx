@@ -53,7 +53,7 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
   };
 
   const getGamesForDate = (date) => {
-    if (!date) return [];
+    if (!date || !games || !Array.isArray(games)) return [];
     const dateStr = date.toISOString().split('T')[0];
     return games.filter(g => g.scheduled_date === dateStr);
   };
