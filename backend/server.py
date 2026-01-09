@@ -832,6 +832,30 @@ async def export_users_csv(admin: User = Depends(get_admin_user)):
         headers={"Content-Disposition": f"attachment; filename=statmoose_users_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.csv"}
     )
 
+@api_router.delete("/admin/users/{user_id}")
+async def delete_user(user_id: str, admin: User = Depends(get_admin_user)):
+    """Delete a user account (admin only)"""
+    # Get the user to be deleted
+    user_to_delete = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    if not user_to_delete:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent deletion of admin user
+    if user_to_delete.get("email") == "antlersportsnetwork@gmail.com":
+        raise HTTPException(status_code=403, detail="Cannot delete the main admin account")
+    
+    # Delete the user
+    await db.users.delete_one({"user_id": user_id})
+    
+    # Delete user sessions
+    await db.user_sessions.delete_many({"user_id": user_id})
+    
+    return {
+        "message": "User deleted successfully",
+        "user_id": user_id,
+        "email": user_to_delete.get("email")
+    }
+
 @api_router.get("/admin/stats")
 async def get_admin_stats(admin: User = Depends(get_admin_user)):
     """Get overall platform stats (admin only)"""
