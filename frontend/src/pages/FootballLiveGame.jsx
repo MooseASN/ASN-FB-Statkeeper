@@ -39,6 +39,8 @@ import KickoffDialog from "@/components/football/KickoffDialog";
 import PlayerSelector from "@/components/football/PlayerSelector";
 import YardLineSelector from "@/components/football/YardLineSelector";
 import { FieldViewDialog } from "@/components/football/FieldViewDialog";
+import { PuntFieldView } from "@/components/football/PuntFieldView";
+import { FieldGoalFieldView } from "@/components/football/FieldGoalFieldView";
 import { PLAY_TYPES, PLAY_RESULTS } from "@/components/football/constants";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
