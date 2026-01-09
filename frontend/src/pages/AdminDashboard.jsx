@@ -578,6 +578,126 @@ export default function AdminDashboard({ user, onLogout }) {
           </CardContent>
         </Card>
       </div>
+
+      {/* School Details Dialog */}
+      <Dialog open={showSchoolDialog} onOpenChange={setShowSchoolDialog}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-3">
+              {selectedSchool?.logo_url ? (
+                <img 
+                  src={selectedSchool.logo_url} 
+                  alt={selectedSchool.name}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div 
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                  style={{ backgroundColor: selectedSchool?.primary_color || "#666" }}
+                >
+                  {selectedSchool?.name?.charAt(0)}
+                </div>
+              )}
+              <div>
+                <div>{selectedSchool?.name}</div>
+                <div className="text-sm font-normal text-muted-foreground">
+                  ID: <span className="font-mono text-orange-600">{selectedSchool?.school_code}</span>
+                  {selectedSchool?.state && <span> • {selectedSchool.state}</span>}
+                </div>
+              </div>
+            </DialogTitle>
+          </DialogHeader>
+
+          {loadingSchoolDetails ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : schoolDetails && (
+            <div className="space-y-6">
+              {/* Sports Used */}
+              <div>
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  Sports Being Used
+                </h3>
+                <div className="flex gap-2">
+                  {schoolDetails.sports_used?.length > 0 ? (
+                    schoolDetails.sports_used.map(sport => (
+                      <Badge key={sport} variant="secondary" className="text-sm">
+                        {sport === "basketball" ? "🏀 Basketball" : sport === "football" ? "🏈 Football" : sport}
+                      </Badge>
+                    ))
+                  ) : (
+                    <span className="text-muted-foreground text-sm">No sports configured</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Seasons */}
+              <div>
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Seasons ({schoolDetails.seasons?.length || 0})
+                </h3>
+                {schoolDetails.seasons?.length > 0 ? (
+                  <div className="space-y-2">
+                    {schoolDetails.seasons.map(season => (
+                      <div key={season.season_id} className="flex items-center justify-between p-2 border rounded">
+                        <div className="flex items-center gap-2">
+                          <span>{season.sport === "basketball" ? "🏀" : "🏈"}</span>
+                          <span className="font-medium">{season.name}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {season.gender === "men" ? "Men's" : "Women's"} {season.level === "varsity" ? "Varsity" : "JV"}
+                          </Badge>
+                        </div>
+                        <span className="text-sm text-muted-foreground">{season.game_count || 0} games</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <span className="text-muted-foreground text-sm">No seasons created</span>
+                )}
+              </div>
+
+              {/* Team Members */}
+              <div>
+                <h3 className="font-semibold mb-2 flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Team Members ({schoolDetails.members?.length || 0})
+                </h3>
+                {schoolDetails.members?.length > 0 ? (
+                  <ScrollArea className="h-48 border rounded">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Role</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {schoolDetails.members.map(member => (
+                          <TableRow key={member.user_id}>
+                            <TableCell>{member.name || member.username || "-"}</TableCell>
+                            <TableCell className="font-mono text-xs">{member.email}</TableCell>
+                            <TableCell>
+                              <Badge variant={member.school_role === "admin" ? "default" : "secondary"}>
+                                {member.school_role === "admin" ? "Admin" : "Member"}
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </ScrollArea>
+                ) : (
+                  <span className="text-muted-foreground text-sm">No members</span>
+                )}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
