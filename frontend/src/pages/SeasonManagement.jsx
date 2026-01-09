@@ -367,6 +367,140 @@ export default function SeasonManagement() {
     }
   };
 
+  // Edit Season handlers
+  const handleOpenEditSeason = () => {
+    setEditSeasonForm({ name: season?.name || "" });
+    setShowEditSeasonDialog(true);
+  };
+
+  const handleUpdateSeason = async () => {
+    if (!editSeasonForm.name.trim()) {
+      toast.error("Please enter a season name");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      await axios.put(
+        `${API}/schools/${school.school_id}/seasons/${seasonId}`,
+        { name: editSeasonForm.name },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("Season updated!");
+      setShowEditSeasonDialog(false);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update season");
+    }
+  };
+
+  const handleDeleteSeason = async () => {
+    if (!deletePassword) {
+      toast.error("Please enter your password to confirm deletion");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      await axios.delete(
+        `${API}/schools/${school.school_id}/seasons/${seasonId}`,
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          data: { password: deletePassword }
+        }
+      );
+      
+      toast.success("Season deleted successfully");
+      navigate("/school-dashboard");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to delete season");
+    }
+  };
+
+  // School search for adding opponents
+  const handleSearchSchools = async () => {
+    if (!schoolSearchQuery || schoolSearchQuery.length < 2) {
+      toast.error("Please enter at least 2 characters");
+      return;
+    }
+    
+    setSearchLoading(true);
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      const res = await axios.get(
+        `${API}/schools/search?q=${encodeURIComponent(schoolSearchQuery)}&sport=${season?.sport}&gender=${season?.gender}&level=${season?.level}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setSchoolSearchResults(res.data);
+    } catch (error) {
+      toast.error("Failed to search schools");
+    } finally {
+      setSearchLoading(false);
+    }
+  };
+
+  const handleImportFromSchool = async (schoolData) => {
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      
+      // Create opponent team with imported data
+      await axios.post(
+        `${API}/schools/${school.school_id}/teams`,
+        {
+          name: schoolData.name,
+          sport: season.sport,
+          color: schoolData.primary_color || "#666666",
+          logo_url: schoolData.logo_url,
+          from_school_code: schoolData.school_code
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success(`Imported ${schoolData.name} as opponent!`);
+      setShowSchoolSearchDialog(false);
+      setSchoolSearchQuery("");
+      setSchoolSearchResults([]);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to import school");
+    }
+  };
+
+  // Link roster import
+  const handleLinkRosterImport = async () => {
+    if (!websiteUrl) {
+      toast.error("Please enter a URL");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      const res = await axios.post(
+        `${API}/team/scrape-roster`,
+        { url: websiteUrl },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (res.data.roster && res.data.roster.length > 0) {
+        const importedPlayers = res.data.roster.map((player, idx) => ({
+          id: `player_${Date.now()}_${idx}`,
+          number: player.number || "",
+          name: player.name || "",
+          position: player.position || "",
+          playerClass: player.playerClass || player.class || ""
+        }));
+        
+        setRoster(importedPlayers);
+        toast.success(`Imported ${importedPlayers.length} players from website`);
+      } else {
+        toast.error("No players found on the page. Try a different URL.");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to import roster from URL");
+    }
+  };
+
   // Game handlers
   const handleCreateGame = async () => {
     if (!gameForm.opponent_team_id || !gameForm.scheduled_date) {
