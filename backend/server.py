@@ -2107,6 +2107,82 @@ async def get_game(game_id: str, user: User = Depends(get_current_user)):
 
 @api_router.get("/games/share/{share_code}")
 async def get_game_by_share_code(share_code: str):
+    # Handle demo share codes
+    if share_code.startswith("demo-"):
+        mode = share_code.replace("demo-", "")
+        if mode in ["classic", "advanced", "simple"]:
+            # Return basketball demo data
+            home_on_floor = ["demo-bh1", "demo-bh2", "demo-bh3", "demo-bh4", "demo-bh5"]
+            away_on_floor = ["demo-ba1", "demo-ba2", "demo-ba3", "demo-ba4", "demo-ba5"]
+            demo_game = {
+                "id": f"demo-basketball-{mode}",
+                "sport": "basketball",
+                "status": "active",
+                "is_demo": True,
+                "simple_mode": mode == "simple",
+                "advanced_mode": mode == "advanced",
+                "home_team_id": "demo-home-team",
+                "away_team_id": "demo-away-team",
+                "home_team_name": "Northside Tigers",
+                "away_team_name": "Eastwood Eagles",
+                "home_team_color": "#f97316",
+                "away_team_color": "#3b82f6",
+                "home_score": 0,
+                "away_score": 0,
+                "period": 1,
+                "current_quarter": 1,
+                "period_label": "1st",
+                "clock_enabled": True,
+                "clock_time": 720,
+                "clock_running": False,
+                "home_timeouts": 5,
+                "away_timeouts": 5,
+                "home_fouls": 0,
+                "away_fouls": 0,
+                "home_bonus": False,
+                "away_bonus": False,
+                "possession": "home",
+                "home_player_stats": create_demo_player_stats(BASKETBALL_DEMO_HOME_PLAYERS, home_on_floor),
+                "away_player_stats": create_demo_player_stats(BASKETBALL_DEMO_AWAY_PLAYERS, away_on_floor),
+                "home_on_floor": home_on_floor,
+                "away_on_floor": away_on_floor,
+                "play_by_play": [],
+                "quarter_scores": {"home": [0, 0, 0, 0], "away": [0, 0, 0, 0]},
+                "share_code": share_code
+            }
+            return demo_game
+        elif mode == "football":
+            # Return football demo data
+            demo_game = {
+                "id": "demo-football",
+                "sport": "football",
+                "status": "active",
+                "is_demo": True,
+                "home_team_id": "demo-home-football",
+                "away_team_id": "demo-away-football",
+                "home_team_name": "Central Wolves",
+                "away_team_name": "Riverside Panthers",
+                "home_team_color": "#dc2626",
+                "away_team_color": "#7c3aed",
+                "home_score": 0,
+                "away_score": 0,
+                "quarter": 1,
+                "home_timeouts": 3,
+                "away_timeouts": 3,
+                "possession": "home",
+                "ball_position": 25,
+                "down": 1,
+                "distance": 10,
+                "clock_time": 900,
+                "clock_running": False,
+                "home_roster": FOOTBALL_DEMO_HOME_ROSTER,
+                "away_roster": FOOTBALL_DEMO_AWAY_ROSTER,
+                "share_code": share_code
+            }
+            return demo_game
+        else:
+            raise HTTPException(status_code=404, detail="Demo game not found")
+    
     game = await db.games.find_one({"share_code": share_code}, {"_id": 0})
     if not game:
         raise HTTPException(status_code=404, detail="Game not found")
