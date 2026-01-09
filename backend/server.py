@@ -1684,41 +1684,124 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
         player_class = ""
         
         position_patterns = ['pos', 'position', 'pos.']
-        class_patterns = ['class', 'yr', 'year', 'cl', 'el', 'elig', 'academic']
+        class_patterns = ['class', 'yr', 'year', 'cl', 'el', 'elig', 'academic', 'grade', 'gr.', 'yr.']
         
+        # Normalize class/grade to standard abbreviation
+        def normalize_class(raw_class):
+            if not raw_class:
+                return ""
+            raw = raw_class.lower().strip()
+            
+            # Handle redshirt prefix
+            is_redshirt = any(rs in raw for rs in ['rs', 'r-', 'redshirt', 'red-shirt', 'r.'])
+            
+            # Remove redshirt prefix for matching
+            clean = raw.replace('redshirt', '').replace('red-shirt', '').replace('r-', '').replace('rs', '').replace('r.', '').strip()
+            
+            # Class mapping with many variations
+            class_map = {
+                # Freshman variations
+                'fr': 'FR', 'freshman': 'FR', 'fr.': 'FR', 'fresh': 'FR', 'frosh': 'FR',
+                '1': 'FR', '1st': 'FR', 'first year': 'FR', 'first-year': 'FR', 'fy': 'FR',
+                '9': 'FR', '9th': 'FR', 'ninth': 'FR', 'grade 9': 'FR',
+                # Sophomore variations
+                'so': 'SO', 'sophomore': 'SO', 'so.': 'SO', 'soph': 'SO',
+                '2': 'SO', '2nd': 'SO', 'second year': 'SO', 'second-year': 'SO',
+                '10': 'SO', '10th': 'SO', 'tenth': 'SO', 'grade 10': 'SO',
+                # Junior variations
+                'jr': 'JR', 'junior': 'JR', 'jr.': 'JR', 'jun': 'JR',
+                '3': 'JR', '3rd': 'JR', 'third year': 'JR', 'third-year': 'JR',
+                '11': 'JR', '11th': 'JR', 'eleventh': 'JR', 'grade 11': 'JR',
+                # Senior variations
+                'sr': 'SR', 'senior': 'SR', 'sr.': 'SR', 'sen': 'SR',
+                '4': 'SR', '4th': 'SR', 'fourth year': 'SR', 'fourth-year': 'SR',
+                '12': 'SR', '12th': 'SR', 'twelfth': 'SR', 'grade 12': 'SR',
+                # Graduate/5th year
+                'gr': 'GR', 'graduate': 'GR', 'grad': 'GR', 'gr.': 'GR',
+                '5': 'GR', '5th': 'GR', 'fifth year': 'GR', 'fifth-year': 'GR',
+                '6': 'GR', '6th': 'GR',
+                # Middle school grades (for prep/youth)
+                '7': '7', '7th': '7', 'seventh': '7', 'grade 7': '7',
+                '8': '8', '8th': '8', 'eighth': '8', 'grade 8': '8',
+            }
+            
+            # Try exact match first
+            result = class_map.get(clean, '')
+            
+            # If no exact match, try partial matches
+            if not result:
+                for key, value in class_map.items():
+                    if key in clean:
+                        result = value
+                        break
+            
+            # If still no match, try to extract just numbers or first 2 chars
+            if not result and clean:
+                import re as re_class
+                # Check for grade number pattern (e.g., "Grade 10", "10th Grade")
+                grade_match = re_class.search(r'(?:grade\s*)?(\d{1,2})(?:th|st|nd|rd)?(?:\s*grade)?', clean)
+                if grade_match:
+                    grade_num = grade_match.group(1)
+                    result = class_map.get(grade_num, grade_num)
+                else:
+                    result = clean.upper()[:2]
+            
+            # Add RS prefix if redshirt
+            if is_redshirt and result:
+                return f"RS {result}"
+            
+            return result
+        
+        # First try to extract from headers/cells in table format
         if headers and cells:
             for i, h in enumerate(headers):
                 h_lower = h.lower()
                 if any(p in h_lower for p in position_patterns) and i < len(cells):
                     position = cells[i].get_text(strip=True)
                 if any(p in h_lower for p in class_patterns) and i < len(cells):
-                    player_class = cells[i].get_text(strip=True)
-                    class_map = {
-                        'fr': 'FR', 'freshman': 'FR', 'fr.': 'FR', '1': 'FR',
-                        'so': 'SO', 'sophomore': 'SO', 'so.': 'SO', '2': 'SO',
-                        'jr': 'JR', 'junior': 'JR', 'jr.': 'JR', '3': 'JR',
-                        'sr': 'SR', 'senior': 'SR', 'sr.': 'SR', '4': 'SR',
-                        'gr': 'GR', 'graduate': 'GR', 'grad': 'GR', 'rs': 'GR', '5': 'GR'
-                    }
-                    player_class = class_map.get(player_class.lower().strip(), player_class.upper()[:2])
+                    raw_class = cells[i].get_text(strip=True)
+                    player_class = normalize_class(raw_class)
         
+        # Try CSS selectors for position
         if not position:
-            pos_elem = row.select_one('[class*="position"], [class*="pos"], .sidearm-roster-player-position')
+            pos_elem = row.select_one('[class*="position"], [class*="pos"], .sidearm-roster-player-position, [data-label*="Pos"], [data-label*="Position"]')
             if pos_elem:
                 position = pos_elem.get_text(strip=True)
         
+        # Try CSS selectors for class/grade with expanded patterns
         if not player_class:
-            class_elem = row.select_one('[class*="class"], [class*="year"], .sidearm-roster-player-class')
-            if class_elem:
-                raw_class = class_elem.get_text(strip=True)
-                class_map = {
-                    'fr': 'FR', 'freshman': 'FR',
-                    'so': 'SO', 'sophomore': 'SO',
-                    'jr': 'JR', 'junior': 'JR',
-                    'sr': 'SR', 'senior': 'SR',
-                    'gr': 'GR', 'graduate': 'GR'
-                }
-                player_class = class_map.get(raw_class.lower().strip(), raw_class.upper()[:2] if raw_class else "")
+            class_selectors = [
+                '[class*="class"]', '[class*="year"]', '[class*="grade"]', '[class*="elig"]',
+                '.sidearm-roster-player-class', '.sidearm-roster-player-year',
+                '.sidearm-roster-player-academic-year', '.sidearm-roster-player-eligibility',
+                '[data-label*="Class"]', '[data-label*="Year"]', '[data-label*="Grade"]', '[data-label*="Yr"]',
+                '.roster-class', '.roster-year', '.roster-grade',
+                '[class*="academic"]', '[class*="cl-"]', '[class*="yr-"]'
+            ]
+            for selector in class_selectors:
+                class_elem = row.select_one(selector)
+                if class_elem:
+                    raw_class = class_elem.get_text(strip=True)
+                    if raw_class:
+                        player_class = normalize_class(raw_class)
+                        break
+        
+        # Look for class in any text content that matches patterns
+        if not player_class:
+            import re as re_extract
+            row_text = row.get_text(' ', strip=True)
+            # Look for common class patterns in the text
+            class_pattern = re_extract.search(
+                r'\b(RS\s*)?(Freshman|Sophomore|Junior|Senior|Graduate|Fr\.|So\.|Jr\.|Sr\.|Gr\.|FR|SO|JR|SR|GR)\b',
+                row_text, re_extract.IGNORECASE
+            )
+            if class_pattern:
+                player_class = normalize_class(class_pattern.group(0))
+            else:
+                # Look for grade numbers
+                grade_pattern = re_extract.search(r'\b(9th|10th|11th|12th|Grade\s*\d{1,2})\b', row_text, re_extract.IGNORECASE)
+                if grade_pattern:
+                    player_class = normalize_class(grade_pattern.group(0))
         
         return position, player_class
     
