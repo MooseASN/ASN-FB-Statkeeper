@@ -404,11 +404,14 @@ export default function SeasonManagement() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => navigate(
-                                season.sport === "football" 
-                                  ? `/football/${game.id}` 
-                                  : `/game/${game.id}`
-                              )}
+                              onClick={() => {
+                                selectSport(season.sport);
+                                navigate(
+                                  season.sport === "football" 
+                                    ? `/football/${game.id}` 
+                                    : `/game/${game.id}`
+                                );
+                              }}
                               className="text-orange-400 hover:text-orange-300"
                             >
                               <Play className="w-4 h-4" />
