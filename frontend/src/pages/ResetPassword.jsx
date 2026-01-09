@@ -75,7 +75,7 @@ export default function ResetPassword() {
     return (
       <div className="min-h-screen bg-gradient-to-b from-black to-gray-900 flex items-center justify-center p-4">
         <div className="text-center text-white">
-          <MooseIcon className="w-16 h-16 mx-auto mb-4 text-white animate-pulse" />
+          <img src="/logo-white.png" alt="StatMoose" className="h-16 w-auto mx-auto mb-4 animate-pulse" />
           <p className="text-lg">Verifying reset link...</p>
         </div>
       </div>
