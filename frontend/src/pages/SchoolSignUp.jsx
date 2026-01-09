@@ -26,6 +26,8 @@ export default function SchoolSignUp() {
   const [formData, setFormData] = useState({
     schoolName: "",
     state: "",
+    classification: "",
+    classificationOther: "",
     logoUrl: "",
     userName: "",
     userEmail: "",
