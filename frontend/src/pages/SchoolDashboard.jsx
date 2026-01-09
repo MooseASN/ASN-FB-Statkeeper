@@ -1347,6 +1347,55 @@ export default function SchoolDashboard() {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* In-Progress Warning Dialog */}
+      <Dialog open={showInProgressWarning} onOpenChange={setShowInProgressWarning}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-yellow-500 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Game In Progress
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-slate-300">
+              This game is already in progress. Opening the stat tracker may conflict with another user who is currently tracking this game.
+            </p>
+            
+            {selectedGame && (
+              <div className="bg-slate-900 rounded-lg p-3 text-center">
+                <div className="font-semibold text-white">
+                  {selectedGame.home_team_name} vs {selectedGame.away_team_name}
+                </div>
+                <div className="text-sm text-green-400 mt-1">
+                  Score: {selectedGame.home_score || 0} - {selectedGame.away_score || 0}
+                </div>
+              </div>
+            )}
+            
+            <p className="text-sm text-yellow-400">
+              Are you sure you want to open the stat tracker for this game?
+            </p>
+            
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setShowInProgressWarning(false)}
+                className="flex-1 border-slate-600 text-white hover:bg-slate-700"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleConfirmInProgressGame}
+                className="flex-1 bg-yellow-600 hover:bg-yellow-700"
+                data-testid="confirm-in-progress-btn"
+              >
+                Yes, Open Tracker
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
