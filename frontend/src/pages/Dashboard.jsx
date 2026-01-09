@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload, ExternalLink, Copy, Pencil } from "lucide-react";
+import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload, ExternalLink, Copy, Pencil, Building2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
@@ -25,6 +25,7 @@ export default function Dashboard({ user, onLogout }) {
   const [embedCopied, setEmbedCopied] = useState(false);
   const [startingGameId, setStartingGameId] = useState(null);
   const [copiedLinkId, setCopiedLinkId] = useState(null);
+  const [schoolInfo, setSchoolInfo] = useState(null);
   
   // Sponsor banner state
   const [sponsorBanners, setSponsorBanners] = useState([]);
@@ -41,6 +42,20 @@ export default function Dashboard({ user, onLogout }) {
   const [startModeDialogOpen, setStartModeDialogOpen] = useState(false);
   const [selectedGameToStart, setSelectedGameToStart] = useState(null);
   const [selectedStartMode, setSelectedStartMode] = useState("classic");
+
+  // Check if user belongs to a school
+  useEffect(() => {
+    const checkSchool = async () => {
+      try {
+        const res = await axios.get(`${API}/schools/my-school`);
+        setSchoolInfo(res.data);
+      } catch (error) {
+        // User doesn't belong to a school - that's fine
+        setSchoolInfo(null);
+      }
+    };
+    checkSchool();
+  }, []);
 
   useEffect(() => {
     fetchData();
