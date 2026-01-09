@@ -156,10 +156,37 @@ export default function Register({ onLogin }) {
       <Card className="w-full max-w-md max-h-[90vh] overflow-y-auto">
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <MooseIcon className="w-16 h-16 text-black" />
+            <img 
+              src="/logo192.png" 
+              alt="StatMoose" 
+              className="w-16 h-16"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+            <div className="w-16 h-16 bg-orange-500 rounded-full items-center justify-center hidden">
+              <span className="text-white font-bold text-2xl">SM</span>
+            </div>
           </div>
           <CardTitle className="text-2xl">Create Account</CardTitle>
           <CardDescription>Start tracking your basketball stats</CardDescription>
+          
+          {/* School/Organization Signup - Moved to top */}
+          <div className="mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+            <p className="text-sm text-orange-800 mb-2">
+              Are you a school or organization?
+            </p>
+            <Button
+              variant="outline"
+              className="w-full border-orange-500 text-orange-600 hover:bg-orange-100"
+              onClick={() => navigate("/school/signup")}
+              data-testid="school-signup-btn"
+            >
+              <Building2 className="w-4 h-4 mr-2" />
+              Sign Up A School/Organization
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleRegister} className="space-y-4">
