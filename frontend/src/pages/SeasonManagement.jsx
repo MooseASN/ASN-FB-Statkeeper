@@ -622,21 +622,46 @@ export default function SeasonManagement() {
                 </CardContent>
               </Card>
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                 {opponentTeams.map(team => (
-                  <Card key={team.id} className="bg-slate-800/50 border-slate-700">
+                  <Card key={team.id} className="bg-slate-800/50 border-slate-700 hover:border-slate-600 transition-colors">
                     <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-8 h-8 rounded-full"
-                          style={{ backgroundColor: team.color || "#666" }}
-                        />
-                        <div>
-                          <div className="font-medium text-white text-sm">{team.name}</div>
-                          <Badge variant="outline" className="text-xs mt-1 border-slate-500 text-slate-200">
-                            {team.sport === "basketball" ? "🏀 Basketball" : "🏈 Football"}
-                          </Badge>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {team.logo_url ? (
+                            <img
+                              src={team.logo_url}
+                              alt={team.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                              style={{ backgroundColor: team.color || "#666" }}
+                            >
+                              {team.name?.charAt(0) || "T"}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium text-white">{team.name}</div>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs border-slate-500 text-slate-200">
+                                {team.sport === "basketball" ? "🏀" : "🏈"} {team.roster?.length || 0} players
+                              </Badge>
+                            </div>
+                          </div>
                         </div>
+                        {isAdmin && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleOpenEditOpponent(team)}
+                            className="text-slate-400 hover:text-white"
+                            data-testid={`edit-opponent-${team.id}`}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                        )}
                       </div>
                     </CardContent>
                   </Card>
