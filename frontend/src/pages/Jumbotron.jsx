@@ -231,7 +231,6 @@ export default function Jumbotron() {
 
   useEffect(() => {
     hasLoadedOnce.current = false;
-    setLoading(true);
     
     // Initial fetch
     fetchData();
