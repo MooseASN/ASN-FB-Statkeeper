@@ -4294,12 +4294,15 @@ class SchoolMemberInvite(BaseModel):
 class SeasonCreate(BaseModel):
     name: str  # e.g., "2025-26 Football"
     sport: str  # "basketball" or "football"
+    gender: Optional[str] = "men"  # "men" or "women"
+    level: Optional[str] = "varsity"  # "varsity" or "subvarsity"
 
 class SchoolTeamCreate(BaseModel):
     name: str
     sport: str  # "basketball" or "football"
     color: Optional[str] = "#000000"
     roster: Optional[List[dict]] = []
+    school_code: Optional[str] = None  # If from another school
 
 class SchoolGameCreate(BaseModel):
     season_id: str
