@@ -428,66 +428,85 @@ export default function AdminDashboard({ user, onLogout }) {
           </CardContent>
         </Card>
 
-        {/* Schools Viewer */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Building2 className="w-5 h-5" />
-                Participating Schools ({schools.length})
-              </CardTitle>
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search schools..."
-                  value={schoolSearchTerm}
-                  onChange={(e) => setSchoolSearchTerm(e.target.value)}
-                  className="pl-9 w-64"
-                />
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {filteredSchools.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                {schoolSearchTerm ? "No schools match your search" : "No schools registered yet"}
-              </div>
-            ) : (
-              <div className="space-y-2">
-                {filteredSchools.map((school) => (
-                  <div
-                    key={school.school_id}
-                    className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
-                    onClick={() => handleViewSchool(school)}
-                  >
-                    <div className="flex items-center gap-3">
-                      {school.logo_url ? (
-                        <img 
-                          src={school.logo_url} 
-                          alt={school.name}
-                          className="w-10 h-10 rounded-full object-cover"
-                        />
-                      ) : (
-                        <div 
-                          className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                          style={{ backgroundColor: school.primary_color || "#666" }}
+        {/* Schools Viewer - Collapsible */}
+        <Collapsible open={schoolsOpen} onOpenChange={setSchoolsOpen}>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Building2 className="w-5 h-5" />
+                    Participating Schools ({schools.length})
+                  </CardTitle>
+                  <ChevronDown className={`w-5 h-5 transition-transform ${schoolsOpen ? 'rotate-180' : ''}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
+                <div className="mb-4">
+                  <div className="relative">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder="Search schools..."
+                      value={schoolSearchTerm}
+                      onChange={(e) => setSchoolSearchTerm(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                </div>
+                {filteredSchools.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    {schoolSearchTerm ? "No schools match your search" : "No schools registered yet"}
+                  </div>
+                ) : (
+                  <ScrollArea className="h-64">
+                    <div className="space-y-2 pr-4">
+                      {filteredSchools.map((school) => (
+                        <div
+                          key={school.school_id}
+                          className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                          onClick={() => handleViewSchool(school)}
                         >
-                          {school.name?.charAt(0)}
+                          <div className="flex items-center gap-3">
+                            {school.logo_url ? (
+                              <img 
+                                src={school.logo_url} 
+                                alt={school.name}
+                                className="w-10 h-10 rounded-full object-cover"
+                              />
+                            ) : (
+                              <div 
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                                style={{ backgroundColor: school.primary_color || "#666" }}
+                              >
+                                {school.name?.charAt(0)}
+                              </div>
+                            )}
+                            <div>
+                              <div className="font-medium">{school.name}</div>
+                              <div className="text-sm text-muted-foreground">
+                                <span className="font-mono text-orange-600">{school.school_code}</span>
+                                {school.state && <span> • {school.state}</span>}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <div className="text-right text-sm">
+                              <div className="text-muted-foreground">{school.member_count || 0} members</div>
+                              <div className="text-muted-foreground">{school.season_count || 0} seasons</div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-muted-foreground" />
+                          </div>
                         </div>
-                      )}
-                      <div>
-                        <div className="font-medium">{school.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          <span className="font-mono text-orange-600">{school.school_code}</span>
-                          {school.state && <span> • {school.state}</span>}
-                        </div>
-                      </div>
+                      ))}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right text-sm">
-                        <div className="text-muted-foreground">{school.member_count || 0} members</div>
-                        <div className="text-muted-foreground">{school.season_count || 0} seasons</div>
-                      </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
                       <ChevronRight className="w-5 h-5 text-muted-foreground" />
                     </div>
                   </div>
