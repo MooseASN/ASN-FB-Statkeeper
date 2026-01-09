@@ -721,14 +721,14 @@ export default function NewGame({ user, onLogout }) {
                     Link this game to one of your school's seasons to track it in the school dashboard.
                   </p>
                   <Select
-                    value={selectedSeasonId}
-                    onValueChange={setSelectedSeasonId}
+                    value={selectedSeasonId || "none"}
+                    onValueChange={(v) => setSelectedSeasonId(v === "none" ? "" : v)}
                   >
                     <SelectTrigger className="bg-white border-orange-300" data-testid="season-select">
                       <SelectValue placeholder="Select a season (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">None - Don't link to a season</SelectItem>
+                      <SelectItem value="none">None - Don't link to a season</SelectItem>
                       {seasons.map(season => (
                         <SelectItem key={season.season_id} value={season.season_id}>
                           {season.name}
