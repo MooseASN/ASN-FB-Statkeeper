@@ -214,29 +214,38 @@ export default function Jumbotron() {
   const { shareCode } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
-  const hasLoadedOnce = React.useRef(false);
-
-  const fetchData = useCallback(async () => {
-    try {
-      const res = await axios.get(`${API}/games/share/${shareCode}`);
-      setGame(res.data);
-      hasLoadedOnce.current = true;
-    } catch (err) {
-      console.error("Error fetching game:", err);
-    }
-  }, [shareCode]);
 
   useEffect(() => {
-    hasLoadedOnce.current = false;
+    let mounted = true;
+    let hasLoadedOnce = false;
+    
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(`${API}/games/share/${shareCode}`);
+        if (mounted) {
+          setGame(res.data);
+          hasLoadedOnce = true;
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Error fetching game:", err);
+        if (mounted && !hasLoadedOnce) {
+          setLoading(false);
+        }
+      }
+    };
     
     // Initial fetch
-    fetchData().finally(() => setLoading(false));
+    fetchData();
     
     // Auto-refresh every 2 seconds
     const interval = setInterval(fetchData, 2000);
     
-    return () => clearInterval(interval);
-  }, [fetchData]);
+    return () => {
+      mounted = false;
+      clearInterval(interval);
+    };
+  }, [shareCode]);
 
   // Calculate score from quarter scores
   const calculateScore = (team) => {
