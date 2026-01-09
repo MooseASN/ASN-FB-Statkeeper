@@ -8,7 +8,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Shield, Plus, X, Building2 } from "lucide-react";
-import MooseIcon from "@/components/MooseIcon";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
