@@ -4886,6 +4886,9 @@ async def get_school_calendar(school_id: str, current_user: User = Depends(get_c
     
     return {"games": games, "seasons": seasons}
 
+# Include router after all routes are defined
+app.include_router(api_router)
+
 @app.on_event("startup")
 async def startup_init():
     """Initialize admin user on startup"""
