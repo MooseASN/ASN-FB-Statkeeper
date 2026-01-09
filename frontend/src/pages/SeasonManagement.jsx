@@ -751,13 +751,31 @@ export default function SeasonManagement() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white">Opponents</h2>
               {isAdmin && (
-                <Button
-                  onClick={() => setShowOpponentDialog(true)}
-                  className="bg-orange-500 hover:bg-orange-600"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Opponent
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenEditSeason}
+                    className="border-slate-600 text-white hover:bg-slate-700"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Edit Season
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSchoolSearchDialog(true)}
+                    className="border-slate-600 text-white hover:bg-slate-700"
+                  >
+                    <Search className="w-4 h-4 mr-2" />
+                    Find School
+                  </Button>
+                  <Button
+                    onClick={() => setShowOpponentDialog(true)}
+                    className="bg-orange-500 hover:bg-orange-600"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Add Opponent
+                  </Button>
+                </div>
               )}
             </div>
             
