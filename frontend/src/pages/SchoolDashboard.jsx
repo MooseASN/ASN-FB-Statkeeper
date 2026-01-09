@@ -163,7 +163,12 @@ export default function SchoolDashboard() {
   const [selectedGame, setSelectedGame] = useState(null);
   
   // New season form
-  const [newSeason, setNewSeason] = useState({ name: "", sport: "basketball" });
+  const [newSeason, setNewSeason] = useState({ 
+    name: "", 
+    sport: "basketball",
+    gender: "men",
+    level: "varsity"
+  });
   
   // Invite link
   const [inviteLink, setInviteLink] = useState("");
