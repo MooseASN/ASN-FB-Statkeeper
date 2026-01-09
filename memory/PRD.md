@@ -486,8 +486,12 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - Admin credentials: admin / NoahTheJew1997
 
 ## Known Issues
-- FootballLiveGame.jsx: Still ~4900 lines; `useGameClock` and `useTimeouts` now integrated, `useDriveState` remaining
+- FootballLiveGame.jsx: Still ~4900 lines; `useGameClock` and `useTimeouts` integrated, `useDriveState` available but not integrated (requires significant refactoring of drive tracking logic - deferred)
 - server.py: ~5000 lines, router templates created at /app/backend/routers/ (refactoring ON HOLD)
+
+## Completed Tasks (January 9, 2026)
+- Demo Jumbotron working: `/jumbotron/demo-classic`, `/jumbotron/demo-advanced`, `/jumbotron/demo-simple`, `/jumbotron/demo-football`
+- Share endpoints return demo data for demo share codes
 
 ## Third-Party Integrations
 - react-player: Video embedding
