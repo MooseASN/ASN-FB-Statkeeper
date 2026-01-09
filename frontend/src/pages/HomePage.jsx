@@ -228,38 +228,64 @@ export default function HomePage() {
       <style>{`
         @keyframes lightSweep {
           0% {
-            left: -100%;
+            transform: translateX(-100%) skewX(-20deg);
           }
           100% {
-            left: 200%;
+            transform: translateX(200%) skewX(-20deg);
           }
         }
-        .logo-sweep-container {
+        
+        .logo-sweep-wrapper {
           position: relative;
           display: inline-block;
-          overflow: hidden;
         }
-        .logo-sweep-container::after {
+        
+        .logo-base {
+          display: block;
+        }
+        
+        .logo-sweep-overlay {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        
+        .logo-sweep-overlay img {
+          opacity: 0;
+        }
+        
+        .logo-sweep-overlay::before {
           content: '';
           position: absolute;
           top: 0;
-          left: -100%;
-          width: 50%;
-          height: 100%;
+          left: 0;
+          right: 0;
+          bottom: 0;
           background: linear-gradient(
             90deg,
             transparent 0%,
-            rgba(255, 255, 255, 0) 20%,
-            rgba(255, 255, 255, 0.4) 50%,
-            rgba(255, 255, 255, 0) 80%,
+            transparent 30%,
+            rgba(255, 255, 255, 0.8) 50%,
+            transparent 70%,
             transparent 100%
           );
-          transform: skewX(-20deg);
-          animation: lightSweep 1.5s ease-in-out forwards;
-          animation-play-state: paused;
+          transform: translateX(-100%) skewX(-20deg);
+          -webkit-mask-image: url('/logo-white.png');
+          -webkit-mask-size: contain;
+          -webkit-mask-repeat: no-repeat;
+          -webkit-mask-position: center;
+          mask-image: url('/logo-white.png');
+          mask-size: contain;
+          mask-repeat: no-repeat;
+          mask-position: center;
         }
-        .logo-sweep-container.animate::after {
-          animation-play-state: running;
+        
+        .logo-sweep-overlay.animate::before {
+          animation: lightSweep 1.2s ease-in-out forwards;
         }
       `}</style>
 
