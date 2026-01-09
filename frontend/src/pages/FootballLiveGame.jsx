@@ -965,6 +965,9 @@ export default function FootballLiveGame({ user, onLogout }) {
     syncPendingPlays 
   } = useOfflineQueue(id, syncPlay);
 
+  // Update ref for queuePlay
+  queuePlayRef.current = queuePlay;
+
   // Handle kickoff team selection (step 0)
   const handleKickoffTeamSelect = (team) => {
     setKickingTeam(team);
