@@ -125,6 +125,20 @@ function AppRoutes({ user, onLogin, onLogout }) {
         </ProtectedRoute>
       } />
       
+      {/* School routes */}
+      <Route path="/school/signup" element={<SchoolSignUp />} />
+      <Route path="/school/join/:inviteCode" element={<SchoolJoin />} />
+      <Route path="/school-dashboard" element={
+        <ProtectedRoute user={user}>
+          <SchoolDashboard />
+        </ProtectedRoute>
+      } />
+      <Route path="/school/season/:seasonId" element={
+        <ProtectedRoute user={user}>
+          <SeasonManagement />
+        </ProtectedRoute>
+      } />
+      
       {/* Protected routes - require both auth and sport selection */}
       <Route path="/" element={<SportProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/events" element={<SportProtectedRoute user={user}><Events user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
