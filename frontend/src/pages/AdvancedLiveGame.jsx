@@ -232,11 +232,16 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
   useEffect(() => {
     if (clockRunning && game?.clock_time > 0) {
       clockIntervalRef.current = setInterval(async () => {
-        try {
-          await axios.post(`${API}/games/${id}/clock/tick`);
-          fetchGame();
-        } catch (error) {
-          console.error("Clock tick failed");
+        if (demoMode) {
+          // In demo mode, just update local state
+          setGame(prev => prev ? {...prev, clock_time: Math.max(0, (prev.clock_time || 0) - 1)} : prev);
+        } else {
+          try {
+            await axios.post(`${API}/games/${id}/clock/tick`);
+            fetchGame();
+          } catch (error) {
+            console.error("Clock tick failed");
+          }
         }
       }, 1000);
     } else {
@@ -249,10 +254,14 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
         clearInterval(clockIntervalRef.current);
       }
     };
-  }, [clockRunning, game?.clock_time, id, fetchGame]);
+  }, [clockRunning, game?.clock_time, id, fetchGame, demoMode]);
 
   // Clock toggle - use useCallback to ensure stable reference
   const handleToggleClock = useCallback(async () => {
+    if (demoMode) {
+      setClockRunning(!clockRunning);
+      return;
+    }
     try {
       if (clockRunning) {
         await axios.post(`${API}/games/${id}/clock/stop`);
@@ -265,7 +274,7 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
     } catch (error) {
       toast.error("Failed to toggle clock");
     }
-  }, [clockRunning, id, fetchGame]);
+  }, [clockRunning, id, fetchGame, demoMode]);
 
   // Keyboard handler
   useEffect(() => {
