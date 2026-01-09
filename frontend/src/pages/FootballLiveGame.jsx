@@ -679,6 +679,9 @@ export default function FootballLiveGame({ user, onLogout }) {
     };
   }, [clockRunning, clockTime, possession]);
 
+  // Ref for queuePlay to avoid circular dependency
+  const queuePlayRef = useRef(null);
+  
   // Save football game state to backend
   const saveFootballState = useCallback(async (newPlayLog = playLog, newHomeScore = homeScore, newAwayScore = awayScore) => {
     if (!id) return;
@@ -715,11 +718,13 @@ export default function FootballLiveGame({ user, onLogout }) {
       await axios.put(`${API}/games/${id}`, gameData);
     } catch (error) {
       console.error("Failed to save game state:", error);
-      // Queue for sync when online
-      queuePlay({ type: 'game-state', data: gameData });
+      // Queue for sync when online using ref
+      if (queuePlayRef.current) {
+        queuePlayRef.current({ type: 'game-state', data: gameData });
+      }
       toast.warning("Play saved locally - will sync when online");
     }
-  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession, currentDrive, allDrives, queuePlay]);
+  }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession, currentDrive, allDrives]);
 
   useEffect(() => {
     fetchGame();
