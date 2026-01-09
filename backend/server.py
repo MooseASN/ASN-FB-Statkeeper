@@ -4585,20 +4585,28 @@ if origins == '*':
     
     class DynamicCORSMiddleware(BaseHTTPMiddleware):
         async def dispatch(self, request: Request, call_next):
-            origin = request.headers.get("origin", "")
+            origin = request.headers.get("origin", "*")
             
             # Handle preflight OPTIONS requests
             if request.method == "OPTIONS":
                 response = Response(status_code=200)
-            else:
-                response = await call_next(request)
+                response.headers["Access-Control-Allow-Origin"] = origin if origin != "*" else "*"
+                response.headers["Access-Control-Allow-Credentials"] = "true"
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+                response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control"
+                response.headers["Access-Control-Max-Age"] = "86400"
+                return response
+            
+            response = await call_next(request)
             
             # Set CORS headers dynamically based on origin
-            if origin:
+            if origin and origin != "*":
                 response.headers["Access-Control-Allow-Origin"] = origin
+            else:
+                response.headers["Access-Control-Allow-Origin"] = "*"
             response.headers["Access-Control-Allow-Credentials"] = "true"
             response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control"
             
             return response
     
