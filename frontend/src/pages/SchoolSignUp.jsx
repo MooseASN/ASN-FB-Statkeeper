@@ -250,6 +250,36 @@ export default function SchoolSignUp() {
                 </Select>
               </div>
 
+              {/* Classification */}
+              <div>
+                <Label className="text-slate-200">Classification *</Label>
+                <Select value={formData.classification} onValueChange={(v) => handleChange("classification", v)}>
+                  <SelectTrigger className="bg-slate-900/50 border-slate-600 text-white" data-testid="classification-select">
+                    <SelectValue placeholder="Select classification" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high_school">High School</SelectItem>
+                    <SelectItem value="college">College</SelectItem>
+                    <SelectItem value="prep">Prep</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              {/* Custom Classification (shown when "Other" is selected) */}
+              {formData.classification === "other" && (
+                <div>
+                  <Label className="text-slate-200">Custom Classification *</Label>
+                  <Input
+                    value={formData.classificationOther}
+                    onChange={(e) => handleChange("classificationOther", e.target.value)}
+                    placeholder="e.g., Club Team, Recreation League"
+                    className="bg-slate-900/50 border-slate-600 text-white"
+                    data-testid="classification-other-input"
+                  />
+                </div>
+              )}
+
               {/* Logo */}
               <div>
                 <Label className="text-slate-200">School Logo (optional)</Label>
