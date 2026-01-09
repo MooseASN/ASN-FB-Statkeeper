@@ -1,176 +1,214 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { RefreshCw } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Calculate player stats
 const calculatePlayerStats = (stats) => {
-  const pts = stats.ft_made + (stats.fg2_made * 2) + (stats.fg3_made * 3);
-  const totalReb = stats.offensive_rebounds + stats.defensive_rebounds;
-  const fg_made = stats.fg2_made + stats.fg3_made;
-  const fg_att = fg_made + stats.fg2_missed + stats.fg3_missed;
-  const ft_made = stats.ft_made;
-  const ft_att = stats.ft_made + stats.ft_missed;
+  const pts = (stats.ft_made || 0) + ((stats.fg2_made || 0) * 2) + ((stats.fg3_made || 0) * 3);
+  const totalReb = (stats.offensive_rebounds || stats.oreb || 0) + (stats.defensive_rebounds || stats.dreb || 0);
+  const fg_made = (stats.fg2_made || 0) + (stats.fg3_made || 0);
+  const fg_att = fg_made + (stats.fg2_missed || 0) + (stats.fg3_missed || 0);
+  const ft_made = stats.ft_made || 0;
+  const ft_att = (stats.ft_made || 0) + (stats.ft_missed || 0);
   
   return { 
     pts, 
     totalReb, 
     fg: `${fg_made}-${fg_att}`,
     ft: `${ft_made}-${ft_att}`,
-    ast: stats.assists,
-    pf: stats.fouls
+    ast: stats.assists || stats.assist || 0,
+    pf: stats.fouls || stats.foul || stats.pf || 0
   };
 };
 
-// Team Panel Component - displays one team's info and on-floor players
-const TeamPanel = ({ team, teamName, teamLogo, teamColor, score, timeoutsUsed, totalTimeouts, totalFouls, bonusStatus, onFloorPlayers, allStats, isHome }) => {
-  // Get stats for players on floor
-  const onFloorStats = onFloorPlayers.map(playerId => {
-    const player = allStats.find(p => p.id === playerId);
-    if (!player) return null;
-    const calc = calculatePlayerStats(player);
-    return {
-      number: player.player_number,
-      name: player.player_name,
-      ...calc
-    };
-  }).filter(Boolean);
+// Team Panel Component - Broadcast Style Stacked Layout
+function TeamPanel({ 
+  teamName, 
+  teamLogo, 
+  teamColor, 
+  timeouts, 
+  totalFouls, 
+  inBonus,
+  onFloorPlayers,
+  allStats
+}) {
+  // Get stats for players on floor (or top 5 by points)
+  let displayPlayers = [];
+  
+  if (onFloorPlayers && onFloorPlayers.length > 0) {
+    displayPlayers = onFloorPlayers.map(playerId => {
+      const player = allStats.find(p => p.id === playerId);
+      if (!player) return null;
+      const calc = calculatePlayerStats(player);
+      return {
+        number: player.player_number || player.number,
+        name: player.player_name || player.name,
+        ...calc
+      };
+    }).filter(Boolean);
+  } else if (allStats && allStats.length > 0) {
+    // Show top 5 by points if no players on floor
+    displayPlayers = [...allStats]
+      .map(player => ({
+        number: player.player_number || player.number,
+        name: player.player_name || player.name,
+        ...calculatePlayerStats(player)
+      }))
+      .sort((a, b) => b.pts - a.pts)
+      .slice(0, 5);
+  }
 
   // Sort by jersey number
-  onFloorStats.sort((a, b) => parseInt(a.number) - parseInt(b.number));
+  displayPlayers.sort((a, b) => parseInt(a.number || 0) - parseInt(b.number || 0));
 
   return (
-    <div className="flex-1 flex flex-col" data-testid={`${team}-panel`}>
-      {/* Team Header */}
-      <div className="flex items-center gap-4 mb-4 px-4">
-        {/* Logo */}
-        <div 
-          className="w-20 h-20 rounded-full flex items-center justify-center border-4 overflow-hidden bg-zinc-700 flex-shrink-0"
-          style={{ borderColor: teamColor }}
-        >
-          {teamLogo ? (
-            <img src={teamLogo} alt={teamName} className="w-16 h-16 object-contain" />
-          ) : (
-            <span className="text-3xl font-bold text-white">{teamName?.charAt(0)}</span>
-          )}
-        </div>
-        
-        {/* Team Info */}
-        <div className="flex-1">
-          <div className="flex items-center gap-3 mb-1">
-            <h2 className="text-2xl font-bold text-white">{teamName}</h2>
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: teamColor }}></div>
-          </div>
-          
-          {/* Score */}
-          <div className="text-5xl font-bold text-white" style={{ color: teamColor }}>
-            {score}
-          </div>
-        </div>
-        
-        {/* Team Stats Column */}
-        <div className="text-right">
-          {/* Timeouts */}
-          <div className="flex items-center justify-end gap-1 mb-2">
-            <span className="text-zinc-400 text-sm mr-2">TO:</span>
-            {Array.from({ length: totalTimeouts || 4 }, (_, i) => (
-              <div
-                key={i}
-                className="w-3 h-3 rounded-full"
-                style={{
-                  backgroundColor: i < (timeoutsUsed || 0) ? '#6b7280' : teamColor
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Team Fouls */}
-          <div className="text-zinc-400 text-sm">
-            Team Fouls: <span className="text-white font-bold">{totalFouls}</span>
-          </div>
-          
-          {/* Bonus Status */}
-          {bonusStatus && (
-            <div className="mt-1">
-              <span className="text-xs font-bold px-2 py-1 bg-yellow-500 text-black rounded">
-                {bonusStatus === "double_bonus" ? "DOUBLE BONUS" : "BONUS"}
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
+    <div 
+      className="flex-1 flex flex-col relative overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, #0d1f3c 0%, #162d50 50%, #1a3a5c 100%)`
+      }}
+    >
+      {/* Subtle grid pattern overlay */}
+      <div 
+        className="absolute inset-0 opacity-[0.08]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(100, 150, 255, 0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(100, 150, 255, 0.15) 1px, transparent 1px)
+          `,
+          backgroundSize: '50px 50px'
+        }}
+      />
       
-      {/* Players Table */}
-      <div className="flex-1 px-4">
-        <table className="w-full">
-          <thead>
-            <tr className="text-zinc-400 text-sm border-b border-zinc-600">
-              <th className="text-left py-2 w-12">#</th>
-              <th className="text-left py-2">PLAYER</th>
-              <th className="text-center py-2 w-16">PTS</th>
-              <th className="text-center py-2 w-16">FG</th>
-              <th className="text-center py-2 w-16">FT</th>
-              <th className="text-center py-2 w-12">REB</th>
-              <th className="text-center py-2 w-12">A</th>
-              <th className="text-center py-2 w-12">PF</th>
-            </tr>
-          </thead>
-          <tbody>
-            {onFloorStats.length > 0 ? (
-              onFloorStats.map((player, idx) => (
-                <tr 
-                  key={idx} 
-                  className="text-white border-b border-zinc-700/50 hover:bg-zinc-700/30"
-                >
-                  <td className="py-3 font-bold" style={{ color: teamColor }}>
-                    {player.number}
-                  </td>
-                  <td className="py-3 font-medium truncate max-w-[150px]">
-                    {player.name}
-                  </td>
-                  <td className="py-3 text-center font-bold text-xl">
-                    {player.pts}
-                  </td>
-                  <td className="py-3 text-center text-zinc-300">
-                    {player.fg}
-                  </td>
-                  <td className="py-3 text-center text-zinc-300">
-                    {player.ft}
-                  </td>
-                  <td className="py-3 text-center">
-                    {player.totalReb}
-                  </td>
-                  <td className="py-3 text-center">
-                    {player.ast}
-                  </td>
-                  <td className="py-3 text-center">
-                    {player.pf >= 5 ? (
-                      <span className="text-red-500 font-bold">{player.pf}</span>
-                    ) : player.pf}
-                  </td>
-                </tr>
-              ))
+      {/* Content */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Team Header Bar */}
+        <div className="flex items-center px-8 py-4">
+          {/* Team Logo */}
+          <div className="flex-shrink-0 mr-6">
+            {teamLogo ? (
+              <img 
+                src={teamLogo} 
+                alt={teamName} 
+                className="w-20 h-20 object-contain drop-shadow-lg"
+              />
             ) : (
-              <tr>
-                <td colSpan="8" className="py-8 text-center text-zinc-500">
-                  No players on floor
-                </td>
-              </tr>
+              <div 
+                className="w-20 h-20 rounded-lg flex items-center justify-center text-5xl font-black text-white shadow-lg"
+                style={{ backgroundColor: teamColor }}
+              >
+                {teamName?.charAt(0) || '?'}
+              </div>
             )}
-            {/* Fill empty rows to maintain consistent height */}
-            {onFloorStats.length < 5 && Array.from({ length: 5 - onFloorStats.length }, (_, i) => (
-              <tr key={`empty-${i}`} className="border-b border-zinc-700/50">
-                <td colSpan="8" className="py-3">&nbsp;</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+          </div>
+          
+          {/* Team Name */}
+          <h2 
+            className="text-5xl font-black text-white uppercase tracking-widest flex-1"
+            style={{ 
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+              fontFamily: "'Arial Black', 'Helvetica Black', sans-serif"
+            }}
+          >
+            {teamName}
+          </h2>
+          
+          {/* Stats Section */}
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3">
+              <span className="text-gray-300 text-lg font-semibold tracking-wider uppercase">Timeouts</span>
+              <span className="text-white text-3xl font-black">{timeouts}</span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <span className="text-gray-300 text-lg font-semibold tracking-wider uppercase">Fouls</span>
+              <span className="text-white text-3xl font-black">{totalFouls}</span>
+            </div>
+            
+            {inBonus && (
+              <div 
+                className="px-5 py-2 rounded text-lg font-black uppercase tracking-wider text-white shadow-lg ml-4"
+                style={{ 
+                  backgroundColor: '#0ea5e9',
+                  boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)'
+                }}
+              >
+                BONUS
+              </div>
+            )}
+          </div>
+        </div>
+        
+        {/* Team color accent line */}
+        <div 
+          className="h-1 mx-8"
+          style={{ 
+            backgroundColor: teamColor,
+            boxShadow: `0 0 10px ${teamColor}`
+          }}
+        />
+        
+        {/* Stats Table */}
+        <div className="flex-1 px-8 py-2">
+          {/* Table Header */}
+          <div className="grid grid-cols-[60px_1fr_80px_100px_80px_80px_60px_60px] gap-2 py-3 border-b border-gray-600/50">
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider">#</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider">Player</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">PTS</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">FG</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">FT</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">REB</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">A</div>
+            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">PF</div>
+          </div>
+
+          {/* Player Rows */}
+          <div className="divide-y divide-gray-700/30">
+            {displayPlayers.length === 0 ? (
+              <div className="py-8 text-center text-gray-400 text-2xl">
+                No players on floor
+              </div>
+            ) : (
+              displayPlayers.map((player, index) => (
+                <div 
+                  key={index}
+                  className="grid grid-cols-[60px_1fr_80px_100px_80px_80px_60px_60px] gap-2 py-3 items-center"
+                >
+                  <div className="text-2xl font-bold text-white">
+                    {player.number || '?'}
+                  </div>
+                  <div className="text-2xl font-bold text-white uppercase truncate">
+                    {player.name?.split(' ').pop() || 'Unknown'}
+                  </div>
+                  <div className="text-2xl font-black text-white text-center">
+                    {player.pts}
+                  </div>
+                  <div className="text-xl text-white text-center">
+                    {player.fg}
+                  </div>
+                  <div className="text-xl text-white text-center">
+                    {player.ft}
+                  </div>
+                  <div className="text-xl text-white text-center">
+                    {player.totalReb}
+                  </div>
+                  <div className="text-xl text-white text-center">
+                    {player.ast}
+                  </div>
+                  <div className={`text-xl text-center ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
+                    {player.pf}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
-};
+}
 
 export default function Jumbotron() {
   const { shareCode } = useParams();
@@ -178,27 +216,22 @@ export default function Jumbotron() {
   const [loading, setLoading] = useState(true);
   const hasLoadedOnce = React.useRef(false);
 
+  const fetchData = useCallback(async () => {
+    try {
+      const res = await axios.get(`${API}/games/share/${shareCode}`);
+      setGame(res.data);
+      hasLoadedOnce.current = true;
+      setLoading(false);
+    } catch (err) {
+      if (!hasLoadedOnce.current) {
+        setLoading(false);
+      }
+    }
+  }, [shareCode]);
+
   useEffect(() => {
-    let mounted = true;
     hasLoadedOnce.current = false;
     setLoading(true);
-    
-    const fetchData = async () => {
-      try {
-        const res = await axios.get(`${API}/games/share/${shareCode}`);
-        if (mounted) {
-          setGame(res.data);
-          hasLoadedOnce.current = true;
-          setLoading(false);
-        }
-      } catch (err) {
-        if (mounted && !hasLoadedOnce.current) {
-          // Only set loading false on first failed attempt
-          setLoading(false);
-        }
-        // If we've loaded once, silently ignore errors (keep showing last data)
-      }
-    };
     
     // Initial fetch
     fetchData();
@@ -206,11 +239,8 @@ export default function Jumbotron() {
     // Auto-refresh every 2 seconds
     const interval = setInterval(fetchData, 2000);
     
-    return () => {
-      mounted = false;
-      clearInterval(interval);
-    };
-  }, [shareCode]);
+    return () => clearInterval(interval);
+  }, [fetchData]);
 
   // Calculate score from quarter scores
   const calculateScore = (team) => {
@@ -219,39 +249,17 @@ export default function Jumbotron() {
 
   // Calculate total team fouls
   const calculateTeamFouls = (stats) => {
-    return stats?.reduce((sum, p) => sum + (p.fouls || 0), 0) || 0;
+    return stats?.reduce((sum, p) => sum + (p.fouls || p.foul || p.pf || 0), 0) || 0;
   };
 
-  // Get quarter/period label
-  const getQuarterLabel = (q) => {
-    const periodLabelType = game?.period_label;
-    
-    if (periodLabelType === "Half") {
-      if (q === 1) return "1st Half";
-      if (q === 2) return "2nd Half";
-      return `OT${q - 2}`;
-    }
-    
-    const label = periodLabelType === "Period" ? "P" : "Q";
-    if (q <= 4) return `${label}${q}`;
-    return `OT${q - 4}`;
-  };
-
-  // Format clock time
-  const formatClockTime = (seconds) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  // Check bonus status (opponent's fouls determine bonus)
+  const getBonus = (opponentFouls) => opponentFouls >= 7;
 
   // Show loading only on initial load
   if (loading && !game) {
     return (
-      <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
-        <div className="text-center">
-          <RefreshCw className="w-10 h-10 animate-spin mx-auto text-zinc-400" />
-          <p className="mt-4 text-zinc-400">Loading jumbotron...</p>
-        </div>
+      <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
+        <div className="text-white text-3xl font-bold tracking-wider animate-pulse">LOADING...</div>
       </div>
     );
   }
@@ -259,110 +267,62 @@ export default function Jumbotron() {
   // Show error only if we never got any data
   if (!game) {
     return (
-      <div className="min-h-screen bg-zinc-800 flex items-center justify-center">
+      <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-white mb-2">Game Not Found</h2>
-          <p className="text-zinc-400">Unable to load game data for share code: {shareCode}</p>
+          <h2 className="text-3xl font-bold text-white mb-2">Game Not Found</h2>
+          <p className="text-gray-400">Unable to load game data for share code: {shareCode}</p>
         </div>
       </div>
     );
   }
-
-  // If we have game data, ALWAYS show it (never show error if we have data)
 
   const homeStats = game.home_player_stats || [];
   const awayStats = game.away_player_stats || [];
   const homeOnFloor = game.home_on_floor || [];
   const awayOnFloor = game.away_on_floor || [];
   
-  const homeColor = game.home_team_color || "#dc2626";
-  const awayColor = game.away_team_color || "#7c3aed";
+  const homeColor = game.home_team_color || "#d4a017";
+  const awayColor = game.away_team_color || "#8b0000";
+
+  const homeFouls = calculateTeamFouls(homeStats);
+  const awayFouls = calculateTeamFouls(awayStats);
+
+  // Calculate remaining timeouts (if using timeouts_used, otherwise show total)
+  const homeTimeouts = game.home_timeouts ?? (game.total_timeouts || 5) - (game.home_timeouts_used || 0);
+  const awayTimeouts = game.away_timeouts ?? (game.total_timeouts || 5) - (game.away_timeouts_used || 0);
 
   return (
-    <div className="min-h-screen bg-zinc-800 flex flex-col" data-testid="jumbotron-page">
-      {/* Header - Game Status */}
-      <div className="bg-zinc-900 py-3 px-6 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <img src="/logo-black.png" alt="StatMoose" className="w-6 h-6 invert opacity-60" />
-          <span className="text-zinc-400 text-sm font-medium">StatMoose</span>
-        </div>
-        
-        {/* Center - Clock and Period */}
-        <div className="flex items-center gap-6">
-          {game.clock_enabled && (
-            <div className="text-4xl font-mono font-bold text-white">
-              {formatClockTime(game.clock_time || 0)}
-            </div>
-          )}
-          
-          <div className={`text-lg font-bold px-4 py-1.5 rounded-lg ${
-            game.status === "active" 
-              ? (game.is_halftime ? "bg-orange-600" : "bg-green-600")
-              : game.status === "scheduled" 
-                ? "bg-blue-600" 
-                : "bg-zinc-600"
-          } text-white`}>
-            {game.status === "active" 
-              ? (game.is_halftime ? "HALFTIME" : getQuarterLabel(game.current_quarter))
-              : game.status === "scheduled" 
-                ? "NOT STARTED" 
-                : "FINAL"}
-          </div>
-        </div>
-        
-        {/* Right side - Live indicator */}
-        {game.status === "active" && (
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
-            <span className="text-red-400 text-sm font-bold">LIVE</span>
-          </div>
-        )}
-        {game.status !== "active" && <div className="w-20"></div>}
-      </div>
-
-      {/* Main Content - Two Team Panels */}
-      <div className="flex-1 flex divide-x divide-zinc-700">
-        {/* Home Team */}
-        <TeamPanel
-          team="home"
-          teamName={game.home_team_name}
-          teamLogo={game.home_team_logo}
-          teamColor={homeColor}
-          score={calculateScore("home")}
-          timeoutsUsed={game.home_timeouts_used}
-          totalTimeouts={game.total_timeouts}
-          totalFouls={calculateTeamFouls(homeStats)}
-          bonusStatus={game.home_bonus}
-          onFloorPlayers={homeOnFloor}
-          allStats={homeStats}
-          isHome={true}
-        />
-        
-        {/* Away Team */}
-        <TeamPanel
-          team="away"
-          teamName={game.away_team_name}
-          teamLogo={game.away_team_logo}
-          teamColor={awayColor}
-          score={calculateScore("away")}
-          timeoutsUsed={game.away_timeouts_used}
-          totalTimeouts={game.total_timeouts}
-          totalFouls={calculateTeamFouls(awayStats)}
-          bonusStatus={game.away_bonus}
-          onFloorPlayers={awayOnFloor}
-          allStats={awayStats}
-          isHome={false}
-        />
-      </div>
-
-      {/* Footer - Score summary */}
-      <div className="bg-zinc-900 py-2 px-6">
-        <div className="flex items-center justify-center gap-8 text-zinc-400 text-sm">
-          <span>{game.home_team_name}: <strong className="text-white">{calculateScore("home")}</strong></span>
-          <span className="text-zinc-600">|</span>
-          <span>{game.away_team_name}: <strong className="text-white">{calculateScore("away")}</strong></span>
-        </div>
-      </div>
+    <div 
+      className="h-screen w-screen flex flex-col overflow-hidden" 
+      style={{ backgroundColor: '#0a1628' }}
+      data-testid="jumbotron-page"
+    >
+      {/* Home Team Panel (Top Half) */}
+      <TeamPanel
+        teamName={game.home_team_name}
+        teamLogo={game.home_team_logo}
+        teamColor={homeColor}
+        timeouts={homeTimeouts}
+        totalFouls={homeFouls}
+        inBonus={getBonus(awayFouls)}
+        onFloorPlayers={homeOnFloor}
+        allStats={homeStats}
+      />
+      
+      {/* Thin separator line with subtle glow */}
+      <div className="h-[2px] bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
+      
+      {/* Away Team Panel (Bottom Half) */}
+      <TeamPanel
+        teamName={game.away_team_name}
+        teamLogo={game.away_team_logo}
+        teamColor={awayColor}
+        timeouts={awayTimeouts}
+        totalFouls={awayFouls}
+        inBonus={getBonus(homeFouls)}
+        onFloorPlayers={awayOnFloor}
+        allStats={awayStats}
+      />
     </div>
   );
 }
