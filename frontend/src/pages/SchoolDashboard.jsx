@@ -12,10 +12,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Building2, Calendar, Users, Trophy, Plus, Copy, RefreshCw, 
-  ChevronLeft, ChevronRight, ArrowLeft, LogOut, Settings,
-  Basketball, CircleDot, Play, Clock, Timer
+  ChevronLeft, ChevronRight, LogOut, Settings, Edit,
+  Play, Clock, Timer, BarChart3, Save, Upload
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -40,12 +41,10 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
     const lastDay = new Date(year, month + 1, 0);
     const days = [];
     
-    // Add empty days for padding
     for (let i = 0; i < firstDay.getDay(); i++) {
       days.push(null);
     }
     
-    // Add actual days
     for (let i = 1; i <= lastDay.getDate(); i++) {
       days.push(new Date(year, month, i));
     }
@@ -61,11 +60,12 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
 
   const days = getDaysInMonth(currentMonth);
   const monthNames = ["January", "February", "March", "April", "May", "June",
-                      "July", "August", "September", "October", "November", "December"];
+    "July", "August", "September", "October", "November", "December"];
+  const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const today = new Date();
 
   return (
-    <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-      {/* Calendar Header */}
+    <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
@@ -75,7 +75,7 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
         >
           <ChevronLeft className="w-4 h-4" />
         </Button>
-        <h3 className="text-lg font-semibold text-white">
+        <h3 className="text-white font-semibold">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
         </h3>
         <Button
@@ -87,54 +87,45 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
           <ChevronRight className="w-4 h-4" />
         </Button>
       </div>
-
-      {/* Day Headers */}
+      
       <div className="grid grid-cols-7 gap-1 mb-2">
-        {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
-          <div key={day} className="text-center text-xs text-slate-500 py-1">
-            {day}
-          </div>
+        {dayNames.map(day => (
+          <div key={day} className="text-center text-xs text-slate-500 py-1">{day}</div>
         ))}
       </div>
-
-      {/* Calendar Grid */}
+      
       <div className="grid grid-cols-7 gap-1">
         {days.map((date, idx) => {
           if (!date) {
-            return <div key={`empty-${idx}`} className="h-20" />;
+            return <div key={`empty-${idx}`} className="h-16" />;
           }
           
           const dateGames = getGamesForDate(date);
-          const isToday = date.toDateString() === new Date().toDateString();
-          const isSelected = selectedDate && date.toDateString() === selectedDate.toDateString();
+          const isToday = date.toDateString() === today.toDateString();
           
           return (
             <div
-              key={idx}
-              onClick={() => onDateChange(date)}
-              className={`h-20 p-1 rounded cursor-pointer transition-colors ${
-                isToday ? "bg-orange-500/20 border border-orange-500" :
-                isSelected ? "bg-slate-700" :
-                "hover:bg-slate-700/50"
+              key={date.toISOString()}
+              className={`h-16 rounded p-1 cursor-pointer transition-colors ${
+                isToday ? "bg-orange-500/20 border border-orange-500" : "hover:bg-slate-700/50"
               }`}
+              onClick={() => onDateChange(date)}
             >
-              <div className={`text-xs ${isToday ? "text-orange-400 font-bold" : "text-slate-400"}`}>
+              <div className={`text-xs mb-1 ${isToday ? "text-orange-400 font-bold" : "text-slate-400"}`}>
                 {date.getDate()}
               </div>
-              <div className="mt-1 space-y-0.5">
-                {dateGames.slice(0, 2).map((game, i) => (
+              <div className="space-y-0.5 overflow-hidden">
+                {dateGames.slice(0, 2).map(game => (
                   <div
-                    key={i}
+                    key={game.id}
                     onClick={(e) => { e.stopPropagation(); onGameClick(game); }}
-                    className={`text-xs truncate px-1 rounded cursor-pointer ${
+                    className={`text-xs px-1 py-0.5 rounded truncate cursor-pointer ${
                       game.status === "active" 
-                        ? "bg-green-500/30 text-green-400 animate-pulse" 
-                        : game.status === "final"
-                        ? "bg-slate-600 text-slate-300"
-                        : "bg-blue-500/30 text-blue-400"
+                        ? "bg-green-500/30 text-green-400" 
+                        : "bg-slate-600/50 text-slate-300"
                     }`}
                   >
-                    {game.sport === "basketball" ? "🏀" : "🏈"} {game.home_team_name?.substring(0, 8)}
+                    {game.home_team_name?.split(' ')[0]}
                   </div>
                 ))}
                 {dateGames.length > 2 && (
@@ -162,6 +153,9 @@ export default function SchoolDashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [userRole, setUserRole] = useState("member");
   
+  // Active tab
+  const [activeTab, setActiveTab] = useState("schedule");
+  
   // Dialog states
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [showSeasonDialog, setShowSeasonDialog] = useState(false);
@@ -174,36 +168,48 @@ export default function SchoolDashboard() {
   // Invite link
   const [inviteLink, setInviteLink] = useState("");
   
+  // Edit school form
+  const [editForm, setEditForm] = useState({
+    name: "",
+    state: "",
+    logo_url: "",
+    primary_color: "#f97316"
+  });
+  const [editLoading, setEditLoading] = useState(false);
+  
   // Game setup options (for starting scheduled games)
   const [gameSetup, setGameSetup] = useState({
-    statMode: "classic", // "simple", "classic", "advanced"
+    statMode: "classic",
     clockEnabled: false,
     periodMinutes: 12,
-    periodLabel: "Quarter", // "Quarter", "Half", "Period"
-    timeoutPreset: "college", // "high_school", "college", "custom"
+    periodLabel: "Quarter",
+    timeoutPreset: "college",
     customTimeouts: 4
   });
 
   const fetchData = useCallback(async () => {
     try {
-      // Check both localStorage and sessionStorage for token
       const token = localStorage.getItem("session_token") || sessionStorage.getItem("session_token");
       if (!token) {
         navigate("/login");
         return;
       }
       
-      // No need for manual headers - axios interceptor handles auth
-      
-      // Get school info - axios interceptor handles auth header
       const schoolRes = await axios.get(`${API}/schools/my-school`);
       setSchool(schoolRes.data);
       setUserRole(schoolRes.data.user_role);
       
+      // Initialize edit form with school data
+      setEditForm({
+        name: schoolRes.data.name || "",
+        state: schoolRes.data.state || "",
+        logo_url: schoolRes.data.logo_url || "",
+        primary_color: schoolRes.data.primary_color || "#f97316"
+      });
+      
       const schoolId = schoolRes.data.school_id;
       setInviteLink(`${window.location.origin}/school/join/${schoolRes.data.invite_code}`);
       
-      // Get members, seasons, and calendar data
       const [membersRes, seasonsRes, calendarRes] = await Promise.all([
         axios.get(`${API}/schools/${schoolId}/members`),
         axios.get(`${API}/schools/${schoolId}/seasons`),
@@ -212,18 +218,16 @@ export default function SchoolDashboard() {
       
       setMembers(membersRes.data);
       setSeasons(seasonsRes.data);
-      setGames(calendarRes.data.games || []);
+      setGames(calendarRes.data);
       
     } catch (error) {
       console.error("Error fetching school data:", error);
       if (error.response?.status === 404) {
-        // User doesn't have a school - redirect to select-sport (not "/" which also redirects)
         toast.error("You are not part of any school");
         navigate("/select-sport");
       } else if (error.response?.status === 401) {
         navigate("/login");
       } else {
-        // For other errors, just show error state but don't redirect
         toast.error("Failed to load school dashboard");
       }
     } finally {
@@ -235,6 +239,18 @@ export default function SchoolDashboard() {
     fetchData();
   }, [fetchData]);
 
+  const handleUpdateRole = async (userId, newRole) => {
+    try {
+      await axios.put(`${API}/schools/${school.school_id}/members/${userId}/role`, {
+        role: newRole
+      });
+      toast.success(`Role updated to ${newRole}`);
+      fetchData();
+    } catch (error) {
+      toast.error("Failed to update role");
+    }
+  };
+
   const handleCopyInvite = () => {
     navigator.clipboard.writeText(inviteLink);
     toast.success("Invite link copied!");
@@ -242,14 +258,9 @@ export default function SchoolDashboard() {
 
   const handleRegenerateInvite = async () => {
     try {
-      const token = sessionStorage.getItem("session_token");
-      const res = await axios.post(
-        `${API}/schools/${school.school_id}/regenerate-invite`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await axios.post(`${API}/schools/${school.school_id}/regenerate-invite`);
       setInviteLink(`${window.location.origin}/school/join/${res.data.invite_code}`);
-      toast.success("New invite link generated!");
+      toast.success("Invite link regenerated!");
     } catch (error) {
       toast.error("Failed to regenerate invite link");
     }
@@ -262,43 +273,22 @@ export default function SchoolDashboard() {
     }
     
     try {
-      const token = sessionStorage.getItem("session_token");
-      await axios.post(
-        `${API}/schools/${school.school_id}/seasons`,
-        newSeason,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await axios.post(`${API}/schools/${school.school_id}/seasons`, newSeason);
       toast.success("Season created!");
       setShowSeasonDialog(false);
       setNewSeason({ name: "", sport: "basketball" });
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to create season");
-    }
-  };
-
-  const handleUpdateRole = async (userId, newRole) => {
-    try {
-      const token = sessionStorage.getItem("session_token");
-      await axios.put(
-        `${API}/schools/${school.school_id}/members/${userId}/role`,
-        { role: newRole },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      toast.success(`Role updated to ${newRole}`);
-      fetchData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to update role");
+      toast.error("Failed to create season");
     }
   };
 
   const handleGameClick = (game) => {
     setSelectedGame(game);
-    // Reset game setup based on sport
     if (game.sport === "football") {
       setGameSetup({
         statMode: "classic",
-        clockEnabled: true, // Always on for football
+        clockEnabled: true,
         periodMinutes: 12,
         periodLabel: "Quarter",
         timeoutPreset: "custom",
@@ -320,10 +310,8 @@ export default function SchoolDashboard() {
   const handleStartGame = async () => {
     if (!selectedGame) return;
     
-    // If game is not started yet, update it with game settings
     if (selectedGame.status === "scheduled") {
       try {
-        // Update the game with setup options
         await axios.put(`${API}/games/${selectedGame.id}`, {
           status: "active",
           simple_mode: gameSetup.statMode === "simple",
@@ -343,10 +331,8 @@ export default function SchoolDashboard() {
       }
     }
     
-    // Select the sport first (required by SportProtectedRoute)
     selectSport(selectedGame.sport);
     
-    // Navigate to stat tracker based on mode
     if (selectedGame.sport === "football") {
       navigate(`/football/${selectedGame.id}`);
     } else if (gameSetup.statMode === "advanced") {
@@ -356,8 +342,25 @@ export default function SchoolDashboard() {
     }
   };
 
+  const handleSaveSchool = async () => {
+    if (!editForm.name.trim()) {
+      toast.error("School name is required");
+      return;
+    }
+    
+    setEditLoading(true);
+    try {
+      await axios.put(`${API}/schools/${school.school_id}`, editForm);
+      toast.success("School updated successfully!");
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update school");
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   const handleLogout = () => {
-    // Clear both storages
     localStorage.removeItem("session_token");
     localStorage.removeItem("user");
     localStorage.removeItem("remember_me");
@@ -383,7 +386,7 @@ export default function SchoolDashboard() {
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
           <p className="text-slate-400">School not found</p>
-          <Button onClick={() => navigate("/")} className="mt-4">
+          <Button onClick={() => navigate("/select-sport")} className="mt-4">
             Go Home
           </Button>
         </div>
@@ -395,22 +398,49 @@ export default function SchoolDashboard() {
 
   return (
     <div className="min-h-screen bg-slate-900">
-      {/* Header */}
-      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
+      {/* Main Header */}
+      <header className="bg-slate-800 border-b border-slate-700 px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            {school.logo_url ? (
-              <img src={school.logo_url} alt={school.name} className="w-12 h-12 object-contain rounded" />
-            ) : (
-              <div className="w-12 h-12 bg-orange-500/20 rounded flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-orange-500" />
+            {/* StatMoose Logo - clickable to go to sport selection */}
+            <div 
+              className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity pr-4 border-r border-slate-600"
+              onClick={() => navigate("/select-sport")}
+            >
+              <img 
+                src="/logo192.png" 
+                alt="StatMoose" 
+                className="w-8 h-8"
+                onError={(e) => {
+                  e.target.style.display = 'none';
+                  e.target.nextSibling.style.display = 'flex';
+                }}
+              />
+              <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center hidden">
+                <span className="text-white font-bold text-xs">SM</span>
               </div>
-            )}
-            <div>
-              <h1 className="text-xl font-bold text-white">{school.name}</h1>
-              <p className="text-sm text-slate-400">{school.state}</p>
+              <span className="text-orange-500 font-bold text-lg">StatMoose</span>
+            </div>
+            
+            {/* School Logo and Name */}
+            <div className="flex items-center gap-3">
+              {school.logo_url ? (
+                <img src={school.logo_url} alt={school.name} className="w-10 h-10 object-contain rounded" />
+              ) : (
+                <div 
+                  className="w-10 h-10 rounded flex items-center justify-center"
+                  style={{ backgroundColor: school.primary_color || '#f97316' }}
+                >
+                  <Building2 className="w-5 h-5 text-white" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-lg font-bold text-white">{school.name}</h1>
+                <p className="text-xs text-slate-400">{school.state}</p>
+              </div>
             </div>
           </div>
+          
           <div className="flex items-center gap-3">
             <Badge variant={userRole === "admin" ? "default" : "secondary"}>
               {userRole === "admin" ? "Admin" : "Member"}
@@ -423,105 +453,288 @@ export default function SchoolDashboard() {
         </div>
       </header>
 
+      {/* Submenu */}
+      <div className="bg-slate-800/50 border-b border-slate-700 px-6">
+        <nav className="flex gap-1">
+          <Button
+            variant="ghost"
+            onClick={() => setActiveTab("schedule")}
+            className={`rounded-none border-b-2 ${
+              activeTab === "schedule" 
+                ? "border-orange-500 text-orange-400" 
+                : "border-transparent text-slate-400 hover:text-white"
+            }`}
+          >
+            <Calendar className="w-4 h-4 mr-2" />
+            Schedule
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setActiveTab("stats")}
+            className={`rounded-none border-b-2 ${
+              activeTab === "stats" 
+                ? "border-orange-500 text-orange-400" 
+                : "border-transparent text-slate-400 hover:text-white"
+            }`}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            Stats
+          </Button>
+          <Button
+            variant="ghost"
+            onClick={() => setActiveTab("members")}
+            className={`rounded-none border-b-2 ${
+              activeTab === "members" 
+                ? "border-orange-500 text-orange-400" 
+                : "border-transparent text-slate-400 hover:text-white"
+            }`}
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Members
+          </Button>
+          {userRole === "admin" && (
+            <Button
+              variant="ghost"
+              onClick={() => setActiveTab("edit")}
+              className={`rounded-none border-b-2 ${
+                activeTab === "edit" 
+                  ? "border-orange-500 text-orange-400" 
+                  : "border-transparent text-slate-400 hover:text-white"
+              }`}
+            >
+              <Edit className="w-4 h-4 mr-2" />
+              Edit School
+            </Button>
+          )}
+        </nav>
+      </div>
+
       <div className="flex">
         {/* Main Content */}
         <div className="flex-1 p-6">
-          {/* Calendar Section */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-orange-500" />
-                Schedule
-              </h2>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedDate(new Date())}
-                className="text-orange-400 hover:text-orange-300"
-              >
-                Today
-              </Button>
-            </div>
-            <SchoolCalendar
-              games={games}
-              onGameClick={handleGameClick}
-              selectedDate={selectedDate}
-              onDateChange={setSelectedDate}
-            />
-          </div>
-
-          {/* Members Section */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-                <Users className="w-5 h-5 text-orange-500" />
-                Team Members ({members.length})
-              </h2>
-              {userRole === "admin" && (
+          {/* Schedule Tab */}
+          {activeTab === "schedule" && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-orange-500" />
+                  Calendar
+                </h2>
                 <Button
-                  variant="outline"
+                  variant="ghost"
                   size="sm"
-                  onClick={() => setShowInviteDialog(true)}
-                  className="border-orange-500 text-orange-400 hover:bg-orange-500/10"
+                  onClick={() => setSelectedDate(new Date())}
+                  className="text-orange-400 hover:text-orange-300"
                 >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Invite
+                  Today
                 </Button>
+              </div>
+              <SchoolCalendar
+                games={games}
+                onGameClick={handleGameClick}
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+              />
+            </div>
+          )}
+
+          {/* Stats Tab */}
+          {activeTab === "stats" && (
+            <div>
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-orange-500" />
+                Season Statistics
+              </h2>
+              
+              {seasons.length === 0 ? (
+                <div className="bg-slate-800/50 rounded-lg p-8 border border-slate-700 text-center">
+                  <Trophy className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+                  <p className="text-slate-400">No seasons created yet</p>
+                  <p className="text-slate-500 text-sm mt-2">Create a season to start tracking stats</p>
+                </div>
+              ) : (
+                <div className="grid gap-4">
+                  {seasons.map(season => (
+                    <Card 
+                      key={season.season_id}
+                      className="bg-slate-800/50 border-slate-700 cursor-pointer hover:border-orange-500/50 transition-colors"
+                      onClick={() => navigate(`/school/season/${season.season_id}/stats`)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <span className="text-2xl">{season.sport === "basketball" ? "🏀" : "🏈"}</span>
+                            <div>
+                              <h3 className="font-semibold text-white">{season.name}</h3>
+                              <p className="text-sm text-slate-400">
+                                {season.games_count || 0} games played
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-slate-500" />
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               )}
             </div>
-            
-            <Card className="bg-slate-800/50 border-slate-700">
-              <CardContent className="p-0">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-slate-700">
-                      <th className="text-left text-slate-400 text-sm p-3">Name</th>
-                      <th className="text-left text-slate-400 text-sm p-3">Email</th>
-                      <th className="text-left text-slate-400 text-sm p-3">Role</th>
-                      {userRole === "admin" && <th className="text-left text-slate-400 text-sm p-3">Actions</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {members.map(member => (
-                      <tr key={member.user_id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
-                        <td className="p-3 text-white">{member.name}</td>
-                        <td className="p-3 text-slate-400">{member.email}</td>
-                        <td className="p-3">
-                          <Badge variant={member.school_role === "admin" ? "default" : "secondary"}>
-                            {member.school_role}
-                          </Badge>
-                        </td>
-                        {userRole === "admin" && (
-                          <td className="p-3">
-                            {member.school_role === "member" && adminCount < 3 && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleUpdateRole(member.user_id, "admin")}
-                                className="text-orange-400 hover:text-orange-300"
-                              >
-                                Make Admin
-                              </Button>
-                            )}
-                            {member.school_role === "admin" && adminCount > 1 && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => handleUpdateRole(member.user_id, "member")}
-                                className="text-slate-400 hover:text-slate-300"
-                              >
-                                Remove Admin
-                              </Button>
-                            )}
-                          </td>
-                        )}
+          )}
+
+          {/* Members Tab */}
+          {activeTab === "members" && (
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+                  <Users className="w-5 h-5 text-orange-500" />
+                  Team Members ({members.length})
+                </h2>
+                {userRole === "admin" && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowInviteDialog(true)}
+                    className="border-orange-500 text-orange-400 hover:bg-orange-500/10"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Invite
+                  </Button>
+                )}
+              </div>
+              
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-0">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left text-slate-400 text-sm p-3">Name</th>
+                        <th className="text-left text-slate-400 text-sm p-3">Email</th>
+                        <th className="text-left text-slate-400 text-sm p-3">Role</th>
+                        {userRole === "admin" && <th className="text-left text-slate-400 text-sm p-3">Actions</th>}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </CardContent>
-            </Card>
-          </div>
+                    </thead>
+                    <tbody>
+                      {members.map(member => (
+                        <tr key={member.user_id} className="border-b border-slate-700/50 hover:bg-slate-700/30">
+                          <td className="p-3 text-white">{member.name}</td>
+                          <td className="p-3 text-slate-400">{member.email}</td>
+                          <td className="p-3">
+                            <Badge variant={member.school_role === "admin" ? "default" : "secondary"}>
+                              {member.school_role}
+                            </Badge>
+                          </td>
+                          {userRole === "admin" && (
+                            <td className="p-3">
+                              {member.school_role === "member" && adminCount < 3 && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleUpdateRole(member.user_id, "admin")}
+                                  className="text-orange-400 hover:text-orange-300"
+                                >
+                                  Make Admin
+                                </Button>
+                              )}
+                              {member.school_role === "admin" && adminCount > 1 && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleUpdateRole(member.user_id, "member")}
+                                  className="text-slate-400 hover:text-slate-300"
+                                >
+                                  Remove Admin
+                                </Button>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
+          {/* Edit School Tab */}
+          {activeTab === "edit" && userRole === "admin" && (
+            <div>
+              <h2 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+                <Settings className="w-5 h-5 text-orange-500" />
+                Edit School
+              </h2>
+              
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-6 space-y-4">
+                  <div>
+                    <Label className="text-slate-200">School Name</Label>
+                    <Input
+                      value={editForm.name}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                      className="bg-slate-900 border-slate-600 text-white mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-slate-200">State</Label>
+                    <Input
+                      value={editForm.state}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, state: e.target.value }))}
+                      placeholder="e.g., Texas"
+                      className="bg-slate-900 border-slate-600 text-white mt-1"
+                    />
+                  </div>
+                  
+                  <div>
+                    <Label className="text-slate-200">Logo URL</Label>
+                    <Input
+                      value={editForm.logo_url}
+                      onChange={(e) => setEditForm(prev => ({ ...prev, logo_url: e.target.value }))}
+                      placeholder="https://example.com/logo.png"
+                      className="bg-slate-900 border-slate-600 text-white mt-1"
+                    />
+                    {editForm.logo_url && (
+                      <div className="mt-2 flex items-center gap-2">
+                        <img 
+                          src={editForm.logo_url} 
+                          alt="Preview" 
+                          className="w-16 h-16 object-contain rounded border border-slate-600"
+                          onError={(e) => e.target.style.display = 'none'}
+                        />
+                        <span className="text-xs text-slate-500">Preview</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <Label className="text-slate-200">Primary Color</Label>
+                    <div className="flex gap-2 mt-1">
+                      <input
+                        type="color"
+                        value={editForm.primary_color}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, primary_color: e.target.value }))}
+                        className="w-12 h-10 rounded border border-slate-600 cursor-pointer"
+                      />
+                      <Input
+                        value={editForm.primary_color}
+                        onChange={(e) => setEditForm(prev => ({ ...prev, primary_color: e.target.value }))}
+                        className="bg-slate-900 border-slate-600 text-white"
+                      />
+                    </div>
+                  </div>
+                  
+                  <Button 
+                    onClick={handleSaveSchool}
+                    disabled={editLoading}
+                    className="w-full bg-orange-500 hover:bg-orange-600 mt-4"
+                  >
+                    <Save className="w-4 h-4 mr-2" />
+                    {editLoading ? "Saving..." : "Save Changes"}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
         </div>
 
         {/* Seasons Sidebar */}
@@ -543,7 +756,7 @@ export default function SchoolDashboard() {
             )}
           </div>
           
-          <ScrollArea className="h-[calc(100vh-200px)]">
+          <ScrollArea className="h-[calc(100vh-260px)]">
             <div className="space-y-3">
               {seasons.length === 0 ? (
                 <p className="text-slate-500 text-center py-8">No seasons yet</p>
@@ -598,10 +811,10 @@ export default function SchoolDashboard() {
             <Button
               onClick={handleRegenerateInvite}
               variant="ghost"
-              className="text-slate-400 hover:text-white"
+              className="w-full text-slate-400"
             >
               <RefreshCw className="w-4 h-4 mr-2" />
-              Generate new link
+              Regenerate Link
             </Button>
           </div>
         </DialogContent>
@@ -611,10 +824,7 @@ export default function SchoolDashboard() {
       <Dialog open={showSeasonDialog} onOpenChange={setShowSeasonDialog}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
-            <DialogTitle>Create New Season</DialogTitle>
-            <DialogDescription className="text-slate-400">
-              Create a new season for your school
-            </DialogDescription>
+            <DialogTitle>Create Season</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -694,7 +904,6 @@ export default function SchoolDashboard() {
                 </Button>
               ) : selectedGame.status === "scheduled" ? (
                 <>
-                  {/* Game Setup Options - Basketball only */}
                   {selectedGame.sport === "basketball" && (
                     <div className="space-y-4 border-t border-slate-700 pt-4">
                       <Label className="text-sm font-semibold text-slate-200">Stat Tracking Mode</Label>
@@ -730,7 +939,7 @@ export default function SchoolDashboard() {
                           onClick={() => setGameSetup(prev => ({ 
                             ...prev, 
                             statMode: "advanced",
-                            clockEnabled: true // Advanced requires clock
+                            clockEnabled: true
                           }))}
                           className={`p-3 rounded-lg border-2 text-left transition-all ${
                             gameSetup.statMode === "advanced" 
@@ -745,7 +954,6 @@ export default function SchoolDashboard() {
                     </div>
                   )}
                   
-                  {/* Clock Options */}
                   <div className="space-y-3 border-t border-slate-700 pt-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
@@ -805,7 +1013,6 @@ export default function SchoolDashboard() {
                     )}
                   </div>
                   
-                  {/* Timeout Options */}
                   <div className="space-y-3 border-t border-slate-700 pt-4">
                     <Label className="text-sm font-semibold text-slate-200">Timeouts</Label>
                     {selectedGame.sport === "football" ? (
