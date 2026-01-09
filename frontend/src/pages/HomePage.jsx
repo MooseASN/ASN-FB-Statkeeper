@@ -212,9 +212,57 @@ const CTASection = () => {
 
 export default function HomePage() {
   const [heroRef, heroInView] = useInView();
+  const [showSweep, setShowSweep] = useState(false);
+
+  useEffect(() => {
+    // Trigger sweep animation after initial fade-in
+    const timer = setTimeout(() => {
+      setShowSweep(true);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <div className="min-h-screen bg-black">
+      {/* Sweep animation styles */}
+      <style>{`
+        @keyframes lightSweep {
+          0% {
+            left: -100%;
+          }
+          100% {
+            left: 200%;
+          }
+        }
+        .logo-sweep-container {
+          position: relative;
+          display: inline-block;
+          overflow: hidden;
+        }
+        .logo-sweep-container::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 50%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0) 20%,
+            rgba(255, 255, 255, 0.4) 50%,
+            rgba(255, 255, 255, 0) 80%,
+            transparent 100%
+          );
+          transform: skewX(-20deg);
+          animation: lightSweep 1.5s ease-in-out forwards;
+          animation-play-state: paused;
+        }
+        .logo-sweep-container.animate::after {
+          animation-play-state: running;
+        }
+      `}</style>
+
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -248,17 +296,19 @@ export default function HomePage() {
       {/* Hero Section */}
       <section ref={heroRef} className="pt-24 pb-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
         <div className="max-w-7xl mx-auto text-center py-16">
-          {/* Large Logo */}
+          {/* Large Logo with Sweep Animation */}
           <div 
             className={`mb-8 transition-all duration-1000 ${
               heroInView ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
             }`}
           >
-            <img 
-              src="/logo-white.png" 
-              alt="StatMoose" 
-              className="h-32 md:h-40 w-auto mx-auto"
-            />
+            <div className={`logo-sweep-container ${showSweep ? 'animate' : ''}`}>
+              <img 
+                src="/logo-white.png" 
+                alt="StatMoose" 
+                className="h-32 md:h-40 w-auto mx-auto"
+              />
+            </div>
           </div>
           
           <p 
