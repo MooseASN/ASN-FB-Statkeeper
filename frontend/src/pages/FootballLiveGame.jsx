@@ -2549,7 +2549,10 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   const receivingRoster = kickingTeam === 'home' ? awayRoster : homeRoster;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
+    <div className={`min-h-screen bg-zinc-950 text-white ${demoMode ? 'pt-10' : ''}`}>
+      {/* Demo Mode Bar */}
+      {demoMode && <DemoModeBar />}
+      
       {/* Set Clock Dialog */}
       <Dialog open={showSetClockDialog} onOpenChange={setShowSetClockDialog}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-sm">
