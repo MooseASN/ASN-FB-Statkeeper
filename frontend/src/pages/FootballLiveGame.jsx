@@ -4102,6 +4102,13 @@ export default function FootballLiveGame({ user, onLogout }) {
                             </Button>
                           ))}
                         </div>
+                        <Button 
+                          variant="outline" 
+                          className="w-full border-yellow-600 text-yellow-400 hover:bg-yellow-900/30 mt-2"
+                          onClick={() => setShowFgFieldView(true)}
+                        >
+                          🏈 Field Goal Field View
+                        </Button>
                         
                         <div className="text-sm text-zinc-400 uppercase mt-4">Result</div>
                         <div className="flex flex-wrap gap-2">
