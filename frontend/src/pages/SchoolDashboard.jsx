@@ -195,12 +195,16 @@ export default function SchoolDashboard() {
       setGames(calendarRes.data.games || []);
       
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching school data:", error);
       if (error.response?.status === 404) {
-        // User doesn't have a school - redirect to regular dashboard or signup
-        navigate("/");
+        // User doesn't have a school - redirect to select-sport (not "/" which also redirects)
+        toast.error("You are not part of any school");
+        navigate("/select-sport");
       } else if (error.response?.status === 401) {
         navigate("/login");
+      } else {
+        // For other errors, just show error state but don't redirect
+        toast.error("Failed to load school dashboard");
       }
     } finally {
       setLoading(false);
