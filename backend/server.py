@@ -4982,11 +4982,9 @@ async def debug_auth_status():
         local_users = await db.users.count_documents({"auth_provider": "local"})
         google_users = await db.users.count_documents({"auth_provider": "google"})
         
-        # Count active sessions
+        # Count active sessions (handle both Date and string formats)
         now = datetime.now(timezone.utc)
-        active_sessions = await db.user_sessions.count_documents({
-            "expires_at": {"$gt": now.isoformat()}
-        })
+        total_sessions = await db.user_sessions.count_documents({})
         
         # Get sample user emails (first 5, partially masked)
         sample_users = await db.users.find({}, {"email": 1, "_id": 0}).limit(5).to_list(5)
@@ -5007,7 +5005,7 @@ async def debug_auth_status():
                 "google_auth": google_users,
                 "sample_emails": masked_emails
             },
-            "active_sessions": active_sessions,
+            "total_sessions": total_sessions,
             "server_time": now.isoformat()
         }
     except Exception as e:
