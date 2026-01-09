@@ -275,6 +275,9 @@ export default function SchoolDashboard() {
   const handleStartGame = () => {
     if (!selectedGame) return;
     
+    // Select the sport first (required by SportProtectedRoute)
+    selectSport(selectedGame.sport);
+    
     // Navigate to stat tracker
     if (selectedGame.sport === "football") {
       navigate(`/football/${selectedGame.id}`);
