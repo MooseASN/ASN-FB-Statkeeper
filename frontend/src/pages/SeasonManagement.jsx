@@ -527,8 +527,8 @@ export default function SeasonManagement() {
                         />
                         <div>
                           <div className="font-medium text-white text-sm">{team.name}</div>
-                          <Badge variant="outline" className="text-xs mt-1">
-                            {team.sport}
+                          <Badge variant="outline" className="text-xs mt-1 border-slate-500 text-slate-200">
+                            {team.sport === "basketball" ? "🏀 Basketball" : "🏈 Football"}
                           </Badge>
                         </div>
                       </div>
