@@ -1127,13 +1127,69 @@ export default function SchoolDashboard() {
                     </Button>
                   </div>
                 </>
+              ) : selectedGame.status === "final" || selectedGame.status === "completed" ? (
+                <div className="space-y-3">
+                  {/* Final Score Display */}
+                  <div className="bg-slate-900/80 rounded-lg p-4 text-center">
+                    <Badge className="mb-2 bg-slate-600">FINAL</Badge>
+                    <div className="flex items-center justify-center gap-6 mt-2">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white">{selectedGame.home_score || 0}</div>
+                        <div className="text-xs text-slate-400">Home</div>
+                      </div>
+                      <div className="text-slate-500">-</div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-white">{selectedGame.away_score || 0}</div>
+                        <div className="text-xs text-slate-400">Away</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Action Buttons for Final Games */}
+                  <Button
+                    onClick={() => {
+                      selectSport(selectedGame.sport);
+                      navigate(`/game/${selectedGame.id}/box-score`);
+                    }}
+                    className="w-full bg-slate-700 hover:bg-slate-600"
+                    data-testid="view-box-score-btn"
+                  >
+                    <BarChart3 className="w-4 h-4 mr-2" />
+                    View Box Score
+                  </Button>
+                  
+                  <Button
+                    onClick={() => {
+                      selectSport(selectedGame.sport);
+                      navigate(`/live/${selectedGame.id}`);
+                    }}
+                    variant="outline"
+                    className="w-full border-slate-600 text-white"
+                    data-testid="view-live-stats-btn"
+                  >
+                    <Play className="w-4 h-4 mr-2" />
+                    View Live Stats Output
+                  </Button>
+                  
+                  {userRole === "admin" && (
+                    <Button
+                      onClick={handleStartGame}
+                      variant="outline"
+                      className="w-full border-orange-500 text-orange-400 hover:bg-orange-500/10"
+                      data-testid="reopen-tracker-btn"
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Reopen Stat Tracker
+                    </Button>
+                  )}
+                </div>
               ) : (
                 <Button
                   onClick={handleStartGame}
                   variant="outline"
                   className="w-full border-slate-600"
                 >
-                  View Final Stats
+                  View Game
                 </Button>
               )}
             </div>
