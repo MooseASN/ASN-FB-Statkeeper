@@ -1,168 +1,174 @@
 <analysis>**original_problem_statement:**
-The user is building StatMoose, a comprehensive sports stat-tracking application. The primary goal of this session was to implement a batch of high-priority features and address UI/UX feedback.
+The user is building StatMoose, a comprehensive sports stat-tracking application. The current session focuses on a major redesign of the public-facing homepage and implementing a full-featured Demo Mode for the basketball and football stat-keepers.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Roster Duplication:** When creating a new season, allow duplicating a roster from a previous season.
-2.  **School Creation Beta Mode:** Add a beta mode toggle in the main admin dashboard. When active, users cannot create a school unless they provide an admin-set password.
-3.  **School Exists Check:** Prevent the creation of a school if one with the same name already exists.
-4.  **Admin Account Deletion:** Allow the main admin to delete user accounts from the admin dashboard.
-5.  **Roster Scraping Enhancement:** Improve the website roster importer to correctly parse player class/grade (e.g., FR, SO, JR, SR).
-6.  **Punt/FG Field View:** Add a Field View for Punt/FG plays in the football live game tracker.
-7.  **Basketball Jumbotron Redesign:** Completely overhaul the basketball jumbotron page to match a user-provided image, featuring a stacked, full-screen, broadcast-style layout.
-8.  **Network Accessibility:** Ensure the entire site, including admin pages and stat trackers, is accessible on restricted networks like those at schools and universities.
-9.  **Jumbotron Text Size:** Increase the font size on the redesigned jumbotron to improve readability and fill the screen more effectively.
+1.  **Homepage Redesign:**
+    *   Create a new homepage inspired by  with a dark theme (black, white, grey).
+    *   Use the official StatMoose logo. A large version should be at the top with a light-sweep animation that follows the logo's shape.
+    *   The hero section text should be updated.
+    *   All sections should have a fade-in animation when scrolled into view.
+    *   Add a Sports Offered section for Basketball, Football, and Baseball (coming soon), with specific styling for text and image opacity.
+    *   Add feature sections for Schools, Broadcasters, and Venues, using user-provided images. These sections should have a slideshow-style text effect that transitions automatically every 7 seconds without navigation controls.
+    *   Get Started button should navigate to the Contact page.
+2.  **Contact Page & Email Integration:**
+    *   Create a contact page with fields for Name, Email, School, State, Role, and a message.
+    *   Integrate the Resend API to ensure form submissions are emailed directly to .
+3.  **Demo Mode Implementation:**
+    *   Create non-editable demos for both Basketball and Football.
+    *   All demo pages must have a persistent orange Demo Mode bar at the top.
+    *   Use fake teams and players (10 for basketball, 50 for football).
+    *   Demos must use the **true, existing stat-keeping UI components**, not simplified placeholders.
+    *   Users should be able to interact with features like box score downloads and the jumbotron.
+    *   Add a View Demo button to the Sports Offered section on the homepage.
+    *   The Basketball demo requires a selector page allowing users to choose between Classic, Advanced, and Simple modes, with a screenshot of each UI to guide them.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The agent successfully implemented all four P0 features: School Creation Beta Mode, Admin Account Deletion, the School Exists Check (which was already partially implemented), and Roster Duplication. The roster scraping functionality was also significantly improved to better parse player class/grade from various college sports websites. Additionally, the basketball jumbotron has been completely redesigned to a broadcast-style, stacked layout with larger text and a new team stats summary bar, closely matching the user's reference image. The backend CORS policy was enhanced to improve accessibility on restricted networks. Scaffolding for the Punt and Field Goal field view components was also created.
+The agent has successfully redesigned the homepage () and the contact page () to match the user's vision, including the dark theme, animations, and slideshow sections. The Resend email integration is complete and functional, sending contact form submissions as requested. The routing has been updated to support the new public-facing pages.
+
+The agent has created the initial structure for the demo mode, including:
+-   Fake data in .
+-   A  page.
+-   Routes in  for the demo pages.
+-   View Demo buttons on the homepage.
+-   Wrapper components (, etc.) that are intended to render the real UI with fake data.
 
 **Last working item**:
--   **Last item agent was working:** The agent was making the text on the redesigned  page even larger, as requested by the user. The agent overwrote the file with new, larger text classes for nearly all elements, from team names to player stats.
+-   **Last item agent was working:** The agent was in the process of implementing the Demo Mode feature. After an initial attempt with placeholder components, the user clarified that the demos must use the *actual* stat-keeping UI. The agent was creating wrapper components and backend endpoints to inject fake data into the real UI components. The work is incomplete, and the agent was about to create a simplified component for the Advanced mode demo, which contradicts the user's request.
 -   **Status:** IN PROGRESS
--   **Agent Testing Done:** N (The agent overwrote the file but has not taken a screenshot to verify the final result of the latest size increase).
--   **Which testing method agent to use?** screenshot tool
+-   **Agent Testing Done:** N
+-   **Which testing method agent to use?** Frontend testing agent. The test should verify the entire demo flow: clicking View Demo on the homepage, selecting a basketball mode, and seeing the correct stat-keeping UI load with the orange Demo Mode banner and fake data.
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Recurring UI Text Visibility Issues (P1)**
-  - **Description:** A general concern where low-contrast text (e.g., grey on dark backgrounds) appears. While many instances are fixed, new UI elements must be checked for high contrast.
+- **Issue 1: Hardcoded API Key (P1)**
+  - **Description:** The Resend API key is hardcoded in . This is a security risk.
 
 **Issues Detail:**
-- **Issue 1: Recurring UI Text Visibility Issues**
-    - **Attempted fixes:** Specific instances were fixed by changing text colors. This is an ongoing task.
-    - **Next debug checklist:** Proactively check all new UI components, especially , , and descriptive text, against dark backgrounds to ensure high contrast.
-    - **Why fix this issue and what will be achieved with the fix?** Improves application usability and accessibility.
-    - **Status:** IN PROGRESS
-    - **Is recurring issue?** Y
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on other issue:** None
+- **Issue 1: Hardcoded API Key**
+    - **Attempted fixes:** None.
+    - **Next debug checklist:**
+        1.  Create a  variable in the  file.
+        2.  Update  to read the key using .
+        3.  Ensure the key is correctly passed to the Resend library.
+    - **Why fix this issue and what will be achieved with the fix?** To improve security by removing sensitive credentials from source code.
+    - **Status:** NOT STARTED
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Backend (by re-testing the contact form).
+    - **Blocked on other issue:** None.
 
 **In progress Task List**:
-- **Task 1: Finalize Jumbotron Text Size (P0)**
-    - **Where to resume:** The agent has updated  with larger text sizes. The next step is to take a screenshot of  to show the user the result of the latest font size increase.
-    - **What will be achieved with this?** This will complete the user's request for a more readable, screen-filling jumbotron display.
+- **Task 1: Complete Demo Mode Implementation (P0)**
+    - **Where to resume:** The agent needs to ensure all demo pages (, , , ) correctly wrap and render the *actual* UI components (, , ) with the fake demo data. The simplified placeholders must be replaced with the real UI. Additionally, screenshots of the three basketball modes need to be taken and added to the  page.
+    - **What will be achieved with this?** A fully functional demo system that allows prospective users to experience the application's core features with pre-populated, non-editable data, matching the user's specific requirements.
     - **Status:** IN PROGRESS
-    - **Should Test frontend/backend/both after fix?** Frontend
-    - **Blocked on something:** None
+    - **Should Test frontend/backend/both after fix?** Both.
+    - **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **P1: Refactor :** Integrate existing custom hooks (, , ) to simplify the massive component, reduce state management complexity, and improve readability.
+    - **P1: Refactor :** Integrate the  custom hook to complete the component refactoring.
+    - **P2: Implement Demo Jumbotron:** The basketball demo allows users to click the Jumbotron button, but it needs to be wired up to a demo-specific Jumbotron view.
+    - **P2: Implement Baseball Demo:** Create the demo for baseball once the stat-keeper for that sport is built.
 - **Future Tasks:**
-    - **P2: Refactor  (ON HOLD):** The user has requested to hold off on this task. It involves breaking the large file into smaller, domain-specific routers (e.g., , ).
-    - **P2: Season Duplicate/Clone Feature:** Add functionality to clone an entire season structure, not just the roster.
+    - **P2: Refactor  (ON HOLD):** Break the large file into smaller, domain-specific routers.
+    - **P2: Season Clone Feature:** Add functionality to clone an entire season structure.
 
 **Completed work in this session**
-- **Feature: School Creation Beta Mode (DONE):** Implemented backend logic and frontend UI for an admin-controlled beta mode that requires a password for new school signups.
-- **Feature: Admin Account Deletion (DONE):** Added a backend endpoint () and frontend UI (delete button and confirmation dialog) in the .
-- **Feature: Roster Duplication (DONE):** Implemented a backend endpoint () and a dialog in  to allow duplicating rosters from previous seasons.
-- **Feature: Roster Scraping Enhancement (DONE):** Improved the  endpoint in  to more accurately extract and normalize player class/grade (FR, SO, JR, SR, GR) from various sports websites.
-- **Feature: Basketball Jumbotron Redesign (DONE):** Completely redesigned  to a broadcast-style, stacked UI with a dark theme, team logos, stats tables, and a team totals summary bar, per user's image.
-- **Bugfix: Network Accessibility (DONE):** Enhanced the CORS middleware in  to allow all origins, headers, and methods, and added other security headers to improve site accessibility on restricted networks.
-- **Task: Punt/FG Field View Scaffolding (DONE):** Created new components  and  and integrated buttons to open them within .
+- **Feature: Homepage Redesign (DONE):** Created  with a dark theme, animations, user-provided images, and slideshow sections, based on the Sidearm Sports example.
+- **Feature: Contact Page and Email Integration (DONE):** Created  and integrated the Resend API in  to email form submissions.
+- **Feature: Homepage Animations (DONE):** Implemented a shape-aware logo sweep animation and scroll-triggered fade-in animations for all page sections.
+- **Feature: Sports Offered Section (DONE):** Added a new section to the homepage with styled images and text for Basketball, Football, and Baseball.
+- **Bugfix: Jumbotron Layout (DONE):** Fixed an issue on  where player text was cut off.
+- **Task: Routing Refactor (DONE):** Updated  to set the new  as the root () and moved the main authenticated application to .
+- **Task: FootballLiveGame.jsx Partial Refactor (DONE):** Successfully integrated  and  hooks into the component.
 
 **Earlier issues found/mentioned but not fixed**
-- **Issue 1: Refactor **
-    - **Debug checklist:** Break the single 5000+ line file into a  directory with separate files for , , , etc.
-    - **Why to solve this issue and what will be achieved with this?** To improve maintainability, reduce complexity, and make the codebase easier to debug and scale.
-    - **Should Test frontend/backend/both after fix:** Both (extensive regression testing needed).
-    - **Is recurring issue?** N
-    - **Status:** BLOCKED (User requested to put this on hold).
-- **Issue 2: Refactor **
-    - **Debug checklist:** Integrate the existing but unused custom hooks (, , ) to manage state within the component.
-    - **Why to solve this issue and what will be achieved with this?** To simplify the massive component, reduce state management complexity, and improve readability.
-    - **Should Test frontend/backend/both after fix:** Frontend
-    - **Is recurring issue?** N
-    - **Status:** NOT STARTED
+-   **Issue 1: Refactor **
+    -   **Debug checklist:** The component has been partially refactored. The final step is to integrate the  hook to manage drive and possession state.
+    -   **Why to solve this issue and what will be achieved with this?** To simplify the massive ~4900 line component, reduce state management complexity, and improve readability.
+    -   **Should Test frontend/backend/both after fix:** Frontend.
+    -   **Is recurring issue?** Y
+    - **Status:** IN PROGRESS (partially done).
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork:** Recurring UI Text Visibility Issues.
-- **Recurrence count:** High.
-- **Status:** IN PROGRESS (ongoing vigilance required).
+- None in this session.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Dynamic CORS Middleware:** Enhanced FastAPI's  to accept requests from any origin () and allow all headers and methods to improve accessibility on restricted networks.
-- **Web Scraping with BeautifulSoup:** Refined parsing logic within the  endpoint to robustly identify and normalize player class/grade from complex HTML table structures.
-- **State Management for UI:** Implemented multiple confirmation dialogs and complex state handling for new features like user deletion and roster duplication.
-- **Full-Screen UI Design:** Utilized Tailwind CSS to create a responsive, full-screen, broadcast-style layout for the Jumbotron, focusing on typography and space utilization.
+-   **Email Integration (Resend):** Using the  Python library to send transactional emails via API. The API key needs to be moved to an environment variable.
+-   **Advanced CSS Animation:** Using  to create a non-rectangular animation effect on the logo and  to trigger animations on scroll.
+-   **Component Composition for Demos:** The current strategy is to wrap existing, complex UI components (, ) in new Demo components. These wrappers provide a demo context and inject fake data, allowing the reuse of the real UI without extensive modifications.
+-   **Routing Strategy:** Separated the public-facing marketing site (at ) from the authenticated application (at ), a common pattern for SaaS applications.
 
 **key DB schema**
-- **admin_settings**:  (fields were utilized)
+- **contact_submissions**:  (NEW)
 
 **changes in tech stack**
-- None.
+- **resend**: New Python package added for email functionality.
 
 **All files of reference**
-- **/app/backend/server.py**: Added endpoints for user deletion and roster duplication; updated beta mode logic; enhanced CORS middleware.
-- **/app/frontend/src/pages/Jumbotron.jsx**: Completely rewritten to implement a new broadcast-style design with larger text.
-- **/app/frontend/src/pages/AdminDashboard.jsx**: Updated to include the UI for school creation beta mode and the user deletion feature.
-- **/app/frontend/src/pages/SchoolSignUp.jsx**: Updated to handle the beta mode password check.
-- **/app/frontend/src/pages/SeasonManagement.jsx**: Updated to include the Duplicate Roster feature.
-- **/app/frontend/src/pages/FootballLiveGame.jsx**: Updated to add buttons and dialogs for new Punt/FG field view components.
-- **/app/frontend/src/components/football/PuntFieldView.jsx**: New component for visualizing punts.
-- **/app/frontend/src/components/football/FieldGoalFieldView.jsx**: New component for visualizing field goals.
+-   **/app/frontend/src/pages/HomePage.jsx**: The new public-facing homepage.
+-   **/app/frontend/src/pages/ContactPage.jsx**: The new contact page with the Resend-powered form.
+-   **/app/backend/server.py**: Contains the  endpoint and the hardcoded Resend API key that needs to be moved.
+-   **/app/frontend/src/App.js**: Contains the new routing structure for the homepage and demo pages.
+-   **/app/frontend/src/pages/BasketballDemoSelector.jsx**: The selection page for basketball demos, which needs UI screenshots.
+-   **/app/frontend/src/pages/DemoLiveGameClassic.jsx**: Wrapper for the real  component. Needs to be verified.
 
 **Areas that need refactoring**:
-- **/app/backend/server.py**: Critically needs to be refactored into smaller routers. This task is on hold per user request.
-- **/app/frontend/src/pages/FootballLiveGame.jsx**: A ~4900 line component that needs to be refactored to use its purpose-built custom hooks for state management.
+-   ****: The Resend API key is hardcoded and must be moved to an environment variable.
+-   ****: Still a very large component. The refactoring needs to be completed by integrating the  hook.
 
 **key api endpoints**
-- **NEW:** : Deletes a user account.
-- **NEW:** : Fetches all rosters from a school's previous seasons.
-- **NEW:** : Verifies the password for school creation in beta mode.
-- **MODIFIED:** : Now includes  status.
-- **MODIFIED:** : Can now update  and .
-- **MODIFIED:** : Logic enhanced for better class/grade extraction.
-- **MODIFIED:**  and : Logic updated to correctly source player stats.
+-   **NEW:** : Submits the contact form and triggers a Resend email.
+-   **NEW:**  / : Endpoints intended to provide fake game data for the demo modes.
 
 **Critical Info for New Agent**
-- **Jumbotron UI is the top priority.** The user's most recent request is to make the text even bigger. Verify the latest changes with a screenshot and be prepared for further adjustments.
-- **Network accessibility was a major concern.** The CORS changes in  were a direct response to users being unable to access the site on certain networks. Be mindful of this if any public-facing endpoints are added or modified.
-- **Test data was manually inserted.** The agent manually inserted player data into the  collection in the  to test the Jumbotron. The game ID used was . The share code is .
-- ** refactoring is still ON HOLD.** Do not work on this unless the user explicitly requests it.
+-   The highest priority is to **complete the Demo Mode implementation**. The user was very specific: use the **real UI components**, not simplified placeholders. The primary task is to correctly wrap the existing stat-keeper components (, , ) and feed them the fake demo data.
+-   Before completing the  page, you must **take screenshots of the three basketball UI modes** (Simple, Classic, Advanced) to display on the selector cards.
+-   The **Resend API key is currently hardcoded** in . This is a security risk and must be moved to a  environment variable in  as a P1 task.
 
 **documents and test reports created in this job**
-- **/app/memory/PRD.md** (Updated with completed tasks)
-- **/app/test_reports/iteration_23.json** (Testing report for P0 features)
+-   /app/memory/PRD.md (updated with homepage and demo tasks)
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **Request:** Make the Jumbotron text even bigger. (Status: **IN PROGRESS**)
-9.  **Request:** Add a team stats bar below player stats on the Jumbotron, and ensure the entire site is accessible on restricted networks. (Status: **RESOLVED**)
-8.  **Request:** Show a screenshot of the new Jumbotron UI. (Status: **RESOLVED**)
-7.  **Request:** Redesign the basketball Jumbotron to match a reference image, creating a stacked, full-screen UI. (Status: **RESOLVED**)
-6.  **Request:** Refactor  with hooks and add Field View for Punt/FG plays. (Status: **PARTIALLY RESOLVED** - Scaffolding for Field View is done, refactor is pending).
-5.  **Request:** Improve roster link importing to scrape player class/grade. (Status: **RESOLVED**)
-4.  **Approval:** Proceed with all 4 priority items (Beta Mode, User Deletion, School Exists Check, Roster Duplication). (Status: **ACKNOWLEDGED**)
-3.  **Confirmation:** User confirmed they want the agent to work on all 4 priority items. (Status: **ACKNOWLEDGED**)
-2.  **User Inquiry:** User asked for plan confirmation via . (Status: **ACKNOWLEDGED**)
-1.  **Initial State:** Agent received handoff summary and started planning.
+1.  **Request:** Create demos for Basketball and Football using the *true* statkeeping UI with fake teams/players. Add an orange Demo Mode bar and View Demo buttons. The basketball demo needs a mode selector with UI screenshots. (Status: **IN PROGRESS**)
+2.  **Confirmation:** Perfect! - Approving the final opacity on homepage sport photos. (Status: **RESOLVED**)
+3.  **Request:** Reduce sport photo opacity by another 20% (total 30%). (Status: **RESOLVED**)
+4.  **Request:** Reduce sport photo opacity by 10%. (Status: **RESOLVED**)
+5.  **Request:** Make the sport text bigger with more character separation. (Status: **RESOLVED**)
+6.  **Implicit Request:** Add a Sports Offered section using provided images. (Status: **RESOLVED**)
+7.  **Request:** Fix the logo sweep animation to be shape-aware. Confirmation that other animations and the email test worked. (Status: **RESOLVED**)
+8.  **Request:** Add scroll-in animations for all sections and a large logo on the hero. Asks for info needed for Resend integration. (Status: **RESOLVED**)
+9.  **User providing Resend API key.** Request for a light sweep reveal animation on the main logo. (Status: **RESOLVED**)
+10. **Request:** Implement various homepage UI tweaks (text alignment, fade transitions, new text) and asks how to set up the contact form email delivery. (Status: **RESOLVED**)
 
 **Project Health Check:**
-- **Broken:** None.
-- **Mocked:**  is still a placeholder. The new  and  are placeholders without functional logic.
-- **Needs Refactoring:** , .
+-   **Broken:** The demo pages are incomplete and may not be using the correct approach (i.e., using placeholders instead of the real UI).
+-   **Mocked:**  contains the mocked data for the demos.
+-   **Needs Refactoring:**
+    -    has a hardcoded API key.
+    -    refactoring is incomplete.
 
 **3rd Party Integrations**
-- **reportlab:** Used for PDF generation.
-- **lucide-react:** Used for icons.
+-   **Resend:** Used for sending transactional emails from the contact form. Key is currently hardcoded. Version  was installed.
+-   **reportlab:** Used for PDF generation.
+-   **lucide-react:** Used for icons.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES. Used for  to test the batch of P0 features.
-- **Troubleshoot agent used after agent stuck in loop:** NO.
-- **Test files created:** A test script was created by the testing agent at .
-- **Known regressions:** None.
+-   **Testing agent used after significant changes:** NO (not in this session).
+-   **Troubleshoot agent used after agent stuck in loop:** NO.
+-   **Test files created:** None.
+-   **Known regressions:** None.
 
 **Credentials to test flow:**
-- **School Admin User:**
-    - Email: 
-    - Password: 
-- **Main Admin User:**
-    - Email: 
-    - Password: 
+-   **School Admin User:**  / 
+-   **Main Admin User:**  / 
 
 **What agent forgot to execute**
-- Nothing. The agent successfully worked through the user's prioritized list of requests. The pending  refactor was correctly identified as a lower priority task to be addressed after the Jumbotron redesign.</analysis>
+-   The agent did not move the hardcoded Resend API key to an environment variable.
+-   The agent has not yet generated the required UI screenshots for the basketball demo selector page.
+-   The agent started creating placeholder/simplified demo components *after* the user clarified they wanted the true UI, indicating a potential misunderstanding of the latest request.</analysis>
