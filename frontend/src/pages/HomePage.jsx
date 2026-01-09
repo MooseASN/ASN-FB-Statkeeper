@@ -87,7 +87,7 @@ const useInView = (options = {}) => {
 };
 
 // Fade transition slideshow component for features
-const FeatureSlideshow = ({ features, isVisible }) => {
+const FeatureSlideshow = ({ features }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
@@ -97,7 +97,7 @@ const FeatureSlideshow = ({ features, isVisible }) => {
       setTimeout(() => {
         setCurrentIndex((prev) => (prev + 1) % features.length);
         setIsTransitioning(false);
-      }, 500); // Half of transition duration
+      }, 500);
     }, 7000);
     return () => clearInterval(timer);
   }, [features.length]);
@@ -148,16 +148,62 @@ const ImageSection = ({ section, reverse = false }) => {
             reverse ? "ml-auto" : "mr-auto"
           } ${
             isInView 
-              ? "opacity-100 translate-x-0" 
-              : reverse 
-                ? "opacity-0 translate-x-20" 
-                : "opacity-0 -translate-x-20"
+              ? "opacity-100 translate-y-0" 
+              : "opacity-0 translate-y-12"
           }`}
         >
-          <h2 className="text-5xl md:text-6xl font-black text-white mb-8 uppercase tracking-tight">
+          <h2 
+            className={`text-5xl md:text-6xl font-black text-white mb-8 uppercase tracking-tight transition-all duration-1000 delay-100 ${
+              isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
             {section.title}
           </h2>
-          <FeatureSlideshow features={section.features} isVisible={isInView} />
+          <div 
+            className={`transition-all duration-1000 delay-300 ${
+              isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+            }`}
+          >
+            <FeatureSlideshow features={section.features} />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// CTA Section Component
+const CTASection = () => {
+  const [ref, isInView] = useInView();
+
+  return (
+    <section ref={ref} className="py-24 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
+      <div className="max-w-4xl mx-auto text-center">
+        <h2 
+          className={`text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight transition-all duration-1000 ${
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          Want StatMoose for Your School?
+        </h2>
+        <p 
+          className={`text-xl text-gray-400 mb-10 max-w-2xl mx-auto transition-all duration-1000 delay-200 ${
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          We would love to hear from you. Get in touch with us to schedule a demo, 
+          ask a question, or learn more about our solutions.
+        </p>
+        <div
+          className={`transition-all duration-1000 delay-400 ${
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          <Link to="/contact">
+            <Button size="lg" className="bg-white text-black hover:bg-gray-200 px-12 py-6 text-lg font-bold uppercase tracking-wide">
+              Contact Us
+            </Button>
+          </Link>
         </div>
       </div>
     </section>
@@ -201,7 +247,20 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section ref={heroRef} className="pt-24 pb-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
-        <div className="max-w-7xl mx-auto text-center py-20">
+        <div className="max-w-7xl mx-auto text-center py-16">
+          {/* Large Logo */}
+          <div 
+            className={`mb-8 transition-all duration-1000 ${
+              heroInView ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
+            }`}
+          >
+            <img 
+              src="/logo-white.png" 
+              alt="StatMoose" 
+              className="h-32 md:h-40 w-auto mx-auto"
+            />
+          </div>
+          
           <p 
             className={`text-gray-400 uppercase tracking-widest text-sm mb-6 font-medium transition-all duration-1000 delay-100 ${
               heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
@@ -254,22 +313,7 @@ export default function HomePage() {
       <ImageSection section={sectionsData.venues} />
 
       {/* CTA Section */}
-      <section className="py-24 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl md:text-5xl font-black text-white mb-6 uppercase tracking-tight">
-            Want StatMoose for Your School?
-          </h2>
-          <p className="text-xl text-gray-400 mb-10 max-w-2xl mx-auto">
-            We would love to hear from you. Get in touch with us to schedule a demo, 
-            ask a question, or learn more about our solutions.
-          </p>
-          <Link to="/contact">
-            <Button size="lg" className="bg-white text-black hover:bg-gray-200 px-12 py-6 text-lg font-bold uppercase tracking-wide">
-              Contact Us
-            </Button>
-          </Link>
-        </div>
-      </section>
+      <CTASection />
 
       {/* Footer */}
       <footer className="py-12 px-6 border-t border-gray-800 bg-black">
