@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   ArrowLeft, Trophy, Users, Calendar, Plus, Upload, Link as LinkIcon, 
-  Trash2, Edit, Play, MapPin, Clock, Pencil, Settings, Search, AlertTriangle
+  Trash2, Edit, Play, MapPin, Clock, Pencil, Settings, Search, AlertTriangle, Copy
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
