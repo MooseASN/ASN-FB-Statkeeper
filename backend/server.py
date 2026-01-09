@@ -4814,6 +4814,20 @@ async def get_school_teams(
 
 # ============ SCHOOL GAMES ROUTES ============
 
+@api_router.get("/schools/{school_id}/seasons/{season_id}/games")
+async def get_season_games(school_id: str, season_id: str, current_user: User = Depends(get_current_user)):
+    """Get all games for a season"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    games = await db.games.find(
+        {"season_id": season_id, "school_id": school_id},
+        {"_id": 0}
+    ).sort("scheduled_date", 1).to_list(500)
+    
+    return games
+
 @api_router.post("/schools/{school_id}/seasons/{season_id}/games")
 async def create_school_game(
     school_id: str, 
