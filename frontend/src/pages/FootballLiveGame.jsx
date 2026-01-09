@@ -568,12 +568,7 @@ export default function FootballLiveGame({ user, onLogout }) {
     setShowSetClockDialog,
     setTempClockMinutes,
     setTempClockSeconds,
-    formatClockTime: formatClockTimeHook,
-    toggleClock,
     stopClock,
-    startClock,
-    confirmSetClock,
-    resetClock,
   } = useGameClock(900);
 
   // Help dialog
