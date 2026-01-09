@@ -152,7 +152,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       } />
       
       {/* Protected routes - require both auth and sport selection */}
-      <Route path="/" element={<SportProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/dashboard" element={<SportProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/events" element={<SportProtectedRoute user={user}><Events user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/events/:id" element={<SportProtectedRoute user={user}><EventDetail user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/teams" element={<SportProtectedRoute user={user}><Teams user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
