@@ -6051,12 +6051,22 @@ app.include_router(api_router)
 
 @app.on_event("startup")
 async def startup_init():
-    """Initialize admin user on startup"""
+    """Initialize on startup - verify database and create admin user"""
     try:
+        # Test database connection first
+        await db.command('ping')
+        logger.info("Database connection verified")
+        
+        # Initialize admin user
         result = await ensure_admin_user()
         logger.info(f"Admin user initialization: {result}")
+        
+        # Log startup complete
+        user_count = await db.users.count_documents({})
+        logger.info(f"Startup complete. Users in database: {user_count}")
     except Exception as e:
-        logger.error(f"Failed to initialize admin user on startup: {e}")
+        logger.error(f"Startup initialization failed: {e}")
+        # Don't raise - let the server start anyway so health checks can report status
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
