@@ -244,12 +244,9 @@ function TeamPanel({
   );
 }
 
-// Team Stats Bar Component
-function TeamStatsBar({ homeStats, awayStats, homeColor, awayColor, homeTeamName, awayTeamName }) {
-  const homeTotals = calculateTeamTotals(homeStats);
-  const awayTotals = calculateTeamTotals(awayStats);
-  
-  const StatBlock = ({ label, homeValue, awayValue }) => (
+// Stat Block for team comparison
+function StatBlock({ label, homeValue, awayValue, homeColor, awayColor }) {
+  return (
     <div className="flex flex-col items-center">
       <div className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">{label}</div>
       <div className="flex items-center gap-4">
@@ -259,6 +256,12 @@ function TeamStatsBar({ homeStats, awayStats, homeColor, awayColor, homeTeamName
       </div>
     </div>
   );
+}
+
+// Team Stats Bar Component
+function TeamStatsBar({ homeStats, awayStats, homeColor, awayColor, homeTeamName, awayTeamName }) {
+  const homeTotals = calculateTeamTotals(homeStats);
+  const awayTotals = calculateTeamTotals(awayStats);
   
   return (
     <div 
@@ -283,31 +286,43 @@ function TeamStatsBar({ homeStats, awayStats, homeColor, awayColor, homeTeamName
           label="FG" 
           homeValue={`${homeTotals.fg_made}/${homeTotals.fg_att} ${formatPct(homeTotals.fg_made, homeTotals.fg_att)}`}
           awayValue={`${awayTotals.fg_made}/${awayTotals.fg_att} ${formatPct(awayTotals.fg_made, awayTotals.fg_att)}`}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatBlock 
           label="3PT" 
           homeValue={`${homeTotals.fg3_made}/${homeTotals.fg3_att} ${formatPct(homeTotals.fg3_made, homeTotals.fg3_att)}`}
           awayValue={`${awayTotals.fg3_made}/${awayTotals.fg3_att} ${formatPct(awayTotals.fg3_made, awayTotals.fg3_att)}`}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatBlock 
           label="FT" 
           homeValue={`${homeTotals.ft_made}/${homeTotals.ft_att} ${formatPct(homeTotals.ft_made, homeTotals.ft_att)}`}
           awayValue={`${awayTotals.ft_made}/${awayTotals.ft_att} ${formatPct(awayTotals.ft_made, awayTotals.ft_att)}`}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatBlock 
           label="REB" 
           homeValue={homeTotals.reb}
           awayValue={awayTotals.reb}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatBlock 
           label="AST" 
           homeValue={homeTotals.ast}
           awayValue={awayTotals.ast}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
         <StatBlock 
           label="TOV" 
           homeValue={homeTotals.tov}
           awayValue={awayTotals.tov}
+          homeColor={homeColor}
+          awayColor={awayColor}
         />
       </div>
     </div>
