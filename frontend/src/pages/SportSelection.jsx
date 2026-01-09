@@ -203,6 +203,34 @@ export default function SportSelection({ user, onLogout }) {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto px-4 py-16">
+        {/* School Dashboard Banner */}
+        {schoolInfo && (
+          <div 
+            onClick={() => navigate("/school-dashboard")}
+            className="mb-8 p-4 bg-gradient-to-r from-orange-500/20 to-orange-600/10 border border-orange-500/30 rounded-lg cursor-pointer hover:border-orange-500/50 transition-all"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                {schoolInfo.logo_url ? (
+                  <img src={schoolInfo.logo_url} alt={schoolInfo.name} className="w-12 h-12 object-contain rounded" />
+                ) : (
+                  <div className="w-12 h-12 bg-orange-500/20 rounded flex items-center justify-center">
+                    <Building2 className="w-6 h-6 text-orange-500" />
+                  </div>
+                )}
+                <div>
+                  <h3 className="text-white font-semibold">{schoolInfo.name}</h3>
+                  <p className="text-orange-400 text-sm">Go to School Dashboard →</p>
+                </div>
+              </div>
+              <Button className="bg-orange-500 hover:bg-orange-600">
+                <Building2 className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
             SELECT YOUR SPORT
