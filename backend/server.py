@@ -5026,6 +5026,7 @@ async def debug_test_login(credentials: UserLogin):
     login_identifier = credentials.email.lower().strip()
     diagnostics = {
         "input_email": login_identifier,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
         "steps": []
     }
     
@@ -5052,7 +5053,8 @@ async def debug_test_login(credentials: UserLogin):
             "user_email": user.get("email"),
             "auth_provider": user.get("auth_provider"),
             "has_password_hash": bool(user.get("password_hash")),
-            "hash_length": len(user.get("password_hash", ""))
+            "hash_length": len(user.get("password_hash", "")),
+            "hash_prefix": user.get("password_hash", "")[:7] if user.get("password_hash") else None
         })
         
         # Step 3: Check auth provider
@@ -5068,7 +5070,8 @@ async def debug_test_login(credentials: UserLogin):
             password_valid = verify_password(credentials.password, stored_hash)
             diagnostics["steps"].append({
                 "step": "verify_password", 
-                "status": "valid" if password_valid else "invalid"
+                "status": "valid" if password_valid else "invalid",
+                "input_password_length": len(credentials.password)
             })
         except Exception as e:
             diagnostics["steps"].append({
