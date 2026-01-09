@@ -673,12 +673,20 @@ const calcTeamShootingStats = (stats) => {
   };
 };
 
-export default function LiveGame() {
-  const { id } = useParams();
+// Demo Mode Bar Component
+const DemoModeBar = () => (
+  <div className="fixed top-0 left-0 right-0 z-[100] bg-orange-500 text-white text-center py-2 font-bold text-sm uppercase tracking-wider shadow-lg">
+    Demo Mode - Stats will not be saved
+  </div>
+);
+
+export default function LiveGame({ demoMode = false, initialDemoData = null }) {
+  const params = useParams();
+  const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
-  const [game, setGame] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [game, setGame] = useState(initialDemoData);
+  const [loading, setLoading] = useState(!demoMode);
   const [addPlayerOpen, setAddPlayerOpen] = useState(false);
   const [addPlayerTeam, setAddPlayerTeam] = useState("home");
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
