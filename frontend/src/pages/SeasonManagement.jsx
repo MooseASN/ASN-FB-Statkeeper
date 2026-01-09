@@ -46,6 +46,18 @@ export default function SeasonManagement() {
   const [showOpponentDialog, setShowOpponentDialog] = useState(false);
   const [showEditOpponentDialog, setShowEditOpponentDialog] = useState(false);
   const [showOpponentRosterDialog, setShowOpponentRosterDialog] = useState(false);
+  const [showEditSeasonDialog, setShowEditSeasonDialog] = useState(false);
+  const [showDeleteSeasonDialog, setShowDeleteSeasonDialog] = useState(false);
+  const [showSchoolSearchDialog, setShowSchoolSearchDialog] = useState(false);
+  
+  // Edit season form
+  const [editSeasonForm, setEditSeasonForm] = useState({ name: "" });
+  const [deletePassword, setDeletePassword] = useState("");
+  
+  // School search
+  const [schoolSearchQuery, setSchoolSearchQuery] = useState("");
+  const [schoolSearchResults, setSchoolSearchResults] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
   
   // Form states
   const [rosterMethod, setRosterMethod] = useState("manual");
