@@ -12,6 +12,25 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
+### January 9, 2026 - Homepage Redesign (Sidearm Sports Style)
+- **Homepage Redesigned** - COMPLETED
+  - Dark theme with black, white, and grey colors (matching Sidearm Sports style)
+  - StatMoose logo (logo-white.png) used in navbar and footer
+  - Hero section: "This is StatMoose" / "Live Sports Statistics For the Modern Age"
+  - Three image sections with uploaded photos:
+    - For Schools (Schools.jpg) - Season Tracking, School Dashboard, Team & Season Reports
+    - For Broadcasters (Broadcasters.jpg) - Multiple Tracking Modes, Live Stat Outputs, Instant Box Scores
+    - For Venues (Venues.jpeg) - Event Management, Ticker & Jumbotron, Game Scheduling
+  - Gradient overlays on images with slideshow-style feature navigation
+  - Auto-rotating features with manual navigation (arrows + dots)
+  - CTA: "Want StatMoose for Your School?" with Contact Us button
+  - Get Started button → Contact page (no free trial)
+
+- **Contact Page Updated** - COMPLETED
+  - Dark theme matching homepage
+  - All form fields: Name, Email, School, State, Role, Message
+  - Email submissions stored in database and logged to jaredmoosejones@gmail.com
+
 ### January 9, 2026 - Homepage & Contact Page
 - **Homepage Created** - COMPLETED
   - Hero section with tagline and CTAs
