@@ -547,12 +547,25 @@ export default function FootballLiveGame({ user, onLogout }) {
   // Play-by-play log
   const [playLog, setPlayLog] = useState([]);
   
-  // Clock
-  const [clockTime, setClockTime] = useState(900); // 15 minutes default
-  const [clockRunning, setClockRunning] = useState(false);
-  const [showSetClockDialog, setShowSetClockDialog] = useState(false);
-  const [tempClockMinutes, setTempClockMinutes] = useState(15);
-  const [tempClockSeconds, setTempClockSeconds] = useState(0);
+  // Clock - Using useGameClock hook
+  const {
+    clockTime,
+    clockRunning,
+    showSetClockDialog,
+    tempClockMinutes,
+    tempClockSeconds,
+    setClockTime,
+    setClockRunning,
+    setShowSetClockDialog,
+    setTempClockMinutes,
+    setTempClockSeconds,
+    formatClockTime: formatClockTimeHook,
+    toggleClock,
+    stopClock,
+    startClock,
+    confirmSetClock,
+    resetClock,
+  } = useGameClock(900);
 
   // Help dialog
   const [showHelpDialog, setShowHelpDialog] = useState(false);
