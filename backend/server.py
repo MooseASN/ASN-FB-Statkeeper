@@ -1437,8 +1437,11 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
                         name_link = name_cell.find('a')
                         name = clean_name(name_link.get_text() if name_link else name_cell.get_text())
                         
+                        # Extract position and class from table cells
+                        position, player_class = extract_position_class(row, headers, cells)
+                        
                         if number and name and re.match(r'^\d{1,3}$', number):
-                            roster.append({"number": number, "name": name})
+                            roster.append({"number": number, "name": name, "position": position, "playerClass": player_class})
                 
                 if roster:
                     break
