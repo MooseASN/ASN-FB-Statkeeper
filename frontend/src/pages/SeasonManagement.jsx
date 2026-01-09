@@ -955,6 +955,199 @@ export default function SeasonManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Opponent Dialog */}
+      <Dialog open={showEditOpponentDialog} onOpenChange={setShowEditOpponentDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Edit Opponent</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Update opponent team details
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white">Team Name</Label>
+              <Input
+                value={editOpponentForm.name}
+                onChange={(e) => setEditOpponentForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Central High School"
+                className="bg-slate-900 border-slate-600 text-white"
+                data-testid="edit-opponent-name"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-white">Team Color</Label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  type="color"
+                  value={editOpponentForm.color}
+                  onChange={(e) => setEditOpponentForm(prev => ({ ...prev, color: e.target.value }))}
+                  className="w-12 h-10 rounded border border-slate-600 cursor-pointer"
+                  data-testid="edit-opponent-color"
+                />
+                <Input
+                  value={editOpponentForm.color}
+                  onChange={(e) => setEditOpponentForm(prev => ({ ...prev, color: e.target.value }))}
+                  className="bg-slate-900 border-slate-600 text-white"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label className="text-white">Logo URL (optional)</Label>
+              <Input
+                value={editOpponentForm.logo_url}
+                onChange={(e) => setEditOpponentForm(prev => ({ ...prev, logo_url: e.target.value }))}
+                placeholder="https://example.com/logo.png"
+                className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-400"
+                data-testid="edit-opponent-logo"
+              />
+              {editOpponentForm.logo_url && (
+                <div className="mt-2 flex items-center gap-2">
+                  <img
+                    src={editOpponentForm.logo_url}
+                    alt="Logo preview"
+                    className="w-10 h-10 rounded object-cover"
+                    onError={(e) => e.target.style.display = 'none'}
+                  />
+                  <span className="text-xs text-slate-400">Preview</span>
+                </div>
+              )}
+            </div>
+            
+            <div className="pt-2 border-t border-slate-700">
+              <Button
+                variant="outline"
+                onClick={handleOpenOpponentRoster}
+                className="w-full border-slate-600 text-white hover:bg-slate-700"
+                data-testid="edit-opponent-roster-btn"
+              >
+                <Users className="w-4 h-4 mr-2" />
+                Manage Roster ({opponentRoster.length} players)
+              </Button>
+            </div>
+            
+            <Button 
+              onClick={handleUpdateOpponent} 
+              className="w-full bg-orange-500 hover:bg-orange-600"
+              data-testid="save-opponent-btn"
+            >
+              Save Changes
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Opponent Roster Dialog */}
+      <Dialog open={showOpponentRosterDialog} onOpenChange={setShowOpponentRosterDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white">Opponent Roster - {editOpponentForm.name}</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Add or remove players from the opponent's roster
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Add Player Form */}
+            <div className="flex gap-2 flex-wrap items-end">
+              <Input
+                placeholder="#"
+                value={newOpponentPlayer.number}
+                onChange={(e) => setNewOpponentPlayer(prev => ({ ...prev, number: e.target.value }))}
+                className="w-16 bg-slate-900 border-slate-600 text-white"
+              />
+              <Input
+                placeholder="Player Name"
+                value={newOpponentPlayer.name}
+                onChange={(e) => setNewOpponentPlayer(prev => ({ ...prev, name: e.target.value }))}
+                className="flex-1 min-w-[140px] bg-slate-900 border-slate-600 text-white"
+              />
+              <Input
+                placeholder="Position"
+                value={newOpponentPlayer.position}
+                onChange={(e) => setNewOpponentPlayer(prev => ({ ...prev, position: e.target.value }))}
+                className="w-24 bg-slate-900 border-slate-600 text-white"
+              />
+              <Select
+                value={newOpponentPlayer.playerClass}
+                onValueChange={(v) => setNewOpponentPlayer(prev => ({ ...prev, playerClass: v }))}
+              >
+                <SelectTrigger className="w-28 bg-slate-900 border-slate-600 text-white">
+                  <SelectValue placeholder="Class" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="FR">Freshman</SelectItem>
+                  <SelectItem value="SO">Sophomore</SelectItem>
+                  <SelectItem value="JR">Junior</SelectItem>
+                  <SelectItem value="SR">Senior</SelectItem>
+                  <SelectItem value="GR">Graduate</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button onClick={handleAddOpponentPlayer} className="bg-orange-500 hover:bg-orange-600">
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Current Roster */}
+            <div>
+              <Label className="text-slate-200">Current Roster ({opponentRoster.length} players)</Label>
+              <ScrollArea className="h-64 mt-2 border border-slate-700 rounded">
+                {opponentRoster.length === 0 ? (
+                  <div className="p-4 text-center text-slate-400">No players added</div>
+                ) : (
+                  <div className="p-2 space-y-1">
+                    {opponentRoster.map((player, idx) => (
+                      <div key={player.id || idx} className="flex items-center justify-between p-2 bg-slate-900/50 rounded">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-orange-400 font-bold w-8">#{player.number}</span>
+                          <span className="text-white">{player.name}</span>
+                          {player.position && (
+                            <Badge variant="outline" className="text-xs border-slate-500 text-white">{player.position}</Badge>
+                          )}
+                          {player.playerClass && (
+                            <Badge variant="secondary" className="text-xs bg-slate-700 text-white">{player.playerClass}</Badge>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleRemoveOpponentPlayer(player.id)}
+                          className="text-red-400 hover:text-red-300"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </div>
+            
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setShowOpponentRosterDialog(false);
+                  setShowEditOpponentDialog(true);
+                }}
+                className="flex-1 border-slate-600 text-white hover:bg-slate-700"
+              >
+                Back
+              </Button>
+              <Button 
+                onClick={handleSaveOpponentRoster} 
+                className="flex-1 bg-orange-500 hover:bg-orange-600"
+                data-testid="save-opponent-roster-btn"
+              >
+                Save Roster
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
