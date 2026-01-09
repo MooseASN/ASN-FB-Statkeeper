@@ -735,9 +735,16 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   }, [id, possession, ballPosition, down, distance, quarter, homeScore, awayScore, homeTimeouts, awayTimeouts, playLog, clockTime, homeTimeOfPossession, awayTimeOfPossession, currentDrive, allDrives]);
 
   useEffect(() => {
-    fetchGame();
+    if (!demoMode) {
+      fetchGame();
+    } else {
+      // Initialize demo mode with default state
+      setClockTime(900);
+      setShowKickoffTeamDialog(true);
+      setLoading(false);
+    }
     document.title = "StatMoose FB";
-  }, [id]);
+  }, [id, demoMode]);
 
   // ============================================
   // DRIVE TRACKING FUNCTIONS (Per Specification)
