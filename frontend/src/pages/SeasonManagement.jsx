@@ -1316,6 +1316,218 @@ export default function SeasonManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Edit Season Dialog */}
+      <Dialog open={showEditSeasonDialog} onOpenChange={setShowEditSeasonDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white">Edit Season</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Update season details or delete the season
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white">Season Name</Label>
+              <Input
+                value={editSeasonForm.name}
+                onChange={(e) => setEditSeasonForm(prev => ({ ...prev, name: e.target.value }))}
+                className="bg-slate-900 border-slate-600 text-white mt-1"
+                data-testid="edit-season-name"
+              />
+            </div>
+            
+            <div className="flex items-center gap-2 text-sm text-slate-400">
+              <span>{season?.sport === "basketball" ? "🏀" : "🏈"}</span>
+              <span className="capitalize">{season?.sport}</span>
+              <span>•</span>
+              <span className="capitalize">{season?.gender === "men" ? "Men's" : "Women's"}</span>
+              <span>•</span>
+              <span className="capitalize">{season?.level === "varsity" ? "Varsity" : "Sub-Varsity"}</span>
+            </div>
+            
+            <Button 
+              onClick={handleUpdateSeason} 
+              className="w-full bg-orange-500 hover:bg-orange-600"
+              data-testid="save-season-btn"
+            >
+              Save Changes
+            </Button>
+            
+            <div className="border-t border-slate-700 pt-4">
+              <Button 
+                variant="destructive"
+                onClick={() => {
+                  setShowEditSeasonDialog(false);
+                  setShowDeleteSeasonDialog(true);
+                }}
+                className="w-full"
+                data-testid="delete-season-btn"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                Delete Season
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Season Confirmation Dialog */}
+      <Dialog open={showDeleteSeasonDialog} onOpenChange={setShowDeleteSeasonDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-red-500 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5" />
+              Delete Season
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              This action cannot be undone. Deleting this season will permanently remove:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <ul className="list-disc list-inside text-slate-300 space-y-1">
+              <li>All scheduled and completed games</li>
+              <li>All game statistics and play-by-play data</li>
+              <li>Season configuration and settings</li>
+            </ul>
+            
+            <div className="bg-red-900/30 border border-red-500/50 rounded p-3">
+              <p className="text-sm text-red-300">
+                To confirm deletion, please enter your account password below:
+              </p>
+            </div>
+            
+            <div>
+              <Label className="text-white">Password</Label>
+              <Input
+                type="password"
+                value={deletePassword}
+                onChange={(e) => setDeletePassword(e.target.value)}
+                placeholder="Enter your password"
+                className="bg-slate-900 border-slate-600 text-white mt-1"
+                data-testid="delete-season-password"
+              />
+            </div>
+            
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={() => {
+                  setShowDeleteSeasonDialog(false);
+                  setDeletePassword("");
+                }}
+                className="flex-1 border-slate-600 text-white hover:bg-slate-700"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive"
+                onClick={handleDeleteSeason}
+                className="flex-1"
+                data-testid="confirm-delete-season-btn"
+              >
+                Delete Season
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* School Search Dialog */}
+      <Dialog open={showSchoolSearchDialog} onOpenChange={setShowSchoolSearchDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-white">Find School on StatMoose</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Search for another school by name or school code to add as an opponent
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="flex gap-2">
+              <Input
+                value={schoolSearchQuery}
+                onChange={(e) => setSchoolSearchQuery(e.target.value)}
+                placeholder="School name or code (e.g., MOOSE)"
+                className="bg-slate-900 border-slate-600 text-white"
+                onKeyDown={(e) => e.key === "Enter" && handleSearchSchools()}
+              />
+              <Button 
+                onClick={handleSearchSchools}
+                disabled={searchLoading}
+                className="bg-orange-500 hover:bg-orange-600"
+              >
+                {searchLoading ? "..." : "Search"}
+              </Button>
+            </div>
+            
+            {schoolSearchResults.length > 0 ? (
+              <ScrollArea className="h-64 border border-slate-700 rounded">
+                <div className="p-2 space-y-2">
+                  {schoolSearchResults.map(schoolResult => (
+                    <div 
+                      key={schoolResult.school_id}
+                      className="p-3 bg-slate-900/50 rounded hover:bg-slate-900 transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          {schoolResult.logo_url ? (
+                            <img 
+                              src={schoolResult.logo_url} 
+                              alt={schoolResult.name}
+                              className="w-10 h-10 rounded-full object-cover"
+                            />
+                          ) : (
+                            <div 
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
+                              style={{ backgroundColor: schoolResult.primary_color || "#666" }}
+                            >
+                              {schoolResult.name?.charAt(0)}
+                            </div>
+                          )}
+                          <div>
+                            <div className="font-medium text-white">{schoolResult.name}</div>
+                            <div className="text-xs text-slate-400">
+                              Code: {schoolResult.school_code} • {schoolResult.state}
+                            </div>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          onClick={() => handleImportFromSchool(schoolResult)}
+                          className="bg-orange-500 hover:bg-orange-600"
+                        >
+                          Add
+                        </Button>
+                      </div>
+                      {schoolResult.matching_seasons?.length > 0 ? (
+                        <div className="mt-2 pt-2 border-t border-slate-700">
+                          <div className="text-xs text-green-400">
+                            ✓ Has matching {season?.gender === "men" ? "Men's" : "Women's"} {season?.level === "varsity" ? "Varsity" : "JV"} {season?.sport} season
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-2 pt-2 border-t border-slate-700">
+                          <div className="text-xs text-yellow-400">
+                            ⚠ No matching season found - team info will be imported manually
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            ) : schoolSearchQuery && !searchLoading ? (
+              <div className="text-center text-slate-400 py-4">
+                No schools found. Try a different search term.
+              </div>
+            ) : null}
+            
+            <p className="text-xs text-slate-500">
+              If the school isn&apos;t on StatMoose, use &quot;Add Opponent&quot; to manually add them.
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
