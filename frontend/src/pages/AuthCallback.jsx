@@ -30,7 +30,7 @@ export default function AuthCallback({ onLogin }) {
         localStorage.setItem("user", JSON.stringify(res.data));
         onLogin(res.data);
         toast.success("Welcome!");
-        navigate("/");
+        navigate("/select-sport");
       } catch (error) {
         console.error("Auth callback error:", error);
         setError(error.response?.data?.detail || "Authentication failed");
