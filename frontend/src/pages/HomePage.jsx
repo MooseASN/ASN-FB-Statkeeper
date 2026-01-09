@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 // Feature data for each section
 const sectionsData = {
@@ -61,67 +60,61 @@ const sectionsData = {
   }
 };
 
-// Slideshow component for features
-const FeatureSlideshow = ({ features }) => {
+// Hook for detecting when element is in viewport
+const useInView = (options = {}) => {
+  const [isInView, setIsInView] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        setIsInView(true);
+      }
+    }, { threshold: 0.2, ...options });
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
+  return [ref, isInView];
+};
+
+// Fade transition slideshow component for features
+const FeatureSlideshow = ({ features, isVisible }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % features.length);
-    }, 5000);
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentIndex((prev) => (prev + 1) % features.length);
+        setIsTransitioning(false);
+      }, 500); // Half of transition duration
+    }, 7000);
     return () => clearInterval(timer);
   }, [features.length]);
 
-  const goToPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + features.length) % features.length);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % features.length);
-  };
-
   return (
-    <div className="relative">
-      {/* Feature content */}
-      <div className="min-h-[120px] flex items-center">
-        <div className="text-center w-full px-12">
-          <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
-            {features[currentIndex].title}
-          </h3>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            {features[currentIndex].description}
-          </p>
-        </div>
-      </div>
-
-      {/* Navigation arrows */}
-      <button
-        onClick={goToPrev}
-        className="absolute left-0 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white transition-colors"
-        aria-label="Previous feature"
+    <div className="relative min-h-[100px]">
+      <div 
+        className={`transition-all duration-1000 ease-in-out ${
+          isTransitioning ? "opacity-0 translate-y-2" : "opacity-100 translate-y-0"
+        }`}
       >
-        <ChevronLeft className="w-8 h-8" />
-      </button>
-      <button
-        onClick={goToNext}
-        className="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-white/70 hover:text-white transition-colors"
-        aria-label="Next feature"
-      >
-        <ChevronRight className="w-8 h-8" />
-      </button>
-
-      {/* Dots indicator */}
-      <div className="flex justify-center gap-2 mt-6">
-        {features.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => setCurrentIndex(index)}
-            className={`w-3 h-3 rounded-full transition-all ${
-              index === currentIndex ? "bg-white w-8" : "bg-white/40 hover:bg-white/60"
-            }`}
-            aria-label={`Go to feature ${index + 1}`}
-          />
-        ))}
+        <h3 className="text-2xl md:text-3xl font-bold text-white mb-3">
+          {features[currentIndex].title}
+        </h3>
+        <p className="text-gray-300 text-lg max-w-xl">
+          {features[currentIndex].description}
+        </p>
       </div>
     </div>
   );
@@ -129,8 +122,10 @@ const FeatureSlideshow = ({ features }) => {
 
 // Section component with image background and gradient
 const ImageSection = ({ section, reverse = false }) => {
+  const [ref, isInView] = useInView();
+
   return (
-    <section className="relative min-h-[500px] flex items-center overflow-hidden">
+    <section ref={ref} className="relative min-h-[500px] flex items-center overflow-hidden">
       {/* Background image */}
       <div 
         className="absolute inset-0 bg-cover bg-center"
@@ -141,18 +136,28 @@ const ImageSection = ({ section, reverse = false }) => {
       <div 
         className={`absolute inset-0 ${
           reverse 
-            ? "bg-gradient-to-l from-black/95 via-black/80 to-black/40"
-            : "bg-gradient-to-r from-black/95 via-black/80 to-black/40"
+            ? "bg-gradient-to-l from-black/95 via-black/85 to-black/50"
+            : "bg-gradient-to-r from-black/95 via-black/85 to-black/50"
         }`}
       />
       
       {/* Content */}
-      <div className={`relative z-10 w-full max-w-7xl mx-auto px-6 py-16 ${reverse ? "text-right" : "text-left"}`}>
-        <div className={`${reverse ? "ml-auto" : "mr-auto"} max-w-2xl`}>
+      <div className={`relative z-10 w-full max-w-7xl mx-auto px-6 py-16`}>
+        <div 
+          className={`max-w-2xl transition-all duration-1000 ease-out ${
+            reverse ? "ml-auto" : "mr-auto"
+          } ${
+            isInView 
+              ? "opacity-100 translate-x-0" 
+              : reverse 
+                ? "opacity-0 translate-x-20" 
+                : "opacity-0 -translate-x-20"
+          }`}
+        >
           <h2 className="text-5xl md:text-6xl font-black text-white mb-8 uppercase tracking-tight">
             {section.title}
           </h2>
-          <FeatureSlideshow features={section.features} />
+          <FeatureSlideshow features={section.features} isVisible={isInView} />
         </div>
       </div>
     </section>
@@ -160,6 +165,8 @@ const ImageSection = ({ section, reverse = false }) => {
 };
 
 export default function HomePage() {
+  const [heroRef, heroInView] = useInView();
+
   return (
     <div className="min-h-screen bg-black">
       {/* Navigation */}
@@ -193,20 +200,36 @@ export default function HomePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="pt-24 pb-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
+      <section ref={heroRef} className="pt-24 pb-20 px-6 bg-gradient-to-b from-black via-gray-900 to-black">
         <div className="max-w-7xl mx-auto text-center py-20">
-          <p className="text-gray-400 uppercase tracking-widest text-sm mb-6 font-medium">
+          <p 
+            className={`text-gray-400 uppercase tracking-widest text-sm mb-6 font-medium transition-all duration-1000 delay-100 ${
+              heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             This is StatMoose
           </p>
-          <h1 className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight uppercase tracking-tight">
+          <h1 
+            className={`text-5xl md:text-7xl font-black text-white mb-6 leading-tight uppercase tracking-tight transition-all duration-1000 delay-200 ${
+              heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             Live Sports Statistics<br />
             <span className="text-gray-400">For the Modern Age</span>
           </h1>
-          <p className="text-xl text-gray-400 max-w-3xl mx-auto mb-10">
+          <p 
+            className={`text-xl text-gray-400 max-w-3xl mx-auto mb-10 transition-all duration-1000 delay-300 ${
+              heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             The comprehensive stat-tracking solution for schools, broadcasters, and venues. 
-            Real-time statistics for football, basketball, and more.
+            Real-time statistics for football, basketball, and more sports to come.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <div 
+            className={`flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-1000 delay-500 ${
+              heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
             <Link to="/contact">
               <Button size="lg" className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide">
                 Get Started
