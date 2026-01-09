@@ -1757,7 +1757,12 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
             for i, h in enumerate(headers):
                 h_lower = h.lower()
                 if any(p in h_lower for p in position_patterns) and i < len(cells):
-                    position = cells[i].get_text(strip=True)
+                    pos_text = cells[i].get_text(strip=True)
+                    # Clean position - remove height/weight patterns
+                    import re as re_pos
+                    pos_text = re_pos.sub(r'\d+[\'\"]\d*[\'\"]*', '', pos_text)  # Remove heights like 6'3"
+                    pos_text = re_pos.sub(r'\d+\s*lbs?', '', pos_text, flags=re_pos.IGNORECASE)  # Remove weights
+                    position = pos_text.strip()
                 if any(p in h_lower for p in class_patterns) and i < len(cells):
                     raw_class = cells[i].get_text(strip=True)
                     player_class = normalize_class(raw_class)
@@ -1766,42 +1771,58 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
         if not position:
             pos_elem = row.select_one('[class*="position"], [class*="pos"], .sidearm-roster-player-position, [data-label*="Pos"], [data-label*="Position"]')
             if pos_elem:
-                position = pos_elem.get_text(strip=True)
+                pos_text = pos_elem.get_text(strip=True)
+                # Clean position - remove height/weight patterns
+                import re as re_pos2
+                pos_text = re_pos2.sub(r'\d+[\'\"]\d*[\'\"]*', '', pos_text)  # Remove heights
+                pos_text = re_pos2.sub(r'\d+\s*lbs?', '', pos_text, flags=re_pos2.IGNORECASE)  # Remove weights
+                position = pos_text.strip()
+                # Also remove duplicate position words (e.g., "GuardGuard" -> "Guard")
+                if position and len(position) > 10:
+                    words = position.split()
+                    if len(words) >= 2 and words[0].lower() == words[1].lower():
+                        position = words[0]
         
         # Try CSS selectors for class/grade with expanded patterns
         if not player_class:
             class_selectors = [
-                '[class*="class"]', '[class*="year"]', '[class*="grade"]', '[class*="elig"]',
-                '.sidearm-roster-player-class', '.sidearm-roster-player-year',
-                '.sidearm-roster-player-academic-year', '.sidearm-roster-player-eligibility',
+                '.sidearm-roster-player-academic-year', '.sidearm-roster-player-year',
+                '.sidearm-roster-player-class', '.sidearm-roster-player-eligibility',
+                '[class*="academic-year"]', '[class*="class-year"]',
                 '[data-label*="Class"]', '[data-label*="Year"]', '[data-label*="Grade"]', '[data-label*="Yr"]',
                 '.roster-class', '.roster-year', '.roster-grade',
-                '[class*="academic"]', '[class*="cl-"]', '[class*="yr-"]'
+                '[class*="cl-"]', '[class*="yr-"]'
             ]
             for selector in class_selectors:
                 class_elem = row.select_one(selector)
                 if class_elem:
                     raw_class = class_elem.get_text(strip=True)
-                    if raw_class:
+                    if raw_class and len(raw_class) < 20:  # Avoid grabbing too much text
                         player_class = normalize_class(raw_class)
-                        break
+                        if player_class:
+                            break
         
         # Look for class in any text content that matches patterns
         if not player_class:
             import re as re_extract
             row_text = row.get_text(' ', strip=True)
-            # Look for common class patterns in the text
+            # Look for common class patterns in the text - be more specific to avoid false positives
             class_pattern = re_extract.search(
-                r'\b(RS\s*)?(Freshman|Sophomore|Junior|Senior|Graduate|Fr\.|So\.|Jr\.|Sr\.|Gr\.|FR|SO|JR|SR|GR)\b',
+                r'\b(R-?S[-\s]*)?(Freshman|Sophomore|Junior|Senior|Graduate|Fr\.|So\.|Jr\.|Sr\.|Gr\.)\b',
                 row_text, re_extract.IGNORECASE
             )
             if class_pattern:
                 player_class = normalize_class(class_pattern.group(0))
             else:
-                # Look for grade numbers
-                grade_pattern = re_extract.search(r'\b(9th|10th|11th|12th|Grade\s*\d{1,2})\b', row_text, re_extract.IGNORECASE)
-                if grade_pattern:
-                    player_class = normalize_class(grade_pattern.group(0))
+                # Look for standalone class abbreviations (must be word boundaries)
+                abbrev_pattern = re_extract.search(r'(?<!\w)(RS\s*)?(FR|SO|JR|SR|GR)(?!\w)', row_text)
+                if abbrev_pattern:
+                    player_class = normalize_class(abbrev_pattern.group(0))
+                else:
+                    # Look for high school grade numbers
+                    grade_pattern = re_extract.search(r'\b(9th|10th|11th|12th|Grade\s*\d{1,2})\b', row_text, re_extract.IGNORECASE)
+                    if grade_pattern:
+                        player_class = normalize_class(grade_pattern.group(0))
         
         return position, player_class
     
