@@ -620,7 +620,7 @@ export default function SeasonManagement() {
             </TabsContent>
             
             <TabsContent value="website" className="space-y-4">
-              <p className="text-sm text-slate-400">
+              <p className="text-sm text-slate-300">
                 Enter the URL of your school's roster page
               </p>
               <div className="flex gap-2">
@@ -634,7 +634,7 @@ export default function SeasonManagement() {
                   Import
                 </Button>
               </div>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-400">
                 Note: Website import may not work for all sites
               </p>
             </TabsContent>
