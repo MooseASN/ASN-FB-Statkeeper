@@ -421,15 +421,23 @@ function KickoffWorkflowDialog({
   return null;
 }
 
-export default function FootballLiveGame({ user, onLogout }) {
-  const { id } = useParams();
+// Demo Mode Bar Component
+const DemoModeBar = () => (
+  <div className="fixed top-0 left-0 right-0 z-[100] bg-orange-500 text-white text-center py-2 font-bold text-sm uppercase tracking-wider shadow-lg">
+    Demo Mode - Stats will not be saved
+  </div>
+);
+
+export default function FootballLiveGame({ user, onLogout, demoMode = false, initialDemoData = null }) {
+  const params = useParams();
+  const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
   // Game state
-  const [game, setGame] = useState(null);
-  const [homeRoster, setHomeRoster] = useState([]);
-  const [awayRoster, setAwayRoster] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [game, setGame] = useState(initialDemoData);
+  const [homeRoster, setHomeRoster] = useState(initialDemoData?.home_roster || []);
+  const [awayRoster, setAwayRoster] = useState(initialDemoData?.away_roster || []);
+  const [loading, setLoading] = useState(!demoMode);
   
   // Kickoff workflow state
   const [showKickoffTeamDialog, setShowKickoffTeamDialog] = useState(false);
