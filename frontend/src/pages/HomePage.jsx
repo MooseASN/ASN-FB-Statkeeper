@@ -139,6 +139,80 @@ const FeatureSlideshow = ({ features }) => {
   );
 };
 
+// Sport Card Component
+const SportCard = ({ sport, index }) => {
+  const [ref, isInView] = useInView();
+  const delay = index * 150;
+
+  return (
+    <div 
+      ref={ref}
+      className="relative flex-1 min-h-[300px] md:min-h-[400px] overflow-hidden group"
+    >
+      {/* Background image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+        style={{ backgroundImage: `url(${sport.image})` }}
+      />
+      
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/30" />
+      
+      {/* Content */}
+      <div 
+        className={`absolute inset-0 flex flex-col items-center justify-center transition-all duration-1000 ease-out`}
+        style={{ transitionDelay: `${delay}ms` }}
+      >
+        <h3 
+          className={`text-4xl md:text-5xl font-black text-white uppercase tracking-tight transition-all duration-1000 ${
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+          style={{ transitionDelay: `${delay}ms` }}
+        >
+          {sport.name}
+        </h3>
+        {sport.comingSoon && (
+          <span 
+            className={`mt-3 px-4 py-1 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm uppercase tracking-wider transition-all duration-1000 ${
+              isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            style={{ transitionDelay: `${delay + 200}ms` }}
+          >
+            Coming Soon
+          </span>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// Sports Offered Section
+const SportsOfferedSection = () => {
+  const [ref, isInView] = useInView();
+
+  return (
+    <section ref={ref} className="bg-black py-16">
+      {/* Section Title */}
+      <div className="max-w-7xl mx-auto px-6 mb-8">
+        <h2 
+          className={`text-4xl md:text-5xl font-black text-white uppercase tracking-tight transition-all duration-1000 ${
+            isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+          }`}
+        >
+          Sports Offered
+        </h2>
+      </div>
+      
+      {/* Sports Grid */}
+      <div className="flex flex-col md:flex-row">
+        {sportsData.map((sport, index) => (
+          <SportCard key={sport.name} sport={sport} index={index} />
+        ))}
+      </div>
+    </section>
+  );
+};
+
 // Section component with image background and gradient
 const ImageSection = ({ section, reverse = false }) => {
   const [ref, isInView] = useInView();
