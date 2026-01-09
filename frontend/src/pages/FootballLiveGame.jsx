@@ -4913,6 +4913,46 @@ export default function FootballLiveGame({ user, onLogout }) {
         homeTeamColor={game?.home_team_color || "#dc2626"}
         awayTeamColor={game?.away_team_color || "#2563eb"}
       />
+      
+      {/* Punt Field View Dialog */}
+      <PuntFieldView
+        isOpen={showPuntFieldView}
+        onClose={() => setShowPuntFieldView(false)}
+        ballPosition={ballPosition}
+        possession={possession}
+        homeTeamName={game?.home_team_name}
+        awayTeamName={game?.away_team_name}
+        homeTeamColor={game?.home_team_color || "#dc2626"}
+        awayTeamColor={game?.away_team_color || "#2563eb"}
+        puntDistance={puntDistance}
+        onPuntDistanceChange={setPuntDistance}
+        returnStartYardLine={puntReturnStartYardLine}
+        onReturnStartChange={setPuntReturnStartYardLine}
+        returnYards={puntReturnYards}
+        onReturnYardsChange={setPuntReturnYards}
+        mode={puntFieldViewMode}
+        onConfirm={() => setShowPuntFieldView(false)}
+      />
+      
+      {/* Field Goal Field View Dialog */}
+      <FieldGoalFieldView
+        isOpen={showFgFieldView}
+        onClose={() => setShowFgFieldView(false)}
+        ballPosition={ballPosition}
+        possession={possession}
+        homeTeamName={game?.home_team_name}
+        awayTeamName={game?.away_team_name}
+        homeTeamColor={game?.home_team_color || "#dc2626"}
+        awayTeamColor={game?.away_team_color || "#2563eb"}
+        fgDistance={fgDistance}
+        onFgDistanceChange={setFgDistance}
+        result={selectedResult}
+        onResultChange={setSelectedResult}
+        onConfirm={() => {
+          setShowFgFieldView(false);
+          // If result is set, we can optionally auto-advance to next step
+        }}
+      />
     </div>
   );
 }
