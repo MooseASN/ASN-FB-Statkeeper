@@ -15,7 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   ArrowLeft, Trophy, Users, Calendar, Plus, Upload, Link as LinkIcon, 
-  Trash2, Edit, Play, MapPin, Clock
+  Trash2, Edit, Play, MapPin, Clock, Pencil
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -44,6 +44,8 @@ export default function SeasonManagement() {
   const [showRosterDialog, setShowRosterDialog] = useState(false);
   const [showGameDialog, setShowGameDialog] = useState(false);
   const [showOpponentDialog, setShowOpponentDialog] = useState(false);
+  const [showEditOpponentDialog, setShowEditOpponentDialog] = useState(false);
+  const [showOpponentRosterDialog, setShowOpponentRosterDialog] = useState(false);
   
   // Form states
   const [rosterMethod, setRosterMethod] = useState("manual");
@@ -68,6 +70,18 @@ export default function SeasonManagement() {
     sport: "",
     color: "#666666"
   });
+  
+  // Edit opponent form
+  const [editOpponentForm, setEditOpponentForm] = useState({
+    id: "",
+    name: "",
+    color: "#666666",
+    logo_url: ""
+  });
+  
+  // Opponent roster editing
+  const [opponentRoster, setOpponentRoster] = useState([]);
+  const [newOpponentPlayer, setNewOpponentPlayer] = useState({ number: "", name: "", position: "", playerClass: "" });
 
   const fetchData = useCallback(async () => {
     try {
