@@ -173,6 +173,16 @@ export default function SchoolDashboard() {
   
   // Invite link
   const [inviteLink, setInviteLink] = useState("");
+  
+  // Game setup options (for starting scheduled games)
+  const [gameSetup, setGameSetup] = useState({
+    statMode: "classic", // "simple", "classic", "advanced"
+    clockEnabled: false,
+    periodMinutes: 12,
+    periodLabel: "Quarter", // "Quarter", "Half", "Period"
+    timeoutPreset: "college", // "high_school", "college", "custom"
+    customTimeouts: 4
+  });
 
   const fetchData = useCallback(async () => {
     try {
