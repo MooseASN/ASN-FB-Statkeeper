@@ -76,14 +76,16 @@ export default function AdminDashboard({ user, onLogout }) {
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes, betaRes] = await Promise.all([
+      const [usersRes, statsRes, betaRes, schoolsRes] = await Promise.all([
         axios.get(`${API}/admin/users`),
         axios.get(`${API}/admin/stats`),
-        axios.get(`${API}/admin/beta-settings`)
+        axios.get(`${API}/admin/beta-settings`),
+        axios.get(`${API}/admin/schools`)
       ]);
       setUsers(usersRes.data.users);
       setStats(statsRes.data);
       setBetaSettings(betaRes.data);
+      setSchools(schoolsRes.data.schools || []);
       setLastUpdated(new Date());
     } catch (error) {
       if (error.response?.status === 403) {
