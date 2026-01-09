@@ -4609,6 +4609,8 @@ async def create_season(school_id: str, data: SeasonCreate, current_user: User =
     }
     await db.seasons.insert_one(season_doc)
     
+    # Remove MongoDB _id before returning
+    season_doc.pop("_id", None)
     return {"season_id": season_id, **season_doc}
 
 @api_router.get("/schools/{school_id}/seasons")
@@ -4712,6 +4714,8 @@ async def create_school_team(school_id: str, data: SchoolTeamCreate, current_use
     }
     await db.teams.insert_one(team_doc)
     
+    # Remove MongoDB _id before returning
+    team_doc.pop("_id", None)
     return team_doc
 
 @api_router.get("/schools/{school_id}/teams")
