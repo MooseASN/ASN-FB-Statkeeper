@@ -205,12 +205,19 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Stats tab: season statistics with team/player averages
   - Members tab: team member management moved here
   - Redshirt checkbox (RS) for player registration (RS FR, RS SO, etc.)
+- [x] **Edit Opponent Teams Feature** - **COMPLETED January 2026**
+  - Edit button on opponent cards in Opponents tab
+  - Edit Opponent dialog: name, color picker, logo URL
+  - Manage Roster functionality for opponents
+  - Backend PUT /api/schools/{school_id}/teams/{team_id} working
+  - 11/11 backend tests passing
 
 ### P1 (Completed)
 - [x] Verify basketball stat tracker improvements - **ALL TESTS PASS**
 - [x] Admin login reliability - **VERIFIED WORKING** (both username and email login methods)
 - [x] Session logout bug fix - App no longer logs out on transient network errors
 - [x] Jumbotron flickering fix
+- [x] Text visibility fixes - All dialogs use white/slate-200 text on dark backgrounds
 
 ### P2 (Future)
 - [ ] Further refactor FootballLiveGame.jsx using the new custom hooks
@@ -224,14 +231,14 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - [ ] Mobile-specific UI improvements
 
 ## Testing
-- Backend: pytest tests at `/app/tests/test_beta_mode.py`
-- Test reports: `/app/test_reports/iteration_1.json`
+- Backend: pytest tests at `/app/tests/test_beta_mode.py`, `/app/tests/test_edit_opponent.py`
+- Test reports: `/app/test_reports/iteration_21.json`
 - Admin credentials: admin / NoahTheJew1997
 
 ## Known Issues
-- FootballLiveGame.jsx: Still large (~4700 lines), needs more refactoring
-- Custom hooks (useGameClock, useDriveState, useTimeouts) created but not integrated
-- server.py: ~5000 lines, needs to be split into domain-specific routers
+- FootballLiveGame.jsx: Still large (~4900 lines), needs more refactoring
+- Custom hooks (useGameClock, useDriveState, useTimeouts) created and imported but not fully integrated
+- server.py: ~5000 lines, router templates created at /app/backend/routers/
 
 ## Third-Party Integrations
 - react-player: Video embedding
