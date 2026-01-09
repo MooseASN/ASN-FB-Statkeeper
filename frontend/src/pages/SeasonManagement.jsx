@@ -388,7 +388,7 @@ export default function SeasonManagement() {
                         <div className="flex items-center gap-4">
                           <div className="text-center min-w-[80px]">
                             <div className="text-sm font-medium text-white">{game.scheduled_date}</div>
-                            <div className="text-xs text-slate-500">{game.scheduled_time || "TBD"}</div>
+                            <div className="text-xs text-slate-500">{formatTime12Hour(game.scheduled_time)}</div>
                           </div>
                           <div className="text-white">
                             <div className="font-medium">
