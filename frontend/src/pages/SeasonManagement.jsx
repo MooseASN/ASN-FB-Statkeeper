@@ -152,7 +152,8 @@ export default function SeasonManagement() {
           id: `player_${Date.now()}_${idx}`,
           number: parts[0] || "",
           name: parts[1] || "",
-          position: parts[2] || ""
+          position: parts[2] || "",
+          playerClass: parts[3] || ""
         };
       }).filter(p => p.number && p.name);
       
