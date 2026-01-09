@@ -28,6 +28,10 @@ import AccountSettings from "@/pages/AccountSettings";
 import AdminDashboard from "@/pages/AdminDashboard";
 import FootballStatsView from "@/pages/FootballStatsView";
 import Jumbotron from "@/pages/Jumbotron";
+import SchoolSignUp from "@/pages/SchoolSignUp";
+import SchoolDashboard from "@/pages/SchoolDashboard";
+import SchoolJoin from "@/pages/SchoolJoin";
+import SeasonManagement from "@/pages/SeasonManagement";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
