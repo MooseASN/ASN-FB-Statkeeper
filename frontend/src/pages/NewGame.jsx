@@ -190,7 +190,7 @@ export default function NewGame({ user, onLogout }) {
 
     setCreating(true);
     try {
-      await axios.post(`${API}/games`, {
+      const gameData = {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
         start_immediately: false,
@@ -203,7 +203,15 @@ export default function NewGame({ user, onLogout }) {
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
-      });
+      };
+      
+      // Add season linkage if selected
+      if (selectedSeasonId && schoolInfo) {
+        gameData.season_id = selectedSeasonId;
+        gameData.school_id = schoolInfo.school_id;
+      }
+      
+      await axios.post(`${API}/games`, gameData);
       toast.success("Game scheduled!");
       navigate("/");
     } catch (error) {
