@@ -1459,84 +1459,85 @@ export default function SeasonManagement() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="flex gap-2">
-              <Input
-                value={schoolSearchQuery}
-                onChange={(e) => setSchoolSearchQuery(e.target.value)}
-                placeholder="School name or code (e.g., MOOSE)"
-                className="bg-slate-900 border-slate-600 text-white"
-                onKeyDown={(e) => e.key === "Enter" && handleSearchSchools()}
-              />
-              <Button 
-                onClick={handleSearchSchools}
-                disabled={searchLoading}
-                className="bg-orange-500 hover:bg-orange-600"
-              >
-                {searchLoading ? "..." : "Search"}
-              </Button>
-            </div>
-            
-            {schoolSearchResults.length > 0 ? (
-              <ScrollArea className="h-64 border border-slate-700 rounded">
-                <div className="p-2 space-y-2">
-                  {schoolSearchResults.map(schoolResult => (
-                    <div 
-                      key={schoolResult.school_id}
-                      className="p-3 bg-slate-900/50 rounded hover:bg-slate-900 transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          {schoolResult.logo_url ? (
-                            <img 
-                              src={schoolResult.logo_url} 
-                              alt={schoolResult.name}
-                              className="w-10 h-10 rounded-full object-cover"
-                            />
-                          ) : (
-                            <div 
-                              className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold"
-                              style={{ backgroundColor: schoolResult.primary_color || "#666" }}
-                            >
-                              {schoolResult.name?.charAt(0)}
-                            </div>
-                          )}
-                          <div>
-                            <div className="font-medium text-white">{schoolResult.name}</div>
-                            <div className="text-xs text-slate-400">
-                              Code: {schoolResult.school_code} • {schoolResult.state}
-                            </div>
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          onClick={() => handleImportFromSchool(schoolResult)}
-                          className="bg-orange-500 hover:bg-orange-600"
-                        >
-                          Add
-                        </Button>
-                      </div>
-                      {schoolResult.matching_seasons?.length > 0 ? (
-                        <div className="mt-2 pt-2 border-t border-slate-700">
-                          <div className="text-xs text-green-400">
-                            ✓ Has matching {season?.gender === "men" ? "Men's" : "Women's"} {season?.level === "varsity" ? "Varsity" : "JV"} {season?.sport} season
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="mt-2 pt-2 border-t border-slate-700">
-                          <div className="text-xs text-yellow-400">
-                            ⚠ No matching season found - team info will be imported manually
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            ) : schoolSearchQuery && !searchLoading ? (
-              <div className="text-center text-slate-400 py-4">
-                No schools found. Try a different search term.
+            {/* Search Input with Dropdown */}
+            <div className="relative">
+              <div className="flex items-center gap-2">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <Input
+                  value={schoolSearchQuery}
+                  onChange={handleSearchInputChange}
+                  placeholder="Type school name or code (e.g., MOOSE)"
+                  className="bg-slate-900 border-slate-600 text-white pl-10"
+                  autoFocus
+                />
+                {searchLoading && (
+                  <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                    <div className="w-4 h-4 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
-            ) : null}
+              
+              {/* Dropdown Results */}
+              {schoolSearchQuery.length >= 2 && (
+                <div className="absolute w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl z-50 max-h-72 overflow-y-auto">
+                  {schoolSearchResults.length > 0 ? (
+                    <div className="py-1">
+                      {schoolSearchResults.map(schoolResult => (
+                        <div 
+                          key={schoolResult.school_id}
+                          className="px-3 py-2 hover:bg-slate-800 cursor-pointer transition-colors border-b border-slate-800 last:border-0"
+                          onClick={() => handleImportFromSchool(schoolResult)}
+                        >
+                          <div className="flex items-center gap-3">
+                            {schoolResult.logo_url ? (
+                              <img 
+                                src={schoolResult.logo_url} 
+                                alt={schoolResult.name}
+                                className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                              />
+                            ) : (
+                              <div 
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0"
+                                style={{ backgroundColor: schoolResult.primary_color || "#666" }}
+                              >
+                                {schoolResult.name?.charAt(0)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="font-medium text-white truncate">{schoolResult.name}</div>
+                              <div className="text-xs text-slate-400">
+                                ID: <span className="text-orange-400 font-mono">{schoolResult.school_code}</span>
+                                {schoolResult.state && <span> • {schoolResult.state}</span>}
+                              </div>
+                              {schoolResult.matching_seasons?.length > 0 ? (
+                                <div className="text-xs text-green-400 mt-0.5">
+                                  ✓ Has matching season
+                                </div>
+                              ) : (
+                                <div className="text-xs text-yellow-400 mt-0.5">
+                                  ⚠ No matching season
+                                </div>
+                              )}
+                            </div>
+                            <Button
+                              size="sm"
+                              className="bg-orange-500 hover:bg-orange-600 flex-shrink-0"
+                            >
+                              Add
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : !searchLoading ? (
+                    <div className="p-4 text-center text-slate-400">
+                      <div className="text-sm">No schools found</div>
+                      <div className="text-xs mt-1">Try a different search term</div>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
             
             <p className="text-xs text-slate-500">
               If the school isn&apos;t on StatMoose, use &quot;Add Opponent&quot; to manually add them.
