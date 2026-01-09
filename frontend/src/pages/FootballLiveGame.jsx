@@ -3794,15 +3794,24 @@ export default function FootballLiveGame({ user, onLogout }) {
                         
                         {/* Punt Distance */}
                         {selectedResult && selectedResult !== 'blocked' && (
-                          <div className="flex items-center justify-center gap-3 mt-4">
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => Math.max(0, prev - 5))}>-5</Button>
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => Math.max(0, prev - 1))}>-1</Button>
-                            <div className="px-4 py-2 bg-zinc-800 rounded text-center">
-                              <div className="text-xs text-zinc-500">Punt Distance</div>
-                              <div className="text-2xl font-bold text-purple-400">{puntDistance}</div>
+                          <div className="space-y-3">
+                            <div className="flex items-center justify-center gap-3 mt-4">
+                              <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => Math.max(0, prev - 5))}>-5</Button>
+                              <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => Math.max(0, prev - 1))}>-1</Button>
+                              <div className="px-4 py-2 bg-zinc-800 rounded text-center">
+                                <div className="text-xs text-zinc-500">Punt Distance</div>
+                                <div className="text-2xl font-bold text-purple-400">{puntDistance}</div>
+                              </div>
+                              <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => prev + 1)}>+1</Button>
+                              <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => prev + 5)}>+5</Button>
                             </div>
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => prev + 1)}>+1</Button>
-                            <Button size="sm" variant="outline" className="border-zinc-600" onClick={() => setPuntDistance(prev => prev + 5)}>+5</Button>
+                            <Button 
+                              variant="outline" 
+                              className="w-full border-purple-600 text-purple-400 hover:bg-purple-900/30"
+                              onClick={() => { setPuntFieldViewMode("punt"); setShowPuntFieldView(true); }}
+                            >
+                              🏈 Punt Field View
+                            </Button>
                           </div>
                         )}
                         
