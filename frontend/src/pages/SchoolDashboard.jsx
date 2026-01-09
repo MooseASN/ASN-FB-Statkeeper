@@ -143,6 +143,7 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
 
 export default function SchoolDashboard() {
   const navigate = useNavigate();
+  const { selectSport } = useSport();
   const [loading, setLoading] = useState(true);
   const [school, setSchool] = useState(null);
   const [members, setMembers] = useState([]);
