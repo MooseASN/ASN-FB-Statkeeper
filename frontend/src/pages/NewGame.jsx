@@ -136,7 +136,7 @@ export default function NewGame({ user, onLogout }) {
 
     setCreating(true);
     try {
-      const res = await axios.post(`${API}/games`, {
+      const gameData = {
         home_team_id: homeTeamId,
         away_team_id: awayTeamId,
         start_immediately: true,
@@ -147,7 +147,15 @@ export default function NewGame({ user, onLogout }) {
         ...getClockSettings(),
         ...getTimeoutSettings(),
         ...getPrimetimeSettings()
-      });
+      };
+      
+      // Add season linkage if selected
+      if (selectedSeasonId && schoolInfo) {
+        gameData.season_id = selectedSeasonId;
+        gameData.school_id = schoolInfo.school_id;
+      }
+      
+      const res = await axios.post(`${API}/games`, gameData);
       toast.success("Game started!");
       // Navigate based on sport and mode
       if (selectedSport === "football") {
