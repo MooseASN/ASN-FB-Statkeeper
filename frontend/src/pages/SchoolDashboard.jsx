@@ -666,12 +666,6 @@ export default function SchoolDashboard() {
                           </div>
                         );
                       })}
-                                <Badge className="bg-green-500 animate-pulse">LIVE NOW</Badge>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
                     </div>
                   </div>
                 );
