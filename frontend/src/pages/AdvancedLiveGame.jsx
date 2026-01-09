@@ -134,6 +134,14 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
 
   // Fetch game data
   const fetchGame = useCallback(async (isInitialLoad = false) => {
+    // In demo mode, don't fetch from API
+    if (demoMode) {
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+      return;
+    }
+    
     try {
       const gameRes = await axios.get(`${API}/games/${id}`);
       
@@ -173,14 +181,19 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
         setLoading(false);
       }
     }
-  }, [id, navigate]);
+  }, [id, navigate, demoMode]);
 
   // Ref for fetchGame to avoid circular dependency
   const fetchGameRef = useRef(fetchGame);
   fetchGameRef.current = fetchGame;
 
-  // Sync function for offline queue
+  // Sync function for offline queue - in demo mode, no API calls
   const syncPlay = useCallback(async (playData) => {
+    if (demoMode) {
+      // In demo mode, stats are already updated locally
+      return;
+    }
+    
     if (playData.type === 'stat') {
       await axios.post(`${API}/games/${id}/stats`, playData.data);
     } else if (playData.type === 'play-by-play') {
@@ -193,7 +206,7 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
     if (fetchGameRef.current) {
       fetchGameRef.current(false);
     }
-  }, [id]);
+  }, [id, demoMode]);
 
   // Offline queue hook
   const { 
@@ -205,9 +218,14 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
   } = useOfflineQueue(id, syncPlay);
 
   useEffect(() => {
-    fetchGame(true); // Initial load
+    if (!demoMode) {
+      fetchGame(true); // Initial load
+      const interval = setInterval(() => fetchGame(false), 5000); // Refresh
+      return () => clearInterval(interval);
+    } else {
+      setLoading(false);
+    }
     document.title = "StatMoose BKB";
-    const interval = setInterval(() => fetchGame(false), 5000); // Refresh
     return () => clearInterval(interval);
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
