@@ -27,6 +27,8 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { 
   ArrowLeft, 
@@ -45,7 +47,8 @@ import {
   EyeOff,
   Building2,
   ChevronRight,
-  ChevronDown
+  ChevronDown,
+  Trash2
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
