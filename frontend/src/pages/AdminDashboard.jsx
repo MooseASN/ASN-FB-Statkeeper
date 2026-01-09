@@ -446,6 +446,45 @@ export default function AdminDashboard({ user, onLogout }) {
               )}
             </div>
             
+            {/* School Creation Beta */}
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Building2 className="w-6 h-6 text-purple-500" />
+                  <div>
+                    <Label className="text-base font-medium">School Creation Beta Mode</Label>
+                    <p className="text-sm text-muted-foreground">Require password to register a new school</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={betaSettings.school_creation_beta}
+                  onCheckedChange={(checked) => setBetaSettings(prev => ({ ...prev, school_creation_beta: checked }))}
+                  data-testid="school-creation-beta-toggle"
+                />
+              </div>
+              {betaSettings.school_creation_beta && (
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showSchoolCreationPassword ? "text" : "password"}
+                      placeholder="Enter beta password for school creation"
+                      value={betaSettings.school_creation_password}
+                      onChange={(e) => setBetaSettings(prev => ({ ...prev, school_creation_password: e.target.value }))}
+                      className="pr-10"
+                      data-testid="school-creation-password-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowSchoolCreationPassword(!showSchoolCreationPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showSchoolCreationPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
             <Button onClick={handleSaveBetaSettings} disabled={savingBeta} className="w-full">
               {savingBeta ? "Saving..." : "Save Beta Settings"}
             </Button>
