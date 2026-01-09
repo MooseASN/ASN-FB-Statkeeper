@@ -4208,6 +4208,686 @@ async def ensure_admin_user():
         logger.error(f"Error ensuring admin user: {e}")
         raise e
 
+# ============ US STATES LIST ============
+US_STATES = [
+    "Alabama", "Alaska", "Arizona", "Arkansas", "California", "Colorado", "Connecticut",
+    "Delaware", "Florida", "Georgia", "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+    "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland", "Massachusetts", "Michigan",
+    "Minnesota", "Mississippi", "Missouri", "Montana", "Nebraska", "Nevada", "New Hampshire",
+    "New Jersey", "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+    "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina", "South Dakota",
+    "Tennessee", "Texas", "Utah", "Vermont", "Virginia", "Washington", "West Virginia",
+    "Wisconsin", "Wyoming"
+]
+
+# ============ SCHOOL/ORGANIZATION MODELS ============
+
+class SchoolRegister(BaseModel):
+    school_name: str
+    state: str
+    logo_url: Optional[str] = None  # Can be uploaded file path or web URL
+    user_name: str
+    user_email: str
+    password: str
+    security_questions: List[SecurityQuestionAnswer]
+
+class SchoolMemberInvite(BaseModel):
+    email: str
+    name: str
+    password: str
+    security_questions: List[SecurityQuestionAnswer]
+
+class SeasonCreate(BaseModel):
+    name: str  # e.g., "2025-26 Football"
+    sport: str  # "basketball" or "football"
+
+class SchoolTeamCreate(BaseModel):
+    name: str
+    sport: str  # "basketball" or "football"
+    color: Optional[str] = "#000000"
+    roster: Optional[List[dict]] = []
+
+class SchoolGameCreate(BaseModel):
+    season_id: str
+    opponent_team_id: str
+    scheduled_date: str
+    scheduled_time: Optional[str] = None
+    location: Optional[str] = None
+    is_home_game: bool = True
+    note: Optional[str] = None
+
+class UpdateMemberRole(BaseModel):
+    role: str  # "admin" or "member"
+
+# ============ SCHOOL/ORGANIZATION ROUTES ============
+
+@api_router.get("/states")
+async def get_us_states():
+    """Get list of US states for dropdown"""
+    return US_STATES
+
+@api_router.get("/security-questions")
+async def get_security_questions():
+    """Get list of security questions for signup"""
+    return SECURITY_QUESTIONS
+
+@api_router.post("/schools/register")
+async def register_school(data: SchoolRegister, response: Response):
+    """Register a new school/organization with admin user"""
+    # Check if school name already exists (case-insensitive)
+    existing_school = await db.schools.find_one(
+        {"name_lower": data.school_name.lower().strip()},
+        {"_id": 0}
+    )
+    if existing_school:
+        raise HTTPException(status_code=400, detail="A school/organization with this name already exists")
+    
+    # Validate state
+    if data.state not in US_STATES:
+        raise HTTPException(status_code=400, detail="Invalid state selected")
+    
+    # Check for existing email
+    existing_email = await db.users.find_one({"email": data.user_email.lower()}, {"_id": 0})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Validate security questions (require at least 2)
+    if len(data.security_questions) < 2:
+        raise HTTPException(status_code=400, detail="Please answer at least 2 security questions")
+    
+    # Hash security question answers
+    hashed_security_questions = []
+    for sq in data.security_questions:
+        if sq.question not in SECURITY_QUESTIONS:
+            raise HTTPException(status_code=400, detail=f"Invalid security question: {sq.question}")
+        hashed_security_questions.append({
+            "question": sq.question,
+            "answer_hash": pwd_context.hash(sq.answer.lower().strip())
+        })
+    
+    # Create IDs
+    school_id = f"school_{uuid.uuid4().hex[:12]}"
+    user_id = f"user_{uuid.uuid4().hex[:12]}"
+    invite_code = secrets.token_urlsafe(16)
+    
+    # Create the school
+    school_doc = {
+        "school_id": school_id,
+        "name": data.school_name.strip(),
+        "name_lower": data.school_name.lower().strip(),
+        "state": data.state,
+        "logo_url": data.logo_url,
+        "invite_code": invite_code,
+        "created_by": user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.schools.insert_one(school_doc)
+    
+    # Create the admin user
+    hashed_password = pwd_context.hash(data.password)
+    user_doc = {
+        "user_id": user_id,
+        "email": data.user_email.lower(),
+        "username": data.user_email.lower().split("@")[0],
+        "name": data.user_name,
+        "password_hash": hashed_password,
+        "security_questions": hashed_security_questions,
+        "picture": None,
+        "auth_provider": "local",
+        "school_id": school_id,
+        "school_role": "admin",  # First user is admin
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
+    
+    # Create a session for the user
+    session_token = f"session_{secrets.token_urlsafe(32)}"
+    session_doc = {
+        "session_token": session_token,
+        "user_id": user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    # Set session cookie
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        samesite="lax",
+        max_age=60 * 60 * 24 * 30  # 30 days
+    )
+    
+    return {
+        "session_token": session_token,
+        "user": {
+            "user_id": user_id,
+            "email": data.user_email.lower(),
+            "name": data.user_name,
+            "school_id": school_id,
+            "school_role": "admin"
+        },
+        "school": {
+            "school_id": school_id,
+            "name": data.school_name,
+            "state": data.state,
+            "logo_url": data.logo_url,
+            "invite_code": invite_code
+        }
+    }
+
+@api_router.get("/schools/check-name/{name}")
+async def check_school_name(name: str):
+    """Check if a school name is available"""
+    existing = await db.schools.find_one(
+        {"name_lower": name.lower().strip()},
+        {"_id": 0}
+    )
+    return {"available": existing is None}
+
+@api_router.get("/schools/invite/{invite_code}")
+async def get_school_by_invite(invite_code: str):
+    """Get school info by invite code (for join page)"""
+    school = await db.schools.find_one(
+        {"invite_code": invite_code},
+        {"_id": 0, "school_id": 1, "name": 1, "state": 1, "logo_url": 1}
+    )
+    if not school:
+        raise HTTPException(status_code=404, detail="Invalid invite code")
+    return school
+
+@api_router.post("/schools/join/{invite_code}")
+async def join_school(invite_code: str, data: SchoolMemberInvite, response: Response):
+    """Join a school using an invite code"""
+    # Get school
+    school = await db.schools.find_one({"invite_code": invite_code}, {"_id": 0})
+    if not school:
+        raise HTTPException(status_code=404, detail="Invalid invite code")
+    
+    # Check for existing email
+    existing_email = await db.users.find_one({"email": data.email.lower()}, {"_id": 0})
+    if existing_email:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Validate security questions
+    if len(data.security_questions) < 2:
+        raise HTTPException(status_code=400, detail="Please answer at least 2 security questions")
+    
+    # Hash security question answers
+    hashed_security_questions = []
+    for sq in data.security_questions:
+        if sq.question not in SECURITY_QUESTIONS:
+            raise HTTPException(status_code=400, detail=f"Invalid security question: {sq.question}")
+        hashed_security_questions.append({
+            "question": sq.question,
+            "answer_hash": pwd_context.hash(sq.answer.lower().strip())
+        })
+    
+    # Create user
+    user_id = f"user_{uuid.uuid4().hex[:12]}"
+    hashed_password = pwd_context.hash(data.password)
+    
+    user_doc = {
+        "user_id": user_id,
+        "email": data.email.lower(),
+        "username": data.email.lower().split("@")[0],
+        "name": data.name,
+        "password_hash": hashed_password,
+        "security_questions": hashed_security_questions,
+        "picture": None,
+        "auth_provider": "local",
+        "school_id": school["school_id"],
+        "school_role": "member",  # New users are members
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.users.insert_one(user_doc)
+    
+    # Create session
+    session_token = f"session_{secrets.token_urlsafe(32)}"
+    session_doc = {
+        "session_token": session_token,
+        "user_id": user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "expires_at": (datetime.now(timezone.utc) + timedelta(days=30)).isoformat()
+    }
+    await db.user_sessions.insert_one(session_doc)
+    
+    response.set_cookie(
+        key="session_token",
+        value=session_token,
+        httponly=True,
+        samesite="lax",
+        max_age=60 * 60 * 24 * 30
+    )
+    
+    return {
+        "session_token": session_token,
+        "user": {
+            "user_id": user_id,
+            "email": data.email.lower(),
+            "name": data.name,
+            "school_id": school["school_id"],
+            "school_role": "member"
+        },
+        "school": {
+            "school_id": school["school_id"],
+            "name": school["name"]
+        }
+    }
+
+@api_router.get("/schools/my-school")
+async def get_my_school(current_user: User = Depends(get_current_user)):
+    """Get the current user's school"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or not user.get("school_id"):
+        raise HTTPException(status_code=404, detail="User is not part of any school")
+    
+    school = await db.schools.find_one(
+        {"school_id": user["school_id"]},
+        {"_id": 0}
+    )
+    if not school:
+        raise HTTPException(status_code=404, detail="School not found")
+    
+    return {
+        **school,
+        "user_role": user.get("school_role", "member")
+    }
+
+@api_router.get("/schools/{school_id}/members")
+async def get_school_members(school_id: str, current_user: User = Depends(get_current_user)):
+    """Get all members of a school (admin only)"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    members = await db.users.find(
+        {"school_id": school_id},
+        {"_id": 0, "user_id": 1, "email": 1, "name": 1, "school_role": 1, "created_at": 1}
+    ).to_list(100)
+    
+    return members
+
+@api_router.put("/schools/{school_id}/members/{user_id}/role")
+async def update_member_role(
+    school_id: str, 
+    user_id: str, 
+    data: UpdateMemberRole,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a member's role (admin only, max 3 admins)"""
+    # Check if current user is admin of this school
+    admin = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not admin or admin.get("school_id") != school_id or admin.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can change member roles")
+    
+    # Get target user
+    target = await db.users.find_one({"user_id": user_id, "school_id": school_id}, {"_id": 0})
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found in this school")
+    
+    # Validate role
+    if data.role not in ["admin", "member"]:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    # Check max admins (3)
+    if data.role == "admin":
+        admin_count = await db.users.count_documents(
+            {"school_id": school_id, "school_role": "admin"}
+        )
+        if target.get("school_role") != "admin" and admin_count >= 3:
+            raise HTTPException(status_code=400, detail="Maximum of 3 admins allowed per school")
+    
+    # Update role
+    await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"school_role": data.role, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"success": True, "new_role": data.role}
+
+@api_router.put("/schools/{school_id}")
+async def update_school(school_id: str, request: Request, current_user: User = Depends(get_current_user)):
+    """Update school details (admin only)"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can update school details")
+    
+    data = await request.json()
+    update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    
+    if "logo_url" in data:
+        update_data["logo_url"] = data["logo_url"]
+    
+    await db.schools.update_one(
+        {"school_id": school_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True}
+
+@api_router.post("/schools/{school_id}/regenerate-invite")
+async def regenerate_invite_code(school_id: str, current_user: User = Depends(get_current_user)):
+    """Regenerate the invite code for a school (admin only)"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can regenerate invite codes")
+    
+    new_code = secrets.token_urlsafe(16)
+    await db.schools.update_one(
+        {"school_id": school_id},
+        {"$set": {"invite_code": new_code, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"invite_code": new_code}
+
+# ============ SEASONS ROUTES ============
+
+@api_router.post("/schools/{school_id}/seasons")
+async def create_season(school_id: str, data: SeasonCreate, current_user: User = Depends(get_current_user)):
+    """Create a new season for a school"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can create seasons")
+    
+    if data.sport not in ["basketball", "football"]:
+        raise HTTPException(status_code=400, detail="Sport must be 'basketball' or 'football'")
+    
+    season_id = f"season_{uuid.uuid4().hex[:12]}"
+    
+    season_doc = {
+        "season_id": season_id,
+        "school_id": school_id,
+        "name": data.name,
+        "sport": data.sport,
+        "team_id": None,  # Will be set when roster is uploaded
+        "created_by": current_user.user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.seasons.insert_one(season_doc)
+    
+    return {"season_id": season_id, **season_doc}
+
+@api_router.get("/schools/{school_id}/seasons")
+async def get_school_seasons(school_id: str, current_user: User = Depends(get_current_user)):
+    """Get all seasons for a school"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    seasons = await db.seasons.find(
+        {"school_id": school_id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    return seasons
+
+@api_router.get("/schools/{school_id}/seasons/{season_id}")
+async def get_season(school_id: str, season_id: str, current_user: User = Depends(get_current_user)):
+    """Get a specific season"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    season = await db.seasons.find_one(
+        {"season_id": season_id, "school_id": school_id},
+        {"_id": 0}
+    )
+    if not season:
+        raise HTTPException(status_code=404, detail="Season not found")
+    
+    # Get the team if exists
+    team = None
+    if season.get("team_id"):
+        team = await db.teams.find_one({"id": season["team_id"]}, {"_id": 0})
+    
+    # Get games for this season
+    games = await db.games.find(
+        {"season_id": season_id},
+        {"_id": 0}
+    ).sort("scheduled_date", 1).to_list(100)
+    
+    return {
+        **season,
+        "team": team,
+        "games": games
+    }
+
+@api_router.put("/schools/{school_id}/seasons/{season_id}/team")
+async def set_season_team(
+    school_id: str, 
+    season_id: str, 
+    team_id: str = Body(..., embed=True),
+    current_user: User = Depends(get_current_user)
+):
+    """Set the team for a season"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can update seasons")
+    
+    # Verify team exists and belongs to this school
+    team = await db.teams.find_one({"id": team_id, "school_id": school_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    await db.seasons.update_one(
+        {"season_id": season_id, "school_id": school_id},
+        {"$set": {"team_id": team_id, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"success": True}
+
+# ============ SCHOOL TEAMS ROUTES ============
+
+@api_router.post("/schools/{school_id}/teams")
+async def create_school_team(school_id: str, data: SchoolTeamCreate, current_user: User = Depends(get_current_user)):
+    """Create a team for a school (opponent or own team)"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Only admins can create teams
+    if user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can create teams")
+    
+    if data.sport not in ["basketball", "football"]:
+        raise HTTPException(status_code=400, detail="Sport must be 'basketball' or 'football'")
+    
+    team_id = f"team_{uuid.uuid4().hex[:12]}"
+    
+    team_doc = {
+        "id": team_id,
+        "name": data.name,
+        "sport": data.sport,
+        "color": data.color,
+        "logo": None,
+        "roster": data.roster or [],
+        "school_id": school_id,
+        "user_id": current_user.user_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.teams.insert_one(team_doc)
+    
+    return team_doc
+
+@api_router.get("/schools/{school_id}/teams")
+async def get_school_teams(
+    school_id: str, 
+    sport: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all teams for a school, optionally filtered by sport"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    query = {"school_id": school_id}
+    if sport:
+        query["sport"] = sport
+    
+    teams = await db.teams.find(query, {"_id": 0}).sort("name", 1).to_list(100)
+    return teams
+
+# ============ SCHOOL GAMES ROUTES ============
+
+@api_router.post("/schools/{school_id}/seasons/{season_id}/games")
+async def create_school_game(
+    school_id: str, 
+    season_id: str, 
+    data: SchoolGameCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a game for a season"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can create games")
+    
+    # Get season
+    season = await db.seasons.find_one({"season_id": season_id, "school_id": school_id}, {"_id": 0})
+    if not season:
+        raise HTTPException(status_code=404, detail="Season not found")
+    
+    if not season.get("team_id"):
+        raise HTTPException(status_code=400, detail="Season must have a team set before creating games")
+    
+    # Get school's team
+    school_team = await db.teams.find_one({"id": season["team_id"]}, {"_id": 0})
+    if not school_team:
+        raise HTTPException(status_code=404, detail="School team not found")
+    
+    # Get opponent team
+    opponent_team = await db.teams.find_one({"id": data.opponent_team_id}, {"_id": 0})
+    if not opponent_team:
+        raise HTTPException(status_code=404, detail="Opponent team not found")
+    
+    game_id = f"game_{uuid.uuid4().hex[:12]}"
+    share_code = secrets.token_urlsafe(8)
+    
+    # Determine home/away based on is_home_game
+    if data.is_home_game:
+        home_team_id = season["team_id"]
+        home_team_name = school_team["name"]
+        home_team_color = school_team.get("color", "#000000")
+        away_team_id = data.opponent_team_id
+        away_team_name = opponent_team["name"]
+        away_team_color = opponent_team.get("color", "#666666")
+    else:
+        home_team_id = data.opponent_team_id
+        home_team_name = opponent_team["name"]
+        home_team_color = opponent_team.get("color", "#666666")
+        away_team_id = season["team_id"]
+        away_team_name = school_team["name"]
+        away_team_color = school_team.get("color", "#000000")
+    
+    # Initialize player stats from rosters
+    home_roster = school_team.get("roster", []) if data.is_home_game else opponent_team.get("roster", [])
+    away_roster = opponent_team.get("roster", []) if data.is_home_game else school_team.get("roster", [])
+    
+    default_player_stats = {
+        "fg2_made": 0, "fg2_missed": 0, "fg3_made": 0, "fg3_missed": 0,
+        "ft_made": 0, "ft_missed": 0, "offensive_rebounds": 0, "defensive_rebounds": 0,
+        "assists": 0, "steals": 0, "blocks": 0, "turnovers": 0, "fouls": 0,
+        "is_active": True, "seconds_played": 0
+    }
+    
+    home_player_stats = [
+        {"id": p.get("id", f"player_{uuid.uuid4().hex[:8]}"), "player_number": p.get("number", ""), 
+         "player_name": p.get("name", ""), **default_player_stats}
+        for p in home_roster
+    ]
+    away_player_stats = [
+        {"id": p.get("id", f"player_{uuid.uuid4().hex[:8]}"), "player_number": p.get("number", ""),
+         "player_name": p.get("name", ""), **default_player_stats}
+        for p in away_roster
+    ]
+    
+    game_doc = {
+        "id": game_id,
+        "user_id": current_user.user_id,
+        "school_id": school_id,
+        "season_id": season_id,
+        "sport": season["sport"],
+        "home_team_id": home_team_id,
+        "home_team_name": home_team_name,
+        "home_team_color": home_team_color,
+        "away_team_id": away_team_id,
+        "away_team_name": away_team_name,
+        "away_team_color": away_team_color,
+        "scheduled_date": data.scheduled_date,
+        "scheduled_time": data.scheduled_time,
+        "location": data.location,
+        "note": data.note,
+        "status": "scheduled",
+        "share_code": share_code,
+        "current_quarter": 1,
+        "quarter_scores": {"home": [0, 0, 0, 0], "away": [0, 0, 0, 0]},
+        "home_player_stats": home_player_stats,
+        "away_player_stats": away_player_stats,
+        "play_by_play": [],
+        "clock_enabled": True,
+        "period_duration": 480 if season["sport"] == "basketball" else 900,
+        "period_label": "Quarter" if season["sport"] == "basketball" else "Quarter",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    await db.games.insert_one(game_doc)
+    
+    return {"game_id": game_id, **game_doc}
+
+@api_router.get("/schools/{school_id}/games")
+async def get_school_games(
+    school_id: str, 
+    season_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get all games for a school, optionally filtered by season"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    query = {"school_id": school_id}
+    if season_id:
+        query["season_id"] = season_id
+    
+    games = await db.games.find(query, {"_id": 0}).sort("scheduled_date", 1).to_list(500)
+    return games
+
+@api_router.get("/schools/{school_id}/calendar")
+async def get_school_calendar(school_id: str, current_user: User = Depends(get_current_user)):
+    """Get all games for the school calendar view"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get all games for this school
+    games = await db.games.find(
+        {"school_id": school_id},
+        {"_id": 0, "id": 1, "sport": 1, "home_team_name": 1, "away_team_name": 1, 
+         "scheduled_date": 1, "scheduled_time": 1, "status": 1, "season_id": 1,
+         "location": 1, "share_code": 1}
+    ).sort("scheduled_date", 1).to_list(500)
+    
+    # Get all seasons to map names
+    seasons = await db.seasons.find(
+        {"school_id": school_id},
+        {"_id": 0, "season_id": 1, "name": 1, "sport": 1}
+    ).to_list(100)
+    
+    season_map = {s["season_id"]: s for s in seasons}
+    
+    # Enrich games with season info
+    for game in games:
+        if game.get("season_id") and game["season_id"] in season_map:
+            game["season_name"] = season_map[game["season_id"]]["name"]
+    
+    return {"games": games, "seasons": seasons}
+
 @app.on_event("startup")
 async def startup_init():
     """Initialize admin user on startup"""
