@@ -27,10 +27,12 @@ import bcrypt as bcrypt_lib
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-# MongoDB connection
-mongo_url = os.environ['MONGO_URL']
+# MongoDB connection with logging
+mongo_url = os.environ.get('MONGO_URL', 'mongodb://localhost:27017')
+db_name = os.environ.get('DB_NAME', 'statmoose')
+logging.info(f"Connecting to MongoDB: {mongo_url[:30]}... DB: {db_name}")
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[db_name]
 
 # Password hashing - use bcrypt directly for better compatibility
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
