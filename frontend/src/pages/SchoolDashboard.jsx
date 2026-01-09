@@ -241,7 +241,8 @@ export default function SchoolDashboard() {
       
       setMembers(membersRes.data);
       setSeasons(seasonsRes.data);
-      setGames(calendarRes.data);
+      // Calendar returns {games: [...], seasons: [...]}
+      setGames(calendarRes.data.games || []);
       
     } catch (error) {
       console.error("Error fetching school data:", error);
