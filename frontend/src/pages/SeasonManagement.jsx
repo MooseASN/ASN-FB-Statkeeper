@@ -462,7 +462,7 @@ export default function SeasonManagement() {
             
             {!season.team ? (
               <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-8 text-center text-slate-500">
+                <CardContent className="p-8 text-center text-slate-300">
                   No roster set up yet
                 </CardContent>
               </Card>
