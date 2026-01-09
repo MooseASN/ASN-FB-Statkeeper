@@ -664,6 +664,32 @@ export default function SchoolDashboard() {
               
               <Card className="bg-slate-800/50 border-slate-700">
                 <CardContent className="p-6 space-y-4">
+                  {/* School Code - Read Only */}
+                  <div>
+                    <Label className="text-slate-200">School ID Code</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input
+                        value={school?.school_code || "N/A"}
+                        disabled
+                        className="bg-slate-900/50 border-slate-700 text-slate-400 cursor-not-allowed"
+                      />
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          navigator.clipboard.writeText(school?.school_code || "");
+                          toast.success("School code copied!");
+                        }}
+                        className="border-slate-600 text-slate-300"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Other schools can use this code to find and add you as an opponent
+                    </p>
+                  </div>
+                  
                   <div>
                     <Label className="text-slate-200">School Name</Label>
                     <Input
