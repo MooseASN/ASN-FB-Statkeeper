@@ -171,7 +171,7 @@ export default function Register({ onLogin }) {
             </p>
             <Button
               variant="outline"
-              className="w-full border-orange-500 text-orange-600 hover:bg-orange-100"
+              className="w-full border-orange-500 text-orange-600 hover:bg-orange-500 hover:text-white"
               onClick={() => navigate("/school/signup")}
               data-testid="school-signup-btn"
             >
