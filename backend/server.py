@@ -989,7 +989,8 @@ async def get_all_schools(admin: User = Depends(get_admin_user)):
     schools = await db.schools.find(
         {},
         {"_id": 0, "school_id": 1, "school_code": 1, "name": 1, "state": 1, 
-         "logo_url": 1, "primary_color": 1, "created_at": 1}
+         "logo_url": 1, "primary_color": 1, "created_at": 1, 
+         "classification": 1, "classification_display": 1}
     ).sort("name", 1).to_list(500)
     
     # Get member counts and season counts for each school
