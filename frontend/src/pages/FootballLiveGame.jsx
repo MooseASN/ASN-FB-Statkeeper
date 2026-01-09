@@ -657,6 +657,14 @@ export default function FootballLiveGame({ user, onLogout }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Quarter end detection - stop clock and notify when time runs out
+  useEffect(() => {
+    if (clockTime === 0 && clockRunning) {
+      stopClock();
+      toast.info("Quarter ended!");
+    }
+  }, [clockTime, clockRunning, stopClock]);
+
   // Clock countdown effect - hook manages basic countdown, this handles drive/TOP tracking
   useEffect(() => {
     let interval = null;
