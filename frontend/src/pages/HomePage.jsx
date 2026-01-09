@@ -2,6 +2,25 @@ import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
+// Sports data
+const sportsData = [
+  {
+    name: "Basketball",
+    image: "https://customer-assets.emergentagent.com/job_statmoose-sports-1/artifacts/pqshwl1p_Basketball.avif",
+    comingSoon: false
+  },
+  {
+    name: "Football",
+    image: "https://customer-assets.emergentagent.com/job_statmoose-sports-1/artifacts/krez4qmm_Football.webp",
+    comingSoon: false
+  },
+  {
+    name: "Baseball",
+    image: "https://customer-assets.emergentagent.com/job_statmoose-sports-1/artifacts/uhv3smdr_Baseball.jpg",
+    comingSoon: true
+  }
+];
+
 // Feature data for each section
 const sectionsData = {
   schools: {
