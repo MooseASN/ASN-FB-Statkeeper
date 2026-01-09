@@ -1,117 +1,214 @@
 <analysis>**original_problem_statement:**
-The user's core goal is to build a comprehensive, production-ready sports stat-tracking application for basketball and football, named StatMoose.
+The user is building StatMoose, a comprehensive sports stat-tracking application. The current focus is on a multi-tenant system for schools and organizations.
 
-Initial requests involved removing a legacy tournament bracket system and adding core stat-tracking features. Throughout the session, the user guided the development with a series of feature requests, UI improvements, and bug fixes, including:
-- **Football Stat Tracker:**
-    - Implement a Field View dialog with a slider for accurate yardage visualization.
-    - Fix complex yardage calculation logic to adhere to NFL/college rules (e.g., crossing the 50-yard line).
-    - Add Touchdown and Safety outcomes to the Field View.
-    - Enhance the football field UI with hashmarks and a line of scrimmage.
-    - Fix a critical bug where penalty yardage was applied in the wrong direction.
-    - Unify penalty selection UI, so penalties like Holding are a single button, which then prompts the user to select the offending team (offense or defense) to apply the correct rule variant.
-    - Fix a bug where the game clock did not initialize to the duration set during game creation.
-- **Basketball Stat Tracker (Classic & Advanced modes):**
-    - Implement an Assist dialog that appears after a made basket, showing only players currently on the floor.
-    - In Advanced mode, automate several workflows:
-        - Trigger the rebound workflow immediately after a missed shot or block.
-        - Automatically flip possession after turnovers or made shots.
-        - Add spacebar and LiveViewLiveViewLiveViewJumbotron.jsxJumbotron.jsx/app/frontend/src/App.js/jumbotron/:gameIdJumbotron.jsxLiveView.jsxbg-zinc-800bg-gray-800home_on_flooraway_on_floorLiveGame.jsxAdvancedLiveGame.jsxFootballLiveGame.jsxuseGameClock.jsuseDriveState.jsuseTimeouts.jsFootballLiveGame.jsxFieldViewDialogFootballLiveGame.jsxLiveView.jsxTeamDetail.jsxFieldViewDialog.jsxpenaltyCatalog.jsPenaltyWorkflowDialog.jsxFootballLiveGame.jsxperiod_durationcalculatePenaltyEnforcementspace`), and fixed the team turnover attribution in .
-- **Feature: Live CSV Team Stats Export (DONE):**
-  - Created a new backend endpoint ().
-  - Added Live CSV links to  and  for a constantly updating stats file.
-- **Bugfix: Public PDF Export on  (DONE):**
-  - Created a new public backend endpoint () that doesn't require authentication.
-  - Updated  to use this new endpoint, making the public export functional.
-- **Bugfix:  Roster Display (DONE):**
-  - Modified the frontend logic to merge full team rosters with player stats, ensuring all players are displayed in the box score, not just those with recorded stats.
-- **Bugfix:  Logo Display (DONE):** Updated backend endpoints ( and ) to include team logo data in the payload.
-- **Issue Resolution: Admin Login Reliability (RESOLVED):** Performed extensive testing on the authentication flow, confirming it is fully functional. The recurring issue is now considered resolved.
+Recent user requests include:
+1.  **Roster Duplication:** When creating a new season, allow duplicating a roster from a previous season.
+2.  **School Creation Beta Mode:** Add a beta mode toggle in the main admin dashboard. When active, users cannot create a school unless they provide an admin-set password.
+3.  **School Exists Check:** Prevent the creation of a school if a school with the same name already exists, showing an informative message instead.
+4.  **Admin Account Deletion:** Allow the main admin to delete user accounts from the admin dashboard.
+5.  **UI/UX Fixes:**
+    *   Fix the hover state color on the Sign Up A School button on the registration page.
+    *   Make uploading a logo a mandatory requirement during school creation.
+6.  **Gameday Section:** Add a Gameday section to the school dashboard for games scheduled on the current day, showing matchup details, live scores for in-progress games, and action buttons.
+7.  **Admin Dashboard Enhancements:** Add a Schools Viewer to see all participating schools, their seasons, and members. Refactor the layout to use a top-level stat card for school count and collapsible sections for Schools and Users.
+8.  **School Classification:** Add a classification field (High School, College, etc.) during school signup and display it in the admin dashboard.
+9.  **Search & Navigation Improvements:** Implement autocomplete/search-as-you-type for finding opponents (both existing and new schools on the platform) and add sport-specific emojis to UI elements.
+
+**User's preferred language**: English
+
+**what currently exists?**
+The application is a full-stack React/FastAPI app with a MongoDB database. The school management system is highly functional.
+- **School Dashboard:** Features a Gameday section showing live and scheduled games for the current day, a full calendar, and a tabbed interface for Schedule, Stats, Members, and Edit School.
+- **Season Management:** School admins can create seasons with specific sports, genders (Men/Women), and levels (Varsity/Sub-Varsity). They can manage schedules, opponents, and rosters. The opponent creation process now includes a searchable dropdown to find existing opponents or import other schools on the StatMoose platform.
+- **Admin Dashboard:** The main admin can view platform-wide statistics (total users, schools, teams, games). It features collapsible sections for viewing a detailed list of all participating schools (including their classification, members, and seasons) and all users.
+- **School Creation:** New schools can be created with a unique, non-editable 3-10 character ID. The signup form includes a mandatory logo upload and a classification dropdown (High School, College, etc.).
+- **Game Status:** The Gameday UI shows if a game is LIVE NOW (with live score and period) or scheduled. A warning dialog prevents multiple users from opening the stat tracker for the same in-progress game.
+
+**Last working item**:
+- **Last item agent was working:** Implementing a beta mode for school creation. The agent was adding the necessary fields to the backend  Pydantic model and the corresponding database update logic.
+- **Status:** IN PROGRESS
+- **Agent Testing Done:** N
+- **Which testing method agent to use?** Both. Backend endpoints for updating and checking beta status need curl/script testing. The frontend  (for the toggle) and  (for the password prompt) will require screenshot testing.
+- **User Testing Done:** N
+
+**All Pending/In progress Issue list**:
+- **Issue 1: Complete User's Latest Feature Batch (P0)**
+  - **Description:** The user provided a large list of new features and fixes in message #543. The agent has started this work but has not completed all items.
+- **Issue 2: Recurring UI Text Visibility Issues (P1)**
+  - **Description:** A general concern where low-contrast text (e.g., grey on dark backgrounds) appears. While many instances are fixed, new UI elements must be checked for high contrast.
+
+**Issues Detail:**
+- **Issue 1: Complete User's Latest Feature Batch**
+    - **Attempted fixes:** The agent has already implemented the required logo upload and fixed the button hover color. It has also started the backend work for the school creation beta mode by updating the Pydantic models in .
+    - **Next debug checklist:**
+        1.  **Beta Mode:**
+            -   Update the  and  endpoints in  to handle the new school creation fields (, ).
+            -   Modify  to display the new toggle and password input for this beta mode.
+            -   Update  to fetch the beta status. If active, it should prompt for the correct password before allowing signup to proceed.
+        2.  **Admin Account Deletion:**
+            -   Create a new endpoint  in .
+            -   Add a delete button for each user in the All Users table in .
+            -   Implement a confirmation dialog before deletion.
+            -   Ensure the login endpoint () correctly handles attempts from deleted accounts (e.g., returns User not found).
+        3.  **School Exists Check:**
+            -   In the  endpoint in , add a case-insensitive check to see if a school with the proposed name already exists. If so, throw an .
+            -   In , display the error message from the API to the user.
+        4.  **Roster Duplication:**
+            -   Create a new backend endpoint (e.g., ) to fetch all rosters from previous seasons for that school.
+            -   In , add a Duplicate Roster button in the Team Roster tab.
+            -   Create a dialog that allows the user to select a previous season, view its roster, and confirm the duplication to the current season's roster.
+    - **Why fix this issue and what will be achieved with the fix?** This will complete the user's latest set of feature requests, enhancing admin controls and improving the user workflow for school and season management.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** N
+    - **Should Test frontend/backend/both after fix?** Both
+    - **Blocked on other issue:** None
+
+- **Issue 2: Recurring UI Text Visibility Issues**
+    - **Attempted fixes:** Specific instances were fixed by changing  to  or .
+    - **Next debug checklist:** Proactively check all new UI components, especially , , and descriptive text, against dark backgrounds to ensure high contrast.
+    - **Why fix this issue and what will be achieved with the fix?** Improves application usability and accessibility.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** Y
+    - **Should Test frontend/backend/both after fix?** Frontend
+
+**In progress Task List**:
+- **Task 1: Complete Implementation of School Creation Beta Mode (P0)**
+    - **Where to resume:** The agent has updated the Pydantic models in . The next step is to update the GET and POST endpoints for beta settings () to include the new  and  fields.
+    - **What will be achieved with this?** Admins will be able to restrict school signups to only users who have a special password.
+    - **Status:** IN PROGRESS
+    - **Should Test frontend/backend/both after fix?** Both
+    - **Blocked on something:** None
+
+**Upcoming and Future Tasks**
+- **Upcoming Tasks:**
+    - **P0: Implement Admin Account Deletion:** Add backend endpoint and frontend UI for the main admin to delete user accounts.
+    - **P0: Implement School Exists Check:** Prevent duplicate school signups.
+    - **P0: Implement Roster Duplication:** Allow users to copy a roster from a previous season when creating a new one.
+- **Future Tasks:**
+    - **P1: Refactor :** Integrate existing custom hooks (, , ) to simplify the component.
+    - **P2: Refactor  (ON HOLD):** The user has requested to hold off on this task. It involves breaking the large file into smaller, domain-specific routers (e.g., , ).
+    - **P2: Season Duplicate/Clone Feature:** Add functionality to clone an entire season structure.
+    - **P2: Add Field View:** Implement the field view for Punt/FG plays in .
+
+**Completed work in this session**
+- **Feature: Gameday Section (DONE):** Implemented a Gameday section on the school dashboard that shows multiple games for the current day, displays live scores and quarter/period for in-progress games, and includes action buttons.
+- **Feature: Game In-Progress Warning (DONE):** Added a warning dialog to prevent multiple users from tracking the same active game.
+- **Feature: School ID Generation (DONE):** Implemented unique, non-editable 3-10 character school IDs upon registration.
+- **Feature: Enhanced Season Creation (DONE):** Added Gender (Men's/Women's) and Level (Varsity/Sub-Varsity) options to the season creation flow.
+- **Feature: Edit/Delete Season (DONE):** Implemented functionality for school admins to edit a season's name and delete a season entirely (with a password-protected confirmation dialog).
+- **Feature: Admin Schools Viewer (DONE):** Added a new section to the main admin dashboard to view all schools, their classification, members, and seasons.
+- **Feature: School Classification (DONE):** Added a  field (High School, College, etc.) to school sign-up and displayed it as a badge in the admin view.
+- **Feature: Searchable Opponent Selection (DONE):** Replaced the static opponent dropdown with a dynamic, searchable input that shows both existing opponents and allows searching for/importing other schools on the platform.
+- **UI: Admin Dashboard Layout (DONE):** Replaced the New Users card with a Schools stat card and converted the schools and users lists into collapsible sections to save space.
+- **UI: Hover State Fix (DONE):** Corrected the text color on the Sign Up A School button during hover.
+- **Validation: Mandatory Logo Upload (DONE):** Made the school logo upload a required field in the signup form.
+- **UI: Sport Emoji Indicators (DONE):** Added sport emojis (🏀/🏈) to season names in the Gameday section.
 
 **Earlier issues found/mentioned but not fixed**
-*   None.
+- **Issue 1: Refactor **
+    - **Debug checklist:** Break the single 5000+ line file into a  directory with separate files for , , , etc.
+    - **Why to solve this issue and what will be achieved with this?** To improve maintainability, reduce complexity, and make the codebase easier to debug and scale.
+    - **Should Test frontend/backend/both after fix:** Both (extensive regression testing needed).
+    - **Is recurring issue?** N
+    - **Status:** BLOCKED (User requested to put this on hold).
+- **Issue 2: Refactor **
+    - **Debug checklist:** Integrate the existing but unused custom hooks (, , ) to manage state within the component.
+    - **Why to solve this issue and what will be achieved with this?** To simplify the massive component, reduce state management complexity, and improve readability.
+    - **Should Test frontend/backend/both after fix:** Frontend
+    - **Is recurring issue?** N
+    - **Status:** NOT STARTED
 
 **Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork:** Admin Login Unreliability.
-- **Recurrence count:** High.
-- **Status:** **RESOLVED**. The agent conducted comprehensive backend and frontend testing (, ) which all passed, verifying the login/logout and session management flows are stable.
+- **Issue recurrence in previous fork:** Recurring UI Text Visibility Issues.
+- **Recurrence count:** High. This has been mentioned multiple times by the user.
+- **Status:** IN PROGRESS (ongoing vigilance required).
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Data-Driven UI Refactoring:** Abstracting complex data variations into a unified UI. For example, creating a single Holding penalty button that dynamically presents different outcomes (10 yards vs. 5 yards + 1st down) based on a subsequent user choice (offense vs. defense). This was done in  and .
-- **Frontend Data Hydration:** Merging two distinct arrays on the client-side (a team's full roster and a list of players with stats) to create a comprehensive data source for UI components like a box score. This ensures all players are displayed, even those with zero stats ().
-- **Public API Endpoint Creation:** Architecting separate, unauthenticated API endpoints (e.g., ) to serve public-facing pages, while keeping core data-mutating endpoints secure behind authentication middleware.
-- **State Logic Encapsulation (Planned):** Proactively creating custom React hooks (, ) to encapsulate related state and logic, as a preparatory step for refactoring a large, complex component ().
+- **Debounced Search:** Used for the school/opponent search feature to prevent excessive API calls while the user is typing.
+- **Conditional UI Rendering:** Extensively used to show different UI states (e.g., Gameday section, live game scores, beta mode prompts, final game options).
+- **Component Refactoring:** The Admin Dashboard was significantly restructured to use collapsible components for better space management.
+- **Data Migration:** A one-time Python script was used to update existing school documents in the database with the new  field.
 
 **key DB schema**
-- No new collections or significant schema changes were introduced in this session.
+- **schools**: 
+- **seasons**: 
+- **games**:  (added to calendar endpoint response)
+- **admin_settings**: 
 
 **changes in tech stack**
-- No changes were made to the tech stack.
+- None.
 
 **All files of reference**
-*   **/app/frontend/src/pages/FootballLiveGame.jsx**: Heavily modified for clock fixes, penalty logic, and integration of the .
-*   **/app/frontend/src/data/penaltyCatalog.js**: Significantly refactored to support unified penalties with team-specific variants.
-*   **/app/frontend/src/components/PenaltyWorkflowDialog.jsx**: UI updated to render unified penalties and handle team selection.
-*   **/app/frontend/src/components/football/FieldViewDialog.jsx**: New component created to visualize play yardage.
-*   **/app/frontend/src/pages/AdvancedLiveGame.jsx**: Received major enhancements for automated stat-tracking workflows (possession, assists, rebounds).
-*   **/app/frontend/src/pages/LiveView.jsx**: Critical fixes applied for PDF export, and to ensure logos and full rosters are always displayed.
-*   **/app/backend/server.py**: New public endpoints added for CSV and PDF exports; existing public game data endpoints were updated to include more team details.
-*   **/app/frontend/src/hooks/**: New directory containing state management hooks planned for refactoring.
+- **/app/backend/server.py**: Main backend file, heavily modified with new endpoints for admin dashboard, school management, season editing, and beta mode settings.
+- **/app/frontend/src/pages/SchoolDashboard.jsx**: Major UI changes to implement the Gameday section and live game status updates.
+- **/app/frontend/src/pages/SeasonManagement.jsx**: Major changes to opponent/game creation flow and addition of Edit/Delete Season functionality.
+- **/app/frontend/src/pages/AdminDashboard.jsx**: Major UI overhaul with a new school stat card and collapsible sections for schools and users.
+- **/app/frontend/src/pages/SchoolSignUp.jsx**: Updated with new  field and mandatory logo upload.
+- **/app/frontend/src/pages/Register.jsx**: Minor style fix for a button hover state.
 
 **Areas that need refactoring**:
-- **/app/frontend/src/pages/FootballLiveGame.jsx**: This remains a high-priority refactoring candidate. The custom hooks that were created to simplify its state management have not yet been integrated.
+- **/app/backend/server.py**: Critically needs to be refactored into smaller routers. The user has this on hold.
+- **/app/frontend/src/pages/FootballLiveGame.jsx**: Still needs to be refactored to use its purpose-built custom hooks.
 
 **key api endpoints**
--    (**NEW**): Public endpoint to generate a live CSV of team stats.
--    (**NEW**): Public endpoint to generate a PDF box score for a basketball game.
--    (**MODIFIED**): Updated to include team logos and full roster data in the response.
--    (**MODIFIED**): Also updated to include team logos and roster data.
+- **NEW:** : Fetches all school data for the admin dashboard.
+- **NEW:** : Fetches detailed info for a single school.
+- **NEW:** : Updates a season's details.
+- **NEW:** : Deletes a season.
+- **NEW:** : Searches for schools by name or ID.
+- **NEW:** : A new endpoint for scraping a roster without a pre-existing team ID.
+- **MODIFIED:** : Updated to include  and check for existing school names.
+- **MODIFIED:** , : To be updated to support school creation beta mode.
+- **MODIFIED:** : Now returns score and period information for games.
 
 **Critical Info for New Agent**
-- Your first task is to implement the **Jumbotron Output page** as detailed in the In progress Task List.
-- The user is currently focused on presentation and data output features (, CSV, Jumbotron). Prioritize these types of requests.
-- The  refactoring is the most significant piece of technical debt. It's a good candidate to work on if there are no other active user requests.
+- **Prioritize the user's latest requests:** Focus on completing the remaining items from user message #543: admin account deletion, the school already exists check, and the roster duplication feature.
+- ** refactoring is on hold.** Do not proceed with this task unless the user explicitly asks for it again.
+- **Text visibility is a recurring theme.** Be proactive in checking all new UI elements for good color contrast against the dark application background.
+- **The agent has started work on the beta mode.** Resume by finishing the backend endpoints and then implementing the required frontend changes on the Admin and School Sign Up pages.
 
 **documents and test reports created in this job**
-- **/app/memory/PRD.md**: Created and updated throughout the session.
-- **/app/test_reports/iteration_*.json**: 15 test reports were generated, verifying all major features and fixes.
+- **/app/memory/PRD.md** (updated multiple times)
+- **/app/test_reports/iteration_21.json**
+- **/app/test_reports/iteration_22.json**
 
 **Last 10 User Messages and any pending HUMAN messages**
-10. **Request:** Implement a live CSV output for team stats comparison. (Status: **RESOLVED**)
-9.  **Request:** Create a Jumbotron Output page based on a reference image. (Status: **IN PROGRESS**)
-8.  **Feedback:** The live stats output doesn't always show full rosters. (Status: **RESOLVED**)
-7.  **Request:** Ensure team logos are properly showing in live stat outputs. (Status: **RESOLVED**)
-6.  **Feedback:** The PDF export on the public live stat link is not working. (Status: **RESOLVED**)
-5.  **Request:** Make sure the export PDF button works on all live stat outputs for basketball. (Status: **RESOLVED**)
-4.  **Request:** Add an assist dialog for both classic and advanced basketball modes. (Status: **RESOLVED**)
-3.  **Request:** Implement several major workflow improvements for the advanced basketball stat tracker. (Status: **RESOLVED**)
-2.  **Request:** Finish the P1 task (verifying admin login). (Status: **RESOLVED**)
-1.  **Request:** Implement all future actions from the previous backlog. (Status: **IN PROGRESS**, some tasks were completed, refactoring is still pending)
+10. **Request:** Add a school tracker and collapsible sections to the admin dashboard. (Status: **RESOLVED**)
+9.  **Request:** Add a  field (High School, College, etc.) to school signup and display it on the admin dashboard. (Status: **RESOLVED**)
+8.  **Request:** A large batch of features: fix button hover, require logo upload, add school creation beta mode, allow admin to delete accounts, prevent duplicate school creation, and add roster duplication from a previous season. (Status: **IN PROGRESS**)
+7.  **Confirmation:** No hold off for now regarding the  refactoring. (Status: **ACKNOWLEDGED**)
+6.  **Request:** Change Statmoose text color to white and an inquiry about the benefits of  refactoring. (Status: **RESOLVED**)
+5.  **Request:** Improve opponent search to be a combined dropdown of existing opponents and searchable new schools. Show season name/emoji for all games in the Gameday section. (Status: **RESOLVED**)
+4.  **Request:** Add sport emoji to season name in Gameday section and make school search an autocomplete dropdown. (Status: **RESOLVED**)
+3.  **Request:** In the Gameday section, show multiple games, display score/quarter for in-progress games, and add a warning dialog if a user tries to track an already-in-progress game. (Status: **RESOLVED**)
+2.  **Request:** Add a Gameday section to the school dashboard for games scheduled today and make the calendar's Today button work correctly. (Status: **RESOLVED**)
+1.  **Request:** A large batch of features: fix roster import, add actions for final games on the calendar, add gender/level to season creation, add edit/delete season functionality, generate unique school IDs, and allow searching for opponents by school ID. (Status: **RESOLVED**)
 
 **Project Health Check:**
-- **Broken:** None
-- **Mocked:** None
-- **Needs Refactoring:** 
+- **Broken:** None.
+- **Mocked:** The  page is still a placeholder without full functionality.
+- **Needs Refactoring:** , .
 
 **3rd Party Integrations**
 - **reportlab:** Used for PDF generation.
 - **lucide-react:** Used for icons.
-- No new integrations were added.
 
 **Testing status**
-- **Testing agent used after significant changes:** YES. The  was used 15 times to successfully verify nearly every feature and bug fix implemented in this session.
-- **Troubleshoot agent used after agent stuck in loop:** NO
-- **Test files created:** The testing agent created and modified test files in the backend, such as .
+- **Testing agent used after significant changes:** YES. Used for  and .
+- **Troubleshoot agent used after agent stuck in loop:** NO.
+- **Test files created:** None.
 - **Known regressions:** None.
 
 **Credentials to test flow:**
-- **Admin User:**
+- **School Admin User:**
     - Email: 
-    - Username: 
+    - Password: 
+- **Main Admin User:**
+    - Email: 
     - Password: 
 
 **What agent forgot to execute**
-- The agent created custom hooks (, , etc.) with the intention of refactoring  but never completed the integration. This remains a key pending future task.
-- The agent did not get to the other backlog items: visually testing game recaps and testing the CSV roster upload via the UI.</analysis>
+The agent correctly followed user instructions to put the  refactoring on hold. It is currently in the middle of a large batch of user requests and has not forgotten any items, but several are still pending implementation as outlined in the All Pending/In progress Issue list.</analysis>
