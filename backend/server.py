@@ -4508,6 +4508,8 @@ US_STATES = [
 class SchoolRegister(BaseModel):
     school_name: str
     state: str
+    classification: str  # "high_school", "college", "prep", or "other"
+    classification_other: Optional[str] = None  # Custom text if classification is "other"
     logo_url: Optional[str] = None  # Can be uploaded file path or web URL
     user_name: str
     user_email: str
