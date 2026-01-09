@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
@@ -37,93 +37,18 @@ const calculatePF = (player) => {
   return player.foul || player.fouls || player.pf || 0;
 };
 
-export default function JumbotronOutput() {
-  const { shareCode } = useParams();
-  const [game, setGame] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Fetch game data
-  const fetchGame = async () => {
-    try {
-      const response = await axios.get(`${API}/games/share/${shareCode}`);
-      setGame(response.data);
-      setError(null);
-    } catch (err) {
-      setError("Game not found");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchGame();
-    // Auto-refresh every 3 seconds for live updates
-    const interval = setInterval(fetchGame, 3000);
-    return () => clearInterval(interval);
-  }, [shareCode]);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
-        <div className="text-white text-3xl font-bold tracking-wider animate-pulse">LOADING...</div>
-      </div>
-    );
-  }
-
-  if (error || !game) {
-    return (
-      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
-        <div className="text-red-400 text-3xl font-bold">{error || "Game not found"}</div>
-      </div>
-    );
-  }
-
-  // Get colors - use team colors or defaults
-  const homeColor = game.home_team_color || "#d4a017"; // Gold/yellow default
-  const awayColor = game.away_team_color || "#8b0000"; // Cardinal red default
-
-  // Get players on floor
-  const homeOnFloor = game.home_on_floor || [];
-  const awayOnFloor = game.away_on_floor || [];
-
-  // Get player stats
-  const homeStats = game.home_player_stats || [];
-  const awayStats = game.away_player_stats || [];
-
-  // Filter to only players on floor, or show top 5 by points
-  const homeFloorPlayers = homeOnFloor.length > 0 
-    ? homeStats.filter(p => homeOnFloor.includes(p.id))
-    : [...homeStats].sort((a, b) => calculatePoints(b) - calculatePoints(a)).slice(0, 5);
-  
-  const awayFloorPlayers = awayOnFloor.length > 0
-    ? awayStats.filter(p => awayOnFloor.includes(p.id))
-    : [...awayStats].sort((a, b) => calculatePoints(b) - calculatePoints(a)).slice(0, 5);
-
-  // Calculate team fouls
-  const homeTeamFouls = homeStats.reduce((sum, p) => sum + calculatePF(p), 0);
-  const awayTeamFouls = awayStats.reduce((sum, p) => sum + calculatePF(p), 0);
-
-  // Check bonus status (7+ fouls = bonus in college, opponent fouls determine your bonus)
-  const homeInBonus = awayTeamFouls >= 7;
-  const awayInBonus = homeTeamFouls >= 7;
-
-  // Get timeouts (default 5 for college, 7 for NBA)
-  const homeTimeouts = game.home_timeouts ?? 5;
-  const awayTimeouts = game.away_timeouts ?? 5;
-
-  // Team Panel Component - Broadcast Style
-  const TeamPanel = ({ 
-    teamName, 
-    teamLogo, 
-    teamColor, 
-    timeouts, 
-    fouls, 
-    inBonus, 
-    players,
-    isTop
-  }) => (
+// Team Panel Component - Broadcast Style (defined outside main component)
+function TeamPanel({ 
+  teamName, 
+  teamLogo, 
+  teamColor, 
+  timeouts, 
+  fouls, 
+  inBonus, 
+  players,
+  isTop
+}) {
+  return (
     <div 
       className="flex-1 flex flex-col relative overflow-hidden"
       style={{
@@ -201,7 +126,7 @@ export default function JumbotronOutput() {
           </div>
         </div>
         
-        {/* Yellow accent line */}
+        {/* Team color accent line */}
         <div 
           className="h-1 mx-8"
           style={{ 
@@ -270,14 +195,99 @@ export default function JumbotronOutput() {
       {/* Corner accents */}
       <div 
         className={`absolute ${isTop ? 'top-0 left-0' : 'bottom-0 left-0'} w-4 h-4`}
-        style={{ borderLeft: `3px solid ${teamColor}`, borderTop: isTop ? `3px solid ${teamColor}` : 'none', borderBottom: !isTop ? `3px solid ${teamColor}` : 'none' }}
+        style={{ 
+          borderLeft: `3px solid ${teamColor}`, 
+          borderTop: isTop ? `3px solid ${teamColor}` : 'none', 
+          borderBottom: !isTop ? `3px solid ${teamColor}` : 'none' 
+        }}
       />
       <div 
         className={`absolute ${isTop ? 'top-0 right-0' : 'bottom-0 right-0'} w-4 h-4`}
-        style={{ borderRight: `3px solid ${teamColor}`, borderTop: isTop ? `3px solid ${teamColor}` : 'none', borderBottom: !isTop ? `3px solid ${teamColor}` : 'none' }}
+        style={{ 
+          borderRight: `3px solid ${teamColor}`, 
+          borderTop: isTop ? `3px solid ${teamColor}` : 'none', 
+          borderBottom: !isTop ? `3px solid ${teamColor}` : 'none' 
+        }}
       />
     </div>
   );
+}
+
+export default function JumbotronOutput() {
+  const { shareCode } = useParams();
+  const [game, setGame] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch game data
+  const fetchGame = useCallback(async () => {
+    try {
+      const response = await axios.get(`${API}/games/share/${shareCode}`);
+      setGame(response.data);
+      setError(null);
+    } catch (err) {
+      setError("Game not found");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [shareCode]);
+
+  useEffect(() => {
+    fetchGame();
+    // Auto-refresh every 3 seconds for live updates
+    const interval = setInterval(fetchGame, 3000);
+    return () => clearInterval(interval);
+  }, [fetchGame]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
+        <div className="text-white text-3xl font-bold tracking-wider animate-pulse">LOADING...</div>
+      </div>
+    );
+  }
+
+  if (error || !game) {
+    return (
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center">
+        <div className="text-red-400 text-3xl font-bold">{error || "Game not found"}</div>
+      </div>
+    );
+  }
+
+  // Get colors - use team colors or defaults
+  const homeColor = game.home_team_color || "#d4a017"; // Gold/yellow default
+  const awayColor = game.away_team_color || "#8b0000"; // Cardinal red default
+
+  // Get players on floor
+  const homeOnFloor = game.home_on_floor || [];
+  const awayOnFloor = game.away_on_floor || [];
+
+  // Get player stats
+  const homeStats = game.home_player_stats || [];
+  const awayStats = game.away_player_stats || [];
+
+  // Filter to only players on floor, or show top 5 by points
+  const homeFloorPlayers = homeOnFloor.length > 0 
+    ? homeStats.filter(p => homeOnFloor.includes(p.id))
+    : [...homeStats].sort((a, b) => calculatePoints(b) - calculatePoints(a)).slice(0, 5);
+  
+  const awayFloorPlayers = awayOnFloor.length > 0
+    ? awayStats.filter(p => awayOnFloor.includes(p.id))
+    : [...awayStats].sort((a, b) => calculatePoints(b) - calculatePoints(a)).slice(0, 5);
+
+  // Calculate team fouls
+  const homeTeamFouls = homeStats.reduce((sum, p) => sum + calculatePF(p), 0);
+  const awayTeamFouls = awayStats.reduce((sum, p) => sum + calculatePF(p), 0);
+
+  // Check bonus status (7+ fouls = bonus in college, opponent fouls determine your bonus)
+  const homeInBonus = awayTeamFouls >= 7;
+  const awayInBonus = homeTeamFouls >= 7;
+
+  // Get timeouts (default 5 for college, 7 for NBA)
+  const homeTimeouts = game.home_timeouts ?? 5;
+  const awayTimeouts = game.away_timeouts ?? 5;
 
   return (
     <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#0a1628' }}>
