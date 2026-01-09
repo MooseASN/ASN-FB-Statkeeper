@@ -98,6 +98,33 @@ export default function SchoolSignUp() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const handleVerifyBetaPassword = async () => {
+    if (!betaPassword.trim()) {
+      toast.error("Please enter the access password");
+      return;
+    }
+    
+    setBetaVerifying(true);
+    try {
+      const res = await axios.post(`${API}/beta-verify`, {
+        sport: "school_creation",
+        password: betaPassword
+      });
+      
+      if (res.data.valid) {
+        setBetaVerified(true);
+        setShowBetaDialog(false);
+        toast.success("Access granted! You can now register your school.");
+      } else {
+        toast.error("Invalid password. Please try again.");
+      }
+    } catch (error) {
+      toast.error("Failed to verify password");
+    } finally {
+      setBetaVerifying(false);
+    }
+  };
+
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
