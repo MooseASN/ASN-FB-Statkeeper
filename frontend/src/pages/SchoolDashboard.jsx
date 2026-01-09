@@ -841,11 +841,41 @@ export default function SchoolDashboard() {
               </Select>
             </div>
             <div>
+              <Label className="text-slate-200">Gender</Label>
+              <Select
+                value={newSeason.gender}
+                onValueChange={(v) => setNewSeason(prev => ({ ...prev, gender: v }))}
+              >
+                <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="men">Men&apos;s</SelectItem>
+                  <SelectItem value="women">Women&apos;s</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-slate-200">Level</Label>
+              <Select
+                value={newSeason.level}
+                onValueChange={(v) => setNewSeason(prev => ({ ...prev, level: v }))}
+              >
+                <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="varsity">Varsity</SelectItem>
+                  <SelectItem value="subvarsity">Sub-Varsity (JV/Freshman)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
               <Label className="text-slate-200">Season Name</Label>
               <Input
                 value={newSeason.name}
                 onChange={(e) => setNewSeason(prev => ({ ...prev, name: e.target.value }))}
-                placeholder="e.g., 2025-26 Men's Basketball"
+                placeholder="e.g., 2025-26 Season"
                 className="bg-slate-900 border-slate-600 text-white"
               />
             </div>
