@@ -166,13 +166,14 @@ export default function SchoolDashboard() {
 
   const fetchData = useCallback(async () => {
     try {
-      const token = sessionStorage.getItem("session_token");
+      // Check both localStorage and sessionStorage for token
+      const token = localStorage.getItem("session_token") || sessionStorage.getItem("session_token");
       if (!token) {
         navigate("/login");
         return;
       }
       
-      const headers = { Authorization: `Bearer ${token}` };
+      // No need for manual headers - axios interceptor handles auth
       
       // Get school info
       const schoolRes = await axios.get(`${API}/schools/my-school`, { headers });
