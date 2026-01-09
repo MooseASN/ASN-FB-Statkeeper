@@ -329,22 +329,6 @@ export default function Register({ onLogin }) {
             </Button>
           </form>
           
-          {/* School/Organization Signup */}
-          <div className="mt-6 pt-6 border-t">
-            <p className="text-center text-sm text-muted-foreground mb-3">
-              Are you a school or organization?
-            </p>
-            <Button
-              variant="outline"
-              className="w-full border-orange-500 text-orange-600 hover:bg-orange-50"
-              onClick={() => navigate("/school/signup")}
-              data-testid="school-signup-btn"
-            >
-              <Building2 className="w-4 h-4 mr-2" />
-              Sign Up A School/Organization
-            </Button>
-          </div>
-          
           <p className="text-center text-sm text-muted-foreground mt-6">
             Already have an account?{" "}
             <Link to="/login" className="text-black font-medium hover:underline">
