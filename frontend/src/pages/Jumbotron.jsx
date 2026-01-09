@@ -130,23 +130,23 @@ function TeamPanel({
           </h2>
           
           {/* Stats */}
-          <div className="flex items-center gap-10">
-            <div className="flex items-center gap-3">
-              <span className="text-gray-300 text-2xl uppercase" style={broadcastFont}>Timeouts</span>
-              <span className="text-white text-5xl" style={broadcastFont}>{timeouts}</span>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-xl uppercase" style={broadcastFont}>Timeouts</span>
+              <span className="text-white text-3xl" style={broadcastFont}>{timeouts}</span>
             </div>
             
-            <div className="flex items-center gap-3">
-              <span className="text-gray-300 text-2xl uppercase" style={broadcastFont}>Fouls</span>
-              <span className="text-white text-5xl" style={broadcastFont}>{totalFouls}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-xl uppercase" style={broadcastFont}>Fouls</span>
+              <span className="text-white text-3xl" style={broadcastFont}>{totalFouls}</span>
             </div>
             
             {(inBonus || doubleBonus) && (
               <div 
-                className="px-6 py-2 rounded-lg text-2xl text-white uppercase ml-2"
+                className="px-4 py-1 rounded-md text-xl text-white uppercase"
                 style={{ 
                   backgroundColor: '#1e40af',
-                  border: '3px solid #3b82f6',
+                  border: '2px solid #3b82f6',
                   ...broadcastFont
                 }}
               >
@@ -157,27 +157,27 @@ function TeamPanel({
         </div>
         
         {/* Stats Table */}
-        <div className="flex-1 px-6 min-h-0 flex flex-col">
+        <div className="flex-1 px-4 min-h-0 flex flex-col">
           {/* Header Row */}
           <div 
-            className="grid grid-cols-[100px_1fr_100px_130px_130px_130px_100px_80px_80px] gap-1 py-2 flex-shrink-0"
+            className="grid grid-cols-[70px_1fr_70px_90px_90px_90px_70px_60px_60px] gap-1 py-1 flex-shrink-0"
             style={{ backgroundColor: '#1e3a5f' }}
           >
-            <div className="text-gray-100 text-2xl uppercase pl-4" style={broadcastFont}>#</div>
-            <div className="text-gray-100 text-2xl uppercase" style={broadcastFont}>Player</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>PTS</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>FG</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>3FG</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>FT</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>REB</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>A</div>
-            <div className="text-gray-100 text-2xl uppercase text-center" style={broadcastFont}>PF</div>
+            <div className="text-gray-100 text-lg uppercase pl-3" style={broadcastFont}>#</div>
+            <div className="text-gray-100 text-lg uppercase" style={broadcastFont}>Player</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>PTS</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>FG</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>3FG</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>FT</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>REB</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>A</div>
+            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>PF</div>
           </div>
 
           {/* Player Rows - scrollable if needed */}
           <div className="flex-1 overflow-y-auto flex flex-col">
             {displayPlayers.length === 0 ? (
-              <div className="text-center text-gray-400 text-4xl py-4" style={broadcastFont}>
+              <div className="text-center text-gray-400 text-2xl py-2" style={broadcastFont}>
                 No players on floor
               </div>
             ) : (
