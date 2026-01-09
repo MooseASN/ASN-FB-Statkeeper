@@ -4812,6 +4812,61 @@ async def get_school_teams(
     teams = await db.teams.find(query, {"_id": 0}).sort("name", 1).to_list(100)
     return teams
 
+@api_router.put("/schools/{school_id}/teams/{team_id}")
+async def update_school_team(
+    school_id: str,
+    team_id: str,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a school team (admin only)"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    if user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can update teams")
+    
+    # Verify team belongs to this school
+    team = await db.teams.find_one({"id": team_id, "school_id": school_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    data = await request.json()
+    update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    
+    if "name" in data:
+        update_data["name"] = data["name"]
+    if "color" in data:
+        update_data["color"] = data["color"]
+    if "logo_url" in data:
+        update_data["logo_url"] = data["logo_url"]
+    if "roster" in data:
+        update_data["roster"] = data["roster"]
+    
+    await db.teams.update_one(
+        {"id": team_id, "school_id": school_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True}
+
+@api_router.get("/schools/{school_id}/teams/{team_id}")
+async def get_school_team(
+    school_id: str,
+    team_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get a specific school team"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    team = await db.teams.find_one({"id": team_id, "school_id": school_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    return team
+
 # ============ SCHOOL GAMES ROUTES ============
 
 @api_router.get("/schools/{school_id}/seasons/{season_id}/games")
