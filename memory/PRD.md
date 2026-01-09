@@ -12,31 +12,54 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
-### January 9, 2026 - Demo Mode Implementation
-- **Basketball Demo** - COMPLETED
-  - Demo mode selector page with 3 mode options (Classic, Advanced, Quick)
-  - Classic Mode fully functional with:
-    - Orange "DEMO MODE" bar
+### January 9, 2026 - Demo Mode Implementation - FULLY COMPLETE
+- **Basketball Demo** - VERIFIED WORKING (All 3 Modes)
+  - Demo mode selector page with 3 mode options (Classic, Advanced, Simple)
+  - **Classic Mode** - Full stat tracking with player cards:
+    - Orange "DEMO MODE - Stats will not be saved" bar
     - Fake teams: Northside Tigers vs Eastwood Eagles (10 players each)
-    - Full stat tracking (2PT, 3PT, FT, AST, REB, STL, BLK, TO, FOUL)
+    - Full stat tracking (2PT, 3PT, FT, AST, REB, STL, BLK, TO)
+    - Make/Miss shot modal for accuracy tracking
+    - Sub In/Out functionality
     - Share, Embed, and Jumbotron buttons
-    - Clock and period tracking
-    - Recent actions log
-  - Advanced/Quick modes show placeholder pages redirecting to Classic
+    - Clock with start/stop and period tracking
+  - **Advanced Mode** - Play-by-play focused interface:
+    - Team selector tabs (Home/Away)
+    - Player list with click-to-select
+    - Shot buttons with assist attribution
+    - Live play-by-play log
+    - Share and Box Score buttons
+  - **Simple Mode** - Quick scoring interface:
+    - Streamlined +1, +2, +3 buttons per player
+    - Gradient scoreboard
+    - 5 players shown per team
 
-- **Football Demo** - COMPLETED
+- **Football Demo** - VERIFIED WORKING
   - Orange "DEMO MODE" bar
   - Fake teams: Central Wolves vs Riverside Panthers (50 players each)
-  - Field visualization with ball position
-  - Down & distance tracking
+  - Field visualization with ball position marker
+  - Down & distance tracking (1st & 10, etc.)
   - Play buttons (RUN, PASS, PUNT, FIELD GOAL)
-  - Touchdown and field goal scoring
-  - Play log
+  - Yardage selection dialog for runs/passes
+  - Touchdown and field goal scoring with animations
+  - Play log with timestamp
   - Share and Embed buttons
 
-- **Homepage Updates** - COMPLETED
-  - Added "View Demo" buttons to Basketball and Football sport cards
+- **Homepage Integration** - VERIFIED WORKING
+  - "View Demo" buttons on Basketball and Football sport cards
+  - Basketball → Demo selector page → Mode selection
+  - Football → Direct to Football demo
   - Baseball shows "Coming Soon" badge
+
+- **API Endpoints** - VERIFIED WORKING
+  - GET /api/demo/basketball/{mode} - Returns demo game data for classic/advanced/simple
+  - GET /api/demo/football - Returns demo football game data
+
+### January 9, 2026 - Security Fix
+- **Resend API Key** - MOVED TO ENVIRONMENT VARIABLE
+  - Previously hardcoded in server.py (security risk)
+  - Now reads from RESEND_API_KEY in backend/.env
+  - Contact form email submissions still working correctly
 
 ### January 9, 2026 - Homepage Redesign (Sidearm Sports Style)
 - **Homepage Redesigned** - COMPLETED
