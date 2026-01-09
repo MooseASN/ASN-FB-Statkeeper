@@ -127,16 +127,22 @@ export default function SeasonManagement() {
       return;
     }
     
+    // Build class string with redshirt prefix if applicable
+    let classStr = newPlayer.playerClass || "";
+    if (newPlayer.isRedshirt && classStr) {
+      classStr = `RS ${classStr}`;
+    }
+    
     const player = {
       id: `player_${Date.now()}`,
       number: newPlayer.number,
       name: newPlayer.name,
       position: newPlayer.position || "",
-      playerClass: newPlayer.playerClass || ""
+      playerClass: classStr
     };
     
     setRoster(prev => [...prev, player]);
-    setNewPlayer({ number: "", name: "", position: "", playerClass: "" });
+    setNewPlayer({ number: "", name: "", position: "", playerClass: "", isRedshirt: false });
   };
 
   const handleRemovePlayer = (id) => {
