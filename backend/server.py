@@ -1321,6 +1321,54 @@ async def import_maxpreps_roster(team_id: str, request: MaxPrepsImportRequest, u
         cleaned = re_inner.sub(r'^\d{1,3}\s+', '', cleaned)
         return cleaned
     
+    # Helper function to extract position and class/year
+    def extract_position_class(row, headers=None, cells=None):
+        position = ""
+        player_class = ""
+        
+        # Common position patterns
+        position_patterns = ['pos', 'position', 'pos.']
+        class_patterns = ['class', 'yr', 'year', 'cl', 'el', 'elig', 'academic']
+        
+        # Try from headers/cells in table
+        if headers and cells:
+            for i, h in enumerate(headers):
+                h_lower = h.lower()
+                if any(p in h_lower for p in position_patterns) and i < len(cells):
+                    position = cells[i].get_text(strip=True)
+                if any(p in h_lower for p in class_patterns) and i < len(cells):
+                    player_class = cells[i].get_text(strip=True)
+                    # Normalize class abbreviations
+                    class_map = {
+                        'fr': 'FR', 'freshman': 'FR', 'fr.': 'FR', '1': 'FR',
+                        'so': 'SO', 'sophomore': 'SO', 'so.': 'SO', '2': 'SO',
+                        'jr': 'JR', 'junior': 'JR', 'jr.': 'JR', '3': 'JR',
+                        'sr': 'SR', 'senior': 'SR', 'sr.': 'SR', '4': 'SR',
+                        'gr': 'GR', 'graduate': 'GR', 'grad': 'GR', 'rs': 'GR', '5': 'GR'
+                    }
+                    player_class = class_map.get(player_class.lower().strip(), player_class.upper()[:2])
+        
+        # Try from element selectors (for card layouts)
+        if not position:
+            pos_elem = row.select_one('[class*="position"], [class*="pos"], .sidearm-roster-player-position, .roster-player-position')
+            if pos_elem:
+                position = pos_elem.get_text(strip=True)
+        
+        if not player_class:
+            class_elem = row.select_one('[class*="class"], [class*="year"], .sidearm-roster-player-class, .roster-player-class, [class*="academic"]')
+            if class_elem:
+                raw_class = class_elem.get_text(strip=True)
+                class_map = {
+                    'fr': 'FR', 'freshman': 'FR', 'fr.': 'FR',
+                    'so': 'SO', 'sophomore': 'SO', 'so.': 'SO',
+                    'jr': 'JR', 'junior': 'JR', 'jr.': 'JR',
+                    'sr': 'SR', 'senior': 'SR', 'sr.': 'SR',
+                    'gr': 'GR', 'graduate': 'GR', 'grad': 'GR', 'rs': 'GR'
+                }
+                player_class = class_map.get(raw_class.lower().strip(), raw_class.upper()[:2] if raw_class else "")
+        
+        return position, player_class
+    
     # PrestoSports/Sidearm specific selectors (common on college athletic sites)
     # These platforms use specific class patterns
     
