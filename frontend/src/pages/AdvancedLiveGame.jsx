@@ -39,16 +39,24 @@ const HOTKEYS = {
   ' ': 'toggle_clock', // Spacebar
 };
 
-export default function AdvancedLiveGame() {
-  const { id } = useParams();
+// Demo Mode Bar Component
+const DemoModeBar = () => (
+  <div className="fixed top-0 left-0 right-0 z-[100] bg-orange-500 text-white text-center py-2 font-bold text-sm uppercase tracking-wider shadow-lg">
+    Demo Mode - Stats will not be saved
+  </div>
+);
+
+export default function AdvancedLiveGame({ demoMode = false, initialDemoData = null }) {
+  const params = useParams();
+  const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
   // Core state
-  const [game, setGame] = useState(null);
-  const [homeStats, setHomeStats] = useState([]);
-  const [awayStats, setAwayStats] = useState([]);
-  const [playByPlay, setPlayByPlay] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [game, setGame] = useState(initialDemoData);
+  const [homeStats, setHomeStats] = useState(initialDemoData?.home_player_stats || []);
+  const [awayStats, setAwayStats] = useState(initialDemoData?.away_player_stats || []);
+  const [playByPlay, setPlayByPlay] = useState(initialDemoData?.play_by_play || []);
+  const [loading, setLoading] = useState(!demoMode);
   
   // UI state
   const [activeTab, setActiveTab] = useState("addplay"); // addplay, export, rosters
