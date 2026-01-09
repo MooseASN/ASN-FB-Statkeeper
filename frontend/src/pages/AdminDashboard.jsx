@@ -602,8 +602,11 @@ export default function AdminDashboard({ user, onLogout }) {
                 </TableBody>
               </Table>
             </div>
-          </CardContent>
-        </Card>
+          </ScrollArea>
+        </CardContent>
+      </CollapsibleContent>
+    </Card>
+  </Collapsible>
       </div>
 
       {/* School Details Dialog */}
