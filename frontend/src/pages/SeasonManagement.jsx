@@ -907,12 +907,16 @@ export default function SeasonManagement() {
                   onChange={(e) => setWebsiteUrl(e.target.value)}
                   className="bg-slate-900 border-slate-600 text-white"
                 />
-                <Button variant="outline" className="border-slate-600 text-white">
+                <Button 
+                  variant="outline" 
+                  className="border-slate-600 text-white"
+                  onClick={handleLinkRosterImport}
+                >
                   Import
                 </Button>
               </div>
               <p className="text-xs text-slate-400">
-                Note: Website import may not work for all sites
+                Note: Website import may not work for all sites. Best results from athletic department roster pages.
               </p>
             </TabsContent>
           </Tabs>
