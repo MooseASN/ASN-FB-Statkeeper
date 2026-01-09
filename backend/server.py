@@ -1830,6 +1830,29 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
         
         return position, player_class
     
+    # Helper to clean position text
+    def clean_position(pos_text):
+        if not pos_text:
+            return ""
+        # Remove height/weight patterns
+        import re as re_pos_clean
+        cleaned = re_pos_clean.sub(r'\d+[\'\"]\d*[\'\"]*', '', pos_text)  # Remove heights
+        cleaned = re_pos_clean.sub(r'\d+\s*lbs?', '', cleaned, flags=re_pos_clean.IGNORECASE)  # Remove weights
+        cleaned = cleaned.strip()
+        # Fix duplicate words (e.g., "GuardGuard" -> "Guard")
+        if cleaned:
+            # Check for exact duplicate (word repeated immediately)
+            match = re_pos_clean.match(r'^(\w+)\1$', cleaned, re_pos_clean.IGNORECASE)
+            if match:
+                cleaned = match.group(1).title()
+            # Also check for common positions with issues
+            elif len(cleaned) > 12:
+                # Try to extract first position word
+                pos_match = re_pos_clean.match(r'^(Guard|Forward|Center|Point Guard|Shooting Guard|Small Forward|Power Forward|PG|SG|SF|PF|C|G|F|QB|RB|WR|TE|OL|DL|LB|CB|S|K|P)', cleaned, re_pos_clean.IGNORECASE)
+                if pos_match:
+                    cleaned = pos_match.group(1)
+        return cleaned
+    
     # Try PrestoSports/Sidearm roster patterns
     presto_rows = soup.select('.sidearm-roster-player, .roster-player, [class*="roster"] tr, .s-person-card')
     for row in presto_rows:
@@ -1850,6 +1873,7 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
                 name = clean_name(name_elem.get_text())
         
         position, player_class = extract_position_class(row)
+        position = clean_position(position)
         
         if name:
             roster.append({
