@@ -370,10 +370,10 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - [x] Text visibility fixes - All dialogs use white/slate-200 text on dark backgrounds
 
 ### P2 (Future)
-- [ ] Further refactor FootballLiveGame.jsx using the new custom hooks
+- [ ] Continue refactoring FootballLiveGame.jsx - integrate `useDriveState` hook for drive/possession state
 - [ ] Visual test of game recaps on LiveView
 - [ ] UI test of CSV roster upload for football
-- [ ] Refactor server.py (~5000 lines) into domain-specific routers
+- [ ] Refactor server.py (~5000 lines) into domain-specific routers (ON HOLD per user request)
 
 ### P3 (Nice to have)
 - [ ] Performance optimizations for large rosters
@@ -386,9 +386,8 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - Admin credentials: admin / NoahTheJew1997
 
 ## Known Issues
-- FootballLiveGame.jsx: Still large (~4900 lines), needs more refactoring
-- Custom hooks (useGameClock, useDriveState, useTimeouts) created and imported but not fully integrated
-- server.py: ~5000 lines, router templates created at /app/backend/routers/
+- FootballLiveGame.jsx: Still ~4900 lines; `useGameClock` and `useTimeouts` now integrated, `useDriveState` remaining
+- server.py: ~5000 lines, router templates created at /app/backend/routers/ (refactoring ON HOLD)
 
 ## Third-Party Integrations
 - react-player: Video embedding
