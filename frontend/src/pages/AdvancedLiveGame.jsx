@@ -226,7 +226,6 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
       setLoading(false);
     }
     document.title = "StatMoose BKB";
-    return () => clearInterval(interval);
   }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clock management
