@@ -752,7 +752,7 @@ export default function SeasonManagement() {
             
             <TabsContent value="website" className="space-y-4">
               <p className="text-sm text-slate-300">
-                Enter the URL of your school's roster page
+                Enter the URL of your school&apos;s roster page
               </p>
               <div className="flex gap-2">
                 <Input
@@ -1046,7 +1046,7 @@ export default function SeasonManagement() {
           <DialogHeader>
             <DialogTitle className="text-white">Opponent Roster - {editOpponentForm.name}</DialogTitle>
             <DialogDescription className="text-slate-400">
-              Add or remove players from the opponent's roster
+              Add or remove players from the opponent&apos;s roster
             </DialogDescription>
           </DialogHeader>
           
