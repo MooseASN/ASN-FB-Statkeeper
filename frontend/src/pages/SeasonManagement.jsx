@@ -724,11 +724,11 @@ export default function SeasonManagement() {
       <Dialog open={showGameDialog} onOpenChange={setShowGameDialog}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
-            <DialogTitle>Schedule Game</DialogTitle>
+            <DialogTitle className="text-white">Schedule Game</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <Label className="text-slate-200">Opponent</Label>
+              <Label className="text-white">Opponent</Label>
               <Select
                 value={gameForm.opponent_team_id}
                 onValueChange={(v) => setGameForm(prev => ({ ...prev, opponent_team_id: v }))}
@@ -755,7 +755,7 @@ export default function SeasonManagement() {
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label className="text-slate-200">Date</Label>
+                <Label className="text-white">Date</Label>
                 <Input
                   type="date"
                   value={gameForm.scheduled_date}
@@ -764,7 +764,7 @@ export default function SeasonManagement() {
                 />
               </div>
               <div>
-                <Label className="text-slate-200">Time</Label>
+                <Label className="text-white">Time</Label>
                 <Input
                   type="time"
                   value={gameForm.scheduled_time}
@@ -775,24 +775,24 @@ export default function SeasonManagement() {
             </div>
             
             <div>
-              <Label className="text-slate-200">Location</Label>
+              <Label className="text-white">Location</Label>
               <Input
                 value={gameForm.location}
                 onChange={(e) => setGameForm(prev => ({ ...prev, location: e.target.value }))}
                 placeholder="e.g., Home Gym"
-                className="bg-slate-900 border-slate-600 text-white"
+                className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-400"
               />
             </div>
             
             <div>
-              <Label className="text-slate-200">Home/Away</Label>
+              <Label className="text-white">Home/Away</Label>
               <div className="flex gap-2 mt-1">
                 <Button
                   type="button"
                   variant={gameForm.is_home_game ? "default" : "outline"}
                   size="sm"
                   onClick={() => setGameForm(prev => ({ ...prev, is_home_game: true }))}
-                  className={gameForm.is_home_game ? "bg-orange-500" : "border-slate-600"}
+                  className={gameForm.is_home_game ? "bg-orange-500" : "border-slate-600 text-white"}
                 >
                   Home
                 </Button>
@@ -801,7 +801,7 @@ export default function SeasonManagement() {
                   variant={!gameForm.is_home_game ? "default" : "outline"}
                   size="sm"
                   onClick={() => setGameForm(prev => ({ ...prev, is_home_game: false }))}
-                  className={!gameForm.is_home_game ? "bg-orange-500" : "border-slate-600"}
+                  className={!gameForm.is_home_game ? "bg-orange-500" : "border-slate-600 text-white"}
                 >
                   Away
                 </Button>
@@ -809,12 +809,12 @@ export default function SeasonManagement() {
             </div>
             
             <div>
-              <Label className="text-slate-200">Game Note (optional)</Label>
+              <Label className="text-white">Game Note (optional)</Label>
               <Input
                 value={gameForm.note}
                 onChange={(e) => setGameForm(prev => ({ ...prev, note: e.target.value }))}
                 placeholder="e.g., Homecoming game, District playoff"
-                className="bg-slate-900 border-slate-600 text-white"
+                className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-400"
               />
             </div>
             
