@@ -221,11 +221,8 @@ export default function Jumbotron() {
       const res = await axios.get(`${API}/games/share/${shareCode}`);
       setGame(res.data);
       hasLoadedOnce.current = true;
-      setLoading(false);
     } catch (err) {
-      if (!hasLoadedOnce.current) {
-        setLoading(false);
-      }
+      console.error("Error fetching game:", err);
     }
   }, [shareCode]);
 
@@ -233,7 +230,7 @@ export default function Jumbotron() {
     hasLoadedOnce.current = false;
     
     // Initial fetch
-    fetchData();
+    fetchData().finally(() => setLoading(false));
     
     // Auto-refresh every 2 seconds
     const interval = setInterval(fetchData, 2000);
