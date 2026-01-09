@@ -648,7 +648,10 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
   };
 
   return (
-    <div className="min-h-screen bg-black text-white" data-testid="advanced-live-game">
+    <div className={`min-h-screen bg-black text-white ${demoMode ? 'pt-10' : ''}`} data-testid="advanced-live-game">
+      {/* Demo Mode Bar */}
+      {demoMode && <DemoModeBar />}
+      
       {/* Top Header Bar */}
       <div className="bg-zinc-900 border-b border-zinc-800">
         <div className="flex items-center justify-between px-4 py-2">
