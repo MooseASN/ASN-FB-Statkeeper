@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Building2, Calendar, Users, Trophy, Plus, Copy, RefreshCw, 
   ChevronLeft, ChevronRight, LogOut, Settings, Edit,
-  Play, Clock, Timer, BarChart3, Save, Upload
+  Play, Clock, Timer, BarChart3, Save, Upload, AlertTriangle
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
