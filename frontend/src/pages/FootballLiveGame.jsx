@@ -657,20 +657,11 @@ export default function FootballLiveGame({ user, onLogout }) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Clock countdown effect - also updates drive time of possession
+  // Clock countdown effect - hook manages basic countdown, this handles drive/TOP tracking
   useEffect(() => {
     let interval = null;
     if (clockRunning && clockTime > 0) {
       interval = setInterval(() => {
-        setClockTime(prev => {
-          if (prev <= 1) {
-            setClockRunning(false);
-            toast.info("Quarter ended!");
-            return 0;
-          }
-          return prev - 1;
-        });
-        
         // Always update drive elapsed time when clock is running
         setCurrentDrive(prev => ({
           ...prev,
