@@ -250,7 +250,8 @@ async def login(credentials: UserLogin, response: Response):
     
     if not user:
         logging.warning(f"User not found: {login_identifier}")
-        raise HTTPException(status_code=401, detail="Invalid email/username or password")
+        # More specific error for debugging
+        raise HTTPException(status_code=401, detail="User not found. Please check your email/username.")
     
     logging.info(f"User found: {user.get('email')}, auth_provider: {user.get('auth_provider')}")
     
@@ -261,16 +262,20 @@ async def login(credentials: UserLogin, response: Response):
     stored_hash = user.get("password_hash", "")
     logging.info(f"Verifying password, hash exists: {bool(stored_hash)}, hash length: {len(stored_hash)}")
     
+    if not stored_hash:
+        logging.error(f"No password hash for user: {login_identifier}")
+        raise HTTPException(status_code=401, detail="Account has no password set. Please use 'Forgot Password' to set one.")
+    
     try:
         password_valid = verify_password(credentials.password, stored_hash)
         logging.info(f"Password verification result: {password_valid}")
     except Exception as e:
         logging.error(f"Password verification error: {e}")
-        password_valid = False
+        raise HTTPException(status_code=401, detail="Password verification error. Please try again.")
     
     if not password_valid:
         logging.warning(f"Password mismatch for user: {login_identifier}")
-        raise HTTPException(status_code=401, detail="Invalid email/username or password")
+        raise HTTPException(status_code=401, detail="Incorrect password. Please try again.")
     
     # Create session - no IP/device restrictions, just user credentials
     session_token = f"session_{uuid.uuid4().hex}"
