@@ -177,6 +177,15 @@ export default function SportSelection({ user, onLogout }) {
                     <DropdownMenuSeparator />
                   </>
                 )}
+                {schoolInfo && (
+                  <>
+                    <DropdownMenuItem onClick={() => navigate("/school-dashboard")} className="cursor-pointer text-orange-600">
+                      <Building2 className="w-4 h-4 mr-2" />
+                      {schoolInfo.name}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem onClick={() => navigate("/account")} className="cursor-pointer">
                   <Settings className="w-4 h-4 mr-2" />
                   Account Settings
