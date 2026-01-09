@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Mail, Send, CheckCircle } from "lucide-react";
+import { ArrowLeft, Send, CheckCircle } from "lucide-react";
 import axios from "axios";
 
 const API = process.env.REACT_APP_BACKEND_URL;
@@ -41,7 +41,6 @@ export default function ContactPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate required fields
     if (!formData.name || !formData.email || !formData.school || !formData.state || !formData.role) {
       toast.error("Please fill in all required fields");
       return;
@@ -73,17 +72,17 @@ export default function ContactPage() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-slate-900 flex items-center justify-center px-6">
+      <div className="min-h-screen bg-black flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-emerald-400" />
+          <div className="w-20 h-20 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="w-10 h-10 text-white" />
           </div>
-          <h1 className="text-3xl font-bold text-white mb-4">Message Sent!</h1>
-          <p className="text-slate-400 mb-8">
+          <h1 className="text-3xl font-black text-white mb-4 uppercase tracking-tight">Message Sent!</h1>
+          <p className="text-gray-400 mb-8">
             Thank you for your interest in StatMoose. We'll get back to you as soon as possible.
           </p>
           <Link to="/">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
+            <Button className="bg-white text-black hover:bg-gray-200 font-semibold">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
@@ -94,19 +93,20 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <div className="min-h-screen bg-black">
       {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-slate-900/95 backdrop-blur-sm border-b border-slate-800">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-gray-800">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">S</span>
-            </div>
-            <span className="text-2xl font-bold text-white">StatMoose</span>
+            <img 
+              src="/logo-white.png" 
+              alt="StatMoose" 
+              className="h-10 w-auto"
+            />
           </Link>
           <div className="flex items-center gap-4">
             <Link to="/">
-              <Button variant="ghost" className="text-slate-300 hover:text-white hover:bg-slate-800">
+              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to Home
               </Button>
@@ -120,22 +120,24 @@ export default function ContactPage() {
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <div className="text-center mb-12">
-            <div className="w-16 h-16 bg-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Mail className="w-8 h-8 text-emerald-400" />
-            </div>
-            <h1 className="text-4xl font-bold text-white mb-3">Contact Us</h1>
-            <p className="text-slate-400 text-lg">
+            <p className="text-gray-500 uppercase tracking-widest text-sm mb-4 font-medium">
+              Get in Touch
+            </p>
+            <h1 className="text-4xl md:text-5xl font-black text-white mb-4 uppercase tracking-tight">
+              Contact Us
+            </h1>
+            <p className="text-gray-400 text-lg">
               Interested in StatMoose for your school? Fill out the form below and we'll be in touch.
             </p>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8">
+          <form onSubmit={handleSubmit} className="bg-gray-900/50 border border-gray-800 rounded-lg p-8">
             <div className="space-y-6">
               {/* Name */}
               <div>
-                <Label htmlFor="name" className="text-white mb-2 block">
-                  Name <span className="text-red-400">*</span>
+                <Label htmlFor="name" className="text-white mb-2 block font-medium">
+                  Name <span className="text-gray-500">*</span>
                 </Label>
                 <Input
                   id="name"
@@ -143,15 +145,15 @@ export default function ContactPage() {
                   value={formData.name}
                   onChange={handleChange}
                   placeholder="Your full name"
-                  className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+                  className="bg-black border-gray-700 text-white placeholder:text-gray-600 focus:border-white focus:ring-white"
                   required
                 />
               </div>
 
               {/* Email */}
               <div>
-                <Label htmlFor="email" className="text-white mb-2 block">
-                  Email <span className="text-red-400">*</span>
+                <Label htmlFor="email" className="text-white mb-2 block font-medium">
+                  Email <span className="text-gray-500">*</span>
                 </Label>
                 <Input
                   id="email"
@@ -160,15 +162,15 @@ export default function ContactPage() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your.email@school.edu"
-                  className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+                  className="bg-black border-gray-700 text-white placeholder:text-gray-600 focus:border-white focus:ring-white"
                   required
                 />
               </div>
 
               {/* School */}
               <div>
-                <Label htmlFor="school" className="text-white mb-2 block">
-                  School <span className="text-red-400">*</span>
+                <Label htmlFor="school" className="text-white mb-2 block font-medium">
+                  School <span className="text-gray-500">*</span>
                 </Label>
                 <Input
                   id="school"
@@ -176,26 +178,26 @@ export default function ContactPage() {
                   value={formData.school}
                   onChange={handleChange}
                   placeholder="School or University name"
-                  className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500"
+                  className="bg-black border-gray-700 text-white placeholder:text-gray-600 focus:border-white focus:ring-white"
                   required
                 />
               </div>
 
               {/* State */}
               <div>
-                <Label htmlFor="state" className="text-white mb-2 block">
-                  State <span className="text-red-400">*</span>
+                <Label htmlFor="state" className="text-white mb-2 block font-medium">
+                  State <span className="text-gray-500">*</span>
                 </Label>
                 <Select value={formData.state} onValueChange={(value) => setFormData(prev => ({ ...prev, state: value }))}>
-                  <SelectTrigger className="bg-slate-900 border-slate-600 text-white focus:border-emerald-500">
-                    <SelectValue placeholder="Select your state" />
+                  <SelectTrigger className="bg-black border-gray-700 text-white focus:border-white focus:ring-white">
+                    <SelectValue placeholder="Select your state" className="text-gray-600" />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
+                  <SelectContent className="bg-gray-900 border-gray-700 max-h-[300px]">
                     {usStates.map(state => (
                       <SelectItem 
                         key={state} 
                         value={state}
-                        className="text-white hover:bg-slate-700 focus:bg-slate-700"
+                        className="text-white hover:bg-gray-800 focus:bg-gray-800 cursor-pointer"
                       >
                         {state}
                       </SelectItem>
@@ -206,24 +208,24 @@ export default function ContactPage() {
 
               {/* Role */}
               <div>
-                <Label htmlFor="role" className="text-white mb-2 block">
-                  Role <span className="text-red-400">*</span>
+                <Label htmlFor="role" className="text-white mb-2 block font-medium">
+                  Role <span className="text-gray-500">*</span>
                 </Label>
                 <Select value={formData.role} onValueChange={handleRoleChange}>
-                  <SelectTrigger className="bg-slate-900 border-slate-600 text-white focus:border-emerald-500">
-                    <SelectValue placeholder="Select your role" />
+                  <SelectTrigger className="bg-black border-gray-700 text-white focus:border-white focus:ring-white">
+                    <SelectValue placeholder="Select your role" className="text-gray-600" />
                   </SelectTrigger>
-                  <SelectContent className="bg-slate-800 border-slate-700">
-                    <SelectItem value="SID" className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                  <SelectContent className="bg-gray-900 border-gray-700">
+                    <SelectItem value="SID" className="text-white hover:bg-gray-800 focus:bg-gray-800 cursor-pointer">
                       Sports Information Director (SID)
                     </SelectItem>
-                    <SelectItem value="Athletic Director" className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                    <SelectItem value="Athletic Director" className="text-white hover:bg-gray-800 focus:bg-gray-800 cursor-pointer">
                       Athletic Director
                     </SelectItem>
-                    <SelectItem value="Coach" className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                    <SelectItem value="Coach" className="text-white hover:bg-gray-800 focus:bg-gray-800 cursor-pointer">
                       Coach
                     </SelectItem>
-                    <SelectItem value="Other" className="text-white hover:bg-slate-700 focus:bg-slate-700">
+                    <SelectItem value="Other" className="text-white hover:bg-gray-800 focus:bg-gray-800 cursor-pointer">
                       Other
                     </SelectItem>
                   </SelectContent>
@@ -232,7 +234,7 @@ export default function ContactPage() {
 
               {/* Message */}
               <div>
-                <Label htmlFor="message" className="text-white mb-2 block">
+                <Label htmlFor="message" className="text-white mb-2 block font-medium">
                   Message
                 </Label>
                 <Textarea
@@ -242,7 +244,7 @@ export default function ContactPage() {
                   onChange={handleChange}
                   placeholder="Tell us about your needs or ask any questions..."
                   rows={5}
-                  className="bg-slate-900 border-slate-600 text-white placeholder:text-slate-500 focus:border-emerald-500 resize-none"
+                  className="bg-black border-gray-700 text-white placeholder:text-gray-600 focus:border-white focus:ring-white resize-none"
                 />
               </div>
 
@@ -250,11 +252,11 @@ export default function ContactPage() {
               <Button 
                 type="submit" 
                 disabled={loading}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 text-lg"
+                className="w-full bg-white text-black hover:bg-gray-200 py-6 text-lg font-bold uppercase tracking-wide"
               >
                 {loading ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    <div className="w-5 h-5 border-2 border-black/30 border-t-black rounded-full animate-spin mr-2" />
                     Sending...
                   </>
                 ) : (
@@ -268,14 +270,30 @@ export default function ContactPage() {
           </form>
 
           {/* Alternative Contact */}
-          <p className="text-center text-slate-500 mt-8">
+          <p className="text-center text-gray-600 mt-8">
             Or email us directly at{" "}
-            <a href="mailto:jaredmoosejones@gmail.com" className="text-emerald-400 hover:text-emerald-300">
+            <a href="mailto:jaredmoosejones@gmail.com" className="text-white hover:underline">
               jaredmoosejones@gmail.com
             </a>
           </p>
         </div>
       </section>
+
+      {/* Footer */}
+      <footer className="py-8 px-6 border-t border-gray-800">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <Link to="/">
+            <img 
+              src="/logo-white.png" 
+              alt="StatMoose" 
+              className="h-6 w-auto opacity-60"
+            />
+          </Link>
+          <p className="text-gray-600 text-sm">
+            © {new Date().getFullYear()} StatMoose. All rights reserved.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
