@@ -76,6 +76,11 @@ export default function SeasonManagement() {
     note: ""
   });
   
+  // Opponent selection with search
+  const [opponentSearchQuery, setOpponentSearchQuery] = useState("");
+  const [showOpponentDropdown, setShowOpponentDropdown] = useState(false);
+  const [selectedOpponentName, setSelectedOpponentName] = useState("");
+  
   // Opponent form
   const [opponentForm, setOpponentForm] = useState({
     name: "",
