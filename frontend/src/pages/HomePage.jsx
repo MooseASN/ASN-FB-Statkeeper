@@ -151,7 +151,7 @@ const SportCard = ({ sport, index }) => {
     >
       {/* Background image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-90"
+        className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105 opacity-70"
         style={{ backgroundImage: `url(${sport.image})` }}
       />
       
