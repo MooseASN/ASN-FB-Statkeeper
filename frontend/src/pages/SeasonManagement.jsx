@@ -382,7 +382,7 @@ export default function SeasonManagement() {
             
             {season.games?.length === 0 ? (
               <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-8 text-center text-slate-500">
+                <CardContent className="p-8 text-center text-slate-300">
                   No games scheduled yet
                 </CardContent>
               </Card>
@@ -395,14 +395,14 @@ export default function SeasonManagement() {
                         <div className="flex items-center gap-4">
                           <div className="text-center min-w-[80px]">
                             <div className="text-sm font-medium text-white">{game.scheduled_date}</div>
-                            <div className="text-xs text-slate-500">{formatTime12Hour(game.scheduled_time)}</div>
+                            <div className="text-xs text-slate-300">{formatTime12Hour(game.scheduled_time)}</div>
                           </div>
                           <div className="text-white">
                             <div className="font-medium">
                               {game.home_team_name} vs {game.away_team_name}
                             </div>
                             {game.location && (
-                              <div className="text-xs text-slate-500 flex items-center gap-1">
+                              <div className="text-xs text-slate-300 flex items-center gap-1">
                                 <MapPin className="w-3 h-3" />
                                 {game.location}
                               </div>
