@@ -79,6 +79,10 @@ export default function AdminDashboard({ user, onLogout }) {
   const [schoolDetails, setSchoolDetails] = useState(null);
   const [loadingSchoolDetails, setLoadingSchoolDetails] = useState(false);
   const [showSchoolDialog, setShowSchoolDialog] = useState(false);
+  
+  // Collapsible sections
+  const [schoolsOpen, setSchoolsOpen] = useState(false);
+  const [usersOpen, setUsersOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
