@@ -12,6 +12,26 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
+### January 9, 2026 - Gameday Section & UI Improvements
+- **Gameday Section** - COMPLETED
+  - Shows only when games are scheduled for today
+  - Supports multiple games in a single view
+  - In-progress games show: score, quarter/period, "LIVE NOW" badge with animation
+  - Scheduled games show: matchup, time, location
+  - Action buttons: "Live Stats Output" and "Start Game"/"Continue Tracking"
+  - Green highlight and border for active games
+  
+- **In-Progress Game Warning** - COMPLETED
+  - Warning dialog when trying to open tracker for active game
+  - Shows game matchup and current score
+  - Confirmation required before proceeding
+  - Prevents accidental conflicts between multiple stat trackers
+  
+- **Today Button Fixed** - COMPLETED
+  - Moved to calendar header next to month/year
+  - Navigates to current month AND selects today's date
+  - Orange text for visibility
+
 ### January 9, 2026 - Major Feature Update
 - **Season Creation Enhanced** - COMPLETED
   - Added gender selection (Men's/Women's)
