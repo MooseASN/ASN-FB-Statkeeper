@@ -472,9 +472,10 @@ export default function SeasonManagement() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-slate-700">
-                        <th className="text-left text-slate-400 text-sm p-3 w-20">#</th>
-                        <th className="text-left text-slate-400 text-sm p-3">Name</th>
-                        <th className="text-left text-slate-400 text-sm p-3">Position</th>
+                        <th className="text-left text-slate-300 text-sm p-3 w-20">#</th>
+                        <th className="text-left text-slate-300 text-sm p-3">Name</th>
+                        <th className="text-left text-slate-300 text-sm p-3">Position</th>
+                        <th className="text-left text-slate-300 text-sm p-3">Class</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -482,7 +483,8 @@ export default function SeasonManagement() {
                         <tr key={idx} className="border-b border-slate-700/50">
                           <td className="p-3 text-orange-400 font-bold">{player.number}</td>
                           <td className="p-3 text-white">{player.name}</td>
-                          <td className="p-3 text-slate-400">{player.position || "-"}</td>
+                          <td className="p-3 text-white">{player.position || "-"}</td>
+                          <td className="p-3 text-white">{player.playerClass || "-"}</td>
                         </tr>
                       ))}
                     </tbody>
