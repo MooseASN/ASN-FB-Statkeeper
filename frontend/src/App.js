@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Toaster } from "@/components/ui/sonner";
 import axios from "axios";
 import { SportProvider, useSport } from "@/contexts/SportContext";
+import HomePage from "@/pages/HomePage";
+import ContactPage from "@/pages/ContactPage";
 import SportSelection from "@/pages/SportSelection";
 import Dashboard from "@/pages/Dashboard";
 import Teams from "@/pages/Teams";
