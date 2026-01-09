@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "sonner";
+import { useSport } from "@/contexts/SportContext";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +22,7 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 export default function SeasonManagement() {
   const { seasonId } = useParams();
   const navigate = useNavigate();
+  const { selectSport } = useSport();
   const [loading, setLoading] = useState(true);
   const [season, setSeason] = useState(null);
   const [school, setSchool] = useState(null);
