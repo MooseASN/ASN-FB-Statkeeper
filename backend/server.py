@@ -950,11 +950,13 @@ async def get_beta_status():
     if not settings:
         return {
             "basketball_beta": False,
-            "football_beta": False
+            "football_beta": False,
+            "school_creation_beta": False
         }
     return {
         "basketball_beta": settings.get("basketball_beta", False),
-        "football_beta": settings.get("football_beta", False)
+        "football_beta": settings.get("football_beta", False),
+        "school_creation_beta": settings.get("school_creation_beta", False)
     }
 
 @api_router.post("/beta-verify")
@@ -972,8 +974,12 @@ async def verify_beta_password(sport: str = Body(...), password: str = Body(...)
         if not settings.get("football_beta", False):
             return {"valid": True}
         return {"valid": password == settings.get("football_password", "")}
+    elif sport == "school_creation":
+        if not settings.get("school_creation_beta", False):
+            return {"valid": True}
+        return {"valid": password == settings.get("school_creation_password", "")}
     
-    return {"valid": False, "error": "Invalid sport"}
+    return {"valid": False, "error": "Invalid type"}
 
 @api_router.post("/admin/migrate-teams-sport")
 async def migrate_teams_to_basketball(admin: User = Depends(get_admin_user)):
