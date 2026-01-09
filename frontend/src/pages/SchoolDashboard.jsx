@@ -31,7 +31,7 @@ const formatTime12Hour = (time24) => {
 };
 
 // Calendar component
-function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
+function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange, onGoToToday }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
   const getDaysInMonth = (date) => {
@@ -58,6 +58,14 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
     return games.filter(g => g.scheduled_date === dateStr);
   };
 
+  // Function to go to today's date
+  const handleGoToToday = () => {
+    const today = new Date();
+    setCurrentMonth(today);
+    onDateChange(today);
+    if (onGoToToday) onGoToToday();
+  };
+
   const days = getDaysInMonth(currentMonth);
   const monthNames = ["January", "February", "March", "April", "May", "June",
     "July", "August", "September", "October", "November", "December"];
@@ -75,9 +83,19 @@ function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
         >
           <ChevronLeft className="w-4 h-4" />
         </Button>
-        <h3 className="text-white font-semibold">
-          {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
-        </h3>
+        <div className="flex items-center gap-2">
+          <h3 className="text-white font-semibold">
+            {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
+          </h3>
+          <Button
+            variant="ghost"
+            size="xs"
+            onClick={handleGoToToday}
+            className="text-orange-400 hover:text-orange-300 text-xs px-2 py-1"
+          >
+            Today
+          </Button>
+        </div>
         <Button
           variant="ghost"
           size="sm"
