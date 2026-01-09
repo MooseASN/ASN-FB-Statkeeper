@@ -645,7 +645,7 @@ export default function SeasonManagement() {
             <Label className="text-slate-200">Current Roster ({roster.length} players)</Label>
             <ScrollArea className="h-48 mt-2 border border-slate-700 rounded">
               {roster.length === 0 ? (
-                <div className="p-4 text-center text-slate-500">No players added</div>
+                <div className="p-4 text-center text-slate-400">No players added</div>
               ) : (
                 <div className="p-2 space-y-1">
                   {roster.map((player, idx) => (
