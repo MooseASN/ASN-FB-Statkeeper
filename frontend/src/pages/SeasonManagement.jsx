@@ -539,25 +539,40 @@ export default function SeasonManagement() {
             </TabsList>
             
             <TabsContent value="manual" className="space-y-4">
-              <div className="flex gap-2">
+              <div className="flex gap-2 flex-wrap">
                 <Input
                   placeholder="#"
                   value={newPlayer.number}
                   onChange={(e) => setNewPlayer(prev => ({ ...prev, number: e.target.value }))}
-                  className="w-16 bg-slate-900 border-slate-600"
+                  className="w-16 bg-slate-900 border-slate-600 text-white"
                 />
                 <Input
                   placeholder="Player Name"
                   value={newPlayer.name}
                   onChange={(e) => setNewPlayer(prev => ({ ...prev, name: e.target.value }))}
-                  className="flex-1 bg-slate-900 border-slate-600"
+                  className="flex-1 min-w-[140px] bg-slate-900 border-slate-600 text-white"
                 />
                 <Input
                   placeholder="Position"
                   value={newPlayer.position}
                   onChange={(e) => setNewPlayer(prev => ({ ...prev, position: e.target.value }))}
-                  className="w-24 bg-slate-900 border-slate-600"
+                  className="w-24 bg-slate-900 border-slate-600 text-white"
                 />
+                <Select
+                  value={newPlayer.playerClass}
+                  onValueChange={(v) => setNewPlayer(prev => ({ ...prev, playerClass: v }))}
+                >
+                  <SelectTrigger className="w-28 bg-slate-900 border-slate-600 text-white">
+                    <SelectValue placeholder="Class" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FR">Freshman</SelectItem>
+                    <SelectItem value="SO">Sophomore</SelectItem>
+                    <SelectItem value="JR">Junior</SelectItem>
+                    <SelectItem value="SR">Senior</SelectItem>
+                    <SelectItem value="GR">Graduate</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Button onClick={handleAddPlayer} className="bg-orange-500 hover:bg-orange-600">
                   <Plus className="w-4 h-4" />
                 </Button>
