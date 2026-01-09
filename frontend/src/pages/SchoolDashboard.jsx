@@ -619,7 +619,7 @@ export default function SchoolDashboard() {
                   </div>
                 </div>
                 <div className="text-sm text-slate-400 mt-2">
-                  {selectedGame.scheduled_date} {selectedGame.scheduled_time && `at ${selectedGame.scheduled_time}`}
+                  {selectedGame.scheduled_date} {selectedGame.scheduled_time && `at ${formatTime12Hour(selectedGame.scheduled_time)}`}
                 </div>
                 {selectedGame.status === "active" && (
                   <Badge className="mt-2 bg-green-500 animate-pulse">LIVE</Badge>
