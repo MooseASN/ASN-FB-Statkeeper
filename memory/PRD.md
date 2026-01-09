@@ -58,6 +58,17 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - "Punt Return Field View" button in return yards step
   - "Field Goal Field View" button in FG distance step
 
+- **Basketball Jumbotron Redesign** - COMPLETED
+  - Completely redesigned `/jumbotron/{shareCode}` page
+  - Changed from side-by-side to stacked (top/bottom) team layout
+  - Full-screen broadcast-style design with dark blue gradient background
+  - Team header with logo, name (large uppercase tracking), timeouts, and fouls
+  - Team color accent line separator under each header
+  - Stats table: #, PLAYER, PTS, FG, FT, REB, A, PF columns
+  - BONUS badge appears when opponent reaches 7+ fouls
+  - Auto-refreshes every 2 seconds for live updates
+  - Grid pattern overlay for modern broadcast aesthetic
+
 ### January 9, 2026 - Gameday Section & UI Improvements
 - **Gameday Section** - COMPLETED
   - Shows only when games are scheduled for today
