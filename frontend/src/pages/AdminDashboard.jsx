@@ -253,6 +253,20 @@ export default function AdminDashboard({ user, onLogout }) {
           <Card>
             <CardContent className="p-4">
               <div className="flex items-center gap-3">
+                <div className="p-2 bg-purple-100 rounded-lg">
+                  <Building2 className="w-5 h-5 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Schools</p>
+                  <p className="text-2xl font-bold">{schools.length || 0}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
                 <div className="p-2 bg-orange-100 rounded-lg">
                   <Target className="w-5 h-5 text-orange-600" />
                 </div>
@@ -279,20 +293,6 @@ export default function AdminDashboard({ user, onLogout }) {
                   <p className="text-xs text-muted-foreground">
                     🏀 {stats?.basketball_games || 0} | 🏈 {stats?.football_games || 0}
                   </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Calendar className="w-5 h-5 text-purple-600" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">New Users (7d)</p>
-                  <p className="text-2xl font-bold">{stats?.recent_signups_7d || 0}</p>
                 </div>
               </div>
             </CardContent>
