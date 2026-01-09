@@ -39,6 +39,15 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Preview shows first 6 players when season selected
   - GET /api/schools/{school_id}/rosters endpoint returns all previous rosters
 
+- **Improved Roster Scraping** - COMPLETED
+  - Enhanced class/grade extraction in link roster import
+  - Supports: FR, SO, JR, SR, GR (college) and grades 7-12 (high school)
+  - Recognizes redshirt prefixes (RS FR, RS SO, etc.)
+  - Handles many variations: "Freshman", "Fr.", "9th", "Grade 9", etc.
+  - Fixed duplicate position text issue (e.g., "GuardGuard" → "Guard")
+  - Improved position cleaning (removes height/weight data)
+  - Works with PrestoSports, Sidearm, and most athletic department sites
+
 ### January 9, 2026 - Gameday Section & UI Improvements
 - **Gameday Section** - COMPLETED
   - Shows only when games are scheduled for today
