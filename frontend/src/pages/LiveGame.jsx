@@ -761,6 +761,14 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   const fetchGameRef = useRef(null);
 
   const fetchGame = useCallback(async (isInitialLoad = false) => {
+    // In demo mode, don't fetch from API - data is managed locally
+    if (demoMode) {
+      if (isInitialLoad) {
+        setLoading(false);
+      }
+      return;
+    }
+    
     try {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
@@ -782,13 +790,18 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
         setLoading(false);
       }
     }
-  }, [id, navigate]);
+  }, [id, navigate, demoMode]);
 
   // Keep ref updated
   fetchGameRef.current = fetchGame;
 
-  // Sync function for offline queue
+  // Sync function for offline queue - in demo mode, just update local state
   const syncPlay = useCallback(async (playData) => {
+    if (demoMode) {
+      // In demo mode, stats are already updated locally, no API call needed
+      return;
+    }
+    
     if (playData.type === 'stat') {
       await axios.post(`${API}/games/${id}/stats`, playData.data);
     } else if (playData.type === 'team-stat') {
@@ -804,7 +817,7 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
     if (fetchGameRef.current) {
       fetchGameRef.current(false);
     }
-  }, [id]);
+  }, [id, demoMode]);
 
   // Offline queue hook
   const { 
@@ -816,14 +829,22 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   } = useOfflineQueue(id, syncPlay);
 
   useEffect(() => {
-    fetchGame(true); // Initial load
+    if (!demoMode) {
+      fetchGame(true); // Initial load
+      const interval = setInterval(() => fetchGame(false), 5000); // Refresh
+      return () => clearInterval(interval);
+    } else {
+      setLoading(false);
+    }
     document.title = "StatMoose BKB";
-    const interval = setInterval(() => fetchGame(false), 5000); // Refresh
-    return () => clearInterval(interval);
-  }, [id]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [id, demoMode]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Clock control functions - use useCallback for stable references (must be defined before useEffect that uses them)
   const handleStartClock = useCallback(async () => {
+    if (demoMode) {
+      setClockRunning(true);
+      return;
+    }
     try {
       await axios.post(`${API}/games/${id}/clock/start`);
       setClockRunning(true);
