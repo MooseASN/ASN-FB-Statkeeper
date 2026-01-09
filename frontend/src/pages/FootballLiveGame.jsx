@@ -881,6 +881,33 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   }, [playLog, homeScore, awayScore, saveFootballState, game]);
 
   const fetchGame = async (isInitialLoad = true) => {
+    // In demo mode, don't fetch from API
+    if (demoMode) {
+      if (isInitialLoad) {
+        // Initialize football state from demo data
+        if (initialDemoData?.football_state) {
+          const state = initialDemoData.football_state;
+          setPossession(state.possession || 'home');
+          setBallPosition(state.ball_position || 25);
+          setDown(state.down || 1);
+          setDistance(state.distance || 10);
+          setQuarter(state.quarter || 1);
+          setHomeScore(state.home_score || 0);
+          setAwayScore(state.away_score || 0);
+          setHomeTimeouts(state.home_timeouts ?? 3);
+          setAwayTimeouts(state.away_timeouts ?? 3);
+          setPlayLog(state.play_log || []);
+          setClockTime(state.clock_time || 900);
+        } else {
+          // Default football game state
+          setClockTime(900);
+          setShowKickoffTeamDialog(true);
+        }
+        setLoading(false);
+      }
+      return;
+    }
+    
     try {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
