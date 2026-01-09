@@ -130,6 +130,16 @@ export default function SchoolSignUp() {
       return;
     }
     
+    if (!formData.classification) {
+      toast.error("Please select a school classification");
+      return;
+    }
+    
+    if (formData.classification === "other" && !formData.classificationOther.trim()) {
+      toast.error("Please enter your custom classification");
+      return;
+    }
+    
     if (nameAvailable === false) {
       toast.error("This school/organization name is already taken");
       return;
@@ -141,6 +151,8 @@ export default function SchoolSignUp() {
       const res = await axios.post(`${API}/schools/register`, {
         school_name: formData.schoolName,
         state: formData.state,
+        classification: formData.classification,
+        classification_other: formData.classification === "other" ? formData.classificationOther : null,
         logo_url: formData.logoUrl || null,
         user_name: formData.userName,
         user_email: formData.userEmail,
