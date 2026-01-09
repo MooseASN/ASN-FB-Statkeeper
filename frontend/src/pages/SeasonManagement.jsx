@@ -418,10 +418,10 @@ export default function SeasonManagement() {
     }
   };
 
-  // School search for adding opponents
-  const handleSearchSchools = async () => {
-    if (!schoolSearchQuery || schoolSearchQuery.length < 2) {
-      toast.error("Please enter at least 2 characters");
+  // School search for adding opponents - with debounce
+  const handleSearchSchools = async (query) => {
+    if (!query || query.length < 2) {
+      setSchoolSearchResults([]);
       return;
     }
     
@@ -429,15 +429,31 @@ export default function SeasonManagement() {
     try {
       const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
       const res = await axios.get(
-        `${API}/schools/search?q=${encodeURIComponent(schoolSearchQuery)}&sport=${season?.sport}&gender=${season?.gender}&level=${season?.level}`,
+        `${API}/schools/search?q=${encodeURIComponent(query)}&sport=${season?.sport}&gender=${season?.gender}&level=${season?.level}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSchoolSearchResults(res.data);
     } catch (error) {
-      toast.error("Failed to search schools");
+      console.error("Search error:", error);
     } finally {
       setSearchLoading(false);
     }
+  };
+
+  // Debounced search handler
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSchoolSearchQuery(value);
+    
+    // Clear previous timeout
+    if (window.schoolSearchTimeout) {
+      clearTimeout(window.schoolSearchTimeout);
+    }
+    
+    // Set new timeout for debounce
+    window.schoolSearchTimeout = setTimeout(() => {
+      handleSearchSchools(value);
+    }, 300);
   };
 
   const handleImportFromSchool = async (schoolData) => {
