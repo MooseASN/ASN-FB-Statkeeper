@@ -1778,6 +1778,102 @@ export default function SeasonManagement() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Duplicate Roster Dialog */}
+      <Dialog open={showDuplicateRosterDialog} onOpenChange={setShowDuplicateRosterDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Copy className="w-5 h-5 text-orange-500" />
+              Duplicate Roster from Previous Season
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Select a roster from a previous season to copy players to this season.
+            </DialogDescription>
+          </DialogHeader>
+          
+          {loadingRosters ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-500"></div>
+            </div>
+          ) : previousRosters.length === 0 ? (
+            <div className="py-8 text-center">
+              <Users className="w-12 h-12 mx-auto text-slate-600 mb-3" />
+              <p className="text-slate-300 font-medium">No Previous Rosters</p>
+              <p className="text-sm text-slate-400 mt-1">
+                You don&apos;t have any rosters from previous seasons to duplicate.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {previousRosters.map((rosterData) => (
+                <div
+                  key={rosterData.season_id}
+                  onClick={() => setSelectedRoster(rosterData)}
+                  className={`p-4 border rounded-lg cursor-pointer transition-all ${
+                    selectedRoster?.season_id === rosterData.season_id
+                      ? "border-orange-500 bg-orange-500/10"
+                      : "border-slate-600 hover:border-slate-500 hover:bg-slate-700/50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="font-medium text-white flex items-center gap-2">
+                        <span>{rosterData.sport === "basketball" ? "🏀" : "🏈"}</span>
+                        {rosterData.season_name}
+                      </div>
+                      <div className="text-sm text-slate-400 mt-1">
+                        {rosterData.gender === "men" ? "Men's" : "Women's"} {rosterData.level === "varsity" ? "Varsity" : "JV"}
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-orange-400 font-bold">{rosterData.player_count}</div>
+                      <div className="text-xs text-slate-400">players</div>
+                    </div>
+                  </div>
+                  
+                  {selectedRoster?.season_id === rosterData.season_id && rosterData.roster?.length > 0 && (
+                    <div className="mt-3 pt-3 border-t border-slate-600">
+                      <div className="text-xs text-slate-400 mb-2">Preview:</div>
+                      <div className="grid grid-cols-2 gap-1 text-sm">
+                        {rosterData.roster.slice(0, 6).map((player, idx) => (
+                          <div key={idx} className="text-slate-300 truncate">
+                            #{player.number} {player.name}
+                          </div>
+                        ))}
+                        {rosterData.roster.length > 6 && (
+                          <div className="text-slate-500">
+                            +{rosterData.roster.length - 6} more...
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          
+          <div className="flex justify-end gap-2 mt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowDuplicateRosterDialog(false)}
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDuplicateRoster}
+              disabled={!selectedRoster}
+              className="bg-orange-500 hover:bg-orange-600"
+              data-testid="confirm-duplicate-roster-btn"
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Duplicate Roster
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
