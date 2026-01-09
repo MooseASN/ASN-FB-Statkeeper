@@ -57,7 +57,7 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
       setNewName(res.data.name || "");
     } catch (error) {
       toast.error("Failed to load profile");
-      navigate("/");
+      navigate("/dashboard");
     } finally {
       setLoading(false);
     }

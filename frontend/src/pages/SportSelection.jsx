@@ -105,7 +105,7 @@ export default function SportSelection({ user, onLogout }) {
     }
     
     selectSport(sport);
-    navigate("/");
+    navigate("/dashboard");
   };
   
   const handleVerifyPassword = async () => {
@@ -132,7 +132,7 @@ export default function SportSelection({ user, onLogout }) {
         
         // Now select the sport
         selectSport(selectedBetaSport);
-        navigate("/");
+        navigate("/dashboard");
       } else {
         toast.error("Incorrect beta password");
       }

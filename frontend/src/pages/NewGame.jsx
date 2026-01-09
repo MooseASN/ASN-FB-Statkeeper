@@ -213,7 +213,7 @@ export default function NewGame({ user, onLogout }) {
       
       await axios.post(`${API}/games`, gameData);
       toast.success("Game scheduled!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       toast.error("Failed to schedule game");
     } finally {

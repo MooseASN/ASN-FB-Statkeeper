@@ -110,7 +110,7 @@ export default function AdminDashboard({ user, onLogout }) {
     } catch (error) {
       if (error.response?.status === 403) {
         toast.error("Admin access required");
-        navigate("/");
+        navigate("/dashboard");
       } else {
         toast.error("Failed to load admin data");
       }

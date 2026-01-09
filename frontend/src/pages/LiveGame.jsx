@@ -766,7 +766,7 @@ export default function LiveGame() {
       // Only navigate away on initial load failure, not on refresh failures
       if (isInitialLoad) {
         toast.error("Failed to load game");
-        navigate("/");
+        navigate("/dashboard");
       }
       // Silently ignore refresh errors - keep showing last data
     } finally {

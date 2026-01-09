@@ -97,7 +97,7 @@ export default function EditGame({ user, onLogout }) {
       }
     } catch (error) {
       toast.error("Failed to load game data");
-      navigate("/");
+      navigate("/dashboard");
     } finally {
       setLoading(false);
     }
@@ -140,7 +140,7 @@ export default function EditGame({ user, onLogout }) {
 
       await axios.put(`${API}/games/${id}`, updateData);
       toast.success("Game updated!");
-      navigate("/");
+      navigate("/dashboard");
     } catch (error) {
       toast.error("Failed to update game");
     } finally {

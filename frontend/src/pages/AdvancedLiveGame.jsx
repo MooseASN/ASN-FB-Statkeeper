@@ -157,7 +157,7 @@ export default function AdvancedLiveGame() {
       // Only navigate away on initial load failure
       if (isInitialLoad) {
         toast.error("Failed to load game");
-        navigate("/");
+        navigate("/dashboard");
       }
       // Silently ignore refresh errors
     } finally {
