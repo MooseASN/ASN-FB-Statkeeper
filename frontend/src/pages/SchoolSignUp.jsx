@@ -109,6 +109,11 @@ export default function SchoolSignUp() {
       return;
     }
     
+    if (!formData.logoUrl) {
+      toast.error("Please upload a school logo");
+      return;
+    }
+    
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return;
