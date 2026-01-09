@@ -642,8 +642,8 @@ export default function AdminDashboard({ user, onLogout }) {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    filteredUsers.map((u) => (
-                      <TableRow key={u.user_id}>
+                    filteredUsers.map((u, idx) => (
+                      <TableRow key={`${u.user_id}_${idx}`}>
                         <TableCell className="font-mono text-xs">{u.user_id}</TableCell>
                         <TableCell>
                           <span className={u.email === "antlersportsnetwork@gmail.com" ? "font-bold text-amber-600" : ""}>
