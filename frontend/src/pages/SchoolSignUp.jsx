@@ -287,7 +287,7 @@ export default function SchoolSignUp() {
 
               {/* Logo */}
               <div>
-                <Label className="text-slate-200">School Logo (optional)</Label>
+                <Label className="text-slate-200">School Logo *</Label>
                 <div className="flex gap-2 mt-2 mb-3">
                   <Button
                     type="button"
