@@ -194,7 +194,7 @@ function TeamPanel({
                   style={{ backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}
                 >
                   <div className="text-xl font-bold text-white pl-2">
-                    {player.number || '?'}*
+                    {player.number || '?'}
                   </div>
                   <div className="text-xl font-bold text-white uppercase truncate">
                     {player.name?.split(' ').pop() || 'Unknown'}
