@@ -302,12 +302,20 @@ export default function HomePage() {
               heroInView ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"
             }`}
           >
-            <div className={`logo-sweep-container ${showSweep ? 'animate' : ''}`}>
+            <div className="logo-sweep-wrapper">
               <img 
                 src="/logo-white.png" 
                 alt="StatMoose" 
-                className="h-32 md:h-40 w-auto mx-auto"
+                className="logo-base h-32 md:h-40 w-auto mx-auto"
               />
+              <div className={`logo-sweep-overlay ${showSweep ? 'animate' : ''}`}>
+                <img 
+                  src="/logo-white.png" 
+                  alt="" 
+                  className="h-32 md:h-40 w-auto mx-auto"
+                  aria-hidden="true"
+                />
+              </div>
             </div>
           </div>
           
