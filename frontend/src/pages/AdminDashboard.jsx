@@ -142,6 +142,20 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!deletingUser) return;
+    
+    try {
+      await axios.delete(`${API}/admin/users/${deletingUser.user_id}`);
+      toast.success(`User ${deletingUser.email} deleted successfully`);
+      setShowDeleteUserDialog(false);
+      setDeletingUser(null);
+      fetchData(); // Refresh user list
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to delete user");
+    }
+  };
+
   const handleExportCSV = async () => {
     try {
       const response = await axios.get(`${API}/admin/users/export`, {
