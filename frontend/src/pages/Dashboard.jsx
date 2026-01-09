@@ -288,6 +288,14 @@ export default function Dashboard({ user, onLogout }) {
                 Manage Teams
               </Button>
             </Link>
+            {schoolInfo && (
+              <Link to="/school-dashboard">
+                <Button size="lg" variant="outline" className="border-orange-400/50 text-orange-400 hover:bg-orange-500/10" data-testid="school-dashboard-btn">
+                  <Building2 className="w-5 h-5 mr-2" />
+                  {schoolInfo.name}
+                </Button>
+              </Link>
+            )}
           </div>
         </div>
 
