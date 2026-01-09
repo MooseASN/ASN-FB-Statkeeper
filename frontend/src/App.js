@@ -138,6 +138,11 @@ function AppRoutes({ user, onLogin, onLogout }) {
           <SeasonManagement />
         </ProtectedRoute>
       } />
+      <Route path="/school/season/:seasonId/stats" element={
+        <ProtectedRoute user={user}>
+          <SeasonStats />
+        </ProtectedRoute>
+      } />
       
       {/* Protected routes - require both auth and sport selection */}
       <Route path="/" element={<SportProtectedRoute user={user}><Dashboard user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
