@@ -10,6 +10,11 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
   Table,
   TableBody,
   TableCell,
@@ -39,7 +44,8 @@ import {
   Eye,
   EyeOff,
   Building2,
-  ChevronRight
+  ChevronRight,
+  ChevronDown
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
