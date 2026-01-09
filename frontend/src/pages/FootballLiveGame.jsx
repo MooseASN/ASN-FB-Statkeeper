@@ -3940,10 +3940,10 @@ export default function FootballLiveGame({ user, onLogout }) {
                           <Button 
                             size="sm" 
                             variant="outline" 
-                            className="w-full border-green-600 text-green-400 hover:bg-green-900/30"
-                            onClick={() => setShowFieldViewDialog(true)}
+                            className="w-full border-purple-600 text-purple-400 hover:bg-purple-900/30"
+                            onClick={() => { setPuntFieldViewMode("return"); setShowPuntFieldView(true); }}
                           >
-                            🏈 Field View
+                            🏈 Punt Return Field View
                           </Button>
                         </div>
                         <div className="flex flex-wrap gap-2 justify-center mt-2">
