@@ -540,9 +540,18 @@ export default function FootballLiveGame({ user, onLogout }) {
   const [homeScore, setHomeScore] = useState(0);
   const [awayScore, setAwayScore] = useState(0);
   
-  // Timeouts
-  const [homeTimeouts, setHomeTimeouts] = useState(3);
-  const [awayTimeouts, setAwayTimeouts] = useState(3);
+  // Timeouts - Using useTimeouts hook
+  const {
+    homeTimeouts,
+    awayTimeouts,
+    setHomeTimeouts,
+    setAwayTimeouts,
+    useTimeout: useTimeoutHook,
+    restoreTimeout,
+    resetTimeoutsForHalf,
+    hasTimeouts,
+    getTimeoutsRemaining,
+  } = useTimeouts(3);
   
   // Play-by-play log
   const [playLog, setPlayLog] = useState([]);
