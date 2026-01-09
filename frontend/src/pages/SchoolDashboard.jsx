@@ -534,7 +534,7 @@ export default function SchoolDashboard() {
               {/* Gameday Section - Only show if there's a game today */}
               {(() => {
                 const todayStr = new Date().toISOString().split('T')[0];
-                const todayGames = games.filter(g => g.scheduled_date === todayStr);
+                const todayGames = (games || []).filter(g => g.scheduled_date === todayStr);
                 
                 if (todayGames.length === 0) return null;
                 
@@ -548,7 +548,7 @@ export default function SchoolDashboard() {
                     <div className="space-y-4">
                       {todayGames.map(game => {
                         // Find the season for this game
-                        const gameSeason = seasons.find(s => s.season_id === game.season_id);
+                        const gameSeason = (seasons || []).find(s => s.season_id === game.season_id);
                         
                         return (
                           <div key={game.id} className="bg-slate-900/70 rounded-lg p-4">
