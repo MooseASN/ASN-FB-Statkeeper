@@ -181,19 +181,30 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - [x] Create custom hooks for football game management
 - [x] Admin login verification - **ALL TESTS PASS** (7 backend, 6 frontend)
 - [x] Jumbotron Output Page for basketball - **IMPLEMENTED & TESTED**
+- [x] **Offline Mode** - Implemented across all stat-tracking modes (Basketball Classic, Advanced, Football)
+- [x] **"Halves" Period Option** - Added to game creation, all views updated
+- [x] **School/Organization Management Feature** - **COMPLETED January 2026**
+  - School signup with unique name validation
+  - School admin dashboard with calendar, members table, seasons sidebar
+  - Season management with roster, opponents, and game scheduling
+  - Invite link system for members to join schools
+  - 22 backend API tests passing (100% coverage)
 
 ### P1 (Completed)
 - [x] Verify basketball stat tracker improvements - **ALL TESTS PASS**
 - [x] Admin login reliability - **VERIFIED WORKING** (both username and email login methods)
+- [x] Session logout bug fix - App no longer logs out on transient network errors
+- [x] Jumbotron flickering fix
 
 ### P2 (Future)
 - [ ] Further refactor FootballLiveGame.jsx using the new custom hooks
 - [ ] Visual test of game recaps on LiveView
 - [ ] UI test of CSV roster upload for football
+- [ ] Refactor server.py (~5000 lines) into domain-specific routers
 
 ### P3 (Nice to have)
 - [ ] Performance optimizations for large rosters
-- [ ] Offline mode support
+- [x] Offline mode support - **IMPLEMENTED**
 - [ ] Mobile-specific UI improvements
 
 ## Testing
