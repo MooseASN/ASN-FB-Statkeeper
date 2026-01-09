@@ -23,6 +23,40 @@ const calculatePlayerStats = (stats) => {
   };
 };
 
+// Calculate team totals from all player stats
+const calculateTeamTotals = (allStats) => {
+  const totals = {
+    fg_made: 0, fg_att: 0,
+    fg3_made: 0, fg3_att: 0,
+    ft_made: 0, ft_att: 0,
+    reb: 0, ast: 0, tov: 0
+  };
+  
+  allStats.forEach(p => {
+    // FG (2pt + 3pt)
+    totals.fg_made += (p.fg2_made || 0) + (p.fg3_made || 0);
+    totals.fg_att += (p.fg2_made || 0) + (p.fg3_made || 0) + (p.fg2_missed || 0) + (p.fg3_missed || 0);
+    // 3PT only
+    totals.fg3_made += (p.fg3_made || 0);
+    totals.fg3_att += (p.fg3_made || 0) + (p.fg3_missed || 0);
+    // FT
+    totals.ft_made += (p.ft_made || 0);
+    totals.ft_att += (p.ft_made || 0) + (p.ft_missed || 0);
+    // Other stats
+    totals.reb += (p.offensive_rebounds || p.oreb || 0) + (p.defensive_rebounds || p.dreb || 0);
+    totals.ast += (p.assists || p.assist || 0);
+    totals.tov += (p.turnovers || p.turnover || p.tov || 0);
+  });
+  
+  return totals;
+};
+
+// Format percentage
+const formatPct = (made, att) => {
+  if (att === 0) return "0%";
+  return `${Math.round((made / att) * 100)}%`;
+};
+
 // Team Panel Component - Broadcast Style Stacked Layout
 function TeamPanel({ 
   teamName, 
@@ -65,7 +99,7 @@ function TeamPanel({
 
   return (
     <div 
-      className="flex-1 flex flex-col relative overflow-hidden"
+      className="flex-1 flex flex-col relative overflow-hidden min-h-0"
       style={{
         background: `linear-gradient(135deg, #0d1f3c 0%, #162d50 50%, #1a3a5c 100%)`
       }}
@@ -83,20 +117,20 @@ function TeamPanel({
       />
       
       {/* Content */}
-      <div className="relative z-10 flex flex-col h-full">
+      <div className="relative z-10 flex flex-col h-full min-h-0">
         {/* Team Header Bar */}
-        <div className="flex items-center px-8 py-4">
+        <div className="flex items-center px-6 py-2 flex-shrink-0">
           {/* Team Logo */}
-          <div className="flex-shrink-0 mr-6">
+          <div className="flex-shrink-0 mr-4">
             {teamLogo ? (
               <img 
                 src={teamLogo} 
                 alt={teamName} 
-                className="w-20 h-20 object-contain drop-shadow-lg"
+                className="w-14 h-14 object-contain drop-shadow-lg"
               />
             ) : (
               <div 
-                className="w-20 h-20 rounded-lg flex items-center justify-center text-5xl font-black text-white shadow-lg"
+                className="w-14 h-14 rounded-lg flex items-center justify-center text-3xl font-black text-white shadow-lg"
                 style={{ backgroundColor: teamColor }}
               >
                 {teamName?.charAt(0) || '?'}
@@ -106,7 +140,7 @@ function TeamPanel({
           
           {/* Team Name */}
           <h2 
-            className="text-5xl font-black text-white uppercase tracking-widest flex-1"
+            className="text-4xl font-black text-white uppercase tracking-widest flex-1"
             style={{ 
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
               fontFamily: "'Arial Black', 'Helvetica Black', sans-serif"
@@ -116,20 +150,20 @@ function TeamPanel({
           </h2>
           
           {/* Stats Section */}
-          <div className="flex items-center gap-8">
-            <div className="flex items-center gap-3">
-              <span className="text-gray-300 text-lg font-semibold tracking-wider uppercase">Timeouts</span>
-              <span className="text-white text-3xl font-black">{timeouts}</span>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-sm font-semibold tracking-wider uppercase">Timeouts</span>
+              <span className="text-white text-2xl font-black">{timeouts}</span>
             </div>
             
-            <div className="flex items-center gap-3">
-              <span className="text-gray-300 text-lg font-semibold tracking-wider uppercase">Fouls</span>
-              <span className="text-white text-3xl font-black">{totalFouls}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-300 text-sm font-semibold tracking-wider uppercase">Fouls</span>
+              <span className="text-white text-2xl font-black">{totalFouls}</span>
             </div>
             
             {inBonus && (
               <div 
-                className="px-5 py-2 rounded text-lg font-black uppercase tracking-wider text-white shadow-lg ml-4"
+                className="px-4 py-1 rounded text-sm font-black uppercase tracking-wider text-white shadow-lg ml-2"
                 style={{ 
                   backgroundColor: '#0ea5e9',
                   boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)'
@@ -143,7 +177,7 @@ function TeamPanel({
         
         {/* Team color accent line */}
         <div 
-          className="h-1 mx-8"
+          className="h-1 mx-6 flex-shrink-0"
           style={{ 
             backgroundColor: teamColor,
             boxShadow: `0 0 10px ${teamColor}`
@@ -151,53 +185,53 @@ function TeamPanel({
         />
         
         {/* Stats Table */}
-        <div className="flex-1 px-8 py-2">
+        <div className="flex-1 px-6 py-1 min-h-0 overflow-hidden">
           {/* Table Header */}
-          <div className="grid grid-cols-[60px_1fr_80px_100px_80px_80px_60px_60px] gap-2 py-3 border-b border-gray-600/50">
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider">#</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider">Player</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">PTS</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">FG</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">FT</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">REB</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">A</div>
-            <div className="text-gray-400 text-base font-semibold uppercase tracking-wider text-center">PF</div>
+          <div className="grid grid-cols-[50px_1fr_70px_80px_70px_60px_50px_50px] gap-1 py-1 border-b border-gray-600/50">
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider">#</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider">Player</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">PTS</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">FG</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">FT</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">REB</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">A</div>
+            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">PF</div>
           </div>
 
           {/* Player Rows */}
-          <div className="divide-y divide-gray-700/30">
+          <div>
             {displayPlayers.length === 0 ? (
-              <div className="py-8 text-center text-gray-400 text-2xl">
+              <div className="py-4 text-center text-gray-400 text-lg">
                 No players on floor
               </div>
             ) : (
               displayPlayers.map((player, index) => (
                 <div 
                   key={index}
-                  className="grid grid-cols-[60px_1fr_80px_100px_80px_80px_60px_60px] gap-2 py-3 items-center"
+                  className="grid grid-cols-[50px_1fr_70px_80px_70px_60px_50px_50px] gap-1 py-1.5 items-center border-b border-gray-700/20"
                 >
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-xl font-bold text-white">
                     {player.number || '?'}
                   </div>
-                  <div className="text-2xl font-bold text-white uppercase truncate">
+                  <div className="text-lg font-bold text-white uppercase truncate">
                     {player.name?.split(' ').pop() || 'Unknown'}
                   </div>
-                  <div className="text-2xl font-black text-white text-center">
+                  <div className="text-xl font-black text-white text-center">
                     {player.pts}
                   </div>
-                  <div className="text-xl text-white text-center">
+                  <div className="text-base text-white text-center">
                     {player.fg}
                   </div>
-                  <div className="text-xl text-white text-center">
+                  <div className="text-base text-white text-center">
                     {player.ft}
                   </div>
-                  <div className="text-xl text-white text-center">
+                  <div className="text-base text-white text-center">
                     {player.totalReb}
                   </div>
-                  <div className="text-xl text-white text-center">
+                  <div className="text-base text-white text-center">
                     {player.ast}
                   </div>
-                  <div className={`text-xl text-center ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
+                  <div className={`text-base text-center ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
                     {player.pf}
                   </div>
                 </div>
@@ -205,6 +239,76 @@ function TeamPanel({
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Team Stats Bar Component
+function TeamStatsBar({ homeStats, awayStats, homeColor, awayColor, homeTeamName, awayTeamName }) {
+  const homeTotals = calculateTeamTotals(homeStats);
+  const awayTotals = calculateTeamTotals(awayStats);
+  
+  const StatBlock = ({ label, homeValue, awayValue }) => (
+    <div className="flex flex-col items-center">
+      <div className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">{label}</div>
+      <div className="flex items-center gap-4">
+        <span className="text-white font-bold text-sm" style={{ color: homeColor }}>{homeValue}</span>
+        <span className="text-gray-500">|</span>
+        <span className="text-white font-bold text-sm" style={{ color: awayColor }}>{awayValue}</span>
+      </div>
+    </div>
+  );
+  
+  return (
+    <div 
+      className="flex-shrink-0 px-8 py-3"
+      style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1f3c 100%)' }}
+    >
+      {/* Team names header */}
+      <div className="flex justify-center gap-8 mb-2">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }} />
+          <span className="text-white text-sm font-bold uppercase">{homeTeamName}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }} />
+          <span className="text-white text-sm font-bold uppercase">{awayTeamName}</span>
+        </div>
+      </div>
+      
+      {/* Stats row */}
+      <div className="flex justify-center gap-8">
+        <StatBlock 
+          label="FG" 
+          homeValue={`${homeTotals.fg_made}/${homeTotals.fg_att} ${formatPct(homeTotals.fg_made, homeTotals.fg_att)}`}
+          awayValue={`${awayTotals.fg_made}/${awayTotals.fg_att} ${formatPct(awayTotals.fg_made, awayTotals.fg_att)}`}
+        />
+        <StatBlock 
+          label="3PT" 
+          homeValue={`${homeTotals.fg3_made}/${homeTotals.fg3_att} ${formatPct(homeTotals.fg3_made, homeTotals.fg3_att)}`}
+          awayValue={`${awayTotals.fg3_made}/${awayTotals.fg3_att} ${formatPct(awayTotals.fg3_made, awayTotals.fg3_att)}`}
+        />
+        <StatBlock 
+          label="FT" 
+          homeValue={`${homeTotals.ft_made}/${homeTotals.ft_att} ${formatPct(homeTotals.ft_made, homeTotals.ft_att)}`}
+          awayValue={`${awayTotals.ft_made}/${awayTotals.ft_att} ${formatPct(awayTotals.ft_made, awayTotals.ft_att)}`}
+        />
+        <StatBlock 
+          label="REB" 
+          homeValue={homeTotals.reb}
+          awayValue={awayTotals.reb}
+        />
+        <StatBlock 
+          label="AST" 
+          homeValue={homeTotals.ast}
+          awayValue={awayTotals.ast}
+        />
+        <StatBlock 
+          label="TOV" 
+          homeValue={homeTotals.tov}
+          awayValue={awayTotals.tov}
+        />
       </div>
     </div>
   );
@@ -246,11 +350,6 @@ export default function Jumbotron() {
       clearInterval(interval);
     };
   }, [shareCode]);
-
-  // Calculate score from quarter scores
-  const calculateScore = (team) => {
-    return game?.quarter_scores?.[team]?.reduce((a, b) => a + b, 0) || 0;
-  };
 
   // Calculate total team fouls
   const calculateTeamFouls = (stats) => {
@@ -302,7 +401,7 @@ export default function Jumbotron() {
       style={{ backgroundColor: '#0a1628' }}
       data-testid="jumbotron-page"
     >
-      {/* Home Team Panel (Top Half) */}
+      {/* Home Team Panel (Top) */}
       <TeamPanel
         teamName={game.home_team_name}
         teamLogo={game.home_team_logo}
@@ -314,10 +413,10 @@ export default function Jumbotron() {
         allStats={homeStats}
       />
       
-      {/* Thin separator line with subtle glow */}
-      <div className="h-[2px] bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
+      {/* Thin separator line */}
+      <div className="h-[2px] flex-shrink-0 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
       
-      {/* Away Team Panel (Bottom Half) */}
+      {/* Away Team Panel (Bottom) */}
       <TeamPanel
         teamName={game.away_team_name}
         teamLogo={game.away_team_logo}
@@ -327,6 +426,16 @@ export default function Jumbotron() {
         inBonus={getBonus(homeFouls)}
         onFloorPlayers={awayOnFloor}
         allStats={awayStats}
+      />
+      
+      {/* Team Stats Bar (Bottom) */}
+      <TeamStatsBar
+        homeStats={homeStats}
+        awayStats={awayStats}
+        homeColor={homeColor}
+        awayColor={awayColor}
+        homeTeamName={game.home_team_name}
+        awayTeamName={game.away_team_name}
       />
     </div>
   );
