@@ -99,21 +99,21 @@ function TeamPanel({
       }}
     >
       <div className="relative z-10 flex flex-col h-full min-h-0">
-        {/* Team Header */}
+        {/* Team Header - More compact */}
         <div 
-          className="flex items-center px-6 py-3 flex-shrink-0"
+          className="flex items-center px-4 py-2 flex-shrink-0"
           style={{ 
             background: `linear-gradient(90deg, ${teamColor}40 0%, transparent 60%)`,
-            borderBottom: `5px solid ${teamColor}`
+            borderBottom: `4px solid ${teamColor}`
           }}
         >
           {/* Team Logo */}
-          <div className="flex-shrink-0 mr-5">
+          <div className="flex-shrink-0 mr-4">
             {teamLogo ? (
-              <img src={teamLogo} alt={teamName} className="w-24 h-24 object-contain drop-shadow-lg" />
+              <img src={teamLogo} alt={teamName} className="w-16 h-16 object-contain drop-shadow-lg" />
             ) : (
               <div 
-                className="w-24 h-24 rounded-xl flex items-center justify-center text-5xl text-white shadow-lg"
+                className="w-16 h-16 rounded-lg flex items-center justify-center text-4xl text-white shadow-lg"
                 style={{ backgroundColor: teamColor, ...broadcastFont }}
               >
                 {teamName?.charAt(0) || '?'}
@@ -123,7 +123,7 @@ function TeamPanel({
           
           {/* Team Name */}
           <h2 
-            className="text-6xl text-white uppercase tracking-wide flex-1"
+            className="text-4xl text-white uppercase tracking-wide flex-1"
             style={broadcastFont}
           >
             {teamName}
