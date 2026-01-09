@@ -4840,6 +4840,8 @@ async def create_school_game(
     }
     await db.games.insert_one(game_doc)
     
+    # Remove MongoDB _id before returning
+    game_doc.pop("_id", None)
     return {"game_id": game_id, **game_doc}
 
 @api_router.get("/schools/{school_id}/games")
