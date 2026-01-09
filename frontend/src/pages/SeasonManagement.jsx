@@ -1110,35 +1110,137 @@ export default function SeasonManagement() {
       </Dialog>
 
       {/* Add Game Dialog */}
-      <Dialog open={showGameDialog} onOpenChange={setShowGameDialog}>
+      <Dialog open={showGameDialog} onOpenChange={(open) => {
+        setShowGameDialog(open);
+        if (!open) {
+          setOpponentSearchQuery("");
+          setShowOpponentDropdown(false);
+          setSelectedOpponentName("");
+        }
+      }}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white">
           <DialogHeader>
             <DialogTitle className="text-white">Schedule Game</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div>
+            <div className="relative">
               <Label className="text-white">Opponent</Label>
-              <Select
-                value={gameForm.opponent_team_id}
-                onValueChange={(v) => setGameForm(prev => ({ ...prev, opponent_team_id: v }))}
-              >
-                <SelectTrigger className="bg-slate-900 border-slate-600 text-white">
-                  <SelectValue placeholder="Select opponent" />
-                </SelectTrigger>
-                <SelectContent>
-                  {opponentTeams.map(team => (
-                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {opponentTeams.length === 0 && (
-                <Button
-                  variant="link"
-                  className="text-orange-400 p-0 h-auto mt-1"
-                  onClick={() => { setShowGameDialog(false); setShowOpponentDialog(true); }}
-                >
-                  + Add opponent first
-                </Button>
+              <div className="relative mt-1">
+                <Input
+                  value={selectedOpponentName || opponentSearchQuery}
+                  onChange={handleOpponentSearchChange}
+                  onFocus={() => setShowOpponentDropdown(true)}
+                  placeholder="Search existing opponents or find a school..."
+                  className="bg-slate-900 border-slate-600 text-white"
+                />
+                {selectedOpponentName && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedOpponentName("");
+                      setGameForm(prev => ({ ...prev, opponent_team_id: "" }));
+                      setOpponentSearchQuery("");
+                    }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                  >
+                    ×
+                  </button>
+                )}
+              </div>
+              
+              {/* Dropdown */}
+              {showOpponentDropdown && !selectedOpponentName && (
+                <div className="absolute w-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-xl z-50 max-h-64 overflow-y-auto">
+                  {/* Existing Opponents Section */}
+                  {getFilteredOpponents().length > 0 && (
+                    <div>
+                      <div className="px-3 py-1.5 text-xs font-semibold text-slate-400 bg-slate-800/50">
+                        Existing Opponents
+                      </div>
+                      {getFilteredOpponents().map(team => (
+                        <div
+                          key={team.id}
+                          className="px-3 py-2 hover:bg-slate-800 cursor-pointer flex items-center gap-3"
+                          onClick={() => handleSelectOpponent(team)}
+                        >
+                          {team.logo_url ? (
+                            <img src={team.logo_url} alt={team.name} className="w-8 h-8 rounded-full object-cover" />
+                          ) : (
+                            <div 
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                              style={{ backgroundColor: team.color || "#666" }}
+                            >
+                              {team.name?.charAt(0)}
+                            </div>
+                          )}
+                          <span className="text-white">{team.name}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* School Search Results */}
+                  {opponentSearchQuery.length >= 2 && schoolSearchResults.length > 0 && (
+                    <div>
+                      <div className="px-3 py-1.5 text-xs font-semibold text-slate-400 bg-slate-800/50 border-t border-slate-700">
+                        Schools on StatMoose
+                      </div>
+                      {schoolSearchResults.map(schoolResult => (
+                        <div
+                          key={schoolResult.school_id}
+                          className="px-3 py-2 hover:bg-slate-800 cursor-pointer flex items-center gap-3"
+                          onClick={() => handleImportFromSchoolForGame(schoolResult)}
+                        >
+                          {schoolResult.logo_url ? (
+                            <img src={schoolResult.logo_url} alt={schoolResult.name} className="w-8 h-8 rounded-full object-cover" />
+                          ) : (
+                            <div 
+                              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold"
+                              style={{ backgroundColor: schoolResult.primary_color || "#666" }}
+                            >
+                              {schoolResult.name?.charAt(0)}
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="text-white">{schoolResult.name}</div>
+                            <div className="text-xs text-slate-400">
+                              ID: <span className="text-orange-400">{schoolResult.school_code}</span>
+                            </div>
+                          </div>
+                          <Badge className="bg-blue-600 text-xs">Import</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {/* No Results */}
+                  {getFilteredOpponents().length === 0 && schoolSearchResults.length === 0 && opponentSearchQuery && (
+                    <div className="p-4 text-center text-slate-400 text-sm">
+                      No opponents found. 
+                      <button
+                        type="button"
+                        className="text-orange-400 ml-1 hover:underline"
+                        onClick={() => { setShowGameDialog(false); setShowOpponentDialog(true); }}
+                      >
+                        Add manually
+                      </button>
+                    </div>
+                  )}
+                  
+                  {/* Empty state */}
+                  {!opponentSearchQuery && opponentTeams.length === 0 && (
+                    <div className="p-4 text-center text-slate-400 text-sm">
+                      No opponents yet. Start typing to search schools or 
+                      <button
+                        type="button"
+                        className="text-orange-400 ml-1 hover:underline"
+                        onClick={() => { setShowGameDialog(false); setShowOpponentDialog(true); }}
+                      >
+                        add manually
+                      </button>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
             
