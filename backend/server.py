@@ -4614,8 +4614,28 @@ async def update_school(school_id: str, request: Request, current_user: User = D
     data = await request.json()
     update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
     
+    # Update allowed fields
+    if "name" in data:
+        new_name = data["name"].strip()
+        if new_name:
+            # Check if name is already taken by another school
+            existing = await db.schools.find_one({
+                "name_lower": new_name.lower(),
+                "school_id": {"$ne": school_id}
+            })
+            if existing:
+                raise HTTPException(status_code=400, detail="School name already taken")
+            update_data["name"] = new_name
+            update_data["name_lower"] = new_name.lower()
+    
+    if "state" in data:
+        update_data["state"] = data["state"]
+    
     if "logo_url" in data:
         update_data["logo_url"] = data["logo_url"]
+    
+    if "primary_color" in data:
+        update_data["primary_color"] = data["primary_color"]
     
     await db.schools.update_one(
         {"school_id": school_id},
