@@ -145,6 +145,12 @@ export default function SchoolSignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Check beta mode
+    if (betaMode && !betaVerified) {
+      setShowBetaDialog(true);
+      return;
+    }
+    
     // Validation
     if (!formData.schoolName || !formData.state || !formData.userName || 
         !formData.userEmail || !formData.password) {
