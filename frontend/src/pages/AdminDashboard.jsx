@@ -167,6 +167,27 @@ export default function AdminDashboard({ user, onLogout }) {
     u.user_id?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const filteredSchools = schools.filter(s =>
+    s.name?.toLowerCase().includes(schoolSearchTerm.toLowerCase()) ||
+    s.school_code?.toLowerCase().includes(schoolSearchTerm.toLowerCase()) ||
+    s.state?.toLowerCase().includes(schoolSearchTerm.toLowerCase())
+  );
+
+  const handleViewSchool = async (school) => {
+    setSelectedSchool(school);
+    setShowSchoolDialog(true);
+    setLoadingSchoolDetails(true);
+    
+    try {
+      const res = await axios.get(`${API}/admin/schools/${school.school_id}`);
+      setSchoolDetails(res.data);
+    } catch (error) {
+      toast.error("Failed to load school details");
+    } finally {
+      setLoadingSchoolDetails(false);
+    }
+  };
+
   if (loading) {
     return (
       <Layout user={user} onLogout={onLogout}>
