@@ -851,9 +851,13 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
     } catch (error) {
       toast.error("Failed to start clock");
     }
-  }, [id]);
+  }, [id, demoMode]);
 
   const handleStopClock = useCallback(async () => {
+    if (demoMode) {
+      setClockRunning(false);
+      return;
+    }
     try {
       await axios.post(`${API}/games/${id}/clock/stop`);
       setClockRunning(false);
@@ -863,7 +867,7 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
     } catch (error) {
       toast.error("Failed to stop clock");
     }
-  }, [id, clockTime, fetchGame]);
+  }, [id, clockTime, fetchGame, demoMode]);
 
   // Backslash keyboard handler for clock toggle
   useEffect(() => {
