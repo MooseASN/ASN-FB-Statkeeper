@@ -531,6 +531,78 @@ export default function SchoolSignUp() {
           </p>
         </form>
       </div>
+
+      {/* Beta Mode Access Dialog */}
+      <Dialog open={showBetaDialog} onOpenChange={(open) => {
+        if (!betaVerified) {
+          setShowBetaDialog(open);
+        }
+      }}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <Lock className="w-5 h-5 text-orange-500" />
+              School Registration Beta Access
+            </DialogTitle>
+            <DialogDescription className="text-slate-300">
+              School registration is currently in beta mode. Please enter the access password to continue.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="py-4 space-y-4">
+            <div className="p-3 bg-amber-900/30 border border-amber-600/50 rounded-lg">
+              <p className="text-sm text-amber-200">
+                If you don&apos;t have the access password, please contact the StatMoose administrator.
+              </p>
+            </div>
+            
+            <div>
+              <Label className="text-slate-200">Access Password</Label>
+              <div className="relative mt-1">
+                <Input
+                  type={showBetaPassword ? "text" : "password"}
+                  placeholder="Enter access password"
+                  value={betaPassword}
+                  onChange={(e) => setBetaPassword(e.target.value)}
+                  className="bg-slate-900 border-slate-600 text-white pr-10"
+                  data-testid="beta-password-input"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      handleVerifyBetaPassword();
+                    }
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowBetaPassword(!showBetaPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                >
+                  {showBetaPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => navigate("/signup")}
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+            >
+              Go Back
+            </Button>
+            <Button
+              onClick={handleVerifyBetaPassword}
+              disabled={betaVerifying}
+              className="bg-orange-500 hover:bg-orange-600"
+              data-testid="verify-beta-btn"
+            >
+              {betaVerifying ? "Verifying..." : "Verify Access"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
