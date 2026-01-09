@@ -108,7 +108,7 @@ export default function Register({ onLogin }) {
       localStorage.setItem("user", JSON.stringify(res.data));
       onLogin(res.data);
       toast.success("Account created successfully!");
-      navigate("/");
+      navigate("/select-sport");
     } catch (error) {
       const detail = error.response?.data?.detail;
       if (detail?.includes("Email")) {

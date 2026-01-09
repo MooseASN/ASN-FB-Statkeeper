@@ -43,7 +43,7 @@ export default function Login({ onLogin }) {
       
       onLogin(res.data);
       toast.success("Welcome back!");
-      navigate("/");
+      navigate("/select-sport");
     } catch (error) {
       toast.error(error.response?.data?.detail || "Invalid email or password");
     } finally {
