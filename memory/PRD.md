@@ -147,7 +147,8 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Season statistics with team/player averages
   - Schedule tab with game results
 - **Refactoring Progress**
-  - Custom hooks (useGameClock, useDriveState, useTimeouts) imported into FootballLiveGame.jsx
+  - **useGameClock** and **useTimeouts** hooks now actively integrated into FootballLiveGame.jsx
+  - `useDriveState` hook available for future integration
   - Router templates created at /app/backend/routers/ for future server.py refactoring
 
 ## User Personas
