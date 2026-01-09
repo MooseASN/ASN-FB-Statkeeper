@@ -451,7 +451,7 @@ export default function SchoolDashboard() {
                 alt="StatMoose" 
                 className="w-8 h-8 object-contain"
               />
-              <span className="text-orange-500 font-bold text-lg">StatMoose</span>
+              <span className="text-white font-bold text-lg">StatMoose</span>
             </div>
             
             {/* School Logo and Name */}
