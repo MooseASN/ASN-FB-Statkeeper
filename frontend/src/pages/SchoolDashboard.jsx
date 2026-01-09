@@ -612,7 +612,7 @@ export default function SchoolDashboard() {
                             <div className="text-center mb-4">
                               {gameSeason && (
                                 <Badge className="bg-slate-700 text-slate-200 mb-2">
-                                  {gameSeason.name}
+                                  {game.sport === "basketball" ? "🏀" : "🏈"} {gameSeason.name}
                                 </Badge>
                               )}
                               {!isInProgress && (
