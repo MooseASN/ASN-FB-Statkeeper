@@ -8,53 +8,30 @@ const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 const calculatePlayerStats = (stats) => {
   const pts = (stats.ft_made || 0) + ((stats.fg2_made || 0) * 2) + ((stats.fg3_made || 0) * 3);
   const totalReb = (stats.offensive_rebounds || stats.oreb || 0) + (stats.defensive_rebounds || stats.dreb || 0);
-  const fg_made = (stats.fg2_made || 0) + (stats.fg3_made || 0);
-  const fg_att = fg_made + (stats.fg2_missed || 0) + (stats.fg3_missed || 0);
+  
+  const fg2_made = stats.fg2_made || 0;
+  const fg2_miss = stats.fg2_missed || 0;
+  const fg3_made = stats.fg3_made || 0;
+  const fg3_miss = stats.fg3_missed || 0;
+  
+  const fg_made = fg2_made + fg3_made;
+  const fg_att = fg_made + fg2_miss + fg3_miss;
+  const fg3_att = fg3_made + fg3_miss;
+  
   const ft_made = stats.ft_made || 0;
-  const ft_att = (stats.ft_made || 0) + (stats.ft_missed || 0);
+  const ft_att = ft_made + (stats.ft_missed || 0);
   
   return { 
     pts, 
     totalReb, 
     fg: `${fg_made}-${fg_att}`,
+    fg3: `${fg3_made}-${fg3_att}`,
     ft: `${ft_made}-${ft_att}`,
     ast: stats.assists || stats.assist || 0,
-    pf: stats.fouls || stats.foul || stats.pf || 0
+    pf: stats.fouls || stats.foul || stats.pf || 0,
+    // Raw values for totals calculation
+    raw: { fg_made, fg_att, fg3_made, fg3_att, ft_made, ft_att, totalReb, ast: stats.assists || stats.assist || 0, pf: stats.fouls || stats.foul || stats.pf || 0, pts }
   };
-};
-
-// Calculate team totals from all player stats
-const calculateTeamTotals = (allStats) => {
-  const totals = {
-    fg_made: 0, fg_att: 0,
-    fg3_made: 0, fg3_att: 0,
-    ft_made: 0, ft_att: 0,
-    reb: 0, ast: 0, tov: 0
-  };
-  
-  allStats.forEach(p => {
-    // FG (2pt + 3pt)
-    totals.fg_made += (p.fg2_made || 0) + (p.fg3_made || 0);
-    totals.fg_att += (p.fg2_made || 0) + (p.fg3_made || 0) + (p.fg2_missed || 0) + (p.fg3_missed || 0);
-    // 3PT only
-    totals.fg3_made += (p.fg3_made || 0);
-    totals.fg3_att += (p.fg3_made || 0) + (p.fg3_missed || 0);
-    // FT
-    totals.ft_made += (p.ft_made || 0);
-    totals.ft_att += (p.ft_made || 0) + (p.ft_missed || 0);
-    // Other stats
-    totals.reb += (p.offensive_rebounds || p.oreb || 0) + (p.defensive_rebounds || p.dreb || 0);
-    totals.ast += (p.assists || p.assist || 0);
-    totals.tov += (p.turnovers || p.turnover || p.tov || 0);
-  });
-  
-  return totals;
-};
-
-// Format percentage
-const formatPct = (made, att) => {
-  if (att === 0) return "0%";
-  return `${Math.round((made / att) * 100)}%`;
 };
 
 // Team Panel Component - Broadcast Style Stacked Layout
@@ -65,6 +42,7 @@ function TeamPanel({
   timeouts, 
   totalFouls, 
   inBonus,
+  doubleBonus,
   onFloorPlayers,
   allStats
 }) {
@@ -97,40 +75,49 @@ function TeamPanel({
   // Sort by jersey number
   displayPlayers.sort((a, b) => parseInt(a.number || 0) - parseInt(b.number || 0));
 
+  // Calculate totals from displayed players
+  const totals = displayPlayers.reduce((acc, p) => {
+    acc.pts += p.raw.pts;
+    acc.fg_made += p.raw.fg_made;
+    acc.fg_att += p.raw.fg_att;
+    acc.fg3_made += p.raw.fg3_made;
+    acc.fg3_att += p.raw.fg3_att;
+    acc.ft_made += p.raw.ft_made;
+    acc.ft_att += p.raw.ft_att;
+    acc.reb += p.raw.totalReb;
+    acc.ast += p.raw.ast;
+    acc.pf += p.raw.pf;
+    return acc;
+  }, { pts: 0, fg_made: 0, fg_att: 0, fg3_made: 0, fg3_att: 0, ft_made: 0, ft_att: 0, reb: 0, ast: 0, pf: 0 });
+
   return (
     <div 
       className="flex-1 flex flex-col relative overflow-hidden min-h-0"
       style={{
-        background: `linear-gradient(135deg, #0d1f3c 0%, #162d50 50%, #1a3a5c 100%)`
+        background: `linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)`
       }}
     >
-      {/* Subtle grid pattern overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.08]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(100, 150, 255, 0.15) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(100, 150, 255, 0.15) 1px, transparent 1px)
-          `,
-          backgroundSize: '50px 50px'
-        }}
-      />
-      
       {/* Content */}
       <div className="relative z-10 flex flex-col h-full min-h-0">
         {/* Team Header Bar */}
-        <div className="flex items-center px-6 py-2 flex-shrink-0">
+        <div 
+          className="flex items-center px-6 py-3 flex-shrink-0"
+          style={{ 
+            background: `linear-gradient(90deg, ${teamColor}22 0%, transparent 50%)`,
+            borderBottom: `3px solid ${teamColor}`
+          }}
+        >
           {/* Team Logo */}
           <div className="flex-shrink-0 mr-4">
             {teamLogo ? (
               <img 
                 src={teamLogo} 
                 alt={teamName} 
-                className="w-14 h-14 object-contain drop-shadow-lg"
+                className="w-16 h-16 object-contain drop-shadow-lg"
               />
             ) : (
               <div 
-                className="w-14 h-14 rounded-lg flex items-center justify-center text-3xl font-black text-white shadow-lg"
+                className="w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-black text-white shadow-lg"
                 style={{ backgroundColor: teamColor }}
               >
                 {teamName?.charAt(0) || '?'}
@@ -140,7 +127,7 @@ function TeamPanel({
           
           {/* Team Name */}
           <h2 
-            className="text-4xl font-black text-white uppercase tracking-widest flex-1"
+            className="text-4xl font-black text-white uppercase tracking-wider flex-1"
             style={{ 
               textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
               fontFamily: "'Arial Black', 'Helvetica Black', sans-serif"
@@ -152,178 +139,123 @@ function TeamPanel({
           {/* Stats Section */}
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <span className="text-gray-300 text-sm font-semibold tracking-wider uppercase">Timeouts</span>
-              <span className="text-white text-2xl font-black">{timeouts}</span>
+              <span className="text-gray-300 text-base font-semibold tracking-wider uppercase">Timeouts</span>
+              <span className="text-white text-3xl font-black">{timeouts}</span>
             </div>
             
             <div className="flex items-center gap-2">
-              <span className="text-gray-300 text-sm font-semibold tracking-wider uppercase">Fouls</span>
-              <span className="text-white text-2xl font-black">{totalFouls}</span>
+              <span className="text-gray-300 text-base font-semibold tracking-wider uppercase">Fouls</span>
+              <span className="text-white text-3xl font-black">{totalFouls}</span>
             </div>
             
-            {inBonus && (
+            {(inBonus || doubleBonus) && (
               <div 
-                className="px-4 py-1 rounded text-sm font-black uppercase tracking-wider text-white shadow-lg ml-2"
+                className="px-4 py-2 rounded text-base font-black uppercase tracking-wider text-white shadow-lg ml-2"
                 style={{ 
-                  backgroundColor: '#0ea5e9',
-                  boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)'
+                  backgroundColor: '#1e40af',
+                  border: '2px solid #3b82f6'
                 }}
               >
-                BONUS
+                {doubleBonus ? "BONUS++" : "BONUS++"}
               </div>
             )}
           </div>
         </div>
         
-        {/* Team color accent line */}
-        <div 
-          className="h-1 mx-6 flex-shrink-0"
-          style={{ 
-            backgroundColor: teamColor,
-            boxShadow: `0 0 10px ${teamColor}`
-          }}
-        />
-        
         {/* Stats Table */}
-        <div className="flex-1 px-6 py-1 min-h-0 overflow-hidden">
+        <div className="flex-1 px-6 py-1 min-h-0 overflow-hidden flex flex-col">
           {/* Table Header */}
-          <div className="grid grid-cols-[50px_1fr_70px_80px_70px_60px_50px_50px] gap-1 py-1 border-b border-gray-600/50">
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider">#</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider">Player</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">PTS</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">FG</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">FT</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">REB</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">A</div>
-            <div className="text-gray-400 text-sm font-semibold uppercase tracking-wider text-center">PF</div>
+          <div 
+            className="grid grid-cols-[60px_1fr_70px_80px_80px_80px_70px_50px_50px] gap-1 py-2 flex-shrink-0"
+            style={{ backgroundColor: '#1e3a5f' }}
+          >
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider pl-2">#</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider">Player</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">PTS</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">FG</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">3FG</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">FT</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">REB</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">A</div>
+            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">PF</div>
           </div>
 
           {/* Player Rows */}
-          <div>
+          <div className="flex-1 overflow-hidden">
             {displayPlayers.length === 0 ? (
-              <div className="py-4 text-center text-gray-400 text-lg">
+              <div className="py-6 text-center text-gray-400 text-xl">
                 No players on floor
               </div>
             ) : (
               displayPlayers.map((player, index) => (
                 <div 
                   key={index}
-                  className="grid grid-cols-[50px_1fr_70px_80px_70px_60px_50px_50px] gap-1 py-1.5 items-center border-b border-gray-700/20"
+                  className="grid grid-cols-[60px_1fr_70px_80px_80px_80px_70px_50px_50px] gap-1 py-2 items-center border-b border-gray-700/30"
+                  style={{ backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}
                 >
-                  <div className="text-xl font-bold text-white">
-                    {player.number || '?'}
+                  <div className="text-xl font-bold text-white pl-2">
+                    {player.number || '?'}*
                   </div>
-                  <div className="text-lg font-bold text-white uppercase truncate">
+                  <div className="text-xl font-bold text-white uppercase truncate">
                     {player.name?.split(' ').pop() || 'Unknown'}
                   </div>
                   <div className="text-xl font-black text-white text-center">
                     {player.pts}
                   </div>
-                  <div className="text-base text-white text-center">
+                  <div className="text-lg text-white text-center">
                     {player.fg}
                   </div>
-                  <div className="text-base text-white text-center">
+                  <div className="text-lg text-white text-center">
+                    {player.fg3}
+                  </div>
+                  <div className="text-lg text-white text-center">
                     {player.ft}
                   </div>
-                  <div className="text-base text-white text-center">
+                  <div className="text-lg text-white text-center">
                     {player.totalReb}
                   </div>
-                  <div className="text-base text-white text-center">
+                  <div className="text-lg text-white text-center">
                     {player.ast}
                   </div>
-                  <div className={`text-base text-center ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
+                  <div className={`text-lg text-center ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
                     {player.pf}
                   </div>
                 </div>
               ))
             )}
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
 
-// Stat Block for team comparison
-function StatBlock({ label, homeValue, awayValue, homeColor, awayColor }) {
-  return (
-    <div className="flex flex-col items-center">
-      <div className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">{label}</div>
-      <div className="flex items-center gap-4">
-        <span className="text-white font-bold text-sm" style={{ color: homeColor }}>{homeValue}</span>
-        <span className="text-gray-500">|</span>
-        <span className="text-white font-bold text-sm" style={{ color: awayColor }}>{awayValue}</span>
-      </div>
-    </div>
-  );
-}
-
-// Team Stats Bar Component
-function TeamStatsBar({ homeStats, awayStats, homeColor, awayColor, homeTeamName, awayTeamName }) {
-  const homeTotals = calculateTeamTotals(homeStats);
-  const awayTotals = calculateTeamTotals(awayStats);
-  
-  return (
-    <div 
-      className="flex-shrink-0 px-8 py-3"
-      style={{ background: 'linear-gradient(180deg, #0a1628 0%, #0d1f3c 100%)' }}
-    >
-      {/* Team names header */}
-      <div className="flex justify-center gap-8 mb-2">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: homeColor }} />
-          <span className="text-white text-sm font-bold uppercase">{homeTeamName}</span>
+          {/* TOTALS Row */}
+          <div 
+            className="grid grid-cols-[60px_1fr_70px_80px_80px_80px_70px_50px_50px] gap-1 py-2 items-center flex-shrink-0"
+            style={{ backgroundColor: '#1e40af' }}
+          >
+            <div className="text-lg font-black text-white uppercase pl-2 col-span-2">
+              TOTALS
+            </div>
+            <div className="text-xl font-black text-white text-center">
+              {totals.pts}
+            </div>
+            <div className="text-lg font-bold text-white text-center">
+              {totals.fg_made}-{totals.fg_att}
+            </div>
+            <div className="text-lg font-bold text-white text-center">
+              {totals.fg3_made}-{totals.fg3_att}
+            </div>
+            <div className="text-lg font-bold text-white text-center">
+              {totals.ft_made}-{totals.ft_att}
+            </div>
+            <div className="text-lg font-bold text-white text-center">
+              {totals.reb}
+            </div>
+            <div className="text-lg font-bold text-white text-center">
+              {totals.ast}
+            </div>
+            <div className="text-lg font-bold text-white text-center">
+              {totals.pf}
+            </div>
+          </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: awayColor }} />
-          <span className="text-white text-sm font-bold uppercase">{awayTeamName}</span>
-        </div>
-      </div>
-      
-      {/* Stats row */}
-      <div className="flex justify-center gap-8">
-        <StatBlock 
-          label="FG" 
-          homeValue={`${homeTotals.fg_made}/${homeTotals.fg_att} ${formatPct(homeTotals.fg_made, homeTotals.fg_att)}`}
-          awayValue={`${awayTotals.fg_made}/${awayTotals.fg_att} ${formatPct(awayTotals.fg_made, awayTotals.fg_att)}`}
-          homeColor={homeColor}
-          awayColor={awayColor}
-        />
-        <StatBlock 
-          label="3PT" 
-          homeValue={`${homeTotals.fg3_made}/${homeTotals.fg3_att} ${formatPct(homeTotals.fg3_made, homeTotals.fg3_att)}`}
-          awayValue={`${awayTotals.fg3_made}/${awayTotals.fg3_att} ${formatPct(awayTotals.fg3_made, awayTotals.fg3_att)}`}
-          homeColor={homeColor}
-          awayColor={awayColor}
-        />
-        <StatBlock 
-          label="FT" 
-          homeValue={`${homeTotals.ft_made}/${homeTotals.ft_att} ${formatPct(homeTotals.ft_made, homeTotals.ft_att)}`}
-          awayValue={`${awayTotals.ft_made}/${awayTotals.ft_att} ${formatPct(awayTotals.ft_made, awayTotals.ft_att)}`}
-          homeColor={homeColor}
-          awayColor={awayColor}
-        />
-        <StatBlock 
-          label="REB" 
-          homeValue={homeTotals.reb}
-          awayValue={awayTotals.reb}
-          homeColor={homeColor}
-          awayColor={awayColor}
-        />
-        <StatBlock 
-          label="AST" 
-          homeValue={homeTotals.ast}
-          awayValue={awayTotals.ast}
-          homeColor={homeColor}
-          awayColor={awayColor}
-        />
-        <StatBlock 
-          label="TOV" 
-          homeValue={homeTotals.tov}
-          awayValue={awayTotals.tov}
-          homeColor={homeColor}
-          awayColor={awayColor}
-        />
       </div>
     </div>
   );
@@ -373,6 +305,7 @@ export default function Jumbotron() {
 
   // Check bonus status (opponent's fouls determine bonus)
   const getBonus = (opponentFouls) => opponentFouls >= 7;
+  const getDoubleBonus = (opponentFouls) => opponentFouls >= 10;
 
   // Show loading only on initial load
   if (loading && !game) {
@@ -400,8 +333,8 @@ export default function Jumbotron() {
   const homeOnFloor = game.home_on_floor || [];
   const awayOnFloor = game.away_on_floor || [];
   
-  const homeColor = game.home_team_color || "#d4a017";
-  const awayColor = game.away_team_color || "#8b0000";
+  const homeColor = game.home_team_color || "#6cb4ee";
+  const awayColor = game.away_team_color || "#003366";
 
   const homeFouls = calculateTeamFouls(homeStats);
   const awayFouls = calculateTeamFouls(awayStats);
@@ -413,7 +346,7 @@ export default function Jumbotron() {
   return (
     <div 
       className="h-screen w-screen flex flex-col overflow-hidden" 
-      style={{ backgroundColor: '#0a1628' }}
+      style={{ backgroundColor: '#0f0f1a' }}
       data-testid="jumbotron-page"
     >
       {/* Home Team Panel (Top) */}
@@ -424,12 +357,13 @@ export default function Jumbotron() {
         timeouts={homeTimeouts}
         totalFouls={homeFouls}
         inBonus={getBonus(awayFouls)}
+        doubleBonus={getDoubleBonus(awayFouls)}
         onFloorPlayers={homeOnFloor}
         allStats={homeStats}
       />
       
-      {/* Thin separator line */}
-      <div className="h-[2px] flex-shrink-0 bg-gradient-to-r from-transparent via-blue-400/60 to-transparent" />
+      {/* Thin separator */}
+      <div className="h-2 flex-shrink-0" style={{ backgroundColor: '#0a0a12' }} />
       
       {/* Away Team Panel (Bottom) */}
       <TeamPanel
@@ -439,18 +373,9 @@ export default function Jumbotron() {
         timeouts={awayTimeouts}
         totalFouls={awayFouls}
         inBonus={getBonus(homeFouls)}
+        doubleBonus={getDoubleBonus(homeFouls)}
         onFloorPlayers={awayOnFloor}
         allStats={awayStats}
-      />
-      
-      {/* Team Stats Bar (Bottom) */}
-      <TeamStatsBar
-        homeStats={homeStats}
-        awayStats={awayStats}
-        homeColor={homeColor}
-        awayColor={awayColor}
-        homeTeamName={game.home_team_name}
-        awayTeamName={game.away_team_name}
       />
     </div>
   );
