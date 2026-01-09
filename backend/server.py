@@ -5123,6 +5123,37 @@ async def delete_season(
     
     return {"success": True, "message": "Season and all associated games deleted"}
 
+@api_router.get("/schools/{school_id}/rosters")
+async def get_school_rosters(school_id: str, current_user: User = Depends(get_current_user)):
+    """Get all rosters from all seasons for a school (for roster duplication)"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id:
+        raise HTTPException(status_code=403, detail="Not authorized")
+    
+    # Get all seasons for this school that have a team_id
+    seasons = await db.seasons.find(
+        {"school_id": school_id, "team_id": {"$exists": True, "$ne": None}},
+        {"_id": 0}
+    ).to_list(100)
+    
+    rosters = []
+    for season in seasons:
+        team = await db.teams.find_one({"id": season["team_id"]}, {"_id": 0})
+        if team and team.get("roster"):
+            rosters.append({
+                "season_id": season["season_id"],
+                "season_name": season["name"],
+                "sport": season.get("sport", ""),
+                "gender": season.get("gender", ""),
+                "level": season.get("level", ""),
+                "team_id": season["team_id"],
+                "team_name": team.get("name", ""),
+                "roster": team.get("roster", []),
+                "player_count": len(team.get("roster", []))
+            })
+    
+    return rosters
+
 @api_router.get("/schools/search")
 async def search_schools(
     q: str = "",
