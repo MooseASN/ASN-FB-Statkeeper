@@ -1,0 +1,767 @@
+import { useState, useEffect, useCallback } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { 
+  ArrowLeft, Trophy, Users, Calendar, Plus, Upload, Link as LinkIcon, 
+  Trash2, Edit, Play, MapPin, Clock
+} from "lucide-react";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+export default function SeasonManagement() {
+  const { seasonId } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [season, setSeason] = useState(null);
+  const [school, setSchool] = useState(null);
+  const [teams, setTeams] = useState([]);
+  const [userRole, setUserRole] = useState("member");
+  
+  // Dialog states
+  const [showTeamDialog, setShowTeamDialog] = useState(false);
+  const [showRosterDialog, setShowRosterDialog] = useState(false);
+  const [showGameDialog, setShowGameDialog] = useState(false);
+  const [showOpponentDialog, setShowOpponentDialog] = useState(false);
+  
+  // Form states
+  const [rosterMethod, setRosterMethod] = useState("manual");
+  const [newPlayer, setNewPlayer] = useState({ number: "", name: "", position: "" });
+  const [roster, setRoster] = useState([]);
+  const [csvFile, setCsvFile] = useState(null);
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  
+  // Game form
+  const [gameForm, setGameForm] = useState({
+    opponent_team_id: "",
+    scheduled_date: "",
+    scheduled_time: "",
+    location: "",
+    is_home_game: true,
+    note: ""
+  });
+  
+  // Opponent form
+  const [opponentForm, setOpponentForm] = useState({
+    name: "",
+    sport: "",
+    color: "#666666"
+  });
+
+  const fetchData = useCallback(async () => {
+    try {
+      const token = sessionStorage.getItem("session_token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+      
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      // Get school info first
+      const schoolRes = await axios.get(`${API}/schools/my-school`, { headers });
+      setSchool(schoolRes.data);
+      setUserRole(schoolRes.data.user_role);
+      
+      const schoolId = schoolRes.data.school_id;
+      
+      // Get season details and teams
+      const [seasonRes, teamsRes] = await Promise.all([
+        axios.get(`${API}/schools/${schoolId}/seasons/${seasonId}`, { headers }),
+        axios.get(`${API}/schools/${schoolId}/teams?sport=${schoolRes.data.sport || ''}`, { headers })
+      ]);
+      
+      setSeason(seasonRes.data);
+      setTeams(teamsRes.data);
+      
+      // Set opponent form sport to match season
+      setOpponentForm(prev => ({ ...prev, sport: seasonRes.data.sport }));
+      
+      // If season has a team, load the roster
+      if (seasonRes.data.team?.roster) {
+        setRoster(seasonRes.data.team.roster);
+      }
+      
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      if (error.response?.status === 401) {
+        navigate("/login");
+      } else {
+        toast.error("Failed to load season");
+        navigate("/school-dashboard");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [seasonId, navigate]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Roster handlers
+  const handleAddPlayer = () => {
+    if (!newPlayer.number || !newPlayer.name) {
+      toast.error("Please enter player number and name");
+      return;
+    }
+    
+    const player = {
+      id: `player_${Date.now()}`,
+      number: newPlayer.number,
+      name: newPlayer.name,
+      position: newPlayer.position || ""
+    };
+    
+    setRoster(prev => [...prev, player]);
+    setNewPlayer({ number: "", name: "", position: "" });
+  };
+
+  const handleRemovePlayer = (id) => {
+    setRoster(prev => prev.filter(p => p.id !== id));
+  };
+
+  const handleCsvUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').filter(line => line.trim());
+      
+      // Skip header if exists
+      const startIdx = lines[0]?.toLowerCase().includes('number') || lines[0]?.toLowerCase().includes('name') ? 1 : 0;
+      
+      const players = lines.slice(startIdx).map((line, idx) => {
+        const parts = line.split(',').map(p => p.trim());
+        return {
+          id: `player_${Date.now()}_${idx}`,
+          number: parts[0] || "",
+          name: parts[1] || "",
+          position: parts[2] || ""
+        };
+      }).filter(p => p.number && p.name);
+      
+      setRoster(players);
+      toast.success(`Imported ${players.length} players`);
+    };
+    reader.readAsText(file);
+  };
+
+  const handleSaveRoster = async () => {
+    if (roster.length === 0) {
+      toast.error("Please add at least one player");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token");
+      const headers = { Authorization: `Bearer ${token}` };
+      
+      // Create or update team for this season
+      let teamId = season.team_id;
+      
+      if (!teamId) {
+        // Create new team
+        const teamRes = await axios.post(
+          `${API}/schools/${school.school_id}/teams`,
+          {
+            name: `${school.name} ${season.sport === 'basketball' ? 'Basketball' : 'Football'}`,
+            sport: season.sport,
+            color: "#FF6B00",
+            roster: roster
+          },
+          { headers }
+        );
+        teamId = teamRes.data.id;
+        
+        // Link team to season
+        await axios.put(
+          `${API}/schools/${school.school_id}/seasons/${seasonId}/team`,
+          { team_id: teamId },
+          { headers }
+        );
+      } else {
+        // Update existing team roster
+        await axios.put(
+          `${API}/teams/${teamId}`,
+          { roster: roster },
+          { headers }
+        );
+      }
+      
+      toast.success("Roster saved!");
+      setShowRosterDialog(false);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to save roster");
+    }
+  };
+
+  // Opponent handlers
+  const handleCreateOpponent = async () => {
+    if (!opponentForm.name.trim()) {
+      toast.error("Please enter opponent name");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token");
+      await axios.post(
+        `${API}/schools/${school.school_id}/teams`,
+        {
+          name: opponentForm.name,
+          sport: season.sport,
+          color: opponentForm.color,
+          roster: []
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("Opponent created!");
+      setShowOpponentDialog(false);
+      setOpponentForm({ name: "", sport: season.sport, color: "#666666" });
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to create opponent");
+    }
+  };
+
+  // Game handlers
+  const handleCreateGame = async () => {
+    if (!gameForm.opponent_team_id || !gameForm.scheduled_date) {
+      toast.error("Please select opponent and date");
+      return;
+    }
+    
+    if (!season.team_id) {
+      toast.error("Please set up your team roster first");
+      return;
+    }
+    
+    try {
+      const token = sessionStorage.getItem("session_token");
+      await axios.post(
+        `${API}/schools/${school.school_id}/seasons/${seasonId}/games`,
+        {
+          ...gameForm,
+          season_id: seasonId
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("Game scheduled!");
+      setShowGameDialog(false);
+      setGameForm({
+        opponent_team_id: "",
+        scheduled_date: "",
+        scheduled_time: "",
+        location: "",
+        is_home_game: true,
+        note: ""
+      });
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to create game");
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <Trophy className="w-12 h-12 text-orange-500 mx-auto animate-pulse" />
+          <p className="text-slate-400 mt-4">Loading season...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!season) {
+    return (
+      <div className="min-h-screen bg-slate-900 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-slate-400">Season not found</p>
+          <Button onClick={() => navigate("/school-dashboard")} className="mt-4">
+            Back to Dashboard
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  const isAdmin = userRole === "admin";
+  const opponentTeams = teams.filter(t => t.id !== season.team_id && t.sport === season.sport);
+
+  return (
+    <div className="min-h-screen bg-slate-900">
+      {/* Header */}
+      <header className="bg-slate-800 border-b border-slate-700 px-6 py-4">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate("/school-dashboard")}
+            className="text-slate-400 hover:text-white"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back
+          </Button>
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{season.sport === "basketball" ? "🏀" : "🏈"}</span>
+            <div>
+              <h1 className="text-xl font-bold text-white">{season.name}</h1>
+              <p className="text-sm text-slate-400">{school?.name}</p>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="p-6">
+        <Tabs defaultValue="schedule" className="space-y-6">
+          <TabsList className="bg-slate-800">
+            <TabsTrigger value="schedule">Schedule</TabsTrigger>
+            <TabsTrigger value="roster">Team Roster</TabsTrigger>
+            <TabsTrigger value="opponents">Opponents</TabsTrigger>
+          </TabsList>
+
+          {/* Schedule Tab */}
+          <TabsContent value="schedule">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Game Schedule</h2>
+              {isAdmin && (
+                <Button
+                  onClick={() => setShowGameDialog(true)}
+                  className="bg-orange-500 hover:bg-orange-600"
+                  disabled={!season.team_id}
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Game
+                </Button>
+              )}
+            </div>
+            
+            {!season.team_id && (
+              <Card className="bg-yellow-500/10 border-yellow-500/50 mb-4">
+                <CardContent className="p-4 text-yellow-400 text-sm">
+                  ⚠️ Please set up your team roster before scheduling games
+                </CardContent>
+              </Card>
+            )}
+            
+            {season.games?.length === 0 ? (
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-8 text-center text-slate-500">
+                  No games scheduled yet
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="space-y-3">
+                {season.games?.map(game => (
+                  <Card key={game.id} className="bg-slate-800/50 border-slate-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="text-center min-w-[80px]">
+                            <div className="text-sm font-medium text-white">{game.scheduled_date}</div>
+                            <div className="text-xs text-slate-500">{game.scheduled_time || "TBD"}</div>
+                          </div>
+                          <div className="text-white">
+                            <div className="font-medium">
+                              {game.home_team_name} vs {game.away_team_name}
+                            </div>
+                            {game.location && (
+                              <div className="text-xs text-slate-500 flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
+                                {game.location}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={
+                            game.status === "active" ? "default" :
+                            game.status === "final" ? "secondary" :
+                            "outline"
+                          } className={game.status === "active" ? "bg-green-500 animate-pulse" : ""}>
+                            {game.status === "active" ? "LIVE" :
+                             game.status === "final" ? "Final" :
+                             "Scheduled"}
+                          </Badge>
+                          {(isAdmin || game.status !== "scheduled") && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => navigate(
+                                season.sport === "football" 
+                                  ? `/football/${game.id}` 
+                                  : `/game/${game.id}`
+                              )}
+                              className="text-orange-400 hover:text-orange-300"
+                            >
+                              <Play className="w-4 h-4" />
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* Roster Tab */}
+          <TabsContent value="roster">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Team Roster</h2>
+              {isAdmin && (
+                <Button
+                  onClick={() => setShowRosterDialog(true)}
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  {season.team ? "Edit Roster" : "Set Up Roster"}
+                </Button>
+              )}
+            </div>
+            
+            {!season.team ? (
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-8 text-center text-slate-500">
+                  No roster set up yet
+                </CardContent>
+              </Card>
+            ) : (
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-0">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-slate-700">
+                        <th className="text-left text-slate-400 text-sm p-3 w-20">#</th>
+                        <th className="text-left text-slate-400 text-sm p-3">Name</th>
+                        <th className="text-left text-slate-400 text-sm p-3">Position</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {season.team.roster?.map((player, idx) => (
+                        <tr key={idx} className="border-b border-slate-700/50">
+                          <td className="p-3 text-orange-400 font-bold">{player.number}</td>
+                          <td className="p-3 text-white">{player.name}</td>
+                          <td className="p-3 text-slate-400">{player.position || "-"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </CardContent>
+              </Card>
+            )}
+          </TabsContent>
+
+          {/* Opponents Tab */}
+          <TabsContent value="opponents">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-white">Opponents</h2>
+              {isAdmin && (
+                <Button
+                  onClick={() => setShowOpponentDialog(true)}
+                  className="bg-orange-500 hover:bg-orange-600"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Opponent
+                </Button>
+              )}
+            </div>
+            
+            {opponentTeams.length === 0 ? (
+              <Card className="bg-slate-800/50 border-slate-700">
+                <CardContent className="p-8 text-center text-slate-500">
+                  No opponents added yet
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {opponentTeams.map(team => (
+                  <Card key={team.id} className="bg-slate-800/50 border-slate-700">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-8 h-8 rounded-full"
+                          style={{ backgroundColor: team.color || "#666" }}
+                        />
+                        <div>
+                          <div className="font-medium text-white text-sm">{team.name}</div>
+                          <Badge variant="outline" className="text-xs mt-1">
+                            {team.sport}
+                          </Badge>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      {/* Roster Dialog */}
+      <Dialog open={showRosterDialog} onOpenChange={setShowRosterDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Team Roster</DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Add players to your team roster
+            </DialogDescription>
+          </DialogHeader>
+          
+          <Tabs value={rosterMethod} onValueChange={setRosterMethod}>
+            <TabsList className="bg-slate-700 mb-4">
+              <TabsTrigger value="manual">Manual Entry</TabsTrigger>
+              <TabsTrigger value="csv">CSV Upload</TabsTrigger>
+              <TabsTrigger value="website">From Website</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="manual" className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="#"
+                  value={newPlayer.number}
+                  onChange={(e) => setNewPlayer(prev => ({ ...prev, number: e.target.value }))}
+                  className="w-16 bg-slate-900 border-slate-600"
+                />
+                <Input
+                  placeholder="Player Name"
+                  value={newPlayer.name}
+                  onChange={(e) => setNewPlayer(prev => ({ ...prev, name: e.target.value }))}
+                  className="flex-1 bg-slate-900 border-slate-600"
+                />
+                <Input
+                  placeholder="Position"
+                  value={newPlayer.position}
+                  onChange={(e) => setNewPlayer(prev => ({ ...prev, position: e.target.value }))}
+                  className="w-24 bg-slate-900 border-slate-600"
+                />
+                <Button onClick={handleAddPlayer} className="bg-orange-500 hover:bg-orange-600">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="csv" className="space-y-4">
+              <p className="text-sm text-slate-400">
+                Upload a CSV file with columns: Number, Name, Position
+              </p>
+              <Input
+                type="file"
+                accept=".csv"
+                onChange={handleCsvUpload}
+                className="bg-slate-900 border-slate-600"
+              />
+            </TabsContent>
+            
+            <TabsContent value="website" className="space-y-4">
+              <p className="text-sm text-slate-400">
+                Enter the URL of your school's roster page
+              </p>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="https://school.edu/roster"
+                  value={websiteUrl}
+                  onChange={(e) => setWebsiteUrl(e.target.value)}
+                  className="bg-slate-900 border-slate-600"
+                />
+                <Button variant="outline" className="border-slate-600">
+                  Import
+                </Button>
+              </div>
+              <p className="text-xs text-slate-500">
+                Note: Website import may not work for all sites
+              </p>
+            </TabsContent>
+          </Tabs>
+          
+          {/* Current Roster */}
+          <div className="mt-4">
+            <Label className="text-slate-200">Current Roster ({roster.length} players)</Label>
+            <ScrollArea className="h-48 mt-2 border border-slate-700 rounded">
+              {roster.length === 0 ? (
+                <div className="p-4 text-center text-slate-500">No players added</div>
+              ) : (
+                <div className="p-2 space-y-1">
+                  {roster.map((player, idx) => (
+                    <div key={idx} className="flex items-center justify-between p-2 bg-slate-900/50 rounded">
+                      <div className="flex items-center gap-2">
+                        <span className="text-orange-400 font-bold w-8">#{player.number}</span>
+                        <span className="text-white">{player.name}</span>
+                        {player.position && (
+                          <Badge variant="outline" className="text-xs">{player.position}</Badge>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemovePlayer(player.id)}
+                        className="text-red-400 hover:text-red-300"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </ScrollArea>
+          </div>
+          
+          <Button onClick={handleSaveRoster} className="w-full bg-orange-500 hover:bg-orange-600 mt-4">
+            Save Roster
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Opponent Dialog */}
+      <Dialog open={showOpponentDialog} onOpenChange={setShowOpponentDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle>Add Opponent</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-slate-200">Team Name</Label>
+              <Input
+                value={opponentForm.name}
+                onChange={(e) => setOpponentForm(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Central High School"
+                className="bg-slate-900 border-slate-600"
+              />
+            </div>
+            <div>
+              <Label className="text-slate-200">Team Color</Label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  type="color"
+                  value={opponentForm.color}
+                  onChange={(e) => setOpponentForm(prev => ({ ...prev, color: e.target.value }))}
+                  className="w-12 h-10 rounded border border-slate-600 cursor-pointer"
+                />
+                <Input
+                  value={opponentForm.color}
+                  onChange={(e) => setOpponentForm(prev => ({ ...prev, color: e.target.value }))}
+                  className="bg-slate-900 border-slate-600"
+                />
+              </div>
+            </div>
+            <Button onClick={handleCreateOpponent} className="w-full bg-orange-500 hover:bg-orange-600">
+              Add Opponent
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Game Dialog */}
+      <Dialog open={showGameDialog} onOpenChange={setShowGameDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle>Schedule Game</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-slate-200">Opponent</Label>
+              <Select
+                value={gameForm.opponent_team_id}
+                onValueChange={(v) => setGameForm(prev => ({ ...prev, opponent_team_id: v }))}
+              >
+                <SelectTrigger className="bg-slate-900 border-slate-600">
+                  <SelectValue placeholder="Select opponent" />
+                </SelectTrigger>
+                <SelectContent>
+                  {opponentTeams.map(team => (
+                    <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {opponentTeams.length === 0 && (
+                <Button
+                  variant="link"
+                  className="text-orange-400 p-0 h-auto mt-1"
+                  onClick={() => { setShowGameDialog(false); setShowOpponentDialog(true); }}
+                >
+                  + Add opponent first
+                </Button>
+              )}
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label className="text-slate-200">Date</Label>
+                <Input
+                  type="date"
+                  value={gameForm.scheduled_date}
+                  onChange={(e) => setGameForm(prev => ({ ...prev, scheduled_date: e.target.value }))}
+                  className="bg-slate-900 border-slate-600"
+                />
+              </div>
+              <div>
+                <Label className="text-slate-200">Time</Label>
+                <Input
+                  type="time"
+                  value={gameForm.scheduled_time}
+                  onChange={(e) => setGameForm(prev => ({ ...prev, scheduled_time: e.target.value }))}
+                  className="bg-slate-900 border-slate-600"
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label className="text-slate-200">Location</Label>
+              <Input
+                value={gameForm.location}
+                onChange={(e) => setGameForm(prev => ({ ...prev, location: e.target.value }))}
+                placeholder="e.g., Home Gym"
+                className="bg-slate-900 border-slate-600"
+              />
+            </div>
+            
+            <div>
+              <Label className="text-slate-200">Home/Away</Label>
+              <div className="flex gap-2 mt-1">
+                <Button
+                  type="button"
+                  variant={gameForm.is_home_game ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setGameForm(prev => ({ ...prev, is_home_game: true }))}
+                  className={gameForm.is_home_game ? "bg-orange-500" : "border-slate-600"}
+                >
+                  Home
+                </Button>
+                <Button
+                  type="button"
+                  variant={!gameForm.is_home_game ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setGameForm(prev => ({ ...prev, is_home_game: false }))}
+                  className={!gameForm.is_home_game ? "bg-orange-500" : "border-slate-600"}
+                >
+                  Away
+                </Button>
+              </div>
+            </div>
+            
+            <Button onClick={handleCreateGame} className="w-full bg-orange-500 hover:bg-orange-600">
+              Schedule Game
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
