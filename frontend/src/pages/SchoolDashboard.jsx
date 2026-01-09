@@ -653,10 +653,10 @@ export default function SchoolDashboard() {
 
       {/* Game Start Dialog */}
       <Dialog open={showGameStartDialog} onOpenChange={setShowGameStartDialog}>
-        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+        <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {selectedGame?.status === "active" ? "Game In Progress" : "Start Game?"}
+              {selectedGame?.status === "active" ? "Game In Progress" : "Start Game"}
             </DialogTitle>
           </DialogHeader>
           {selectedGame && (
@@ -664,18 +664,21 @@ export default function SchoolDashboard() {
               <div className="bg-slate-900 rounded-lg p-4 text-center">
                 <div className="flex items-center justify-center gap-4">
                   <div className="text-right">
-                    <div className="font-bold">{selectedGame.home_team_name}</div>
-                    <div className="text-xs text-slate-500">Home</div>
+                    <div className="font-bold text-white">{selectedGame.home_team_name}</div>
+                    <div className="text-xs text-slate-400">Home</div>
                   </div>
                   <div className="text-2xl font-bold text-orange-500">VS</div>
                   <div className="text-left">
-                    <div className="font-bold">{selectedGame.away_team_name}</div>
-                    <div className="text-xs text-slate-500">Away</div>
+                    <div className="font-bold text-white">{selectedGame.away_team_name}</div>
+                    <div className="text-xs text-slate-400">Away</div>
                   </div>
                 </div>
                 <div className="text-sm text-slate-400 mt-2">
                   {selectedGame.scheduled_date} {selectedGame.scheduled_time && `at ${formatTime12Hour(selectedGame.scheduled_time)}`}
                 </div>
+                {selectedGame.note && (
+                  <div className="text-xs text-orange-400 mt-1">{selectedGame.note}</div>
+                )}
                 {selectedGame.status === "active" && (
                   <Badge className="mt-2 bg-green-500 animate-pulse">LIVE</Badge>
                 )}
@@ -691,10 +694,162 @@ export default function SchoolDashboard() {
                 </Button>
               ) : selectedGame.status === "scheduled" ? (
                 <>
-                  <p className="text-slate-400 text-sm text-center">
-                    Are you ready to start tracking this game?
-                  </p>
-                  <div className="flex gap-2">
+                  {/* Game Setup Options - Basketball only */}
+                  {selectedGame.sport === "basketball" && (
+                    <div className="space-y-4 border-t border-slate-700 pt-4">
+                      <Label className="text-sm font-semibold text-slate-200">Stat Tracking Mode</Label>
+                      <div className="grid grid-cols-3 gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setGameSetup(prev => ({ ...prev, statMode: "simple" }))}
+                          className={`p-3 rounded-lg border-2 text-left transition-all ${
+                            gameSetup.statMode === "simple" 
+                              ? "border-green-500 bg-green-900/30" 
+                              : "border-slate-600 hover:border-slate-500"
+                          }`}
+                        >
+                          <div className="font-semibold text-green-400 text-sm">Simple</div>
+                          <p className="text-xs text-slate-400">Basic stats</p>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => setGameSetup(prev => ({ ...prev, statMode: "classic" }))}
+                          className={`p-3 rounded-lg border-2 text-left transition-all ${
+                            gameSetup.statMode === "classic" 
+                              ? "border-orange-500 bg-orange-900/30" 
+                              : "border-slate-600 hover:border-slate-500"
+                          }`}
+                        >
+                          <div className="font-semibold text-orange-400 text-sm">Classic</div>
+                          <p className="text-xs text-slate-400">Full stats</p>
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => setGameSetup(prev => ({ 
+                            ...prev, 
+                            statMode: "advanced",
+                            clockEnabled: true // Advanced requires clock
+                          }))}
+                          className={`p-3 rounded-lg border-2 text-left transition-all ${
+                            gameSetup.statMode === "advanced" 
+                              ? "border-blue-500 bg-blue-900/30" 
+                              : "border-slate-600 hover:border-slate-500"
+                          }`}
+                        >
+                          <div className="font-semibold text-blue-400 text-sm">Advanced</div>
+                          <p className="text-xs text-slate-400">Pro interface</p>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Clock Options */}
+                  <div className="space-y-3 border-t border-slate-700 pt-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Timer className="w-4 h-4 text-slate-400" />
+                        <Label className="text-sm font-semibold text-slate-200">Game Clock</Label>
+                      </div>
+                      {selectedGame.sport !== "football" && (
+                        <Switch
+                          checked={gameSetup.clockEnabled}
+                          onCheckedChange={(v) => setGameSetup(prev => ({ ...prev, clockEnabled: v }))}
+                          disabled={gameSetup.statMode === "advanced"}
+                        />
+                      )}
+                      {selectedGame.sport === "football" && (
+                        <span className="text-xs text-green-400">Always On</span>
+                      )}
+                    </div>
+                    
+                    {(gameSetup.clockEnabled || selectedGame.sport === "football") && (
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs text-slate-400">Minutes per Period</Label>
+                          <Select
+                            value={gameSetup.periodMinutes.toString()}
+                            onValueChange={(v) => setGameSetup(prev => ({ ...prev, periodMinutes: parseInt(v) }))}
+                          >
+                            <SelectTrigger className="bg-slate-900 border-slate-600 text-white mt-1">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[6, 8, 10, 12, 15, 20].map(m => (
+                                <SelectItem key={m} value={m.toString()}>{m} min</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        {selectedGame.sport === "basketball" && (
+                          <div>
+                            <Label className="text-xs text-slate-400">Period Type</Label>
+                            <Select
+                              value={gameSetup.periodLabel}
+                              onValueChange={(v) => setGameSetup(prev => ({ ...prev, periodLabel: v }))}
+                            >
+                              <SelectTrigger className="bg-slate-900 border-slate-600 text-white mt-1">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="Quarter">Quarters (4)</SelectItem>
+                                <SelectItem value="Half">Halves (2)</SelectItem>
+                                <SelectItem value="Period">Periods</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Timeout Options */}
+                  <div className="space-y-3 border-t border-slate-700 pt-4">
+                    <Label className="text-sm font-semibold text-slate-200">Timeouts</Label>
+                    {selectedGame.sport === "football" ? (
+                      <p className="text-xs text-slate-400">3 timeouts per half (standard)</p>
+                    ) : (
+                      <div className="flex gap-2 flex-wrap">
+                        {[
+                          { value: "high_school", label: "HS (5)" },
+                          { value: "college", label: "College (4)" },
+                          { value: "custom", label: "Custom" }
+                        ].map(opt => (
+                          <Button
+                            key={opt.value}
+                            type="button"
+                            variant={gameSetup.timeoutPreset === opt.value ? "default" : "outline"}
+                            size="sm"
+                            onClick={() => setGameSetup(prev => ({ ...prev, timeoutPreset: opt.value }))}
+                            className={gameSetup.timeoutPreset === opt.value 
+                              ? "bg-orange-500 hover:bg-orange-600" 
+                              : "border-slate-600 text-slate-300"}
+                          >
+                            {opt.label}
+                          </Button>
+                        ))}
+                        {gameSetup.timeoutPreset === "custom" && (
+                          <Select
+                            value={gameSetup.customTimeouts.toString()}
+                            onValueChange={(v) => setGameSetup(prev => ({ ...prev, customTimeouts: parseInt(v) }))}
+                          >
+                            <SelectTrigger className="w-20 bg-slate-900 border-slate-600 text-white">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1, 2, 3, 4, 5, 6, 7].map(n => (
+                                <SelectItem key={n} value={n.toString()}>{n}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2 pt-2">
                     <Button
                       onClick={() => setShowGameStartDialog(false)}
                       variant="outline"
