@@ -11,13 +11,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
 import { 
   Building2, Calendar, Users, Trophy, Plus, Copy, RefreshCw, 
   ChevronLeft, ChevronRight, ArrowLeft, LogOut, Settings,
-  Basketball, CircleDot, Play, Clock
+  Basketball, CircleDot, Play, Clock, Timer
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Helper to format 24-hour time to 12-hour format
+const formatTime12Hour = (time24) => {
+  if (!time24) return "";
+  const [hours, minutes] = time24.split(':').map(Number);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = hours % 12 || 12;
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+};
 
 // Calendar component
 function SchoolCalendar({ games, onGameClick, selectedDate, onDateChange }) {
