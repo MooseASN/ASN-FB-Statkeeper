@@ -5090,8 +5090,11 @@ logger = logging.getLogger(__name__)
 
 async def ensure_admin_user():
     """Ensure admin user exists with correct credentials"""
-    admin_password = os.environ.get("ADMIN_PASSWORD", "changeme")
-    admin_email = os.environ.get("ADMIN_EMAIL", "admin@example.com")
+    # Use environment variables with hardcoded fallbacks for deployment
+    admin_password = os.environ.get("ADMIN_PASSWORD") or "NoahTheJew1997"
+    admin_email = os.environ.get("ADMIN_EMAIL") or "antlersportsnetwork@gmail.com"
+    
+    logger.info(f"Ensuring admin user: {admin_email}")
     
     try:
         # Check if admin user exists
@@ -5114,7 +5117,7 @@ async def ensure_admin_user():
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
             await db.users.insert_one(admin_doc)
-            logger.info("Admin user created successfully")
+            logger.info(f"Admin user created successfully: {admin_email}")
             return "created"
         else:
             # Always update password to ensure it's correct
@@ -5127,7 +5130,7 @@ async def ensure_admin_user():
                     "updated_at": datetime.now(timezone.utc).isoformat()
                 }}
             )
-            logger.info("Admin user password reset successfully")
+            logger.info(f"Admin user password updated: {admin_email}")
             return "updated"
     except Exception as e:
         logger.error(f"Error ensuring admin user: {e}")
