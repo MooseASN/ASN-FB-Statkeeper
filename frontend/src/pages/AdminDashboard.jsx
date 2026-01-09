@@ -631,12 +631,13 @@ export default function AdminDashboard({ user, onLogout }) {
                           <TableHead className="text-center">Games</TableHead>
                     <TableHead className="text-center">Events</TableHead>
                     <TableHead>Created</TableHead>
+                    <TableHead className="text-center">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {filteredUsers.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
                         {searchTerm ? "No users match your search" : "No users found"}
                       </TableCell>
                     </TableRow>
@@ -668,6 +669,22 @@ export default function AdminDashboard({ user, onLogout }) {
                         <TableCell className="text-center">{u.event_count || 0}</TableCell>
                         <TableCell className="text-sm text-muted-foreground">
                           {u.created_at ? new Date(u.created_at).toLocaleDateString() : "-"}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {u.email !== "antlersportsnetwork@gmail.com" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setDeletingUser(u);
+                                setShowDeleteUserDialog(true);
+                              }}
+                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                              data-testid={`delete-user-${u.user_id}`}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          )}
                         </TableCell>
                       </TableRow>
                     ))
