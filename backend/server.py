@@ -4940,11 +4940,35 @@ Submitted at: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}
 # Health check endpoint for Kubernetes
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy"}
+    """Basic health check with database connectivity test"""
+    try:
+        # Quick database ping
+        await db.command('ping')
+        return {"status": "healthy", "database": "connected"}
+    except Exception as e:
+        return {"status": "degraded", "database": "disconnected", "error": str(e)}
 
 @app.get("/api/health")
 async def api_health_check():
-    return {"status": "healthy", "service": "statmoose-api"}
+    """API health check with database connectivity test"""
+    try:
+        # Quick database ping
+        await db.command('ping')
+        # Quick query to verify collections are accessible
+        user_count = await db.users.count_documents({})
+        return {
+            "status": "healthy", 
+            "service": "statmoose-api",
+            "database": "connected",
+            "users_count": user_count
+        }
+    except Exception as e:
+        return {
+            "status": "degraded", 
+            "service": "statmoose-api",
+            "database": "error",
+            "error": str(e)
+        }
 
 # Health check endpoint that also ensures admin exists (for production init)
 @app.get("/api/init-admin")
