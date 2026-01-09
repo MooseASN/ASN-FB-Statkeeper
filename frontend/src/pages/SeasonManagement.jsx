@@ -410,11 +410,20 @@ export default function SeasonManagement() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <Badge variant={
-                            game.status === "active" ? "default" :
-                            game.status === "final" ? "secondary" :
-                            "outline"
-                          } className={game.status === "active" ? "bg-green-500 animate-pulse" : ""}>
+                          <Badge 
+                            variant={
+                              game.status === "active" ? "default" :
+                              game.status === "final" ? "secondary" :
+                              "outline"
+                            } 
+                            className={
+                              game.status === "active" 
+                                ? "bg-green-500 animate-pulse" 
+                                : game.status === "scheduled"
+                                ? "border-slate-500 text-white bg-slate-700"
+                                : ""
+                            }
+                          >
                             {game.status === "active" ? "LIVE" :
                              game.status === "final" ? "Final" :
                              "Scheduled"}
