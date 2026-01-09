@@ -101,6 +101,10 @@ function AppRoutes({ user, onLogin, onLogout }) {
 
   return (
     <Routes>
+      {/* Public homepage and contact */}
+      <Route path="/" element={<HomePage />} />
+      <Route path="/contact" element={<ContactPage />} />
+      
       {/* Public routes */}
       <Route path="/login" element={user ? <Navigate to="/select-sport" replace /> : <Login onLogin={onLogin} />} />
       <Route path="/register" element={user ? <Navigate to="/select-sport" replace /> : <Register onLogin={onLogin} />} />
