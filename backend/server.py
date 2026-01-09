@@ -1693,10 +1693,13 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
             raw = raw_class.lower().strip()
             
             # Handle redshirt prefix
-            is_redshirt = any(rs in raw for rs in ['rs', 'r-', 'redshirt', 'red-shirt', 'r.'])
+            is_redshirt = any(rs in raw for rs in ['rs ', 'r-', 'redshirt', 'red-shirt', 'r. '])
             
             # Remove redshirt prefix for matching
-            clean = raw.replace('redshirt', '').replace('red-shirt', '').replace('r-', '').replace('rs', '').replace('r.', '').strip()
+            clean = raw
+            for prefix in ['redshirt ', 'red-shirt ', 'r- ', 'rs ', 'r. ']:
+                clean = clean.replace(prefix, '')
+            clean = clean.strip()
             
             # Class mapping with many variations
             class_map = {
@@ -1728,23 +1731,24 @@ async def scrape_roster_only(request: ScrapeRosterRequest, user: User = Depends(
             # Try exact match first
             result = class_map.get(clean, '')
             
-            # If no exact match, try partial matches
+            # If no exact match, try to extract the first word that might be a class
             if not result:
-                for key, value in class_map.items():
-                    if key in clean:
-                        result = value
-                        break
+                # Look for class word at beginning or as standalone
+                import re as re_norm
+                class_match = re_norm.match(r'^(freshman|sophomore|junior|senior|graduate|grad|fr|so|jr|sr|gr)\b', clean, re_norm.IGNORECASE)
+                if class_match:
+                    result = class_map.get(class_match.group(1).lower(), '')
             
-            # If still no match, try to extract just numbers or first 2 chars
+            # If still no match, try to extract just numbers for grades
             if not result and clean:
                 import re as re_class
                 # Check for grade number pattern (e.g., "Grade 10", "10th Grade")
-                grade_match = re_class.search(r'(?:grade\s*)?(\d{1,2})(?:th|st|nd|rd)?(?:\s*grade)?', clean)
+                grade_match = re_class.search(r'\b(\d{1,2})(?:th|st|nd|rd)?\b', clean)
                 if grade_match:
                     grade_num = grade_match.group(1)
-                    result = class_map.get(grade_num, grade_num)
-                else:
-                    result = clean.upper()[:2]
+                    # Only use if it's a valid grade number (7-12 for HS, 1-6 for college)
+                    if grade_num in class_map:
+                        result = class_map.get(grade_num, '')
             
             # Add RS prefix if redshirt
             if is_redshirt and result:
