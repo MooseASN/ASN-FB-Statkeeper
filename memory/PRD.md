@@ -48,6 +48,16 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Improved position cleaning (removes height/weight data)
   - Works with PrestoSports, Sidearm, and most athletic department sites
 
+- **Punt/Field Goal Field Views** - COMPLETED
+  - Added `PuntFieldView` component with visual punt trajectory arc
+  - Shows punt distance, landing spot, and return path on miniature field
+  - Added `FieldGoalFieldView` component with goal post visualization
+  - Shows FG distance, kick trajectory, and result selection (Good/No Good/Blocked)
+  - Both views integrated into FootballLiveGame.jsx punt and FG workflows
+  - "Punt Field View" button in punt distance selection step
+  - "Punt Return Field View" button in return yards step
+  - "Field Goal Field View" button in FG distance step
+
 ### January 9, 2026 - Gameday Section & UI Improvements
 - **Gameday Section** - COMPLETED
   - Shows only when games are scheduled for today
