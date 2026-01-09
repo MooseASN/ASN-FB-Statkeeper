@@ -4970,6 +4970,52 @@ async def api_health_check():
             "error": str(e)
         }
 
+@app.get("/api/debug/auth-status")
+async def debug_auth_status():
+    """Debug endpoint to check authentication system status"""
+    try:
+        # Check database
+        await db.command('ping')
+        
+        # Count users
+        user_count = await db.users.count_documents({})
+        local_users = await db.users.count_documents({"auth_provider": "local"})
+        google_users = await db.users.count_documents({"auth_provider": "google"})
+        
+        # Count active sessions
+        now = datetime.now(timezone.utc)
+        active_sessions = await db.user_sessions.count_documents({
+            "expires_at": {"$gt": now.isoformat()}
+        })
+        
+        # Get sample user emails (first 5, partially masked)
+        sample_users = await db.users.find({}, {"email": 1, "_id": 0}).limit(5).to_list(5)
+        masked_emails = []
+        for u in sample_users:
+            email = u.get("email", "")
+            if "@" in email:
+                parts = email.split("@")
+                masked = parts[0][:3] + "***@" + parts[1]
+                masked_emails.append(masked)
+        
+        return {
+            "status": "ok",
+            "database": "connected",
+            "users": {
+                "total": user_count,
+                "local_auth": local_users,
+                "google_auth": google_users,
+                "sample_emails": masked_emails
+            },
+            "active_sessions": active_sessions,
+            "server_time": now.isoformat()
+        }
+    except Exception as e:
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
 # Health check endpoint that also ensures admin exists (for production init)
 @app.get("/api/init-admin")
 async def init_admin_endpoint():
