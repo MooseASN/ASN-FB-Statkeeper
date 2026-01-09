@@ -546,11 +546,6 @@ export default function FootballLiveGame({ user, onLogout }) {
     awayTimeouts,
     setHomeTimeouts,
     setAwayTimeouts,
-    useTimeout: useTimeoutHook,
-    restoreTimeout,
-    resetTimeoutsForHalf,
-    hasTimeouts,
-    getTimeoutsRemaining,
   } = useTimeouts(3);
   
   // Play-by-play log
