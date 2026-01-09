@@ -1063,7 +1063,7 @@ export default function SeasonManagement() {
             
             <TabsContent value="website" className="space-y-4">
               <p className="text-sm text-slate-300">
-                Enter the URL of your school&apos;s roster page
+                Enter the URL of your school&apos;s roster page. The importer will extract player numbers, names, positions, and class/grade.
               </p>
               <div className="flex gap-2">
                 <Input
@@ -1081,7 +1081,7 @@ export default function SeasonManagement() {
                 </Button>
               </div>
               <p className="text-xs text-slate-400">
-                Note: Website import may not work for all sites. Best results from athletic department roster pages.
+                Supports PrestoSports, Sidearm, and most athletic department roster pages. Recognizes class years (FR/SO/JR/SR/GR), high school grades (9-12), and redshirt status.
               </p>
             </TabsContent>
           </Tabs>
