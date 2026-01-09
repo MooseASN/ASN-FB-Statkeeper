@@ -281,7 +281,7 @@ export default function SchoolDashboard() {
       await axios.post(`${API}/schools/${school.school_id}/seasons`, newSeason);
       toast.success("Season created!");
       setShowSeasonDialog(false);
-      setNewSeason({ name: "", sport: "basketball" });
+      setNewSeason({ name: "", sport: "basketball", gender: "men", level: "varsity" });
       fetchData();
     } catch (error) {
       toast.error("Failed to create season");
