@@ -4569,6 +4569,74 @@ async def generate_football_boxscore_pdf(game_id: str):
 async def root():
     return {"message": "Basketball Stats API"}
 
+# ============= CONTACT FORM =============
+class ContactFormRequest(BaseModel):
+    name: str
+    email: str
+    school: str
+    state: str
+    role: str
+    message: str = ""
+
+@app.post("/api/contact")
+async def submit_contact_form(form_data: ContactFormRequest):
+    """Submit contact form - sends email to admin"""
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    
+    try:
+        # Store the contact submission in database for backup
+        contact_doc = {
+            "name": form_data.name,
+            "email": form_data.email,
+            "school": form_data.school,
+            "state": form_data.state,
+            "role": form_data.role,
+            "message": form_data.message,
+            "submitted_at": datetime.now(timezone.utc).isoformat(),
+            "status": "new"
+        }
+        await db.contact_submissions.insert_one(contact_doc)
+        
+        # Try to send email notification
+        try:
+            admin_email = "jaredmoosejones@gmail.com"
+            
+            # Create email content
+            subject = f"StatMoose Contact: {form_data.school} - {form_data.role}"
+            body = f"""
+New contact form submission from StatMoose:
+
+Name: {form_data.name}
+Email: {form_data.email}
+School: {form_data.school}
+State: {form_data.state}
+Role: {form_data.role}
+
+Message:
+{form_data.message if form_data.message else "(No message provided)"}
+
+---
+Submitted at: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}
+            """
+            
+            # For now, we'll just log the email content since SMTP isn't configured
+            # In production, configure SMTP settings via environment variables
+            print(f"Contact form submission received:")
+            print(f"To: {admin_email}")
+            print(f"Subject: {subject}")
+            print(f"Body: {body}")
+            
+        except Exception as email_error:
+            print(f"Email notification failed (form still saved): {email_error}")
+        
+        return {"success": True, "message": "Contact form submitted successfully"}
+        
+    except Exception as e:
+        print(f"Contact form error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit contact form")
+
 # Health check endpoint for Kubernetes
 @app.get("/health")
 async def health_check():
