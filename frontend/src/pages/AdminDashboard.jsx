@@ -65,6 +65,14 @@ export default function AdminDashboard({ user, onLogout }) {
   const [savingBeta, setSavingBeta] = useState(false);
   const [showBasketballPassword, setShowBasketballPassword] = useState(false);
   const [showFootballPassword, setShowFootballPassword] = useState(false);
+  
+  // Schools viewer
+  const [schools, setSchools] = useState([]);
+  const [schoolSearchTerm, setSchoolSearchTerm] = useState("");
+  const [selectedSchool, setSelectedSchool] = useState(null);
+  const [schoolDetails, setSchoolDetails] = useState(null);
+  const [loadingSchoolDetails, setLoadingSchoolDetails] = useState(false);
+  const [showSchoolDialog, setShowSchoolDialog] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
