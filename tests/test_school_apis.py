@@ -258,6 +258,7 @@ class TestSchoolAPIs:
             f"{BASE_URL}/api/schools/{TEST_SCHOOL_ID}/seasons/{season_id}/games",
             headers=self.headers,
             json={
+                "season_id": season_id,  # Required in body as well
                 "opponent_team_id": opponent_id,
                 "scheduled_date": "2026-02-15",
                 "scheduled_time": "19:00",
