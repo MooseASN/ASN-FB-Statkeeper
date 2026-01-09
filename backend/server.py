@@ -4119,8 +4119,6 @@ async def init_admin_endpoint():
     except Exception as e:
         return {"status": "error", "detail": str(e)}
 
-app.include_router(api_router)
-
 # Dynamic CORS handling for credentials
 origins = os.environ.get('CORS_ORIGINS', '*')
 if origins == '*':
