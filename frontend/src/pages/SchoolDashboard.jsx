@@ -175,8 +175,8 @@ export default function SchoolDashboard() {
       
       // No need for manual headers - axios interceptor handles auth
       
-      // Get school info
-      const schoolRes = await axios.get(`${API}/schools/my-school`, { headers });
+      // Get school info - axios interceptor handles auth header
+      const schoolRes = await axios.get(`${API}/schools/my-school`);
       setSchool(schoolRes.data);
       setUserRole(schoolRes.data.user_role);
       
@@ -185,9 +185,9 @@ export default function SchoolDashboard() {
       
       // Get members, seasons, and calendar data
       const [membersRes, seasonsRes, calendarRes] = await Promise.all([
-        axios.get(`${API}/schools/${schoolId}/members`, { headers }),
-        axios.get(`${API}/schools/${schoolId}/seasons`, { headers }),
-        axios.get(`${API}/schools/${schoolId}/calendar`, { headers })
+        axios.get(`${API}/schools/${schoolId}/members`),
+        axios.get(`${API}/schools/${schoolId}/seasons`),
+        axios.get(`${API}/schools/${schoolId}/calendar`)
       ]);
       
       setMembers(membersRes.data);
