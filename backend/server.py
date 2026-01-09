@@ -4359,6 +4359,20 @@ async def register_school(data: SchoolRegister, response: Response):
             "answer_hash": pwd_context.hash(sq.answer.lower().strip())
         })
     
+    # Generate unique school code from name (3-10 chars)
+    base_code = ''.join(c for c in data.school_name.upper() if c.isalnum())[:6]
+    if len(base_code) < 3:
+        base_code = base_code.ljust(3, 'X')
+    
+    # Ensure uniqueness by checking existing codes
+    school_code = base_code
+    counter = 1
+    while await db.schools.find_one({"school_code": school_code}):
+        school_code = f"{base_code[:5]}{counter}"
+        counter += 1
+        if counter > 999:
+            school_code = f"{base_code[:3]}{secrets.token_hex(2).upper()}"
+    
     # Create IDs
     school_id = f"school_{uuid.uuid4().hex[:12]}"
     user_id = f"user_{uuid.uuid4().hex[:12]}"
@@ -4367,6 +4381,7 @@ async def register_school(data: SchoolRegister, response: Response):
     # Create the school
     school_doc = {
         "school_id": school_id,
+        "school_code": school_code,
         "name": data.school_name.strip(),
         "name_lower": data.school_name.lower().strip(),
         "state": data.state,
