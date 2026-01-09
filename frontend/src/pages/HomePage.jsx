@@ -480,6 +480,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Sports Offered Section */}
+      <SportsOfferedSection />
+
       {/* For Schools Section */}
       <ImageSection section={sectionsData.schools} />
 
