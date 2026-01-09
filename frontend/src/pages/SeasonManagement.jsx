@@ -557,7 +557,7 @@ export default function SeasonManagement() {
             </TabsList>
             
             <TabsContent value="manual" className="space-y-4">
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap items-end">
                 <Input
                   placeholder="#"
                   value={newPlayer.number}
@@ -591,6 +591,14 @@ export default function SeasonManagement() {
                     <SelectItem value="GR">Graduate</SelectItem>
                   </SelectContent>
                 </Select>
+                <div className="flex items-center gap-2 px-2 py-2 bg-slate-900 border border-slate-600 rounded-md">
+                  <Checkbox
+                    id="redshirt"
+                    checked={newPlayer.isRedshirt}
+                    onCheckedChange={(checked) => setNewPlayer(prev => ({ ...prev, isRedshirt: checked }))}
+                  />
+                  <Label htmlFor="redshirt" className="text-xs text-slate-300 cursor-pointer">RS</Label>
+                </div>
                 <Button onClick={handleAddPlayer} className="bg-orange-500 hover:bg-orange-600">
                   <Plus className="w-4 h-4" />
                 </Button>
