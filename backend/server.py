@@ -4604,9 +4604,14 @@ if origins == '*':
                 response = Response(status_code=200)
                 response.headers["Access-Control-Allow-Origin"] = origin if origin != "*" else "*"
                 response.headers["Access-Control-Allow-Credentials"] = "true"
-                response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-                response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control"
+                response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+                response.headers["Access-Control-Allow-Headers"] = "*"
                 response.headers["Access-Control-Max-Age"] = "86400"
+                response.headers["Access-Control-Expose-Headers"] = "*"
+                # Security headers for restricted networks
+                response.headers["X-Content-Type-Options"] = "nosniff"
+                response.headers["X-Frame-Options"] = "SAMEORIGIN"
+                response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
                 return response
             
             response = await call_next(request)
@@ -4617,8 +4622,16 @@ if origins == '*':
             else:
                 response.headers["Access-Control-Allow-Origin"] = "*"
             response.headers["Access-Control-Allow-Credentials"] = "true"
-            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH"
-            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization, X-Requested-With, Accept, Origin, Cache-Control"
+            response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS, PATCH, HEAD"
+            response.headers["Access-Control-Allow-Headers"] = "*"
+            response.headers["Access-Control-Expose-Headers"] = "*"
+            # Security headers for restricted networks
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["X-Frame-Options"] = "SAMEORIGIN"
+            response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+            # Cache control for better performance on slow/restricted networks
+            if "Cache-Control" not in response.headers:
+                response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
             
             return response
     
@@ -4630,6 +4643,7 @@ else:
         allow_origins=origins.split(','),
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
 
 logging.basicConfig(
