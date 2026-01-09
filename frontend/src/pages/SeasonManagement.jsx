@@ -622,11 +622,14 @@ export default function SeasonManagement() {
                 <div className="p-2 space-y-1">
                   {roster.map((player, idx) => (
                     <div key={idx} className="flex items-center justify-between p-2 bg-slate-900/50 rounded">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
                         <span className="text-orange-400 font-bold w-8">#{player.number}</span>
                         <span className="text-white">{player.name}</span>
                         {player.position && (
-                          <Badge variant="outline" className="text-xs">{player.position}</Badge>
+                          <Badge variant="outline" className="text-xs border-slate-600">{player.position}</Badge>
+                        )}
+                        {player.playerClass && (
+                          <Badge variant="secondary" className="text-xs bg-slate-700">{player.playerClass}</Badge>
                         )}
                       </div>
                       <Button
