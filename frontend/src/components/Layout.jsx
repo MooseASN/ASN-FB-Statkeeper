@@ -1,5 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight, Settings, Shield } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Home, Users, History, Plus, LogOut, User, Calendar, ArrowLeftRight, Settings, Shield, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -9,6 +10,9 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
+import axios from "axios";
+
+const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 const ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"];
 const ADMIN_USERNAMES = ["admin"];
@@ -24,8 +28,24 @@ export default function Layout({ children, user, onLogout }) {
   const navigate = useNavigate();
   const { selectedSport, clearSport } = useSport();
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
+  const [schoolInfo, setSchoolInfo] = useState(null);
   
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + "/");
+
+  // Check if user belongs to a school
+  useEffect(() => {
+    const checkSchool = async () => {
+      try {
+        const res = await axios.get(`${API}/schools/my-school`);
+        setSchoolInfo(res.data);
+      } catch (error) {
+        setSchoolInfo(null);
+      }
+    };
+    if (user) {
+      checkSchool();
+    }
+  }, [user]);
 
   const handleSwitchSport = () => {
     clearSport();
