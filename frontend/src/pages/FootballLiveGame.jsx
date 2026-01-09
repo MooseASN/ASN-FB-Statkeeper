@@ -558,6 +558,11 @@ export default function FootballLiveGame({ user, onLogout }) {
   
   // Field View Dialog for yardage calculation
   const [showFieldViewDialog, setShowFieldViewDialog] = useState(false);
+  
+  // Punt/FG Field View Dialogs
+  const [showPuntFieldView, setShowPuntFieldView] = useState(false);
+  const [puntFieldViewMode, setPuntFieldViewMode] = useState("punt"); // "punt" or "return"
+  const [showFgFieldView, setShowFgFieldView] = useState(false);
 
   // Keyboard shortcuts
   useEffect(() => {
