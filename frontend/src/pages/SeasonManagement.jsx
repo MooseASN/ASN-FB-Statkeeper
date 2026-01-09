@@ -461,6 +461,75 @@ export default function SeasonManagement() {
     }, 300);
   };
 
+  // Opponent search handler for game scheduling
+  const handleOpponentSearchChange = (e) => {
+    const value = e.target.value;
+    setOpponentSearchQuery(value);
+    setShowOpponentDropdown(true);
+    
+    // If typing, also search for schools
+    if (value.length >= 2) {
+      if (window.opponentSearchTimeout) {
+        clearTimeout(window.opponentSearchTimeout);
+      }
+      window.opponentSearchTimeout = setTimeout(() => {
+        handleSearchSchools(value);
+      }, 300);
+    } else {
+      setSchoolSearchResults([]);
+    }
+  };
+
+  // Get filtered opponents based on search
+  const getFilteredOpponents = () => {
+    if (!opponentSearchQuery) return opponentTeams;
+    const query = opponentSearchQuery.toLowerCase();
+    return opponentTeams.filter(team => 
+      team.name.toLowerCase().includes(query)
+    );
+  };
+
+  // Select an opponent (existing or from school search)
+  const handleSelectOpponent = (team, isFromSearch = false) => {
+    setGameForm(prev => ({ ...prev, opponent_team_id: team.id }));
+    setSelectedOpponentName(team.name);
+    setOpponentSearchQuery("");
+    setShowOpponentDropdown(false);
+    
+    if (isFromSearch) {
+      // If from school search, create the opponent first
+      handleImportFromSchoolForGame(team);
+    }
+  };
+
+  // Import school and set as opponent for game
+  const handleImportFromSchoolForGame = async (schoolData) => {
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      const res = await axios.post(
+        `${API}/schools/${school.school_id}/teams`,
+        {
+          name: schoolData.name,
+          sport: season.sport,
+          color: schoolData.primary_color || "#666666",
+          logo_url: schoolData.logo_url,
+          from_school_code: schoolData.school_code
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      // Set the newly created team as the opponent
+      if (res.data.team_id) {
+        setGameForm(prev => ({ ...prev, opponent_team_id: res.data.team_id }));
+      }
+      setSelectedOpponentName(schoolData.name);
+      toast.success(`Added ${schoolData.name} as opponent`);
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to add school as opponent");
+    }
+  };
+
   const handleImportFromSchool = async (schoolData) => {
     try {
       const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
