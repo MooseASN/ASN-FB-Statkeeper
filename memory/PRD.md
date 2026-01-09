@@ -257,18 +257,26 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   "basketball_beta": boolean,
   "basketball_password": string,
   "football_beta": boolean,
-  "football_password": string
+  "football_password": string,
+  "school_creation_beta": boolean,
+  "school_creation_password": string
 }
 ```
 
 ### users collection
-- user_id, email, username, password_hash, security_questions, auth_provider
+- user_id, email, username, password_hash, security_questions, auth_provider, school_id, school_role
+
+### schools collection
+- school_id, school_code, name, name_lower, state, classification, classification_display, logo_url, invite_code
+
+### seasons collection
+- season_id, school_id, name, sport, gender, level, team_id
 
 ### teams collection
-- id, user_id, name, color, logo_url, roster[], sport
+- id, user_id, school_id, name, color, logo_url, roster[], sport
 
 ### games collection
-- id, user_id, home_team_id, away_team_id, status, sport, quarter_scores, play_by_play, football_state
+- id, user_id, home_team_id, away_team_id, status, sport, quarter_scores, play_by_play, football_state, season_id
 
 ## Prioritized Backlog
 
