@@ -12,38 +12,42 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
-### January 9, 2026 - Demo Mode Implementation - FULLY COMPLETE
+### January 9, 2026 - Demo Mode Implementation - USING REAL UI COMPONENTS
+- **All demos now use the EXACT same UI as signed-in users**
+- Modified `LiveGame.jsx`, `AdvancedLiveGame.jsx`, `FootballLiveGame.jsx` to accept `demoMode` and `initialDemoData` props
+- Demo wrapper components fetch demo data and pass to real UI components
+- Stats work locally in demo mode (no API calls to persist)
+
 - **Basketball Demo** - VERIFIED WORKING (All 3 Modes)
-  - Demo mode selector page with 3 mode options (Classic, Advanced, Simple)
-  - **Classic Mode** - Full stat tracking with player cards:
+  - **Classic Mode** (`/demo/basketball/classic`) - Uses real `LiveGame.jsx`:
     - Orange "DEMO MODE - Stats will not be saved" bar
     - Fake teams: Northside Tigers vs Eastwood Eagles (10 players each)
     - Full stat tracking (2PT, 3PT, FT, AST, REB, STL, BLK, TO)
-    - Make/Miss shot modal for accuracy tracking
+    - Make/Miss shot modal with assist attribution
     - Sub In/Out functionality
-    - Share, Embed, and Jumbotron buttons
+    - All buttons work: Share, Embed, PDF, CSV, Jumbotron, Note
     - Clock with start/stop and period tracking
-  - **Advanced Mode** - Play-by-play focused interface:
-    - Team selector tabs (Home/Away)
-    - Player list with click-to-select
-    - Shot buttons with assist attribution
-    - Live play-by-play log
-    - Share and Box Score buttons
-  - **Simple Mode** - Quick scoring interface:
-    - Streamlined +1, +2, +3 buttons per player
-    - Gradient scoreboard
-    - 5 players shown per team
+    - UNDO button for last action
+  - **Advanced Mode** (`/demo/basketball/advanced`) - Uses real `AdvancedLiveGame.jsx`:
+    - Possession toggle buttons
+    - All action buttons (2PT, 3PT, FT, Steal, Turnover, Foul, Assist, Rebound, Block)
+    - Player tables with full stats
+    - Recent Plays, Summary, Leaders tabs
+    - Clock controls
+    - Export and Rosters buttons
+  - **Simple Mode** (`/demo/basketball/simple`) - Uses real `LiveGame.jsx` with `simple_mode: true`:
+    - Same UI as Classic but shots register immediately without Make/Miss modal
 
-- **Football Demo** - VERIFIED WORKING
+- **Football Demo** (`/demo/football`) - VERIFIED WORKING - Uses real `FootballLiveGame.jsx`:
   - Orange "DEMO MODE" bar
-  - Fake teams: Central Wolves vs Riverside Panthers (50 players each)
-  - Field visualization with ball position marker
-  - Down & distance tracking (1st & 10, etc.)
-  - Play buttons (RUN, PASS, PUNT, FIELD GOAL)
-  - Yardage selection dialog for runs/passes
-  - Touchdown and field goal scoring with animations
+  - Fake teams: Central Wolves vs Riverside Panthers (50 players per team)
+  - Kickoff workflow dialog
+  - Field visualization with ball position
+  - Down & distance tracking
+  - All play type buttons (Run, Pass, Punt, Kickoff, Field Goal, Extra PT, Penalty, Timeout)
+  - Game controls (Spot Ball, Set Down & Distance, Advance Quarter, End Game)
+  - Box Score PDF export
   - Play log with timestamp
-  - Share and Embed buttons
 
 - **Homepage Integration** - VERIFIED WORKING
   - "View Demo" buttons on Basketball and Football sport cards
