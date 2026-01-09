@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, PlayCircle, Users, Calendar, Clock, Timer, FileText } from "lucide-react";
+import { ArrowLeft, PlayCircle, Users, Calendar, Clock, Timer, FileText, Building2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
@@ -48,6 +48,11 @@ export default function NewGame({ user, onLogout }) {
 
   // Game notes
   const [gameNote, setGameNote] = useState("");
+  
+  // School/Season linking (for school users)
+  const [schoolInfo, setSchoolInfo] = useState(null);
+  const [seasons, setSeasons] = useState([]);
+  const [selectedSeasonId, setSelectedSeasonId] = useState("");
 
   useEffect(() => {
     fetchTeams();
