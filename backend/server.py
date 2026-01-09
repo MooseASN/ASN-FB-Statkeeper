@@ -4784,6 +4784,117 @@ async def set_season_team(
     
     return {"success": True}
 
+class SeasonUpdate(BaseModel):
+    name: Optional[str] = None
+
+class SeasonDelete(BaseModel):
+    password: str
+
+@api_router.put("/schools/{school_id}/seasons/{season_id}")
+async def update_season(
+    school_id: str, 
+    season_id: str, 
+    data: SeasonUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update a season's details"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can update seasons")
+    
+    update_data = {"updated_at": datetime.now(timezone.utc).isoformat()}
+    if data.name:
+        update_data["name"] = data.name.strip()
+    
+    await db.seasons.update_one(
+        {"season_id": season_id, "school_id": school_id},
+        {"$set": update_data}
+    )
+    
+    return {"success": True}
+
+@api_router.delete("/schools/{school_id}/seasons/{season_id}")
+async def delete_season(
+    school_id: str, 
+    season_id: str,
+    data: SeasonDelete,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete a season and all associated data (games, stats). Requires password confirmation."""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can delete seasons")
+    
+    # Verify password
+    if not verify_password(data.password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Incorrect password")
+    
+    # Get the season first
+    season = await db.seasons.find_one({"season_id": season_id, "school_id": school_id})
+    if not season:
+        raise HTTPException(status_code=404, detail="Season not found")
+    
+    # Delete all games for this season
+    await db.games.delete_many({"season_id": season_id})
+    
+    # Delete the season
+    await db.seasons.delete_one({"season_id": season_id, "school_id": school_id})
+    
+    return {"success": True, "message": "Season and all associated games deleted"}
+
+@api_router.get("/schools/search")
+async def search_schools(
+    q: str = "",
+    sport: Optional[str] = None,
+    gender: Optional[str] = None,
+    level: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Search for schools by name or school code. Can filter by sport/gender/level to find matching seasons."""
+    if not q or len(q) < 2:
+        return []
+    
+    # Search by school code (exact, case-insensitive) or school name (partial, case-insensitive)
+    schools = await db.schools.find(
+        {
+            "$or": [
+                {"school_code": q.upper()},
+                {"name_lower": {"$regex": q.lower(), "$options": "i"}}
+            ]
+        },
+        {"_id": 0, "school_id": 1, "school_code": 1, "name": 1, "logo_url": 1, "primary_color": 1, "state": 1}
+    ).limit(10).to_list(10)
+    
+    result = []
+    for school in schools:
+        school_data = {
+            "school_id": school["school_id"],
+            "school_code": school.get("school_code", ""),
+            "name": school["name"],
+            "logo_url": school.get("logo_url"),
+            "primary_color": school.get("primary_color"),
+            "state": school.get("state"),
+            "matching_seasons": []
+        }
+        
+        # If sport/gender/level filters provided, find matching seasons
+        if sport:
+            season_filter = {"school_id": school["school_id"], "sport": sport}
+            if gender:
+                season_filter["gender"] = gender
+            if level:
+                season_filter["level"] = level
+            
+            matching_seasons = await db.seasons.find(
+                season_filter,
+                {"_id": 0, "season_id": 1, "name": 1, "sport": 1, "gender": 1, "level": 1}
+            ).to_list(10)
+            school_data["matching_seasons"] = matching_seasons
+        
+        result.append(school_data)
+    
+    return result
+
 # ============ SCHOOL TEAMS ROUTES ============
 
 @api_router.post("/schools/{school_id}/teams")
