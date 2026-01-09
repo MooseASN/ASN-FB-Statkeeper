@@ -29,6 +29,10 @@ import { RULESETS } from "@/data/penaltyCatalog";
 import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import ConnectionStatus from "@/components/ConnectionStatus";
 
+// Import custom hooks for game state management
+import { useGameClock } from "@/hooks/useGameClock";
+import { useTimeouts } from "@/hooks/useTimeouts";
+
 // Import extracted football components
 import FootballField from "@/components/football/FootballField";
 import KickoffDialog from "@/components/football/KickoffDialog";
