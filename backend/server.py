@@ -4637,7 +4637,7 @@ async def get_basketball_demo_game(mode: str):
         "id": f"demo-basketball-{mode}",
         "_id": f"demo-basketball-{mode}",
         "sport": "basketball",
-        "status": "live",
+        "status": "active",  # Use 'active' to match real game status
         "is_demo": True,
         "simple_mode": mode == "simple",
         "advanced_mode": mode == "advanced",
@@ -4650,6 +4650,7 @@ async def get_basketball_demo_game(mode: str):
         "home_score": 0,
         "away_score": 0,
         "period": 1,
+        "current_quarter": 1,
         "period_label": "1st",
         "clock_enabled": True,
         "clock_time": 720,
@@ -4658,12 +4659,15 @@ async def get_basketball_demo_game(mode: str):
         "away_timeouts": 5,
         "home_fouls": 0,
         "away_fouls": 0,
+        "home_bonus": False,
+        "away_bonus": False,
         "possession": "home",
         "home_player_stats": create_demo_player_stats(BASKETBALL_DEMO_HOME_PLAYERS, home_on_floor),
         "away_player_stats": create_demo_player_stats(BASKETBALL_DEMO_AWAY_PLAYERS, away_on_floor),
         "home_on_floor": home_on_floor,
         "away_on_floor": away_on_floor,
         "play_by_play": [],
+        "quarter_scores": {"home": [0, 0, 0, 0], "away": [0, 0, 0, 0]},
         "share_code": f"demo-{mode}"
     }
     
