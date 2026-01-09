@@ -610,11 +610,9 @@ export default function SchoolDashboard() {
                             
                             {/* Season & Time Info */}
                             <div className="text-center mb-4">
-                              {gameSeason && (
-                                <Badge className="bg-slate-700 text-slate-200 mb-2">
-                                  {game.sport === "basketball" ? "🏀" : "🏈"} {gameSeason.name}
-                                </Badge>
-                              )}
+                              <Badge className="bg-slate-700 text-slate-200 mb-2">
+                                {game.sport === "basketball" ? "🏀" : "🏈"} {gameSeason?.name || (game.sport === "basketball" ? "Basketball" : "Football")}
+                              </Badge>
                               {!isInProgress && (
                                 <div className="text-sm text-slate-300">
                                   {game.scheduled_time ? formatTime12Hour(game.scheduled_time) : "Time TBD"}
