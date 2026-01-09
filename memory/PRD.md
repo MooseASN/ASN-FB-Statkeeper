@@ -11,6 +11,42 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - **Multi-tenant school/organization management system**
 
 ## Latest Updates (January 2026)
+
+### January 9, 2026 - Major Feature Update
+- **Season Creation Enhanced** - COMPLETED
+  - Added gender selection (Men's/Women's)
+  - Added level selection (Varsity/Sub-Varsity)
+  - Backend validation for new fields
+  
+- **Edit Season Feature** - COMPLETED
+  - Edit Season button in Opponents tab
+  - Rename season functionality
+  - Delete season with password confirmation
+  - Warning dialog showing what will be deleted
+  
+- **School ID Code System** - COMPLETED
+  - Auto-generated 3-10 character unique code from school name
+  - Displayed in Edit School tab (read-only with copy button)
+  - Migration applied to existing schools (e.g., "Moose Academy" → "MOOSEA")
+  
+- **School Search for Opponents** - COMPLETED
+  - "Find School" button in Opponents tab
+  - Search by school name or code
+  - Shows matching seasons based on sport/gender/level
+  - Import school logo, name, color as opponent
+  
+- **Calendar Game Actions for Final Games** - COMPLETED
+  - "View Box Score" button
+  - "View Live Stats Output" button  
+  - "Reopen Stat Tracker" button (admin only)
+  - Shows final score display
+  
+- **Link Roster Import** - COMPLETED
+  - New `/api/team/scrape-roster` endpoint
+  - Extracts player number, name, position, and class
+  - Works with PrestoSports, Sidearm, and generic table layouts
+
+### Previous Updates
 - **Edit Opponent Teams Feature** - COMPLETED
   - Admins can edit opponent name, color, logo, and roster
   - Full dialog workflow with proper text visibility
