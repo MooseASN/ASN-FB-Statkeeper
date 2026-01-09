@@ -408,17 +408,10 @@ export default function SchoolDashboard() {
               onClick={() => navigate("/select-sport")}
             >
               <img 
-                src="/logo192.png" 
+                src="/logo-white.png" 
                 alt="StatMoose" 
-                className="w-8 h-8"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
+                className="w-8 h-8 object-contain"
               />
-              <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center hidden">
-                <span className="text-white font-bold text-xs">SM</span>
-              </div>
               <span className="text-orange-500 font-bold text-lg">StatMoose</span>
             </div>
             
