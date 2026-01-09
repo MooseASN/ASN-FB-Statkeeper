@@ -754,7 +754,7 @@ export default function SeasonManagement() {
                 value={gameForm.location}
                 onChange={(e) => setGameForm(prev => ({ ...prev, location: e.target.value }))}
                 placeholder="e.g., Home Gym"
-                className="bg-slate-900 border-slate-600"
+                className="bg-slate-900 border-slate-600 text-white"
               />
             </div>
             
@@ -780,6 +780,16 @@ export default function SeasonManagement() {
                   Away
                 </Button>
               </div>
+            </div>
+            
+            <div>
+              <Label className="text-slate-200">Game Note (optional)</Label>
+              <Input
+                value={gameForm.note}
+                onChange={(e) => setGameForm(prev => ({ ...prev, note: e.target.value }))}
+                placeholder="e.g., Homecoming game, District playoff"
+                className="bg-slate-900 border-slate-600 text-white"
+              />
             </div>
             
             <Button onClick={handleCreateGame} className="w-full bg-orange-500 hover:bg-orange-600">
