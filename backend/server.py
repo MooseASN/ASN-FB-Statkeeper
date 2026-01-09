@@ -5014,6 +5014,73 @@ async def debug_auth_status():
             "error": str(e)
         }
 
+@app.post("/api/debug/test-login")
+async def debug_test_login(credentials: UserLogin):
+    """Debug endpoint to test login and return detailed diagnostics"""
+    login_identifier = credentials.email.lower().strip()
+    diagnostics = {
+        "input_email": login_identifier,
+        "steps": []
+    }
+    
+    try:
+        # Step 1: Database ping
+        await db.command('ping')
+        diagnostics["steps"].append({"step": "db_ping", "status": "ok"})
+        
+        # Step 2: Find user
+        user = await db.users.find_one({"email": login_identifier}, {"_id": 0})
+        if not user:
+            user = await db.users.find_one({"username": login_identifier}, {"_id": 0})
+        
+        if not user:
+            diagnostics["steps"].append({"step": "find_user", "status": "not_found"})
+            # List all user emails for debugging
+            all_users = await db.users.find({}, {"email": 1, "_id": 0}).to_list(100)
+            diagnostics["existing_emails"] = [u.get("email", "?") for u in all_users]
+            return {"success": False, "diagnostics": diagnostics}
+        
+        diagnostics["steps"].append({
+            "step": "find_user", 
+            "status": "found",
+            "user_email": user.get("email"),
+            "auth_provider": user.get("auth_provider"),
+            "has_password_hash": bool(user.get("password_hash")),
+            "hash_length": len(user.get("password_hash", ""))
+        })
+        
+        # Step 3: Check auth provider
+        if user.get("auth_provider") == "google":
+            diagnostics["steps"].append({"step": "auth_provider", "status": "google_only"})
+            return {"success": False, "reason": "google_auth_only", "diagnostics": diagnostics}
+        
+        diagnostics["steps"].append({"step": "auth_provider", "status": "local"})
+        
+        # Step 4: Verify password
+        stored_hash = user.get("password_hash", "")
+        try:
+            password_valid = verify_password(credentials.password, stored_hash)
+            diagnostics["steps"].append({
+                "step": "verify_password", 
+                "status": "valid" if password_valid else "invalid"
+            })
+        except Exception as e:
+            diagnostics["steps"].append({
+                "step": "verify_password", 
+                "status": "error",
+                "error": str(e)
+            })
+            return {"success": False, "reason": "password_verification_error", "diagnostics": diagnostics}
+        
+        if not password_valid:
+            return {"success": False, "reason": "wrong_password", "diagnostics": diagnostics}
+        
+        return {"success": True, "diagnostics": diagnostics}
+        
+    except Exception as e:
+        diagnostics["steps"].append({"step": "exception", "error": str(e)})
+        return {"success": False, "reason": "exception", "diagnostics": diagnostics}
+
 # Health check endpoint that also ensures admin exists (for production init)
 @app.get("/api/init-admin")
 async def init_admin_endpoint():
