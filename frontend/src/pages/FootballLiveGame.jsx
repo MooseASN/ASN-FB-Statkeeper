@@ -32,6 +32,7 @@ import ConnectionStatus from "@/components/ConnectionStatus";
 // Import custom hooks for game state management
 import { useGameClock } from "@/hooks/useGameClock";
 import { useTimeouts } from "@/hooks/useTimeouts";
+import { useDriveState } from "@/hooks/useDriveState";
 
 // Import extracted football components
 import FootballField from "@/components/football/FootballField";
