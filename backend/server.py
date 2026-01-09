@@ -4599,23 +4599,31 @@ BASKETBALL_DEMO_AWAY_PLAYERS = [
 ]
 
 def create_demo_player_stats(players, on_floor_ids=None):
-    """Create player stats structure for demo"""
+    """Create player stats structure for demo - matches real game format"""
     stats = []
     for i, p in enumerate(players):
         is_on_floor = p["id"] in (on_floor_ids or []) if on_floor_ids else i < 5
         stats.append({
             "id": p["id"],
-            "name": p["name"],
-            "number": p["number"],
-            "stats": {
-                "points": 0, "fgMade": 0, "fgAttempted": 0,
-                "threePtMade": 0, "threePtAttempted": 0,
-                "ftMade": 0, "ftAttempted": 0,
-                "offRebounds": 0, "defRebounds": 0,
-                "assists": 0, "steals": 0, "blocks": 0,
-                "turnovers": 0, "fouls": 0
-            },
-            "onFloor": is_on_floor
+            "player_name": p["name"],
+            "player_number": p["number"],
+            "team_id": "demo-home-team" if p["id"].startswith("demo-bh") else "demo-away-team",
+            "game_id": "demo-basketball",
+            # Flat stat fields matching real game format
+            "ft_made": 0,
+            "ft_missed": 0,
+            "fg2_made": 0,
+            "fg2_missed": 0,
+            "fg3_made": 0,
+            "fg3_missed": 0,
+            "offensive_rebounds": 0,
+            "defensive_rebounds": 0,
+            "assists": 0,
+            "steals": 0,
+            "blocks": 0,
+            "turnovers": 0,
+            "fouls": 0,
+            "on_floor": is_on_floor
         })
     return stats
 
