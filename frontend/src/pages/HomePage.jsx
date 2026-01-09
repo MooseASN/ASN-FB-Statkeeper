@@ -164,10 +164,10 @@ const SportCard = ({ sport, index }) => {
         style={{ transitionDelay: `${delay}ms` }}
       >
         <h3 
-          className={`text-4xl md:text-5xl font-black text-white uppercase tracking-tight transition-all duration-1000 ${
+          className={`text-5xl md:text-6xl font-black text-white uppercase transition-all duration-1000 ${
             isInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
           }`}
-          style={{ transitionDelay: `${delay}ms` }}
+          style={{ transitionDelay: `${delay}ms`, letterSpacing: '0.15em' }}
         >
           {sport.name}
         </h3>
