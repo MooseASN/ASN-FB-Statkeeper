@@ -507,57 +507,55 @@ export default function AdminDashboard({ user, onLogout }) {
             </CollapsibleContent>
           </Card>
         </Collapsible>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
 
-        {/* Users Table */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <Users className="w-5 h-5" />
-                All Users ({filteredUsers.length})
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    placeholder="Search users..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-9 w-64"
-                  />
+        {/* Users Table - Collapsible */}
+        <Collapsible open={usersOpen} onOpenChange={setUsersOpen}>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
+                    All Users ({filteredUsers.length})
+                  </CardTitle>
+                  <ChevronDown className={`w-5 h-5 transition-transform ${usersOpen ? 'rotate-180' : ''}`} />
                 </div>
-                <Button onClick={handleExportCSV} variant="outline">
-                  <Download className="w-4 h-4 mr-2" />
-                  Export CSV
-                </Button>
-              </div>
-            </div>
-            {lastUpdated && (
-              <p className="text-xs text-muted-foreground">
-                Last updated: {lastUpdated.toLocaleTimeString()}
-              </p>
-            )}
-          </CardHeader>
-          <CardContent>
-            <div className="rounded-md border overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Username</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Auth</TableHead>
-                    <TableHead className="text-center">Teams</TableHead>
-                    <TableHead className="text-center">Games</TableHead>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent>
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="relative flex-1">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      placeholder="Search users..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                  <Button onClick={handleExportCSV} variant="outline" size="sm">
+                    <Download className="w-4 h-4 mr-2" />
+                    Export CSV
+                  </Button>
+                </div>
+                {lastUpdated && (
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Last updated: {lastUpdated.toLocaleTimeString()}
+                  </p>
+                )}
+                <ScrollArea className="h-64">
+                  <div className="rounded-md border overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>User ID</TableHead>
+                          <TableHead>Email</TableHead>
+                          <TableHead>Username</TableHead>
+                          <TableHead>Name</TableHead>
+                          <TableHead>Auth</TableHead>
+                          <TableHead className="text-center">Teams</TableHead>
+                          <TableHead className="text-center">Games</TableHead>
                     <TableHead className="text-center">Events</TableHead>
                     <TableHead>Created</TableHead>
                   </TableRow>
