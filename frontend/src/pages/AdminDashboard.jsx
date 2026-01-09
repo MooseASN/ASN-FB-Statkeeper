@@ -66,11 +66,18 @@ export default function AdminDashboard({ user, onLogout }) {
     basketball_beta: false,
     basketball_password: "",
     football_beta: false,
-    football_password: ""
+    football_password: "",
+    school_creation_beta: false,
+    school_creation_password: ""
   });
   const [savingBeta, setSavingBeta] = useState(false);
   const [showBasketballPassword, setShowBasketballPassword] = useState(false);
   const [showFootballPassword, setShowFootballPassword] = useState(false);
+  const [showSchoolCreationPassword, setShowSchoolCreationPassword] = useState(false);
+  
+  // User deletion
+  const [deletingUser, setDeletingUser] = useState(null);
+  const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
   
   // Schools viewer
   const [schools, setSchools] = useState([]);
