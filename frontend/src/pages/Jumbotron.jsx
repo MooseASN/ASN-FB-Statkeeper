@@ -34,7 +34,7 @@ const calculatePlayerStats = (stats) => {
   };
 };
 
-// Team Panel Component - Broadcast Style Stacked Layout
+// Team Panel Component - Broadcast Style with Large Text
 function TeamPanel({ 
   teamName, 
   teamLogo, 
@@ -101,23 +101,23 @@ function TeamPanel({
       <div className="relative z-10 flex flex-col h-full min-h-0">
         {/* Team Header Bar */}
         <div 
-          className="flex items-center px-6 py-3 flex-shrink-0"
+          className="flex items-center px-8 py-4 flex-shrink-0"
           style={{ 
-            background: `linear-gradient(90deg, ${teamColor}22 0%, transparent 50%)`,
-            borderBottom: `3px solid ${teamColor}`
+            background: `linear-gradient(90deg, ${teamColor}33 0%, transparent 60%)`,
+            borderBottom: `4px solid ${teamColor}`
           }}
         >
           {/* Team Logo */}
-          <div className="flex-shrink-0 mr-4">
+          <div className="flex-shrink-0 mr-6">
             {teamLogo ? (
               <img 
                 src={teamLogo} 
                 alt={teamName} 
-                className="w-16 h-16 object-contain drop-shadow-lg"
+                className="w-20 h-20 object-contain drop-shadow-lg"
               />
             ) : (
               <div 
-                className="w-16 h-16 rounded-lg flex items-center justify-center text-3xl font-black text-white shadow-lg"
+                className="w-20 h-20 rounded-lg flex items-center justify-center text-4xl font-black text-white shadow-lg"
                 style={{ backgroundColor: teamColor }}
               >
                 {teamName?.charAt(0) || '?'}
@@ -127,9 +127,9 @@ function TeamPanel({
           
           {/* Team Name */}
           <h2 
-            className="text-4xl font-black text-white uppercase tracking-wider flex-1"
+            className="text-5xl font-black text-white uppercase tracking-wide flex-1"
             style={{ 
-              textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+              textShadow: '3px 3px 6px rgba(0,0,0,0.5)',
               fontFamily: "'Arial Black', 'Helvetica Black', sans-serif"
             }}
           >
@@ -137,87 +137,87 @@ function TeamPanel({
           </h2>
           
           {/* Stats Section */}
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-300 text-base font-semibold tracking-wider uppercase">Timeouts</span>
-              <span className="text-white text-3xl font-black">{timeouts}</span>
+          <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3">
+              <span className="text-gray-300 text-xl font-bold tracking-wider uppercase">Timeouts</span>
+              <span className="text-white text-4xl font-black">{timeouts}</span>
             </div>
             
-            <div className="flex items-center gap-2">
-              <span className="text-gray-300 text-base font-semibold tracking-wider uppercase">Fouls</span>
-              <span className="text-white text-3xl font-black">{totalFouls}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-300 text-xl font-bold tracking-wider uppercase">Fouls</span>
+              <span className="text-white text-4xl font-black">{totalFouls}</span>
             </div>
             
             {(inBonus || doubleBonus) && (
               <div 
-                className="px-4 py-2 rounded text-base font-black uppercase tracking-wider text-white shadow-lg ml-2"
+                className="px-5 py-2 rounded text-xl font-black uppercase tracking-wider text-white shadow-lg ml-2"
                 style={{ 
                   backgroundColor: '#1e40af',
-                  border: '2px solid #3b82f6'
+                  border: '3px solid #3b82f6'
                 }}
               >
-                {doubleBonus ? "BONUS++" : "BONUS++"}
+                {doubleBonus ? "BONUS++" : "BONUS"}
               </div>
             )}
           </div>
         </div>
         
         {/* Stats Table */}
-        <div className="flex-1 px-6 py-1 min-h-0 overflow-hidden flex flex-col">
+        <div className="flex-1 px-8 py-2 min-h-0 overflow-hidden flex flex-col">
           {/* Table Header */}
           <div 
-            className="grid grid-cols-[60px_1fr_70px_80px_80px_80px_70px_50px_50px] gap-1 py-2 flex-shrink-0"
+            className="grid grid-cols-[80px_1fr_100px_120px_120px_120px_100px_80px_80px] gap-2 py-3 flex-shrink-0"
             style={{ backgroundColor: '#1e3a5f' }}
           >
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider pl-2">#</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider">Player</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">PTS</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">FG</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">3FG</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">FT</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">REB</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">A</div>
-            <div className="text-gray-300 text-sm font-bold uppercase tracking-wider text-center">PF</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider pl-4">#</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider">Player</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">PTS</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">FG</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">3FG</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">FT</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">REB</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">A</div>
+            <div className="text-gray-200 text-xl font-bold uppercase tracking-wider text-center">PF</div>
           </div>
 
           {/* Player Rows */}
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden flex flex-col justify-evenly">
             {displayPlayers.length === 0 ? (
-              <div className="py-6 text-center text-gray-400 text-xl">
+              <div className="py-8 text-center text-gray-400 text-3xl">
                 No players on floor
               </div>
             ) : (
               displayPlayers.map((player, index) => (
                 <div 
                   key={index}
-                  className="grid grid-cols-[60px_1fr_70px_80px_80px_80px_70px_50px_50px] gap-1 py-2 items-center border-b border-gray-700/30"
-                  style={{ backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)' }}
+                  className="grid grid-cols-[80px_1fr_100px_120px_120px_120px_100px_80px_80px] gap-2 py-2 items-center"
+                  style={{ backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.03)' }}
                 >
-                  <div className="text-xl font-bold text-white pl-2">
+                  <div className="text-3xl font-bold text-white pl-4">
                     {player.number || '?'}
                   </div>
-                  <div className="text-xl font-bold text-white uppercase truncate">
+                  <div className="text-3xl font-bold text-white uppercase truncate">
                     {player.name?.split(' ').pop() || 'Unknown'}
                   </div>
-                  <div className="text-xl font-black text-white text-center">
+                  <div className="text-3xl font-black text-white text-center">
                     {player.pts}
                   </div>
-                  <div className="text-lg text-white text-center">
+                  <div className="text-2xl text-white text-center font-semibold">
                     {player.fg}
                   </div>
-                  <div className="text-lg text-white text-center">
+                  <div className="text-2xl text-white text-center font-semibold">
                     {player.fg3}
                   </div>
-                  <div className="text-lg text-white text-center">
+                  <div className="text-2xl text-white text-center font-semibold">
                     {player.ft}
                   </div>
-                  <div className="text-lg text-white text-center">
+                  <div className="text-2xl text-white text-center font-semibold">
                     {player.totalReb}
                   </div>
-                  <div className="text-lg text-white text-center">
+                  <div className="text-2xl text-white text-center font-semibold">
                     {player.ast}
                   </div>
-                  <div className={`text-lg text-center ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
+                  <div className={`text-2xl text-center font-semibold ${player.pf >= 5 ? 'text-red-400 font-bold' : 'text-white'}`}>
                     {player.pf}
                   </div>
                 </div>
@@ -227,31 +227,31 @@ function TeamPanel({
 
           {/* TOTALS Row */}
           <div 
-            className="grid grid-cols-[60px_1fr_70px_80px_80px_80px_70px_50px_50px] gap-1 py-2 items-center flex-shrink-0"
+            className="grid grid-cols-[80px_1fr_100px_120px_120px_120px_100px_80px_80px] gap-2 py-3 items-center flex-shrink-0"
             style={{ backgroundColor: '#1e40af' }}
           >
-            <div className="text-lg font-black text-white uppercase pl-2 col-span-2">
+            <div className="text-2xl font-black text-white uppercase pl-4 col-span-2">
               TOTALS
             </div>
-            <div className="text-xl font-black text-white text-center">
+            <div className="text-3xl font-black text-white text-center">
               {totals.pts}
             </div>
-            <div className="text-lg font-bold text-white text-center">
+            <div className="text-2xl font-bold text-white text-center">
               {totals.fg_made}-{totals.fg_att}
             </div>
-            <div className="text-lg font-bold text-white text-center">
+            <div className="text-2xl font-bold text-white text-center">
               {totals.fg3_made}-{totals.fg3_att}
             </div>
-            <div className="text-lg font-bold text-white text-center">
+            <div className="text-2xl font-bold text-white text-center">
               {totals.ft_made}-{totals.ft_att}
             </div>
-            <div className="text-lg font-bold text-white text-center">
+            <div className="text-2xl font-bold text-white text-center">
               {totals.reb}
             </div>
-            <div className="text-lg font-bold text-white text-center">
+            <div className="text-2xl font-bold text-white text-center">
               {totals.ast}
             </div>
-            <div className="text-lg font-bold text-white text-center">
+            <div className="text-2xl font-bold text-white text-center">
               {totals.pf}
             </div>
           </div>
@@ -311,7 +311,7 @@ export default function Jumbotron() {
   if (loading && !game) {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
-        <div className="text-white text-3xl font-bold tracking-wider animate-pulse">LOADING...</div>
+        <div className="text-white text-4xl font-bold tracking-wider animate-pulse">LOADING...</div>
       </div>
     );
   }
@@ -321,8 +321,8 @@ export default function Jumbotron() {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a1628' }}>
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-white mb-2">Game Not Found</h2>
-          <p className="text-gray-400">Unable to load game data for share code: {shareCode}</p>
+          <h2 className="text-4xl font-bold text-white mb-2">Game Not Found</h2>
+          <p className="text-gray-400 text-xl">Unable to load game data for share code: {shareCode}</p>
         </div>
       </div>
     );
