@@ -61,16 +61,17 @@ export default function SeasonManagement() {
 
   const fetchData = useCallback(async () => {
     try {
-      const token = sessionStorage.getItem("session_token");
+      // Check both localStorage and sessionStorage for token
+      const token = localStorage.getItem("session_token") || sessionStorage.getItem("session_token");
       if (!token) {
         navigate("/login");
         return;
       }
       
-      const headers = { Authorization: `Bearer ${token}` };
+      // axios interceptor handles auth header
       
       // Get school info first
-      const schoolRes = await axios.get(`${API}/schools/my-school`, { headers });
+      const schoolRes = await axios.get(`${API}/schools/my-school`);
       setSchool(schoolRes.data);
       setUserRole(schoolRes.data.user_role);
       
@@ -78,8 +79,8 @@ export default function SeasonManagement() {
       
       // Get season details and teams
       const [seasonRes, teamsRes] = await Promise.all([
-        axios.get(`${API}/schools/${schoolId}/seasons/${seasonId}`, { headers }),
-        axios.get(`${API}/schools/${schoolId}/teams?sport=${schoolRes.data.sport || ''}`, { headers })
+        axios.get(`${API}/schools/${schoolId}/seasons/${seasonId}`),
+        axios.get(`${API}/schools/${schoolId}/teams?sport=${schoolRes.data.sport || ''}`)
       ]);
       
       setSeason(seasonRes.data);
