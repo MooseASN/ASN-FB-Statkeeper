@@ -178,6 +178,7 @@ export default function SchoolDashboard() {
   const [showInviteDialog, setShowInviteDialog] = useState(false);
   const [showSeasonDialog, setShowSeasonDialog] = useState(false);
   const [showGameStartDialog, setShowGameStartDialog] = useState(false);
+  const [showInProgressWarning, setShowInProgressWarning] = useState(false);
   const [selectedGame, setSelectedGame] = useState(null);
   
   // New season form
