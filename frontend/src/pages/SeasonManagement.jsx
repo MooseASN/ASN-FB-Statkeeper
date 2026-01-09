@@ -429,6 +429,46 @@ export default function SeasonManagement() {
     }
   };
 
+  // Roster duplication handlers
+  const handleOpenDuplicateRoster = async () => {
+    setShowDuplicateRosterDialog(true);
+    setLoadingRosters(true);
+    setSelectedRoster(null);
+    
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      const res = await axios.get(
+        `${API}/schools/${school.school_id}/rosters`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      // Filter out current season
+      const filteredRosters = res.data.filter(r => r.season_id !== seasonId);
+      setPreviousRosters(filteredRosters);
+    } catch (error) {
+      toast.error("Failed to load previous rosters");
+    } finally {
+      setLoadingRosters(false);
+    }
+  };
+
+  const handleDuplicateRoster = () => {
+    if (!selectedRoster) {
+      toast.error("Please select a roster to duplicate");
+      return;
+    }
+    
+    // Copy the roster to the current roster state
+    const duplicatedRoster = selectedRoster.roster.map((player, idx) => ({
+      ...player,
+      id: `player_${Date.now()}_${idx}` // Generate new IDs
+    }));
+    
+    setRoster(duplicatedRoster);
+    setShowDuplicateRosterDialog(false);
+    setShowRosterDialog(true);
+    toast.success(`Duplicated ${duplicatedRoster.length} players from ${selectedRoster.season_name}`);
+  };
+
   // School search for adding opponents - with debounce
   const handleSearchSchools = async (query) => {
     if (!query || query.length < 2) {
