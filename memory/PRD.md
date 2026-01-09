@@ -12,6 +12,21 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
+### January 9, 2026 - Hooks Refactoring & Jumbotron Updates
+- **FootballLiveGame.jsx Hooks Integration** - COMPLETED
+  - Integrated `useGameClock` hook for clock state management
+  - Integrated `useTimeouts` hook for timeout state management
+  - Fixed `queuePlay` initialization order bug using refs
+  - Reduced component complexity by extracting state logic to hooks
+  - Clock countdown now managed by hook with quarter-end detection
+  - Note: `useDriveState` hook available for future integration
+  
+- **Jumbotron Text Size Verification** - CONFIRMED
+  - Broadcast-style design with large, readable text
+  - Team names displayed prominently at top
+  - Stats table with clear columns and large numbers
+  - TOTALS row for team statistics summary
+
 ### January 9, 2026 - Priority Features Batch
 - **School Creation Beta Mode** - COMPLETED
   - Admin can toggle beta mode requiring password for new school signups
