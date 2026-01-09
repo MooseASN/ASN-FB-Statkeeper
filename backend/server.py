@@ -4570,6 +4570,11 @@ async def root():
     return {"message": "Basketball Stats API"}
 
 # ============= CONTACT FORM =============
+import resend
+
+# Initialize Resend with API key
+resend.api_key = "re_K4JVCrGY_N921Pipek7MDokBey5gQmmaH"
+
 class ContactFormRequest(BaseModel):
     name: str
     email: str
@@ -4580,11 +4585,7 @@ class ContactFormRequest(BaseModel):
 
 @app.post("/api/contact")
 async def submit_contact_form(form_data: ContactFormRequest):
-    """Submit contact form - sends email to admin"""
-    import smtplib
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    
+    """Submit contact form - sends email via Resend"""
     try:
         # Store the contact submission in database for backup
         contact_doc = {
@@ -4599,13 +4600,9 @@ async def submit_contact_form(form_data: ContactFormRequest):
         }
         await db.contact_submissions.insert_one(contact_doc)
         
-        # Try to send email notification
+        # Send email via Resend
         try:
-            admin_email = "jaredmoosejones@gmail.com"
-            
-            # Create email content
-            subject = f"StatMoose Contact: {form_data.school} - {form_data.role}"
-            body = f"""
+            email_body = f"""
 New contact form submission from StatMoose:
 
 Name: {form_data.name}
@@ -4621,12 +4618,16 @@ Message:
 Submitted at: {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")}
             """
             
-            # For now, we'll just log the email content since SMTP isn't configured
-            # In production, configure SMTP settings via environment variables
-            print(f"Contact form submission received:")
-            print(f"To: {admin_email}")
-            print(f"Subject: {subject}")
-            print(f"Body: {body}")
+            params = {
+                "from": "StatMoose <onboarding@resend.dev>",
+                "to": ["jaredmoosejones@gmail.com"],
+                "subject": f"StatMoose Contact: {form_data.school} - {form_data.role}",
+                "text": email_body,
+                "reply_to": form_data.email
+            }
+            
+            email_response = resend.Emails.send(params)
+            print(f"Email sent successfully: {email_response}")
             
         except Exception as email_error:
             print(f"Email notification failed (form still saved): {email_error}")
