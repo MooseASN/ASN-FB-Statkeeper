@@ -56,6 +56,7 @@ export default function NewGame({ user, onLogout }) {
 
   useEffect(() => {
     fetchTeams();
+    fetchSchoolAndSeasons();
   }, [selectedSport]);
 
   const fetchTeams = async () => {
@@ -66,6 +67,25 @@ export default function NewGame({ user, onLogout }) {
       toast.error("Failed to load teams");
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchSchoolAndSeasons = async () => {
+    try {
+      // Check if user belongs to a school
+      const schoolRes = await axios.get(`${API}/schools/my-school`);
+      if (schoolRes.data && schoolRes.data.school_id) {
+        setSchoolInfo(schoolRes.data);
+        
+        // Fetch seasons for this school, filtered by current sport
+        const seasonsRes = await axios.get(`${API}/schools/${schoolRes.data.school_id}/seasons`);
+        const sportSeasons = (seasonsRes.data || []).filter(s => s.sport === selectedSport);
+        setSeasons(sportSeasons);
+      }
+    } catch (error) {
+      // User is not part of a school - that's fine
+      setSchoolInfo(null);
+      setSeasons([]);
     }
   };
 
