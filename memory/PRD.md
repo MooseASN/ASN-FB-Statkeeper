@@ -189,6 +189,14 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
   - Season management with roster, opponents, and game scheduling
   - Invite link system for members to join schools
   - 22 backend API tests passing (100% coverage)
+- [x] **School Dashboard Enhancements** - **COMPLETED January 2026**
+  - Game note field when scheduling games
+  - Player class field (FR/SO/JR/SR/GR) with dropdown
+  - Web scraper extracts position and class from roster pages
+  - Schedule times in 12-hour format (e.g., 7:00 PM)
+  - Opponents filtered by sport in dropdowns
+  - Game start dialog with full mode/clock/timeout options
+  - Text visibility fixes (white on dark slate background)
 
 ### P1 (Completed)
 - [x] Verify basketball stat tracker improvements - **ALL TESTS PASS**
