@@ -511,7 +511,7 @@ export default function SeasonManagement() {
             
             {opponentTeams.length === 0 ? (
               <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-8 text-center text-slate-500">
+                <CardContent className="p-8 text-center text-slate-300">
                   No opponents added yet
                 </CardContent>
               </Card>
