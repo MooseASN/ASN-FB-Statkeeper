@@ -838,13 +838,24 @@ export default function SeasonManagement() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-white">Team Roster</h2>
               {isAdmin && (
-                <Button
-                  onClick={() => setShowRosterDialog(true)}
-                  className="bg-orange-500 hover:bg-orange-600"
-                >
-                  <Edit className="w-4 h-4 mr-2" />
-                  {season.team ? "Edit Roster" : "Set Up Roster"}
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={handleOpenDuplicateRoster}
+                    className="border-slate-600 text-white hover:bg-slate-700"
+                    data-testid="duplicate-roster-btn"
+                  >
+                    <Copy className="w-4 h-4 mr-2" />
+                    Duplicate Roster
+                  </Button>
+                  <Button
+                    onClick={() => setShowRosterDialog(true)}
+                    className="bg-orange-500 hover:bg-orange-600"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    {season.team ? "Edit Roster" : "Set Up Roster"}
+                  </Button>
+                </div>
               )}
             </div>
             
