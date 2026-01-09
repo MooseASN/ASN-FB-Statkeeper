@@ -611,9 +611,9 @@ export default function SeasonManagement() {
                   placeholder="https://school.edu/roster"
                   value={websiteUrl}
                   onChange={(e) => setWebsiteUrl(e.target.value)}
-                  className="bg-slate-900 border-slate-600"
+                  className="bg-slate-900 border-slate-600 text-white"
                 />
-                <Button variant="outline" className="border-slate-600">
+                <Button variant="outline" className="border-slate-600 text-white">
                   Import
                 </Button>
               </div>
