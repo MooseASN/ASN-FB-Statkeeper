@@ -12,6 +12,32 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 
 ## Latest Updates (January 2026)
 
+### January 9, 2026 - Demo Mode Implementation
+- **Basketball Demo** - COMPLETED
+  - Demo mode selector page with 3 mode options (Classic, Advanced, Quick)
+  - Classic Mode fully functional with:
+    - Orange "DEMO MODE" bar
+    - Fake teams: Northside Tigers vs Eastwood Eagles (10 players each)
+    - Full stat tracking (2PT, 3PT, FT, AST, REB, STL, BLK, TO, FOUL)
+    - Share, Embed, and Jumbotron buttons
+    - Clock and period tracking
+    - Recent actions log
+  - Advanced/Quick modes show placeholder pages redirecting to Classic
+
+- **Football Demo** - COMPLETED
+  - Orange "DEMO MODE" bar
+  - Fake teams: Central Wolves vs Riverside Panthers (50 players each)
+  - Field visualization with ball position
+  - Down & distance tracking
+  - Play buttons (RUN, PASS, PUNT, FIELD GOAL)
+  - Touchdown and field goal scoring
+  - Play log
+  - Share and Embed buttons
+
+- **Homepage Updates** - COMPLETED
+  - Added "View Demo" buttons to Basketball and Football sport cards
+  - Baseball shows "Coming Soon" badge
+
 ### January 9, 2026 - Homepage Redesign (Sidearm Sports Style)
 - **Homepage Redesigned** - COMPLETED
   - Dark theme with black, white, and grey colors (matching Sidearm Sports style)
