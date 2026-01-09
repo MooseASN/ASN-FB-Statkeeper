@@ -4962,6 +4962,8 @@ async def api_health_check():
             "status": "healthy", 
             "service": "statmoose-api",
             "database": "connected",
+            "db_name": db_name,
+            "mongo_url_prefix": mongo_url[:40] + "..." if len(mongo_url) > 40 else mongo_url,
             "users_count": user_count
         }
     except Exception as e:
@@ -4969,6 +4971,8 @@ async def api_health_check():
             "status": "degraded", 
             "service": "statmoose-api",
             "database": "error",
+            "db_name": db_name,
+            "mongo_url_prefix": mongo_url[:40] + "..." if len(mongo_url) > 40 else mongo_url,
             "error": str(e)
         }
 
