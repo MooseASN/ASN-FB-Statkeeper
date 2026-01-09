@@ -5327,7 +5327,8 @@ async def get_school_calendar(school_id: str, current_user: User = Depends(get_c
         {"school_id": school_id},
         {"_id": 0, "id": 1, "sport": 1, "home_team_name": 1, "away_team_name": 1, 
          "scheduled_date": 1, "scheduled_time": 1, "status": 1, "season_id": 1,
-         "location": 1, "share_code": 1}
+         "location": 1, "share_code": 1, "home_score": 1, "away_score": 1, 
+         "current_period": 1, "note": 1}
     ).sort("scheduled_date", 1).to_list(500)
     
     # Get all seasons to map names
