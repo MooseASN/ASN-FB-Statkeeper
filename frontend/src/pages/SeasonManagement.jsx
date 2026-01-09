@@ -49,6 +49,12 @@ export default function SeasonManagement() {
   const [showEditSeasonDialog, setShowEditSeasonDialog] = useState(false);
   const [showDeleteSeasonDialog, setShowDeleteSeasonDialog] = useState(false);
   const [showSchoolSearchDialog, setShowSchoolSearchDialog] = useState(false);
+  const [showDuplicateRosterDialog, setShowDuplicateRosterDialog] = useState(false);
+  
+  // Roster duplication
+  const [previousRosters, setPreviousRosters] = useState([]);
+  const [selectedRoster, setSelectedRoster] = useState(null);
+  const [loadingRosters, setLoadingRosters] = useState(false);
   
   // Edit season form
   const [editSeasonForm, setEditSeasonForm] = useState({ name: "" });
