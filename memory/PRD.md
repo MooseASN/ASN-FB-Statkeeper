@@ -489,7 +489,7 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - react-player: Video embedding
 - beautifulsoup4/lxml: Web scraping for roster import
 - reportlab: PDF generation
-- resend: Email service (configured but not fully implemented)
+- **resend**: Email service for contact form (API key in RESEND_API_KEY env variable)
 
 ## School/Organization Feature (January 2026)
 
