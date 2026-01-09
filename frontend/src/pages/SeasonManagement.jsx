@@ -19,6 +19,15 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Helper to format 24-hour time to 12-hour format
+const formatTime12Hour = (time24) => {
+  if (!time24) return "TBD";
+  const [hours, minutes] = time24.split(':').map(Number);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = hours % 12 || 12;
+  return `${hours12}:${minutes.toString().padStart(2, '0')} ${period}`;
+};
+
 export default function SeasonManagement() {
   const { seasonId } = useParams();
   const navigate = useNavigate();
