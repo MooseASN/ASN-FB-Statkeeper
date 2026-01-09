@@ -174,8 +174,8 @@ function TeamPanel({
             <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>PF</div>
           </div>
 
-          {/* Player Rows - scrollable if needed */}
-          <div className="flex-1 overflow-y-auto flex flex-col">
+          {/* Player Rows - stretch to fill available space */}
+          <div className="flex-1 flex flex-col justify-evenly min-h-0">
             {displayPlayers.length === 0 ? (
               <div className="text-center text-gray-400 text-2xl py-2" style={broadcastFont}>
                 No players on floor
@@ -184,7 +184,7 @@ function TeamPanel({
               displayPlayers.map((player, index) => (
                 <div 
                   key={index}
-                  className="grid grid-cols-[70px_1fr_70px_90px_90px_90px_70px_60px_60px] gap-1 items-center flex-shrink-0"
+                  className="grid grid-cols-[70px_1fr_70px_90px_90px_90px_70px_60px_60px] gap-1 items-center flex-1"
                   style={{ backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.03)' }}
                 >
                   <div className="text-2xl text-white pl-3" style={broadcastFont}>
