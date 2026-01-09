@@ -8,6 +8,19 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - Export game data as PDF
 - Share live game stats with public viewers
 - Manage events/tournaments
+- **Multi-tenant school/organization management system**
+
+## Latest Updates (January 2026)
+- **Edit Opponent Teams Feature** - COMPLETED
+  - Admins can edit opponent name, color, logo, and roster
+  - Full dialog workflow with proper text visibility
+  - 11/11 backend API tests passing
+- **Stats Page** - VERIFIED WORKING
+  - Season statistics with team/player averages
+  - Schedule tab with game results
+- **Refactoring Progress**
+  - Custom hooks (useGameClock, useDriveState, useTimeouts) imported into FootballLiveGame.jsx
+  - Router templates created at /app/backend/routers/ for future server.py refactoring
 
 ## User Personas
 1. **Sports Coaches/Managers**: Primary users who track game statistics in real-time
