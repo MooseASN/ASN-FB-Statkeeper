@@ -308,8 +308,15 @@ export default function SchoolDashboard() {
     }
   };
 
-  const handleGameClick = (game) => {
+  const handleGameClick = (game, skipWarning = false) => {
     setSelectedGame(game);
+    
+    // Show warning if game is already in progress
+    if (game.status === "active" && !skipWarning) {
+      setShowInProgressWarning(true);
+      return;
+    }
+    
     if (game.sport === "football") {
       setGameSetup({
         statMode: "classic",
@@ -330,6 +337,13 @@ export default function SchoolDashboard() {
       });
     }
     setShowGameStartDialog(true);
+  };
+
+  const handleConfirmInProgressGame = () => {
+    setShowInProgressWarning(false);
+    if (selectedGame) {
+      handleGameClick(selectedGame, true); // Skip warning on confirm
+    }
   };
 
   const handleStartGame = async () => {
