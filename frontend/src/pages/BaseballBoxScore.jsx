@@ -180,7 +180,7 @@ const BattingStatsTable = ({ teamName, teamColor, teamLogo, players, stats }) =>
 };
 
 // Pitching Stats Table Component
-const PitchingStatsTable = ({ teamName, teamColor, players, stats }) => {
+const PitchingStatsTable = ({ teamName, teamColor, teamLogo, players, stats }) => {
   // Filter to only pitchers (those with pitches_thrown or innings_pitched)
   const pitcherStats = stats?.filter(s => s.pitches_thrown > 0 || s.innings_pitched > 0) || [];
   
@@ -192,6 +192,13 @@ const PitchingStatsTable = ({ teamName, teamColor, players, stats }) => {
           className="flex items-center gap-3 px-4 py-2 rounded-t-lg"
           style={{ backgroundColor: teamColor || '#374151' }}
         >
+          {teamLogo && (
+            <img 
+              src={teamLogo} 
+              alt={`${teamName} logo`}
+              className="w-8 h-8 object-contain"
+            />
+          )}
           <h3 className="text-white font-bold text-lg">{teamName} - Pitching</h3>
         </div>
         <div className="bg-zinc-900 border border-zinc-700 p-4 text-zinc-400 text-center">
@@ -218,6 +225,13 @@ const PitchingStatsTable = ({ teamName, teamColor, players, stats }) => {
         className="flex items-center gap-3 px-4 py-2 rounded-t-lg"
         style={{ backgroundColor: teamColor || '#374151' }}
       >
+        {teamLogo && (
+          <img 
+            src={teamLogo} 
+            alt={`${teamName} logo`}
+            className="w-8 h-8 object-contain"
+          />
+        )}
         <h3 className="text-white font-bold text-lg">{teamName} - Pitching</h3>
       </div>
       <div className="overflow-x-auto">
