@@ -13,6 +13,29 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - GAME CONTROLS & FINALIZATION ✅
+
+#### Game Controls Button - COMPLETED ✅
+- **Location**: Below Team Stats table
+- **Button**: Shows "Game Controls" (gray) or "Game FINAL" (green when finalized)
+- **Modal with 3 options**:
+  1. **Live Stat Output** - Green button (Coming Soon placeholder)
+  2. **PDF Box Score** - Blue button (Coming Soon placeholder)
+  3. **Finalize Game** - Amber button opens finalization flow
+
+#### Game Finalization Flow - COMPLETED ✅
+- **Current Score display**: Shows team scores at finalization time
+- **Winning Pitcher dropdown**: Select from winning team's roster
+- **Losing Pitcher dropdown**: Select from losing team's roster
+- **Saving Pitcher dropdown**: Select from winning team's roster OR "No Save"
+- **End Game button**: Appears only when all 3 selections made
+- **On finalization**:
+  - Game status set to "final"
+  - Toast notification: "Game finalized! Status: FINAL"
+  - Play-by-play log shows "FINAL: [Away] [score] - [score] [Home]"
+  - Button changes to green "Game FINAL"
+  - Data saved to backend (in non-demo mode)
+
 ### January 10, 2026 - UNDO FEATURE & OUTFIELDER REPOSITIONING ✅
 
 #### Undo Feature - COMPLETED ✅
