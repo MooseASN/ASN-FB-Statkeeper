@@ -26,7 +26,8 @@ import {
   Settings,
   Users,
   ArrowLeft,
-  Check
+  Check,
+  ArrowLeftRight
 } from "lucide-react";
 import { X as XIcon } from "lucide-react";
 
