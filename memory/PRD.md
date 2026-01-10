@@ -14,35 +14,34 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
-### January 2026 - SIMPLE FOOTBALL STAT-TRACKING MODE ✅
+### January 2026 - SIMPLE FOOTBALL STAT-TRACKING MODE v2 ✅
 
-#### SimpleFootballLiveGame.jsx - COMPLETED ✅
-Created a broadcaster-friendly simple stat tracking mode for football:
+#### SimpleFootballLiveGame.jsx - REDESIGNED ✅
+Broadcaster-friendly interface with structured stat collection workflows:
 
-**Design Goals:**
-- Minimal clicks for common actions
-- Large, easy-to-tap buttons
-- Essential stats only (no complex play-by-play)
-- Quick score recording with one tap
+**Workflow Details:**
+| Workflow | Steps |
+|----------|-------|
+| **Rush** | Click Rush → Type player # → Enter yards → Select tackler (or No Tackle) |
+| **Pass** | Select QB (with Remember Me checkbox) → Enter yards → Select receiver → Select tackler |
+| **Field Goal** | Select kicker → Choose distance (20-55 yds) → Good (+3) or No Good (change possession) |
+| **Penalty** | Select team → Type-to-search penalty dropdown → Forward/Backward yards |
+| **Turnover** | Fumble / Interception / Turnover on Downs → Auto possession change |
+| **First Down** | One-click adds 1st down to team with possession |
 
-**Features:**
-| Feature | Description |
-|---------|-------------|
-| **Quick Score Buttons** | +6 TD (green), +1 XP (blue), +2 2PT (purple), +3 FG (amber), +2 Safety (red) |
-| **Possession Tracking** | Yellow ring indicator, one-tap to switch teams |
-| **Game Clock** | Start/Stop, quick adjustments (±10s, ±1m), auto-reset per quarter |
-| **Quarter Control** | Up/down arrows, auto-resets clock on quarter change |
-| **Team Stats Panel** | Total Yards, Pass Yards, Rush Yards, Turnovers, 1st Downs |
-| **Yards Dialogs** | Pass/Rush yards input with quick-select buttons |
-| **Timeout Tracking** | 3 per team, visual indicators, stops clock when used |
-| **Game Log** | Chronological event log with quarter markers |
-| **Undo Support** | Reverts last 20 actions |
+**Key Features:**
+- **No scrolling required** - entire UI fits on screen
+- **QB "Remember Me"** - checkbox to persist QB selection per team
+- **Type-to-search player input** - shows matching players as you type
+- **Type-to-search penalties** - 22 common penalties with default yards
+- **Individual player stats** - tracks rush yards, pass yards, receiving yards, tackles
+- **Compact stats panel** - horizontal grid showing Rush/Pass/Total/TO/1st
 
 **Routes:**
 - Demo: `/demo/football/simple`
 - Authenticated: `/football/:id/simple`
 
-**File:** `/app/frontend/src/pages/SimpleFootballLiveGame.jsx` (629 lines)
+**Testing:** 11/11 features passed (100% success rate)
 
 ### January 2026 - CUSTOM HOOKS INTEGRATION ✅
 
