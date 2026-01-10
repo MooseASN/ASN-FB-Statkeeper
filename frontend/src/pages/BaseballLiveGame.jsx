@@ -1324,6 +1324,9 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     
     if (!runner || !currentBase) return;
     
+    // Save state before making changes
+    saveStateForUndo();
+    
     const runnerNumber = typeof runner === 'object' ? runner.number : runner;
     
     setGame(prev => {
