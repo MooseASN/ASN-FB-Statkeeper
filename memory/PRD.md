@@ -13,6 +13,40 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - CRITICAL BUG FIX: Teams Not Showing Up
+
+#### Teams Bug FIX - COMPLETED ✅
+**Root Cause**: `TeamDetail.jsx` was not including the `sport` field when saving team data. The backend `TeamCreate` model defaulted `sport` to `"basketball"`, so when saving a baseball/football team, it would silently change the sport to basketball, causing the team to disappear from the sport-filtered teams list.
+
+**Fix Applied**:
+1. **Frontend (`TeamDetail.jsx`)**: Added `teamSport` state that tracks the team's sport on load and includes it in all PUT requests
+2. **Backend (`server.py` PUT /api/teams)**: Added safeguard logic to preserve existing sport if incoming sport is the default "basketball" but existing sport is different
+
+**Verified**: 7/7 backend tests passed, team sport persistence confirmed working
+
+### January 10, 2026 - Baseball Tracker Enhancements
+
+#### Play-by-Play Log Fixes - COMPLETED ✅
+- **No More Doubling**: Refactored state updates to use `addPlay()` helper with `lastPlayIdRef` for deduplication
+- **Player Names Shown**: All plays now include player number and name (e.g., "Ball 1 - #2 Ryan Smith")
+- **Unique IDs**: Each play has a unique ID using timestamp + counter
+
+#### Baseball Field Enhancements - COMPLETED ✅
+- **Runner Numbers on Bases**: Runners now show their jersey number on the base indicator (instead of just yellow dots)
+- **Team Colors on Field**: 
+  - Fielder position boxes use the fielding team's color
+  - Runner indicators use the batting team's color
+- Added `fieldingTeamColor` and `battingTeamColor` props to `BaseballDiamond` component
+
+#### Substitution Feature - COMPLETED ✅
+- **Substitution Icon**: ArrowLeftRight icon added to each player in batting order
+- **Substitution Dialog**: 3-option dialog when clicking substitute:
+  - Offensive Only (Batting Order) - green button
+  - Defensive Only (Field Position) - blue button
+  - Both (Full Substitution) - purple button
+- **Player Selection**: After choosing type, dropdown shows available bench players
+- **Auto-Advance**: Batting order auto-advances after at-bat concludes
+
 ### January 10, 2026 - Major UI/UX Updates
 
 #### Navigation Fix - COMPLETED
