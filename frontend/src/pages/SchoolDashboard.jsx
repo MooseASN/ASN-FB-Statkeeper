@@ -710,7 +710,7 @@ export default function SchoolDashboard() {
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-3">
-                            <span className="text-2xl">{season.sport === "basketball" ? "🏀" : "🏈"}</span>
+                            <span className="text-2xl">{season.sport === "basketball" ? "🏀" : season.sport === "baseball" ? "⚾" : "🏈"}</span>
                             <div>
                               <h3 className="font-semibold text-white">{season.name}</h3>
                               <p className="text-sm text-slate-400">
