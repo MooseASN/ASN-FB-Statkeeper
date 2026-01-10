@@ -2092,28 +2092,90 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
     game.user_id = user.user_id
     
     doc = game.model_dump()
+    doc = game.model_dump()
+    
+    # For baseball games, embed player stats directly in the game document
+    if game_data.sport == "baseball":
+        home_player_stats = []
+        away_player_stats = []
+        
+        if home_team:
+            for player in home_team.get("roster", []):
+                home_player_stats.append({
+                    "player_number": player["number"],
+                    "player_name": player["name"],
+                    "position": player.get("position", ""),
+                    # Batting stats
+                    "at_bats": 0,
+                    "hits": 0,
+                    "singles": 0,
+                    "doubles": 0,
+                    "triples": 0,
+                    "home_runs": 0,
+                    "runs": 0,
+                    "rbi": 0,
+                    "walks": 0,
+                    "strikeouts_batting": 0,
+                    "hit_by_pitch": 0,
+                    "sacrifice_flies": 0,
+                    "sacrifice_bunts": 0,
+                    "stolen_bases": 0,
+                    "caught_stealing": 0,
+                })
+        
+        if away_team:
+            for player in away_team.get("roster", []):
+                away_player_stats.append({
+                    "player_number": player["number"],
+                    "player_name": player["name"],
+                    "position": player.get("position", ""),
+                    # Batting stats
+                    "at_bats": 0,
+                    "hits": 0,
+                    "singles": 0,
+                    "doubles": 0,
+                    "triples": 0,
+                    "home_runs": 0,
+                    "runs": 0,
+                    "rbi": 0,
+                    "walks": 0,
+                    "strikeouts_batting": 0,
+                    "hit_by_pitch": 0,
+                    "sacrifice_flies": 0,
+                    "sacrifice_bunts": 0,
+                    "stolen_bases": 0,
+                    "caught_stealing": 0,
+                })
+        
+        doc["home_player_stats"] = home_player_stats
+        doc["away_player_stats"] = away_player_stats
+        doc["home_roster"] = home_team.get("roster", []) if home_team else []
+        doc["away_roster"] = away_team.get("roster", []) if away_team else []
+    
     await db.games.insert_one(doc)
     
     # Create player stats for roster players (only if teams are not TBD)
-    if home_team:
-        for player in home_team.get("roster", []):
-            stats = PlayerStats(
-                game_id=game.id,
-                team_id=game_data.home_team_id,
-                player_number=player["number"],
-                player_name=player["name"]
-            )
-            await db.player_stats.insert_one(stats.model_dump())
-    
-    if away_team:
-        for player in away_team.get("roster", []):
-            stats = PlayerStats(
-                game_id=game.id,
-                team_id=game_data.away_team_id,
-                player_number=player["number"],
-                player_name=player["name"]
-            )
-            await db.player_stats.insert_one(stats.model_dump())
+    # For baseball, stats are embedded in game doc, so skip this
+    if game_data.sport != "baseball":
+        if home_team:
+            for player in home_team.get("roster", []):
+                stats = PlayerStats(
+                    game_id=game.id,
+                    team_id=game_data.home_team_id,
+                    player_number=player["number"],
+                    player_name=player["name"]
+                )
+                await db.player_stats.insert_one(stats.model_dump())
+        
+        if away_team:
+            for player in away_team.get("roster", []):
+                stats = PlayerStats(
+                    game_id=game.id,
+                    team_id=game_data.away_team_id,
+                    player_number=player["number"],
+                    player_name=player["name"]
+                )
+                await db.player_stats.insert_one(stats.model_dump())
     
     return game
 
