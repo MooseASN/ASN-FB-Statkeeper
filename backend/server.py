@@ -1232,6 +1232,9 @@ class Game(BaseModel):
     inning_scores: dict = Field(default_factory=lambda: {"home": [], "away": []})  # Runs per inning
     current_batter_id: Optional[str] = None  # Current batter's player ID
     current_pitcher_id: Optional[str] = None  # Current pitcher's player ID
+    # Player stats embedded in game (for baseball)
+    home_player_stats: Optional[List[dict]] = None
+    away_player_stats: Optional[List[dict]] = None
     # General timestamps
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
