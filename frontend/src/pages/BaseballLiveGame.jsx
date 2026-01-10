@@ -1344,6 +1344,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
                 players={battingRoster}
                 currentBatterIndex={currentBatterIndex}
                 onSelectBatter={setCurrentBatterIndex}
+                onSubstitute={(player) => handleSubstitutionRequest(player, battingTeamIsHome)}
               />
             </div>
             
@@ -1371,6 +1372,19 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
           </div>
         </div>
       </div>
+      
+      {/* Substitution Dialog */}
+      <SubstitutionDialog
+        isOpen={showSubstitutionDialog}
+        onClose={() => {
+          setShowSubstitutionDialog(false);
+          setPlayerToSubstitute(null);
+          setSubstitutionTeam(null);
+        }}
+        player={playerToSubstitute}
+        roster={substitutionTeam === 'home' ? homeRoster : awayRoster}
+        onSubstitute={executeSubstitution}
+      />
       
       {/* In Play Modal */}
       <InPlayModal 
