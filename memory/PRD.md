@@ -13,6 +13,33 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - Baseball Game Creation & Persistence COMPLETED
+
+#### Baseball Game Creation UI - FULLY FUNCTIONAL
+- **Innings Selector** in New Game page:
+  - 7 Innings option (high school/doubleheaders)
+  - 9 Innings option (standard regulation) - default
+  - Visual buttons with descriptions
+- **Game Notes** text input for custom notes
+- **Primetime Mode** toggle for video streaming
+- **Navigation**: Creating game routes to `/baseball/:gameId`
+
+#### Backend Persistence - COMPLETED
+- **Game Creation** (`POST /api/games`):
+  - Baseball games initialized with total_innings, current_inning=1, inning_half="top"
+  - balls=0, strikes=0, outs=0
+  - bases state, inning_scores arrays
+  - Player stats embedded in game document
+- **Game Updates** (`PUT /api/games/:id`):
+  - Auto-saves game state with 1 second debounce
+  - Persists balls, strikes, outs, scores, player stats, play-by-play
+- **Teams Filtering**: Teams correctly filtered by sport query parameter
+
+#### Test Results: 100% Pass Rate
+- 8/8 backend API tests passed
+- 7/7 frontend features verified
+- Created test file: `/app/tests/test_baseball_features.py`
+
 ### January 10, 2026 - Baseball Stat Tracker COMPLETED
 
 #### Baseball "Classic Mode" Stat Tracker - FULLY FUNCTIONAL
@@ -38,11 +65,14 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
   - Full lineup with player numbers and names
   - Current batter highlighted
   - Running AB-H stats for each player
-- **Baseball Field Diagram**:
-  - Visual diamond with positions labeled
-  - Outfield (Left, Center, Right)
-  - Infield (First, Second, Third, Shortstop)
-  - Pitcher and Catcher positions
+- **Realistic Baseball Field Diagram**:
+  - Grass mowing pattern stripes
+  - **Faded StatMoose logo in centerfield**
+  - Warning track around outfield
+  - Realistic infield dirt with gradient
+  - Chalk base paths and foul lines
+  - On-deck circles and coaches boxes
+  - Fielding position labels
 - **Play-by-Play Log**:
   - Records all pitches and plays
   - Shows inning indicator (1▲ = top, 1▼ = bottom)
