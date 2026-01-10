@@ -655,6 +655,7 @@ export default function BaseballBoxScore() {
           <BattingStatsTable
             teamName={game.away_team_name}
             teamColor={game.away_team_color}
+            teamLogo={game.away_team_logo}
             players={game.away_roster}
             stats={game.away_player_stats}
           />
@@ -663,6 +664,7 @@ export default function BaseballBoxScore() {
           <BattingStatsTable
             teamName={game.home_team_name}
             teamColor={game.home_team_color}
+            teamLogo={game.home_team_logo}
             players={game.home_roster}
             stats={game.home_player_stats}
           />
@@ -674,6 +676,7 @@ export default function BaseballBoxScore() {
           <PitchingStatsTable
             teamName={game.away_team_name}
             teamColor={game.away_team_color}
+            teamLogo={game.away_team_logo}
             players={game.away_roster}
             stats={game.away_player_stats}
           />
@@ -682,6 +685,7 @@ export default function BaseballBoxScore() {
           <PitchingStatsTable
             teamName={game.home_team_name}
             teamColor={game.home_team_color}
+            teamLogo={game.home_team_logo}
             players={game.home_roster}
             stats={game.home_player_stats}
           />
