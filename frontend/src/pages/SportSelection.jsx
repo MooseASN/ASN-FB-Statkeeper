@@ -33,7 +33,7 @@ export default function SportSelection({ user, onLogout }) {
   const { selectSport } = useSport();
   
   // Beta mode state
-  const [betaStatus, setBetaStatus] = useState({ basketball_beta: false, football_beta: false });
+  const [betaStatus, setBetaStatus] = useState({ basketball_beta: false, football_beta: false, baseball_beta: false });
   const [loadingBeta, setLoadingBeta] = useState(true);
   const [schoolInfo, setSchoolInfo] = useState(null);
   
