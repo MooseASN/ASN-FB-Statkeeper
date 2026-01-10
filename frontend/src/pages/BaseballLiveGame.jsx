@@ -739,6 +739,10 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [awayStats, setAwayStats] = useState(initialDemoData?.away_player_stats || []);
   const [playByPlay, setPlayByPlay] = useState([]);
   
+  // Ref to prevent duplicate play entries (for React strict mode / double renders)
+  const lastPlayIdRef = useRef(null);
+  const playCounterRef = useRef(0);
+  
   // Starter configuration state
   const [showStarterConfig, setShowStarterConfig] = useState(false);
   const [startersConfigured, setStartersConfigured] = useState(demoMode); // Skip for demo
