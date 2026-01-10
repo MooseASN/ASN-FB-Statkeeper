@@ -2267,7 +2267,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         outs: 0,
         bases: { first: null, second: null, third: null },
       }));
-      setCurrentBatterIndex(0);
+      // Note: Don't reset batter index when manually changing inning - keep where they were
     }
     
     toast.success("Game updated");
