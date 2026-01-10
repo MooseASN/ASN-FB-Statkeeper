@@ -1447,6 +1447,51 @@ async def delete_team(team_id: str, user: User = Depends(get_current_user)):
         raise HTTPException(status_code=404, detail="Team not found")
     return {"message": "Team deleted"}
 
+@api_router.post("/teams/{team_id}/logo/upload")
+async def upload_team_logo(team_id: str, file: UploadFile = File(...), user: User = Depends(get_current_user)):
+    """Upload a team logo image. Supports PNG, JPG, JPEG, GIF, WEBP. Max 5MB."""
+    import base64
+    
+    # Check if team belongs to user or user has shared access
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if not team:
+        raise HTTPException(status_code=404, detail="Team not found")
+    
+    # Check ownership or shared access
+    if team.get("user_id") != user.user_id:
+        # Check if user has shared access
+        shared_access = await db.shared_access.find_one({
+            "owner_user_id": team.get("user_id"),
+            "shared_with_user_id": user.user_id,
+            "is_active": True
+        })
+        if not shared_access:
+            raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Validate file type
+    allowed_types = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"]
+    if file.content_type not in allowed_types:
+        raise HTTPException(status_code=400, detail="Invalid file type. Allowed: PNG, JPG, GIF, WEBP")
+    
+    # Read file content
+    content = await file.read()
+    
+    # Check file size (max 5MB)
+    if len(content) > 5 * 1024 * 1024:
+        raise HTTPException(status_code=400, detail="File too large. Maximum size is 5MB")
+    
+    # Convert to base64 data URL
+    base64_content = base64.b64encode(content).decode('utf-8')
+    logo_url = f"data:{file.content_type};base64,{base64_content}"
+    
+    # Update team with logo
+    await db.teams.update_one(
+        {"id": team_id},
+        {"$set": {"logo_url": logo_url, "logo_filename": file.filename}}
+    )
+    
+    return {"message": "Logo uploaded successfully", "logo_url": logo_url}
+
 @api_router.post("/teams/{team_id}/roster/csv")
 async def upload_roster_csv(team_id: str, file: UploadFile = File(...), user: User = Depends(get_current_user)):
     team = await db.teams.find_one({"id": team_id, "user_id": user.user_id}, {"_id": 0})
