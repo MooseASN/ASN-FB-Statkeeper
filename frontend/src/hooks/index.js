@@ -1,7 +1,7 @@
-// Custom hooks for football game management
-export { useGameClock } from './useGameClock';
-export { useDriveState } from './useDriveState';
-export { useTimeouts } from './useTimeouts';
+// Baseball Live Game Custom Hooks
+// These hooks extract reusable game logic from the BaseballLiveGame component
 
-// Offline queue management
-export { useOfflineQueue, executeWithQueue } from './useOfflineQueue';
+export { useGameHistory } from './useGameHistory';
+export { usePlayerStats } from './usePlayerStats';
+export { useBaseRunners } from './useBaseRunners';
+export { usePlayByPlay } from './usePlayByPlay';
