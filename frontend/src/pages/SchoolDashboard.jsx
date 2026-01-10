@@ -1223,6 +1223,8 @@ export default function SchoolDashboard() {
                     <Label className="text-sm font-semibold text-slate-200">Timeouts</Label>
                     {selectedGame.sport === "football" ? (
                       <p className="text-xs text-slate-400">3 timeouts per half (standard)</p>
+                    ) : selectedGame.sport === "baseball" ? (
+                      <p className="text-xs text-slate-400">No timeouts in baseball</p>
                     ) : (
                       <div className="flex gap-2 flex-wrap">
                         {[
