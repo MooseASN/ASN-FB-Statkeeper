@@ -13,6 +13,49 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - Baseball Stat Tracker COMPLETED
+
+#### Baseball "Classic Mode" Stat Tracker - FULLY FUNCTIONAL
+- **Live Game UI** (`BaseballLiveGame.jsx`) - Dark theme scoreboard interface:
+  - Team names with color-coded backgrounds
+  - Live score display
+  - Inning indicator (Top/Bottom + inning number)
+  - Ball/Strike/Out counters with visual dots
+  - Current batter and pitcher info cards
+- **Pitch Tracking**:
+  - Ball (green button) - adds to ball count
+  - Swinging Strike (red button)
+  - Looking Strike (red button)
+  - Foul Ball - counts as strike (max 2)
+  - Intentional Walk
+  - Hit By Pitch
+  - In Play - opens result dialog
+- **In Play Result Dialog**:
+  - Hits: Single, Double, Triple, Home Run (green)
+  - Outs: Ground Out, Fly Out, Line Out, Pop Out, Strikeout (red)
+  - Other: Fielder's Choice, Error, Sacrifice Fly, Sacrifice Bunt, Double Play (gray)
+- **Batting Order Panel**:
+  - Full lineup with player numbers and names
+  - Current batter highlighted
+  - Running AB-H stats for each player
+- **Baseball Field Diagram**:
+  - Visual diamond with positions labeled
+  - Outfield (Left, Center, Right)
+  - Infield (First, Second, Third, Shortstop)
+  - Pitcher and Catcher positions
+- **Play-by-Play Log**:
+  - Records all pitches and plays
+  - Shows inning indicator (1▲ = top, 1▼ = bottom)
+- **Demo Mode** (`/demo/baseball`):
+  - Uses real BaseballLiveGame.jsx component
+  - Mock data from `/api/demo/baseball` endpoint
+  - Orange "DEMO MODE" banner
+  - 100% test pass rate
+
+#### Routes Added:
+- `/baseball/:id` - Live baseball game (protected)
+- `/demo/baseball` - Baseball demo mode
+
 ### January 10, 2026 - P2 Tasks Completed
 
 #### Stripe Payment Integration - COMPLETED
