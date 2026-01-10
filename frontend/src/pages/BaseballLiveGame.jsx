@@ -1655,14 +1655,17 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       addPlay(currentGame.current_inning, currentGame.inning_half, description);
     }
     
-    // Update game state
+    // Determine if this was a hit type where advanceRunners handles the score
+    const isHitType = ['single', 'double', 'triple', 'home_run', 'error'].includes(resultType);
+    
+    // Update game state - don't overwrite score for hit types (advanceRunners handles it)
     setGame(prev => ({
       ...prev,
       balls: 0,
       strikes: 0,
       outs: newOuts,
-      home_score: newHomeScore,
-      away_score: newAwayScore,
+      // Only update score for non-hit types (like sacrifice fly)
+      ...(isHitType ? {} : { home_score: newHomeScore, away_score: newAwayScore }),
       inning_half: newInningHalf,
       current_inning: newInning
     }));
