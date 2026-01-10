@@ -1310,6 +1310,8 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
               onSelect={handleInterceptionThrower} 
               onCancel={closeWorkflow} 
               title={`Who threw the interception? (${offenseTeamName})`}
+              onAddPlayer={addToOffenseRoster}
+              teamName={offenseTeamName}
             />
           )}
           
@@ -1320,6 +1322,8 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
               onSelect={handleInterceptionInterceptor} 
               onCancel={closeWorkflow} 
               title={`Who made the interception? (${defenseTeamName})`}
+              onAddPlayer={addToDefenseRoster}
+              teamName={defenseTeamName}
             />
           )}
           
@@ -1330,6 +1334,8 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
               onSelect={handleFumbler} 
               onCancel={closeWorkflow} 
               title={`Who fumbled? (${offenseTeamName})`}
+              onAddPlayer={addToOffenseRoster}
+              teamName={offenseTeamName}
             />
           )}
           
