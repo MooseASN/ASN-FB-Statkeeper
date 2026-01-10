@@ -1,0 +1,70 @@
+{
+  "summary": "Completed frontend testing of baseball tracker features. All 8 requested features verified working: Home navigation to /dashboard, StatMoose logo to /, baseball field image, starter config dialog with 4 steps, 9 dropdowns per step, teams page refresh button, and team creation.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_26.json"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100% (8/8 features verified)"
+  },
+  "test_credentials": {
+    "admin": "antlersportsnetwork@gmail.com / NoahTheJew1997"
+  },
+  "seed_data_creation": "Created test team: TEST_New Baseball Team (ID: 941db06e-fe8e-4be6-82d7-09c3ce2bfcfd)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All baseball features working correctly. Demo mode at /demo/baseball uses MOCKED API at /api/demo/baseball. Starter config dialog has 4 steps: home batting, home defense, away batting, away defense. Each step has 9 dropdowns for player selection.",
+  "features_tested": {
+    "home_navigation_to_dashboard": {
+      "status": "PASS",
+      "notes": "Home button in Layout.jsx (line 87) correctly links to /dashboard via <Link to='/dashboard'>"
+    },
+    "statmoose_logo_to_homepage": {
+      "status": "PASS",
+      "notes": "StatMoose logo in header (line 62) correctly links to / via <Link to='/'>"
+    },
+    "baseball_field_image": {
+      "status": "PASS",
+      "notes": "Baseball field uses correct image: https://customer-assets.emergentagent.com/job_baseball-tracker-2/artifacts/xsmgreca_Field.png"
+    },
+    "starter_config_dialog_appears": {
+      "status": "PASS",
+      "notes": "StarterConfigDialog appears automatically when starting a new baseball game with teams that have rosters"
+    },
+    "starter_dialog_4_steps": {
+      "status": "PASS",
+      "notes": "Dialog has 4 steps: Step 1 (home batting), Step 2 (home defense), Step 3 (away batting), Step 4 (away defense). Progress bar shows step progression."
+    },
+    "starter_dialog_9_dropdowns": {
+      "status": "PASS",
+      "notes": "Each step shows 9 dropdowns for player selection. Batting order has numbered positions 1-9, defense has position labels (P, C, 1B, 2B, 3B, SS, LF, CF, RF)"
+    },
+    "teams_page_refresh_button": {
+      "status": "PASS",
+      "notes": "Refresh button found with data-testid='refresh-teams-btn'. Clicking it reloads the teams list."
+    },
+    "team_creation_works": {
+      "status": "PASS",
+      "notes": "Create Team dialog opens, accepts team name/color/logo, creates team successfully and navigates to team detail page"
+    }
+  },
+  "demo_mode_verification": {
+    "url": "/demo/baseball",
+    "demo_bar_visible": true,
+    "mocked_api": "/api/demo/baseball",
+    "features_working": ["scoreboard", "batting order", "pitch result buttons", "baseball field", "defensive positions"]
+  },
+  "mocked_api_note": "Demo mode uses /api/demo/baseball for mock data. Regular game mode uses real backend APIs."
+}
