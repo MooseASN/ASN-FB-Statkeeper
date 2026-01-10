@@ -757,6 +757,24 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     document.title = "StatMoose BB";
   }, [id, demoMode, fetchGame]);
   
+  // Show starter config after game loads (if not already configured and has rosters)
+  useEffect(() => {
+    if (!loading && game && !startersConfigured && !demoMode && homeRoster.length > 0 && awayRoster.length > 0) {
+      setShowStarterConfig(true);
+    }
+  }, [loading, game, startersConfigured, demoMode, homeRoster.length, awayRoster.length]);
+  
+  // Handle starter configuration completion
+  const handleStarterConfigComplete = (config) => {
+    setHomeBattingOrder(config.homeBattingOrder);
+    setAwayBattingOrder(config.awayBattingOrder);
+    setHomeDefense(config.homeDefense);
+    setAwayDefense(config.awayDefense);
+    setStartersConfigured(true);
+    setShowStarterConfig(false);
+    toast.success("Starters configured! Game is ready.");
+  };
+  
   // Handle pitch result
   const handlePitchResult = useCallback((resultType) => {
     if (resultType === "in_play") {
