@@ -84,9 +84,9 @@ export default function Layout({ children, user, onLogout }) {
             </div>
             
             <nav className="flex items-center gap-1 sm:gap-2">
-              <Link to="/">
+              <Link to="/dashboard">
                 <Button 
-                  variant={isActive("/") && !isActive("/events") && !isActive("/teams") && !isActive("/history") ? "secondary" : "ghost"} 
+                  variant={isActive("/dashboard") ? "secondary" : "ghost"} 
                   size="sm"
                   className="gap-2"
                   data-testid="nav-home"
