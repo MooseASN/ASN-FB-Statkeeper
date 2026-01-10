@@ -2095,12 +2095,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         newInning = currentGame.current_inning + 1;
       }
       description += " - Side retired";
-      // Reset the OTHER team's batter to lead-off (the new batting team)
-      if (newInningHalf === 'top') {
-        setAwayBatterIndex(0);
-      } else {
-        setHomeBatterIndex(0);
-      }
+      // NOTE: Do NOT reset batter index - each team continues where they left off in the batting order
       // Clear bases
       setGame(prev => ({ ...prev, bases: { first: null, second: null, third: null } }));
     } else {
