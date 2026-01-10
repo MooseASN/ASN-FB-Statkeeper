@@ -121,6 +121,10 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/demo/basketball/simple" element={<DemoLiveGameQuick />} />
       <Route path="/demo/football" element={<DemoFootballLiveGame />} />
       
+      {/* Payment routes */}
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/payment/success" element={<PaymentSuccessPage />} />
+      
       {/* Public routes */}
       <Route path="/login" element={user ? <Navigate to="/select-sport" replace /> : <Login onLogin={onLogin} />} />
       <Route path="/register" element={user ? <Navigate to="/select-sport" replace /> : <Register onLogin={onLogin} />} />
