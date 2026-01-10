@@ -5,6 +5,19 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
   ChevronUp, 
   ChevronDown, 
   Share2, 
@@ -12,10 +25,252 @@ import {
   RotateCcw,
   Settings,
   Users,
-  ArrowLeft
+  ArrowLeft,
+  Check
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Defensive positions for baseball
+const DEFENSIVE_POSITIONS = [
+  { key: 'pitcher', label: 'Pitcher (P)', number: 1 },
+  { key: 'catcher', label: 'Catcher (C)', number: 2 },
+  { key: 'first', label: 'First Base (1B)', number: 3 },
+  { key: 'second', label: 'Second Base (2B)', number: 4 },
+  { key: 'third', label: 'Third Base (3B)', number: 5 },
+  { key: 'shortstop', label: 'Shortstop (SS)', number: 6 },
+  { key: 'left', label: 'Left Field (LF)', number: 7 },
+  { key: 'center', label: 'Center Field (CF)', number: 8 },
+  { key: 'right', label: 'Right Field (RF)', number: 9 },
+];
+
+// Starter Configuration Dialog Component
+const StarterConfigDialog = ({ 
+  isOpen, 
+  onClose, 
+  homeRoster, 
+  awayRoster, 
+  homeTeamName, 
+  awayTeamName,
+  homeTeamColor,
+  awayTeamColor,
+  onComplete 
+}) => {
+  const [step, setStep] = useState(1); // 1: home batting, 2: home defense, 3: away batting, 4: away defense
+  const [homeBattingOrder, setHomeBattingOrder] = useState(Array(9).fill(''));
+  const [homeDefense, setHomeDefense] = useState({});
+  const [awayBattingOrder, setAwayBattingOrder] = useState(Array(9).fill(''));
+  const [awayDefense, setAwayDefense] = useState({});
+  
+  const currentRoster = step <= 2 ? homeRoster : awayRoster;
+  const currentTeamName = step <= 2 ? homeTeamName : awayTeamName;
+  const currentTeamColor = step <= 2 ? homeTeamColor : awayTeamColor;
+  const isBattingStep = step === 1 || step === 3;
+  const currentBattingOrder = step <= 2 ? homeBattingOrder : awayBattingOrder;
+  const setCurrentBattingOrder = step <= 2 ? setHomeBattingOrder : setAwayBattingOrder;
+  const currentDefense = step <= 2 ? homeDefense : awayDefense;
+  const setCurrentDefense = step <= 2 ? setHomeDefense : setAwayDefense;
+  
+  const getStepTitle = () => {
+    switch(step) {
+      case 1: return `${homeTeamName} - Set Batting Order`;
+      case 2: return `${homeTeamName} - Set Defensive Positions`;
+      case 3: return `${awayTeamName} - Set Batting Order`;
+      case 4: return `${awayTeamName} - Set Defensive Positions`;
+      default: return 'Configure Starters';
+    }
+  };
+  
+  const getSelectedPlayerIds = () => {
+    if (isBattingStep) {
+      return currentBattingOrder.filter(id => id);
+    } else {
+      return Object.values(currentDefense).filter(id => id);
+    }
+  };
+  
+  const handleBattingOrderChange = (spotIndex, playerId) => {
+    const newOrder = [...currentBattingOrder];
+    newOrder[spotIndex] = playerId;
+    setCurrentBattingOrder(newOrder);
+  };
+  
+  const handleDefenseChange = (positionKey, playerId) => {
+    setCurrentDefense(prev => ({
+      ...prev,
+      [positionKey]: playerId
+    }));
+  };
+  
+  const canProceed = () => {
+    if (isBattingStep) {
+      return currentBattingOrder.filter(id => id).length === 9;
+    } else {
+      return Object.keys(currentDefense).length === 9;
+    }
+  };
+  
+  const handleNext = () => {
+    if (step < 4) {
+      setStep(step + 1);
+    } else {
+      // Complete - build the lineup data
+      const buildLineupFromOrder = (order, roster) => {
+        return order.map(playerId => {
+          const player = roster.find(p => p.player_number === playerId);
+          return player || null;
+        }).filter(Boolean);
+      };
+      
+      const buildDefenseFromSelections = (defense, roster) => {
+        const result = {};
+        Object.entries(defense).forEach(([posKey, playerId]) => {
+          const player = roster.find(p => p.player_number === playerId);
+          if (player) {
+            result[posKey] = { number: player.player_number, name: player.player_name };
+          }
+        });
+        return result;
+      };
+      
+      onComplete({
+        homeBattingOrder: buildLineupFromOrder(homeBattingOrder, homeRoster),
+        homeDefense: buildDefenseFromSelections(homeDefense, homeRoster),
+        awayBattingOrder: buildLineupFromOrder(awayBattingOrder, awayRoster),
+        awayDefense: buildDefenseFromSelections(awayDefense, awayRoster),
+      });
+    }
+  };
+  
+  const getPlayerById = (playerId) => {
+    return currentRoster?.find(p => p.player_number === playerId);
+  };
+  
+  return (
+    <Dialog open={isOpen} onOpenChange={() => {}}>
+      <DialogContent className="max-w-2xl bg-zinc-900 border-zinc-700 text-white max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold flex items-center gap-3">
+            <div 
+              className="w-4 h-4 rounded-full" 
+              style={{ backgroundColor: currentTeamColor }}
+            />
+            {getStepTitle()}
+          </DialogTitle>
+          <div className="flex items-center gap-2 mt-2">
+            {[1, 2, 3, 4].map(s => (
+              <div 
+                key={s} 
+                className={`h-2 flex-1 rounded-full ${s <= step ? 'bg-green-500' : 'bg-zinc-700'}`}
+              />
+            ))}
+          </div>
+          <p className="text-sm text-zinc-400 mt-1">
+            Step {step} of 4: {isBattingStep ? 'Select 9 batters in order' : 'Assign players to defensive positions'}
+          </p>
+        </DialogHeader>
+        
+        <div className="space-y-3 mt-4">
+          {isBattingStep ? (
+            // Batting Order Selection
+            <div className="grid gap-2">
+              {Array.from({ length: 9 }, (_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <span className="w-8 h-8 flex items-center justify-center bg-zinc-800 rounded-full text-sm font-bold">
+                    {i + 1}
+                  </span>
+                  <Select
+                    value={currentBattingOrder[i] || ''}
+                    onValueChange={(value) => handleBattingOrderChange(i, value)}
+                  >
+                    <SelectTrigger className="flex-1 bg-zinc-800 border-zinc-700 text-white">
+                      <SelectValue placeholder="Select player..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                      {currentRoster?.map(player => {
+                        const isSelected = getSelectedPlayerIds().includes(player.player_number) && 
+                                          currentBattingOrder[i] !== player.player_number;
+                        return (
+                          <SelectItem 
+                            key={player.player_number} 
+                            value={player.player_number}
+                            disabled={isSelected}
+                            className={`text-white ${isSelected ? 'opacity-50' : ''}`}
+                          >
+                            #{player.player_number} {player.player_name} {player.position ? `(${player.position})` : ''}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  {currentBattingOrder[i] && (
+                    <Check className="w-5 h-5 text-green-500" />
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            // Defensive Position Selection
+            <div className="grid gap-2">
+              {DEFENSIVE_POSITIONS.map(pos => (
+                <div key={pos.key} className="flex items-center gap-3">
+                  <span className="w-24 text-sm font-medium text-zinc-300">
+                    {pos.label}
+                  </span>
+                  <Select
+                    value={currentDefense[pos.key] || ''}
+                    onValueChange={(value) => handleDefenseChange(pos.key, value)}
+                  >
+                    <SelectTrigger className="flex-1 bg-zinc-800 border-zinc-700 text-white">
+                      <SelectValue placeholder="Select player..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-zinc-800 border-zinc-700">
+                      {currentRoster?.map(player => {
+                        const isSelected = getSelectedPlayerIds().includes(player.player_number) && 
+                                          currentDefense[pos.key] !== player.player_number;
+                        return (
+                          <SelectItem 
+                            key={player.player_number} 
+                            value={player.player_number}
+                            disabled={isSelected}
+                            className={`text-white ${isSelected ? 'opacity-50' : ''}`}
+                          >
+                            #{player.player_number} {player.player_name}
+                          </SelectItem>
+                        );
+                      })}
+                    </SelectContent>
+                  </Select>
+                  {currentDefense[pos.key] && (
+                    <Check className="w-5 h-5 text-green-500" />
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+        
+        <div className="flex justify-between mt-6 pt-4 border-t border-zinc-700">
+          <Button
+            variant="outline"
+            onClick={() => step > 1 && setStep(step - 1)}
+            disabled={step === 1}
+            className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
+          >
+            Back
+          </Button>
+          <Button
+            onClick={handleNext}
+            disabled={!canProceed()}
+            className="bg-green-600 hover:bg-green-700 text-white"
+          >
+            {step === 4 ? 'Start Game' : 'Next'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
 
 // Demo Mode Bar Component
 const DemoModeBar = () => (
