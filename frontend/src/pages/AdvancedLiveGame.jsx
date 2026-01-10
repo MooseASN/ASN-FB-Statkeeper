@@ -665,7 +665,7 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
         <div className="flex items-center justify-between px-4 py-2">
           {/* Left: Running Score */}
           <div className="flex items-center gap-6">
-            <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-white hover:bg-zinc-800">
+            <Button variant="ghost" size="sm" onClick={() => navigate("/dashboard")} className="text-white hover:bg-zinc-800">
               <ArrowLeft className="w-4 h-4 mr-1" />
               Exit
             </Button>
