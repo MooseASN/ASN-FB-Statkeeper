@@ -70,12 +70,15 @@ export default function AdminDashboard({ user, onLogout }) {
     basketball_password: "",
     football_beta: false,
     football_password: "",
+    baseball_beta: false,
+    baseball_password: "",
     school_creation_beta: false,
     school_creation_password: ""
   });
   const [savingBeta, setSavingBeta] = useState(false);
   const [showBasketballPassword, setShowBasketballPassword] = useState(false);
   const [showFootballPassword, setShowFootballPassword] = useState(false);
+  const [showBaseballPassword, setShowBaseballPassword] = useState(false);
   const [showSchoolCreationPassword, setShowSchoolCreationPassword] = useState(false);
   
   // User deletion
