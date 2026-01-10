@@ -421,29 +421,29 @@ const formatPlayerName = (name) => {
 };
 
 // Baseball Diamond Component - Using provided field image
-const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingTeamColor }) => {
-  // Position labels with coordinates - SS is LEFT of 2B, 2B is RIGHT of 2B position
+const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingTeamColor, onRunnerClick }) => {
+  // Position labels with coordinates - adjusted outfielders to be more visible on field
   const positions = {
-    pitcher: { top: '52%', left: '50%', label: 'P' },
-    catcher: { top: '85%', left: '50%', label: 'C' },
-    first: { top: '52%', left: '75%', label: '1B' },
-    second: { top: '38%', left: '60%', label: '2B' },  // RIGHT of 2nd base
-    third: { top: '52%', left: '25%', label: '3B' },
-    shortstop: { top: '38%', left: '40%', label: 'SS' },  // LEFT of 2nd base
-    left: { top: '12%', left: '15%', label: 'LF' },
-    center: { top: '5%', left: '50%', label: 'CF' },
-    right: { top: '12%', left: '85%', label: 'RF' },
+    pitcher: { top: '55%', left: '50%', label: 'P' },
+    catcher: { top: '88%', left: '50%', label: 'C' },
+    first: { top: '55%', left: '72%', label: '1B' },
+    second: { top: '42%', left: '58%', label: '2B' },
+    third: { top: '55%', left: '28%', label: '3B' },
+    shortstop: { top: '42%', left: '42%', label: 'SS' },
+    left: { top: '18%', left: '20%', label: 'LF' },
+    center: { top: '10%', left: '50%', label: 'CF' },
+    right: { top: '18%', left: '80%', label: 'RF' },
   };
   
   // Base positions for highlighting runners
   const basePositions = {
-    first: { top: '52%', left: '70%' },
-    second: { top: '32%', left: '50%' },
-    third: { top: '52%', left: '30%' },
+    first: { top: '55%', left: '68%' },
+    second: { top: '35%', left: '50%' },
+    third: { top: '55%', left: '32%' },
   };
   
   return (
-    <div className="relative w-full max-w-lg mx-auto">
+    <div className="relative w-full max-w-md mx-auto">
       {/* Baseball field image */}
       <img 
         src="https://customer-assets.emergentagent.com/job_baseball-tracker-2/artifacts/xsmgreca_Field.png"
@@ -451,10 +451,11 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
         className="w-full h-auto"
       />
       
-      {/* Base runners indicators with player numbers */}
+      {/* Base runners indicators with player numbers - CLICKABLE */}
       {bases?.first && (
-        <div 
-          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg animate-pulse text-white text-xs font-bold"
+        <button 
+          onClick={() => onRunnerClick?.('first', bases.first)}
+          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg text-white text-xs font-bold cursor-pointer hover:scale-110 transition-transform"
           style={{ 
             top: basePositions.first.top, 
             left: basePositions.first.left, 
@@ -462,13 +463,15 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
             backgroundColor: battingTeamColor || '#f59e0b',
             borderColor: 'white'
           }}
+          title="Click to manage runner"
         >
           {typeof bases.first === 'object' ? bases.first.number : (bases.first || '')}
-        </div>
+        </button>
       )}
       {bases?.second && (
-        <div 
-          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg animate-pulse text-white text-xs font-bold"
+        <button 
+          onClick={() => onRunnerClick?.('second', bases.second)}
+          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg text-white text-xs font-bold cursor-pointer hover:scale-110 transition-transform"
           style={{ 
             top: basePositions.second.top, 
             left: basePositions.second.left, 
@@ -476,13 +479,15 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
             backgroundColor: battingTeamColor || '#f59e0b',
             borderColor: 'white'
           }}
+          title="Click to manage runner"
         >
           {typeof bases.second === 'object' ? bases.second.number : (bases.second || '')}
-        </div>
+        </button>
       )}
       {bases?.third && (
-        <div 
-          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg animate-pulse text-white text-xs font-bold"
+        <button 
+          onClick={() => onRunnerClick?.('third', bases.third)}
+          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg text-white text-xs font-bold cursor-pointer hover:scale-110 transition-transform"
           style={{ 
             top: basePositions.third.top, 
             left: basePositions.third.left, 
@@ -490,9 +495,10 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
             backgroundColor: battingTeamColor || '#f59e0b',
             borderColor: 'white'
           }}
+          title="Click to manage runner"
         >
           {typeof bases.third === 'object' ? bases.third.number : (bases.third || '')}
-        </div>
+        </button>
       )}
       
       {/* Fielding position labels with player names - using team color */}
@@ -517,6 +523,74 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
           </div>
         );
       })}
+    </div>
+  );
+};
+
+// Base Runner Action Modal
+const BaseRunnerModal = ({ isOpen, onClose, runner, currentBase, onAction }) => {
+  if (!isOpen || !runner) return null;
+  
+  const runnerNumber = typeof runner === 'object' ? runner.number : runner;
+  const runnerName = typeof runner === 'object' ? runner.name : `#${runner}`;
+  
+  const getAvailableBases = () => {
+    const bases = [];
+    if (currentBase !== 'first') bases.push({ value: 'first', label: '1st Base' });
+    if (currentBase !== 'second') bases.push({ value: 'second', label: '2nd Base' });
+    if (currentBase !== 'third') bases.push({ value: 'third', label: '3rd Base' });
+    return bases;
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-zinc-900 rounded-lg p-5 max-w-sm w-full mx-4" onClick={e => e.stopPropagation()}>
+        <h2 className="text-lg font-bold text-white mb-1">
+          Runner: #{runnerNumber}
+        </h2>
+        <p className="text-zinc-400 text-sm mb-4">Currently on {currentBase} base</p>
+        
+        <div className="space-y-2">
+          <Button 
+            onClick={() => onAction('steal')}
+            className="w-full bg-green-700 hover:bg-green-600 text-white py-2"
+          >
+            🏃 Steal Base (Advance + SB)
+          </Button>
+          <Button 
+            onClick={() => onAction('caught_stealing')}
+            className="w-full bg-red-700 hover:bg-red-600 text-white py-2"
+          >
+            ❌ Caught Stealing (Out)
+          </Button>
+          <Button 
+            onClick={() => onAction('picked_off')}
+            className="w-full bg-red-700 hover:bg-red-600 text-white py-2"
+          >
+            ⚠️ Picked Off (Out)
+          </Button>
+          
+          <div className="border-t border-zinc-700 my-3 pt-3">
+            <p className="text-xs text-zinc-400 mb-2">Move Runner To:</p>
+            <div className="flex gap-2">
+              {getAvailableBases().map(base => (
+                <Button
+                  key={base.value}
+                  onClick={() => onAction('move', base.value)}
+                  variant="outline"
+                  className="flex-1 text-xs"
+                >
+                  {base.label}
+                </Button>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <Button onClick={onClose} variant="outline" className="w-full mt-4 text-zinc-400">
+          Cancel
+        </Button>
+      </div>
     </div>
   );
 };
