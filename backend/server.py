@@ -1141,7 +1141,9 @@ class GameCreate(BaseModel):
     simple_mode: bool = False  # Simple mode: only track makes, rebounds, assists, fouls
     advanced_mode: bool = False  # Advanced mode: PrestoSports-style interface
     note: Optional[str] = None  # Game note/description
-    sport: str = "basketball"  # "basketball" or "football"
+    sport: str = "basketball"  # "basketball", "football", or "baseball"
+    # Baseball-specific fields
+    total_innings: int = 9  # Number of innings (default 9, can be 7 for high school/doubleheaders)
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
