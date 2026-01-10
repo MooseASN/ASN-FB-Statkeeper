@@ -2251,14 +2251,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   };
   
   if (loading) {
-    return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-center">
-          <span className="text-6xl animate-bounce">⚾</span>
-          <p className="mt-4 text-zinc-400">Loading game...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen message="Loading game..." />;
   }
   
   return (
