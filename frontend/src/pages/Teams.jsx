@@ -136,7 +136,8 @@ export default function Teams({ user, onLogout }) {
       setIsDialogOpen(false);
       
       // Navigate to the new team's detail page
-      navigate(`/teams/${res.data.id}`);
+      // Use state to indicate we came from team creation - this helps with back navigation
+      navigate(`/teams/${res.data.id}`, { state: { fromTeamCreation: true } });
     } catch (error) {
       toast.error("Failed to create team");
     }
