@@ -375,35 +375,35 @@ const Scoreboard = ({ game, onInningChange }) => {
 
 // Current Batter/Pitcher Info Component
 const CurrentPlayerInfo = ({ batter, pitcher, batterStats, pitcherStats }) => (
-  <div className="flex gap-4 mb-4">
+  <div className="flex gap-2">
     {/* At Bat */}
-    <div className="flex-1 bg-blue-600 rounded-lg p-3">
+    <div className="flex-1 bg-blue-600 rounded-lg p-2">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-xs text-blue-200 uppercase">At Bat</span>
-          <div className="text-white font-bold">
+          <span className="text-[10px] text-blue-200 uppercase">At Bat</span>
+          <div className="text-white text-sm font-bold truncate">
             #{batter?.player_number || "?"} {batter?.player_name || "No Batter"}
           </div>
         </div>
-        <div className="text-right text-sm text-blue-100">
-          <div>Today: {batterStats?.hits || 0}-{batterStats?.at_bats || 0}</div>
-          <div>{batterStats?.hits || 0} H, {batterStats?.strikeouts_batting || 0} K</div>
+        <div className="text-right text-xs text-blue-100">
+          <div>{batterStats?.hits || 0}-{batterStats?.at_bats || 0}</div>
+          <div>{batterStats?.strikeouts_batting || 0} K</div>
         </div>
       </div>
     </div>
     
     {/* Pitching */}
-    <div className="flex-1 bg-red-600 rounded-lg p-3">
+    <div className="flex-1 bg-red-600 rounded-lg p-2">
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-xs text-red-200 uppercase">Pitching</span>
-          <div className="text-white font-bold">
+          <span className="text-[10px] text-red-200 uppercase">Pitching</span>
+          <div className="text-white text-sm font-bold truncate">
             #{pitcher?.player_number || "?"} {pitcher?.player_name || "No Pitcher"}
           </div>
         </div>
-        <div className="text-right text-sm text-red-100">
-          <div>Today: {pitcherStats?.pitches_thrown || 0} P</div>
-          <div>{pitcherStats?.strikeouts_pitching || 0} K, {pitcherStats?.earned_runs || 0} ER</div>
+        <div className="text-right text-xs text-red-100">
+          <div>{pitcherStats?.pitches_thrown || 0} P</div>
+          <div>{pitcherStats?.strikeouts_pitching || 0} K</div>
         </div>
       </div>
     </div>
