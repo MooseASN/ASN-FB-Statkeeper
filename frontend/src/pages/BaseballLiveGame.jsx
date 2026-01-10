@@ -218,8 +218,16 @@ const StarterConfigDialog = ({
                       })}
                     </SelectContent>
                   </Select>
-                  {currentBattingOrder[i] && (
-                    <Check className="w-5 h-5 text-green-500" />
+                  {currentBattingOrder[i] ? (
+                    <button 
+                      onClick={() => handleClearBattingSpot(i)}
+                      className="w-8 h-8 flex items-center justify-center text-red-400 hover:text-red-300 hover:bg-zinc-800 rounded"
+                      title="Clear selection"
+                    >
+                      <XIcon className="w-4 h-4" />
+                    </button>
+                  ) : (
+                    <div className="w-8" />
                   )}
                 </div>
               ))}
