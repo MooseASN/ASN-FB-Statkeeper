@@ -13,6 +13,30 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 2026 - WEB & PDF BOX SCORE ✅
+
+#### Web Box Score Page - COMPLETED ✅
+New page at `/baseball/:id/boxscore` and `/demo/baseball/boxscore`:
+- **Header**: Game date, location, final score with team colors
+- **Score by Innings table**: All innings (1-9+) with R, H, E totals
+- **Scoring Summary**: Play-by-play of scoring plays only
+- **Batting Tables**: Two-column layout for both teams
+  - Columns: Player, Pos, AB, R, H, RBI, BB, SO, LOB
+  - Totals row at bottom
+- **Pitching Tables**: Two-column layout for both teams
+  - Columns: Player, IP, H, R, ER, BB, SO, NP
+  - Totals row at bottom
+- **Game Notes**: HR and SB highlights
+- **Navigation**: "Box Score" button added to live game header
+
+#### PDF Box Score Generation - COMPLETED ✅
+Backend endpoint: `GET /api/games/{id}/boxscore/pdf`
+- Uses reportlab to generate professional PDF
+- Single-page layout fitting all content
+- Includes: Title, date/location, final score, inning-by-inning, batting stats, pitching stats
+- **Excludes**: Umpire, game time, attendance, weather (as requested)
+- Download button on web box score page
+
 ### January 2026 - P0 BUG FIX: BATTING ORDER CONTINUITY ✅
 
 #### Batting Order Reset Bug - FIXED ✅
