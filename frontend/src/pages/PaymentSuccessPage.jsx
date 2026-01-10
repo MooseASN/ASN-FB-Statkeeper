@@ -101,7 +101,7 @@ export default function PaymentSuccessPage() {
               Payment Issue
             </h1>
             <p className="text-slate-400 mb-6">
-              We couldn't confirm your payment. If you were charged, please contact support.
+              We could not confirm your payment. If you were charged, please contact support.
             </p>
             <div className="space-y-3">
               <Button
