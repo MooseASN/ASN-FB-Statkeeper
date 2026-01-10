@@ -991,6 +991,10 @@ async def verify_beta_password(sport: str = Body(...), password: str = Body(...)
         if not settings.get("football_beta", False):
             return {"valid": True}
         return {"valid": password == settings.get("football_password", "")}
+    elif sport == "baseball":
+        if not settings.get("baseball_beta", False):
+            return {"valid": True}
+        return {"valid": password == settings.get("baseball_password", "")}
     elif sport == "school_creation":
         if not settings.get("school_creation_beta", False):
             return {"valid": True}
