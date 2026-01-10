@@ -713,6 +713,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     try {
       const res = await axios.get(`${API}/games/${id}`);
       setGame(res.data);
+      setHomeRoster(res.data.home_roster || []);
+      setAwayRoster(res.data.away_roster || []);
       setHomeStats(res.data.home_player_stats || []);
       setAwayStats(res.data.away_player_stats || []);
       setPlayByPlay(res.data.play_by_play || []);
