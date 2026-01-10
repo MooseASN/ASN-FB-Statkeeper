@@ -149,7 +149,8 @@ export default function NewGame({ user, onLogout }) {
         sport: selectedSport,
         ...getClockSettings(),
         ...getTimeoutSettings(),
-        ...getPrimetimeSettings()
+        ...getPrimetimeSettings(),
+        ...(selectedSport === "baseball" ? { total_innings: totalInnings } : {})
       };
       
       // Add season linkage if selected
@@ -163,6 +164,8 @@ export default function NewGame({ user, onLogout }) {
       // Navigate based on sport and mode
       if (selectedSport === "football") {
         navigate(`/football/${res.data.id}`);
+      } else if (selectedSport === "baseball") {
+        navigate(`/baseball/${res.data.id}`);
       } else if (statMode === "advanced") {
         navigate(`/game/${res.data.id}/advanced`);
       } else {
