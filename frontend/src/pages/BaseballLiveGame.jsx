@@ -1136,6 +1136,52 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     }, 100);
   }, []);
   
+  // Save current state for undo functionality
+  const saveStateForUndo = useCallback(() => {
+    const snapshot = {
+      game: game ? JSON.parse(JSON.stringify(game)) : null,
+      homeStats: JSON.parse(JSON.stringify(homeStats)),
+      awayStats: JSON.parse(JSON.stringify(awayStats)),
+      playByPlay: JSON.parse(JSON.stringify(playByPlay)),
+      currentBatterIndex,
+      homeBattingOrder: JSON.parse(JSON.stringify(homeBattingOrder)),
+      awayBattingOrder: JSON.parse(JSON.stringify(awayBattingOrder)),
+      homeDefense: JSON.parse(JSON.stringify(homeDefense)),
+      awayDefense: JSON.parse(JSON.stringify(awayDefense)),
+      homeErrors,
+      awayErrors,
+    };
+    setUndoHistory(prev => [...prev.slice(-19), snapshot]); // Keep last 20 states
+  }, [game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors]);
+  
+  // Handle undo - restore the previous state
+  const handleUndo = useCallback(() => {
+    if (undoHistory.length === 0) {
+      toast.error("Nothing to undo");
+      return;
+    }
+    
+    const lastState = undoHistory[undoHistory.length - 1];
+    
+    // Restore all state
+    setGame(lastState.game);
+    setHomeStats(lastState.homeStats);
+    setAwayStats(lastState.awayStats);
+    setPlayByPlay(lastState.playByPlay);
+    setCurrentBatterIndex(lastState.currentBatterIndex);
+    setHomeBattingOrder(lastState.homeBattingOrder);
+    setAwayBattingOrder(lastState.awayBattingOrder);
+    setHomeDefense(lastState.homeDefense);
+    setAwayDefense(lastState.awayDefense);
+    setHomeErrors(lastState.homeErrors);
+    setAwayErrors(lastState.awayErrors);
+    
+    // Remove the used state from history
+    setUndoHistory(prev => prev.slice(0, -1));
+    
+    toast.success("Play undone");
+  }, [undoHistory]);
+  
   // Helper function to update batter stats
   const updateBatterStats = useCallback((playerNumber, updates) => {
     const isHomeBatter = battingTeamIsHome;
