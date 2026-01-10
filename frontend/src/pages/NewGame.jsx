@@ -647,6 +647,7 @@ export default function NewGame({ user, onLogout }) {
                   </div>
                 )}
               </div>
+              )}
 
               {/* Timeout Options - Only for Basketball */}
               {selectedSport === "basketball" && (
