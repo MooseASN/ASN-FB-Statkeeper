@@ -670,6 +670,14 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [awayStats, setAwayStats] = useState(initialDemoData?.away_player_stats || []);
   const [playByPlay, setPlayByPlay] = useState([]);
   
+  // Starter configuration state
+  const [showStarterConfig, setShowStarterConfig] = useState(false);
+  const [startersConfigured, setStartersConfigured] = useState(demoMode); // Skip for demo
+  const [homeBattingOrder, setHomeBattingOrder] = useState([]);
+  const [awayBattingOrder, setAwayBattingOrder] = useState([]);
+  const [homeDefense, setHomeDefense] = useState({});
+  const [awayDefense, setAwayDefense] = useState({});
+  
   // UI state
   const [currentBatterIndex, setCurrentBatterIndex] = useState(0);
   const [currentPitcherIndex, setCurrentPitcherIndex] = useState(0);
