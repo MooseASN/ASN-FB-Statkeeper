@@ -1214,7 +1214,19 @@ class Game(BaseModel):
     away_starters: List[str] = []
     starters_selected: bool = False
     # Sport type
-    sport: str = "basketball"  # "basketball" or "football"
+    sport: str = "basketball"  # "basketball", "football", or "baseball"
+    # Baseball-specific fields
+    total_innings: int = 9  # Number of innings (7 for high school/doubleheaders, 9 for standard)
+    current_inning: int = 1  # Current inning number
+    inning_half: str = "top"  # "top" (away bats) or "bottom" (home bats)
+    outs: int = 0  # Current outs (0-2, 3 = end of half inning)
+    balls: int = 0  # Current balls count (0-3, 4 = walk)
+    strikes: int = 0  # Current strikes count (0-2, 3 = strikeout)
+    bases: dict = Field(default_factory=lambda: {"first": None, "second": None, "third": None})  # Runner IDs on bases
+    inning_scores: dict = Field(default_factory=lambda: {"home": [], "away": []})  # Runs per inning
+    current_batter_id: Optional[str] = None  # Current batter's player ID
+    current_pitcher_id: Optional[str] = None  # Current pitcher's player ID
+    # General timestamps
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
     updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
