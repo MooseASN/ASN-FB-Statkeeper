@@ -1051,24 +1051,27 @@ const SubstitutionDialog = ({ isOpen, onClose, player, roster, onSubstitute }) =
 };
 
 // Batting Order Component - Compact version
-const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitute, teamName }) => (
+const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitute, teamName, teamColor }) => (
   <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-    <div className="bg-zinc-800 px-3 py-1.5 border-b border-zinc-700 flex justify-between items-center">
+    <div 
+      className="px-3 py-1.5 border-b border-zinc-700 flex justify-between items-center"
+      style={{ backgroundColor: teamColor ? `${teamColor}40` : '#27272a' }}
+    >
       <h3 className="text-xs font-bold text-white uppercase tracking-wider">
         {teamName ? `Batting: ${teamName}` : 'Batting Order'}
       </h3>
     </div>
-    <div className="max-h-40 overflow-y-auto">
+    <div className="overflow-y-auto" style={{ maxHeight: '280px' }}>
       {players?.map((player, index) => (
         <div 
           key={player.id || player.player_number || index}
-          className={`flex items-center justify-between px-2 py-1 border-b border-zinc-800/50 cursor-pointer hover:bg-zinc-800 ${
+          className={`flex items-center justify-between px-2 py-1.5 border-b border-zinc-800/50 cursor-pointer hover:bg-zinc-800 ${
             index === currentBatterIndex ? 'bg-blue-900/50 border-l-2 border-l-blue-500' : ''
           }`}
           onClick={() => onSelectBatter(index)}
         >
           <div className="flex items-center gap-2">
-            <span className="text-zinc-500 text-xs w-3">{index + 1}.</span>
+            <span className="text-zinc-500 text-xs w-4">{index + 1}.</span>
             <span className="text-white text-xs font-medium">#{player.player_number} {player.player_name}</span>
           </div>
           <div className="flex items-center gap-1">
