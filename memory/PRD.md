@@ -13,6 +13,31 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - P1 TASKS COMPLETED ✅
+
+#### Back Button Navigation Fix - COMPLETED ✅
+All live game components now navigate to `/dashboard` (sport's main page):
+- `LiveGame.jsx` - Line 1738
+- `FootballLiveGame.jsx` - Line 2874
+- `AdvancedLiveGame.jsx` - Line 668
+- `BaseballLiveGame.jsx` - Line 1441 (demo mode goes to `/`, logged-in to `/dashboard`)
+
+#### Baseball Layout Reorganization - COMPLETED ✅
+New condensed 3-column layout:
+- **LEFT (col-span-3)**: Play-by-Play Log + Batting Order
+- **CENTER (col-span-6)**: Baseball Diamond (field image)
+- **RIGHT (col-span-3)**: Pitch Result Buttons + Team Stats Table
+- All content fits on screen without scrolling
+
+#### Real-Time Stats Updates - COMPLETED ✅
+- **At Bat Box**: Shows batter's H-AB, K stats - updates after each plate appearance
+- **Pitcher Box**: Shows pitch count (P) and strikeouts (K) - updates after each pitch
+- **Team Stats Table**: Shows H, AB, R, K, BB columns for both teams - updates in real-time
+- Added `updateBatterStats()` and `updatePitcherStats()` helper functions
+
+#### All 9 Fielders Visible - COMPLETED ✅
+Baseball diamond now displays all positions: LF, CF, RF, SS, 2B, 3B, P, 1B, C
+
 ### January 10, 2026 - CRITICAL BUG FIX: Teams Not Showing Up
 
 #### Teams Bug FIX - COMPLETED ✅
