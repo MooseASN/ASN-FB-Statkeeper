@@ -57,6 +57,15 @@ export default function NewGame({ user, onLogout }) {
   const [seasons, setSeasons] = useState([]);
   const [selectedSeasonId, setSelectedSeasonId] = useState("");
 
+  // Set default stat mode based on sport
+  useEffect(() => {
+    if (selectedSport === "football") {
+      setStatMode("advanced"); // Default to advanced for football
+    } else {
+      setStatMode("classic"); // Default to classic for other sports
+    }
+  }, [selectedSport]);
+
   useEffect(() => {
     fetchTeams();
     fetchSchoolAndSeasons();
