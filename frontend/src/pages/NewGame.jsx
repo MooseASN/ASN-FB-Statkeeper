@@ -457,6 +457,80 @@ export default function NewGame({ user, onLogout }) {
               </div>
               )}
 
+              {/* Football Stat Mode Selection */}
+              {selectedSport === "football" && (
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🏈</span>
+                  <Label className="text-base font-semibold">Stat Tracking Mode</Label>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3">
+                  {/* Simple Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setStatMode("simple")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      statMode === "simple" 
+                        ? "border-orange-500 bg-orange-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                    data-testid="football-mode-simple"
+                  >
+                    <div className="font-semibold text-orange-700 mb-1">Simple</div>
+                    <p className="text-xs text-slate-600">Broadcaster-friendly, minimal input</p>
+                  </button>
+                  
+                  {/* Advanced Mode */}
+                  <button
+                    type="button"
+                    onClick={() => setStatMode("advanced")}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      statMode === "advanced" 
+                        ? "border-green-500 bg-green-50" 
+                        : "border-slate-200 hover:border-slate-300"
+                    }`}
+                    data-testid="football-mode-advanced"
+                  >
+                    <div className="font-semibold text-green-700 mb-1">Advanced</div>
+                    <p className="text-xs text-slate-600">Full play-by-play tracking</p>
+                  </button>
+                </div>
+                
+                {/* Mode Details */}
+                {statMode === "simple" && (
+                  <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-orange-800 mb-1">Simple Mode features:</p>
+                    <ul className="text-sm text-orange-700 grid grid-cols-2 gap-x-4">
+                      <li>• Quick scoring</li>
+                      <li>• Team stats (yards, turnovers)</li>
+                      <li>• Game clock control</li>
+                      <li>• Keyboard shortcuts</li>
+                      <li>• Play-by-play log</li>
+                      <li>• No scroll layout</li>
+                    </ul>
+                  </div>
+                )}
+                
+                {statMode === "advanced" && (
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <p className="text-sm font-medium text-green-800 mb-2">Advanced Mode features:</p>
+                    <ul className="text-sm text-green-700 grid grid-cols-2 gap-x-4 gap-y-1">
+                      <li>• Full play-by-play</li>
+                      <li>• Field position tracking</li>
+                      <li>• Down & distance</li>
+                      <li>• Drive summaries</li>
+                      <li>• Player stats</li>
+                      <li>• Keyboard hotkeys</li>
+                    </ul>
+                    <p className="text-xs text-green-600 mt-2 italic">
+                      * Recommended for detailed stat tracking
+                    </p>
+                  </div>
+                )}
+              </div>
+              )}
+
               {/* Baseball Options - Innings Selection */}
               {selectedSport === "baseball" && (
               <div className="border rounded-lg p-4 space-y-4">
