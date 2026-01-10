@@ -667,32 +667,60 @@ const PlayByPlayLog = ({ plays }) => (
   </div>
 );
 
-// Pitch Result Buttons Component
+// Pitch Result Buttons Component - Compact version
 const PitchResultButtons = ({ onPitchResult, disabled }) => {
   const pitchButtons = [
-    { label: "Foul Ball", type: "foul", color: "bg-zinc-700 hover:bg-zinc-600" },
-    { label: "Swinging Strike", type: "strike_swinging", color: "bg-red-700 hover:bg-red-600" },
-    { label: "Looking Strike", type: "strike_looking", color: "bg-red-700 hover:bg-red-600" },
     { label: "Ball", type: "ball", color: "bg-green-700 hover:bg-green-600" },
-    { label: "Int. Walk", type: "intentional_walk", color: "bg-green-800 hover:bg-green-700" },
-    { label: "Hit By Pitch", type: "hbp", color: "bg-yellow-700 hover:bg-yellow-600" },
+    { label: "Strike (S)", type: "strike_swinging", color: "bg-red-700 hover:bg-red-600" },
+    { label: "Strike (L)", type: "strike_looking", color: "bg-red-700 hover:bg-red-600" },
+    { label: "Foul", type: "foul", color: "bg-zinc-700 hover:bg-zinc-600" },
     { label: "In Play", type: "in_play", color: "bg-blue-700 hover:bg-blue-600" },
+    { label: "HBP", type: "hbp", color: "bg-yellow-700 hover:bg-yellow-600" },
+    { label: "IBB", type: "intentional_walk", color: "bg-green-800 hover:bg-green-700" },
   ];
   
   return (
-    <div className="flex flex-col gap-2">
-      <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-2">Pitch Result</h3>
-      {pitchButtons.map((btn) => (
+    <div className="space-y-1">
+      <h3 className="text-xs font-bold text-white uppercase tracking-wider mb-2">Pitch Result</h3>
+      <div className="grid grid-cols-2 gap-1">
+        {pitchButtons.slice(0, 4).map((btn) => (
+          <Button
+            key={btn.type}
+            onClick={() => onPitchResult(btn.type)}
+            disabled={disabled}
+            className={`${btn.color} text-white text-xs font-bold py-2 rounded transition-colors`}
+            data-testid={`pitch-${btn.type}`}
+          >
+            {btn.label}
+          </Button>
+        ))}
+      </div>
+      <Button
+        onClick={() => onPitchResult("in_play")}
+        disabled={disabled}
+        className="w-full bg-blue-700 hover:bg-blue-600 text-white text-sm font-bold py-3 rounded transition-colors"
+        data-testid="pitch-in_play"
+      >
+        In Play
+      </Button>
+      <div className="grid grid-cols-2 gap-1">
         <Button
-          key={btn.type}
-          onClick={() => onPitchResult(btn.type)}
+          onClick={() => onPitchResult("hbp")}
           disabled={disabled}
-          className={`w-full ${btn.color} text-white font-bold py-3 rounded-lg transition-colors`}
-          data-testid={`pitch-${btn.type}`}
+          className="bg-yellow-700 hover:bg-yellow-600 text-white text-xs font-bold py-2 rounded transition-colors"
+          data-testid="pitch-hbp"
         >
-          {btn.label}
+          HBP
         </Button>
-      ))}
+        <Button
+          onClick={() => onPitchResult("intentional_walk")}
+          disabled={disabled}
+          className="bg-green-800 hover:bg-green-700 text-white text-xs font-bold py-2 rounded transition-colors"
+          data-testid="pitch-intentional_walk"
+        >
+          IBB
+        </Button>
+      </div>
     </div>
   );
 };
