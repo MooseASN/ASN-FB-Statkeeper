@@ -1007,6 +1007,19 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   
   return (
     <div className={`min-h-screen bg-black text-white ${demoMode ? 'pt-10' : ''}`}>
+      {/* Starter Configuration Dialog */}
+      <StarterConfigDialog
+        isOpen={showStarterConfig}
+        onClose={() => setShowStarterConfig(false)}
+        homeRoster={homeRoster.map(p => ({ player_number: p.player_number || p.number, player_name: p.player_name || p.name, position: p.position }))}
+        awayRoster={awayRoster.map(p => ({ player_number: p.player_number || p.number, player_name: p.player_name || p.name, position: p.position }))}
+        homeTeamName={game?.home_team_name || 'Home'}
+        awayTeamName={game?.away_team_name || 'Away'}
+        homeTeamColor={game?.home_team_color || '#dc2626'}
+        awayTeamColor={game?.away_team_color || '#2563eb'}
+        onComplete={handleStarterConfigComplete}
+      />
+      
       {/* Demo Mode Bar */}
       {demoMode && <DemoModeBar />}
       
@@ -1035,8 +1048,14 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               <FileText className="w-4 h-4 mr-2" />
               Box Score
             </Button>
-            <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
-              <Settings className="w-4 h-4" />
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowStarterConfig(true)}
+              className="text-zinc-400 hover:text-white"
+            >
+              <Users className="w-4 h-4 mr-2" />
+              Lineups
             </Button>
           </div>
         </div>
