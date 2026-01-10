@@ -357,6 +357,8 @@ export default function BaseballBoxScore() {
         away_team_name: 'Valley Hawks',
         home_team_color: '#dc2626',
         away_team_color: '#2563eb',
+        home_team_logo: 'https://static.prod-images.emergentagent.com/jobs/c5c231ef-ef17-47e4-a798-a17d1c9d22b3/images/225b74b9df9dcfb1e851b24124f270f93e0599ce047d87dc6bffc2dff7c0d6d0.png',
+        away_team_logo: 'https://static.prod-images.emergentagent.com/jobs/c5c231ef-ef17-47e4-a798-a17d1c9d22b3/images/de33ad55d2986285a9198503d6337489dab64d12d0176a77464f466c14da52df.png',
         home_score: 4,
         away_score: 2,
         home_hits: 8,
