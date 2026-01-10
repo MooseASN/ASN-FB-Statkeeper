@@ -10,8 +10,46 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 - Manage events/tournaments
 - **Multi-tenant school/organization management system**
 - **Subscription-based pricing with Stripe integration**
+- **Shared access - allow multiple users to manage the same teams/games**
 
 ## Latest Updates (January 2026)
+
+### January 2026 - TEAM LOGO UPLOAD, BASEBALL IN SCHOOLS, ADMIN SHARED ACCESS ✅
+
+#### Team Logo Upload - COMPLETED ✅
+- **Endpoint**: `POST /api/teams/{team_id}/logo/upload`
+- Accepts PNG, JPG, GIF, WEBP images up to 5MB
+- Stores logos as base64 data URLs
+- TeamDetail.jsx has new logo upload UI with:
+  - Upload Image button
+  - Logo preview (80x80)
+  - Remove logo button
+  - Fallback URL input
+
+#### Baseball Integration in Schools Dashboard - COMPLETED ✅
+- Baseball (⚾) added as sport option when creating seasons
+- Baseball games navigate to `/baseball/:id` route
+- Clock settings show "N/A - Innings Based" for baseball
+- Timeout section shows "No timeouts in baseball - use mound visits"
+- Sport emoji: basketball 🏀, football 🏈, baseball ⚾
+
+#### Admin Shared Access System - COMPLETED ✅
+Allows users to share their teams, games, and events with other StatMoose users.
+
+**Backend Endpoints**:
+- `GET /api/admin/shared-access` - List users you've granted access to
+- `GET /api/admin/shared-access/received` - List accounts you have access to  
+- `POST /api/admin/shared-access` - Grant access by email
+- `DELETE /api/admin/shared-access/{id}` - Revoke access
+
+**Data Flow**:
+- Teams/Games/Events queries include both owned AND shared data
+- Shared items have `is_shared: true` and `shared_from_user_id` fields
+
+**Frontend UI** (AccountSettings.jsx):
+- Grant Access section with email input
+- "Users with Access to My Data" list with revoke buttons
+- "Accounts I Have Access To" list
 
 ### January 2026 - WEB & PDF BOX SCORE ✅
 
