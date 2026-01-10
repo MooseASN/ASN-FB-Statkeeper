@@ -1,9 +1,9 @@
 # StatMoose - Product Requirements Document
 
 ## Original Problem Statement
-StatMoose is a dual-sport stat tracking application for basketball and football. The application allows users to:
+StatMoose is a multi-sport stat tracking application for basketball, football, and baseball. The application allows users to:
 - Create and manage teams with rosters
-- Track live game statistics for both sports
+- Track live game statistics for all three sports
 - View detailed box scores and play-by-play logs
 - Export game data as PDF
 - Share live game stats with public viewers
@@ -11,6 +11,21 @@ StatMoose is a dual-sport stat tracking application for basketball and football.
 - **Multi-tenant school/organization management system**
 
 ## Latest Updates (January 2026)
+
+### January 10, 2026 - Baseball Sport Infrastructure
+- **Added Baseball to Sport Selection** - Now displays 3 sports: Basketball, Football, Baseball
+- **Baseball Beta Mode Support** - Can enable/disable beta testing mode in admin dashboard
+- **Baseball Game Data Model** - Added baseball-specific fields:
+  - Game: total_innings (default 9), current_inning, inning_half (top/bottom), outs, balls, strikes, bases (runners), inning_scores
+  - Player Stats: Batting (AB, H, 1B, 2B, 3B, HR, R, RBI, BB, K, HBP, SF, SAC, SB, CS), Pitching (IP, H, R, ER, BB, K, HR, pitches, strikes, balls), Fielding (PO, A, E)
+- **Baseball Rules Reference**:
+  - 3 strikes = strikeout (out)
+  - 4 balls = walk
+  - 3 outs = end of half inning (teams switch)
+  - 9 innings standard (7 for high school/doubleheaders)
+  - Top of inning = away team bats, Bottom = home team bats
+- **Updated Admin Dashboard** - Added baseball beta toggle with password protection
+- **Updated SportContext** - Added BASEBALL to SPORTS enum and SPORT_CONFIG
 
 ### January 9, 2026 - Demo Mode Implementation - USING REAL UI COMPONENTS
 - **All demos now use the EXACT same UI as signed-in users**
