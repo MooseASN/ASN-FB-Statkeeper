@@ -256,6 +256,7 @@ export default function Teams({ user, onLogout }) {
               </div>
             </DialogContent>
           </Dialog>
+          </div>
         </div>
 
         {loading ? (
