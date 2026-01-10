@@ -1541,11 +1541,14 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       inning_half: newInningHalf,
       current_inning: newInning
     }));
-  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats, advanceRunners]);
+  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats, advanceRunners, saveStateForUndo]);
   
   // Handle in-play result
   const handleInPlayResult = useCallback((resultType) => {
     setShowInPlayModal(false);
+    
+    // Save state before making changes
+    saveStateForUndo();
     
     const currentGame = game;
     if (!currentGame) return;
