@@ -2380,14 +2380,24 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               awayErrors={awayErrors}
             />
             
-            {/* Game Control Button */}
+            {/* Game Control Button - for inning/score changes */}
             <Button 
-              onClick={() => setShowGameControlModal(true)}
-              className={`w-full ${gameFinalized ? 'bg-green-700 hover:bg-green-600' : 'bg-zinc-700 hover:bg-zinc-600'} text-white py-2`}
+              onClick={() => setShowInningScoreModal(true)}
+              className="w-full bg-blue-700 hover:bg-blue-600 text-white py-2"
               data-testid="game-control-btn"
             >
               <Settings className="w-4 h-4 mr-2" />
-              {gameFinalized ? 'Game FINAL' : 'Game Controls'}
+              Game Control
+            </Button>
+            
+            {/* Wrap-Up Button - for finalization */}
+            <Button 
+              onClick={() => setShowGameControlModal(true)}
+              className={`w-full ${gameFinalized ? 'bg-green-700 hover:bg-green-600' : 'bg-amber-700 hover:bg-amber-600'} text-white py-2`}
+              data-testid="wrap-up-btn"
+            >
+              <Flag className="w-4 h-4 mr-2" />
+              {gameFinalized ? 'Game FINAL' : 'Wrap-Up'}
             </Button>
           </div>
         </div>
@@ -2406,7 +2416,15 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         onSubstitute={executeSubstitution}
       />
       
-      {/* Game Control Modal */}
+      {/* Inning/Score Control Modal */}
+      <InningScoreControlModal
+        isOpen={showInningScoreModal}
+        onClose={() => setShowInningScoreModal(false)}
+        game={game}
+        onUpdate={handleInningScoreUpdate}
+      />
+      
+      {/* Wrap-Up Modal (was Game Control Modal) */}
       <GameControlModal
         isOpen={showGameControlModal}
         onClose={() => setShowGameControlModal(false)}
