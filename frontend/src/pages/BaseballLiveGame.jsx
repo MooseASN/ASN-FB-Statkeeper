@@ -521,8 +521,92 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
   );
 };
 
+// Substitution Dialog Component
+const SubstitutionDialog = ({ isOpen, onClose, player, roster, onSubstitute }) => {
+  const [subType, setSubType] = useState(null); // 'offensive', 'defensive', 'both'
+  const [selectedPlayer, setSelectedPlayer] = useState('');
+  
+  if (!isOpen) return null;
+  
+  const handleSubstitute = () => {
+    if (!selectedPlayer || !subType) return;
+    onSubstitute(player, selectedPlayer, subType);
+    setSubType(null);
+    setSelectedPlayer('');
+    onClose();
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-zinc-900 rounded-lg p-6 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+        <h2 className="text-xl font-bold text-white mb-4">
+          Substitute #{player?.player_number} {player?.player_name}
+        </h2>
+        
+        {!subType ? (
+          <div className="space-y-3">
+            <p className="text-zinc-400 mb-4">What type of substitution?</p>
+            <Button 
+              onClick={() => setSubType('offensive')}
+              className="w-full bg-green-700 hover:bg-green-600 text-white py-3"
+            >
+              Offensive Only (Batting Order)
+            </Button>
+            <Button 
+              onClick={() => setSubType('defensive')}
+              className="w-full bg-blue-700 hover:bg-blue-600 text-white py-3"
+            >
+              Defensive Only (Field Position)
+            </Button>
+            <Button 
+              onClick={() => setSubType('both')}
+              className="w-full bg-purple-700 hover:bg-purple-600 text-white py-3"
+            >
+              Both (Full Substitution)
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <p className="text-zinc-400">
+              Select replacement player ({subType === 'offensive' ? 'batting order' : subType === 'defensive' ? 'field position' : 'both'}):
+            </p>
+            <Select value={selectedPlayer} onValueChange={setSelectedPlayer}>
+              <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                <SelectValue placeholder="Select player..." />
+              </SelectTrigger>
+              <SelectContent className="bg-zinc-800 border-zinc-700">
+                {roster?.filter(p => p.player_number !== player?.player_number).map(p => (
+                  <SelectItem key={p.player_number} value={p.player_number} className="text-white">
+                    #{p.player_number} {p.player_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => setSubType(null)} className="flex-1">
+                Back
+              </Button>
+              <Button 
+                onClick={handleSubstitute} 
+                disabled={!selectedPlayer}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                Confirm
+              </Button>
+            </div>
+          </div>
+        )}
+        
+        <Button onClick={onClose} variant="outline" className="w-full mt-4 text-zinc-400">
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 // Batting Order Component
-const BattingOrder = ({ players, currentBatterIndex, onSelectBatter }) => (
+const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitute }) => (
   <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
     <div className="bg-zinc-800 px-4 py-2 border-b border-zinc-700">
       <h3 className="text-sm font-bold text-white uppercase tracking-wider">Batting Order</h3>
@@ -530,7 +614,7 @@ const BattingOrder = ({ players, currentBatterIndex, onSelectBatter }) => (
     <div className="max-h-64 overflow-y-auto">
       {players?.map((player, index) => (
         <div 
-          key={player.id || index}
+          key={player.id || player.player_number || index}
           className={`flex items-center justify-between px-4 py-2 border-b border-zinc-800 cursor-pointer hover:bg-zinc-800 ${
             index === currentBatterIndex ? 'bg-blue-900/50 border-l-4 border-l-blue-500' : ''
           }`}
@@ -544,10 +628,16 @@ const BattingOrder = ({ players, currentBatterIndex, onSelectBatter }) => (
             <span className="text-zinc-400 text-sm">
               {player.hits || 0}-{player.at_bats || 0}
             </span>
-            <div className="flex flex-col">
-              <ChevronUp className="w-3 h-3 text-zinc-600" />
-              <ChevronDown className="w-3 h-3 text-zinc-600" />
-            </div>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onSubstitute?.(player);
+              }}
+              className="p-1 hover:bg-zinc-700 rounded text-zinc-400 hover:text-white transition-colors"
+              title="Substitute player"
+            >
+              <ArrowLeftRight className="w-4 h-4" />
+            </button>
           </div>
         </div>
       ))}
