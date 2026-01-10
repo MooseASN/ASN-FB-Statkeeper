@@ -42,6 +42,8 @@ import DemoLiveGameAdvanced from "@/pages/DemoLiveGameAdvanced";
 import DemoLiveGameQuick from "@/pages/DemoLiveGameQuick";
 import DemoFootballLiveGame from "@/pages/DemoFootballLiveGame";
 import DemoBaseballLiveGame from "@/pages/DemoBaseballLiveGame";
+// Football pages
+import SimpleFootballLiveGame from "@/pages/SimpleFootballLiveGame";
 // Baseball pages
 import BaseballLiveGame from "@/pages/BaseballLiveGame";
 import BaseballBoxScore from "@/pages/BaseballBoxScore";
