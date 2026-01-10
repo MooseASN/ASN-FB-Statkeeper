@@ -2185,6 +2185,16 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               homeErrors={homeErrors}
               awayErrors={awayErrors}
             />
+            
+            {/* Game Control Button */}
+            <Button 
+              onClick={() => setShowGameControlModal(true)}
+              className={`w-full ${gameFinalized ? 'bg-green-700 hover:bg-green-600' : 'bg-zinc-700 hover:bg-zinc-600'} text-white py-2`}
+              data-testid="game-control-btn"
+            >
+              <Settings className="w-4 h-4 mr-2" />
+              {gameFinalized ? 'Game FINAL' : 'Game Controls'}
+            </Button>
           </div>
         </div>
       </div>
@@ -2200,6 +2210,18 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         player={playerToSubstitute}
         roster={substitutionTeam === 'home' ? homeRoster : awayRoster}
         onSubstitute={executeSubstitution}
+      />
+      
+      {/* Game Control Modal */}
+      <GameControlModal
+        isOpen={showGameControlModal}
+        onClose={() => setShowGameControlModal(false)}
+        game={game}
+        homeRoster={homeRoster}
+        awayRoster={awayRoster}
+        onFinalize={handleFinalizeGame}
+        onLiveOutput={() => {}}
+        onPdfExport={() => {}}
       />
       
       {/* Base Runner Modal */}
