@@ -223,7 +223,7 @@ export default function Teams({ user, onLogout }) {
                     data-testid="team-logo-input"
                   />
                 </div>
-                <Button onClick={handleCreateTeam} className="w-full" data-testid="submit-team-btn">
+                <Button onClick={handleCreateTeam} className="w-full" data-testid="create-team-submit">
                   Create Team
                 </Button>
               </div>
