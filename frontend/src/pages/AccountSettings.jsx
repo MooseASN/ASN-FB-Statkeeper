@@ -43,6 +43,13 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
   
   // Submitting state
   const [submitting, setSubmitting] = useState(false);
+  
+  // Shared Access state
+  const [sharedAccessList, setSharedAccessList] = useState([]);
+  const [receivedAccessList, setReceivedAccessList] = useState([]);
+  const [newShareEmail, setNewShareEmail] = useState("");
+  const [sharingAccess, setSharingAccess] = useState(false);
+  const [loadingSharedAccess, setLoadingSharedAccess] = useState(false);
 
   useEffect(() => {
     fetchProfile();
