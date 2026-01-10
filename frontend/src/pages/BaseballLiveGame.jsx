@@ -847,6 +847,11 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [showInPlayModal, setShowInPlayModal] = useState(false);
   const [activeStatsTab, setActiveStatsTab] = useState("home");
   
+  // Substitution state
+  const [showSubstitutionDialog, setShowSubstitutionDialog] = useState(false);
+  const [playerToSubstitute, setPlayerToSubstitute] = useState(null);
+  const [substitutionTeam, setSubstitutionTeam] = useState(null); // 'home' or 'away'
+  
   // Get current batting team's roster and stats (use configured batting order if available)
   const battingTeamIsHome = game?.inning_half === "bottom";
   const battingRoster = battingTeamIsHome 
