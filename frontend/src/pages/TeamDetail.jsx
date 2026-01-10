@@ -209,7 +209,8 @@ export default function TeamDetail({ user, onLogout }) {
         name: teamName,
         logo_url: teamLogo || null,
         color: teamColor,
-        roster: roster
+        roster: roster,
+        sport: teamSport  // CRITICAL: Preserve the team's sport to avoid switching to default
       });
       setHasUnsavedChanges(false);
       toast.success("Team saved successfully");
