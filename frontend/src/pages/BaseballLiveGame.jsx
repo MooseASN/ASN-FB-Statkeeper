@@ -1050,6 +1050,44 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     }, 100);
   }, []);
   
+  // Helper function to update batter stats
+  const updateBatterStats = useCallback((playerNumber, updates) => {
+    const isHomeBatter = battingTeamIsHome;
+    const setStats = isHomeBatter ? setHomeStats : setAwayStats;
+    
+    setStats(prev => {
+      const existing = prev.find(s => s.player_number === playerNumber);
+      if (existing) {
+        return prev.map(s => 
+          s.player_number === playerNumber 
+            ? { ...s, ...Object.fromEntries(Object.entries(updates).map(([k, v]) => [k, (s[k] || 0) + v])) }
+            : s
+        );
+      } else {
+        return [...prev, { player_number: playerNumber, ...updates }];
+      }
+    });
+  }, [battingTeamIsHome]);
+  
+  // Helper function to update pitcher stats
+  const updatePitcherStats = useCallback((playerNumber, updates) => {
+    const isPitchingHome = !battingTeamIsHome;
+    const setStats = isPitchingHome ? setHomeStats : setAwayStats;
+    
+    setStats(prev => {
+      const existing = prev.find(s => s.player_number === playerNumber);
+      if (existing) {
+        return prev.map(s => 
+          s.player_number === playerNumber 
+            ? { ...s, ...Object.fromEntries(Object.entries(updates).map(([k, v]) => [k, (s[k] || 0) + v])) }
+            : s
+        );
+      } else {
+        return [...prev, { player_number: playerNumber, ...updates }];
+      }
+    });
+  }, [battingTeamIsHome]);
+  
   // Handle pitch result
   const handlePitchResult = useCallback((resultType) => {
     if (resultType === "in_play") {
@@ -1068,6 +1106,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     let newInning = currentGame.current_inning;
     let description = "";
     let shouldAdvanceBatter = false;
+    let batterStatUpdate = {};
+    let pitcherStatUpdate = { pitches_thrown: 1 };
     
     switch (resultType) {
       case "ball":
@@ -1077,6 +1117,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
           newBalls = 0;
           newStrikes = 0;
           shouldAdvanceBatter = true;
+          batterStatUpdate = { walks: 1, plate_appearances: 1 };
         } else {
           description = `Ball ${newBalls} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         }
@@ -1091,6 +1132,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
           newBalls = 0;
           newOuts = currentGame.outs + 1;
           shouldAdvanceBatter = true;
+          batterStatUpdate = { strikeouts_batting: 1, at_bats: 1, plate_appearances: 1 };
+          pitcherStatUpdate.strikeouts_pitching = 1;
         } else {
           description = `Strike ${newStrikes} (${resultType === "strike_swinging" ? "swinging" : "looking"}) - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         }
@@ -1108,6 +1151,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         newBalls = 0;
         newStrikes = 0;
         shouldAdvanceBatter = true;
+        batterStatUpdate = { hit_by_pitch: 1, plate_appearances: 1 };
         break;
         
       case "intentional_walk":
@@ -1115,6 +1159,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         newBalls = 0;
         newStrikes = 0;
         shouldAdvanceBatter = true;
+        batterStatUpdate = { walks: 1, plate_appearances: 1 };
         break;
         
       default:
@@ -1138,6 +1183,14 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
     }
     
+    // Update stats
+    if (currentBatter?.player_number && Object.keys(batterStatUpdate).length > 0) {
+      updateBatterStats(currentBatter.player_number, batterStatUpdate);
+    }
+    if (currentPitcher?.player_number || currentPitcher?.number) {
+      updatePitcherStats(currentPitcher.player_number || currentPitcher.number, pitcherStatUpdate);
+    }
+    
     // Add play to log
     if (description) {
       addPlay(currentGame.current_inning, currentGame.inning_half, description);
@@ -1152,7 +1205,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       inning_half: newInningHalf,
       current_inning: newInning
     }));
-  }, [game, currentBatter, battingRoster.length, addPlay]);
+  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats]);
   
   // Handle in-play result
   const handleInPlayResult = useCallback((resultType) => {
