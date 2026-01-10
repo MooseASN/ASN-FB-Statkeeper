@@ -1227,7 +1227,7 @@ export default function SchoolDashboard() {
                     {selectedGame.sport === "football" ? (
                       <p className="text-xs text-slate-400">3 timeouts per half (standard)</p>
                     ) : selectedGame.sport === "baseball" ? (
-                      <p className="text-xs text-slate-400">No timeouts in baseball</p>
+                      <p className="text-xs text-slate-400">No timeouts in baseball - use mound visits</p>
                     ) : (
                       <div className="flex gap-2 flex-wrap">
                         {[
