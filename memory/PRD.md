@@ -13,6 +13,41 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - BASE RUNNER SYSTEM & UI ENHANCEMENTS ✅
+
+#### Base Runner Advancement Logic - COMPLETED ✅
+- **Single**: Batter to 1st, runner on 1st to 2nd, runner on 2nd to 3rd, runner on 3rd scores
+- **Double**: Batter to 2nd, runner on 1st to 3rd, runners on 2nd/3rd score
+- **Triple**: Batter to 3rd, all runners score
+- **Home Run**: All runners + batter score, bases cleared
+- **Walk/HBP**: Force runners if needed, batter to 1st
+- **advanceRunners()** function handles all base advancement automatically
+
+#### Clickable Base Runners with Actions - COMPLETED ✅
+- **Click on runner** - Opens BaseRunnerModal with options:
+  - 🏃 **Steal Base** - Advances runner one base, adds stolen base stat
+  - ❌ **Caught Stealing** - Adds out, removes runner from base
+  - ⚠️ **Picked Off** - Adds out, removes runner from base
+  - **Move Runner To** - Buttons for 1st, 2nd, or 3rd (available bases only)
+- All actions logged to play-by-play with proper descriptions
+
+#### Outfielders Fixed - COMPLETED ✅
+- **LF** at top:18%, left:20%
+- **CF** at top:10%, left:50%
+- **RF** at top:18%, left:80%
+- All 9 positions now visible on field image
+
+#### Team Stats Updated - COMPLETED ✅
+- Now shows: **R** (runs), **H** (hits), **E** (errors - in red), **SO** (strikeouts), **BB** (walks)
+- Runs shown in green for emphasis
+- Error tracking added per team
+
+#### Scoreboard Redesign - COMPLETED ✅
+- **B/S/O indicators** moved next to inning and centered
+- Compact format: B (green dots), S (red dots), O (yellow dots)
+- Inning indicator with top/bottom arrows
+- More space efficient layout
+
 ### January 10, 2026 - P1 TASKS COMPLETED ✅
 
 #### Back Button Navigation Fix - COMPLETED ✅
