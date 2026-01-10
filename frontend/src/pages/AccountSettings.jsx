@@ -71,6 +71,53 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
     }
   };
 
+  const fetchSharedAccess = async () => {
+    setLoadingSharedAccess(true);
+    try {
+      const [grantedRes, receivedRes] = await Promise.all([
+        axios.get(`${API}/admin/shared-access`),
+        axios.get(`${API}/admin/shared-access/received`)
+      ]);
+      setSharedAccessList(grantedRes.data);
+      setReceivedAccessList(receivedRes.data);
+    } catch (error) {
+      console.error("Failed to load shared access:", error);
+    } finally {
+      setLoadingSharedAccess(false);
+    }
+  };
+
+  const handleGrantAccess = async () => {
+    if (!newShareEmail.trim()) {
+      toast.error("Please enter an email address");
+      return;
+    }
+    
+    setSharingAccess(true);
+    try {
+      await axios.post(`${API}/admin/shared-access`, { email: newShareEmail.trim() });
+      toast.success(`Access granted to ${newShareEmail}`);
+      setNewShareEmail("");
+      fetchSharedAccess();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to grant access");
+    } finally {
+      setSharingAccess(false);
+    }
+  };
+
+  const handleRevokeAccess = async (accessId, email) => {
+    if (!confirm(`Are you sure you want to revoke access for ${email}?`)) return;
+    
+    try {
+      await axios.delete(`${API}/admin/shared-access/${accessId}`);
+      toast.success(`Access revoked for ${email}`);
+      fetchSharedAccess();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to revoke access");
+    }
+  };
+
   const fetchSecurityQuestion = async () => {
     try {
       const res = await axios.get(`${API}/account/security-question`);
