@@ -48,7 +48,8 @@ import {
   Building2,
   ChevronRight,
   ChevronDown,
-  Trash2
+  Trash2,
+  X
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
