@@ -421,7 +421,7 @@ const formatPlayerName = (name) => {
 
 // Baseball Diamond Component - Using provided field image
 const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingTeamColor, onRunnerClick }) => {
-  // Position labels with coordinates - adjusted outfielders to be more visible on field
+  // Position labels with coordinates - outfielders positioned per user reference image
   const positions = {
     pitcher: { top: '55%', left: '50%', label: 'P' },
     catcher: { top: '88%', left: '50%', label: 'C' },
@@ -429,9 +429,9 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
     second: { top: '42%', left: '58%', label: '2B' },
     third: { top: '55%', left: '28%', label: '3B' },
     shortstop: { top: '42%', left: '42%', label: 'SS' },
-    left: { top: '18%', left: '20%', label: 'LF' },
-    center: { top: '10%', left: '50%', label: 'CF' },
-    right: { top: '18%', left: '80%', label: 'RF' },
+    left: { top: '24%', left: '18%', label: 'LF' },      // Updated per reference
+    center: { top: '6%', left: '50%', label: 'CF' },     // Updated per reference  
+    right: { top: '24%', left: '82%', label: 'RF' },     // Updated per reference
   };
   
   // Base positions for highlighting runners
