@@ -714,6 +714,34 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     }));
   };
   
+  // Add player to roster (for this game only)
+  const addPlayerToRoster = (newPlayer, team) => {
+    setGame(prev => {
+      if (!prev) return prev;
+      const rosterKey = team === 'home' ? 'home_roster' : 'away_roster';
+      const currentRoster = prev[rosterKey] || [];
+      // Check if player already exists
+      if (currentRoster.some(p => p.player_number === newPlayer.player_number)) {
+        return prev;
+      }
+      return {
+        ...prev,
+        [rosterKey]: [...currentRoster, newPlayer]
+      };
+    });
+    toast.success(`#${newPlayer.player_number} ${newPlayer.player_name} added to roster`);
+  };
+  
+  // Add to offense roster
+  const addToOffenseRoster = (newPlayer) => {
+    addPlayerToRoster(newPlayer, possession);
+  };
+  
+  // Add to defense roster  
+  const addToDefenseRoster = (newPlayer) => {
+    addPlayerToRoster(newPlayer, defenseTeam);
+  };
+  
   const offenseRoster = possession === 'home' ? game?.home_roster : game?.away_roster;
   const defenseRoster = possession === 'home' ? game?.away_roster : game?.home_roster;
   const offenseTeamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
