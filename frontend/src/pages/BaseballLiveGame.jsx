@@ -1170,6 +1170,196 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     });
   }, [battingTeamIsHome]);
   
+  // Helper function to advance base runners
+  const advanceRunners = useCallback((hitType, batterNumber, batterName) => {
+    setGame(prev => {
+      if (!prev) return prev;
+      
+      let newBases = { ...prev.bases } || {};
+      let runsScored = 0;
+      
+      // Get batter info for base
+      const batterInfo = { number: batterNumber, name: batterName };
+      
+      switch (hitType) {
+        case 'single':
+          // Runner on 3rd scores
+          if (newBases.third) runsScored++;
+          // Runner on 2nd goes to 3rd (or scores on single to outfield)
+          newBases.third = newBases.second || null;
+          // Runner on 1st goes to 2nd
+          newBases.second = newBases.first || null;
+          // Batter to 1st
+          newBases.first = batterInfo;
+          break;
+          
+        case 'double':
+          // Runner on 3rd scores
+          if (newBases.third) runsScored++;
+          // Runner on 2nd scores
+          if (newBases.second) runsScored++;
+          // Runner on 1st goes to 3rd
+          newBases.third = newBases.first || null;
+          // Batter to 2nd
+          newBases.second = batterInfo;
+          newBases.first = null;
+          break;
+          
+        case 'triple':
+          // All runners score
+          if (newBases.third) runsScored++;
+          if (newBases.second) runsScored++;
+          if (newBases.first) runsScored++;
+          // Batter to 3rd
+          newBases.third = batterInfo;
+          newBases.second = null;
+          newBases.first = null;
+          break;
+          
+        case 'home_run':
+          // All runners score + batter
+          if (newBases.third) runsScored++;
+          if (newBases.second) runsScored++;
+          if (newBases.first) runsScored++;
+          runsScored++; // Batter scores
+          // Clear bases
+          newBases = { first: null, second: null, third: null };
+          break;
+          
+        case 'walk':
+        case 'hbp':
+          // Force runners if bases loaded
+          if (newBases.first && newBases.second && newBases.third) {
+            runsScored++; // Runner on 3rd scores
+          }
+          if (newBases.first && newBases.second) {
+            newBases.third = newBases.second;
+          }
+          if (newBases.first) {
+            newBases.second = newBases.first;
+          }
+          newBases.first = batterInfo;
+          break;
+          
+        case 'out':
+          // Don't change bases on out (unless it's an inning-ending out)
+          break;
+          
+        default:
+          break;
+      }
+      
+      // Update score
+      const isHomeBatting = prev.inning_half === 'bottom';
+      return {
+        ...prev,
+        bases: newBases,
+        home_score: isHomeBatting ? (prev.home_score || 0) + runsScored : prev.home_score,
+        away_score: !isHomeBatting ? (prev.away_score || 0) + runsScored : prev.away_score,
+      };
+    });
+  }, []);
+  
+  // Handle runner click
+  const handleRunnerClick = (base, runner) => {
+    setSelectedRunner(runner);
+    setSelectedRunnerBase(base);
+    setShowRunnerModal(true);
+  };
+  
+  // Handle runner action
+  const handleRunnerAction = useCallback((action, targetBase = null) => {
+    const runner = selectedRunner;
+    const currentBase = selectedRunnerBase;
+    
+    if (!runner || !currentBase) return;
+    
+    const runnerNumber = typeof runner === 'object' ? runner.number : runner;
+    
+    setGame(prev => {
+      if (!prev) return prev;
+      
+      let newBases = { ...prev.bases };
+      let newOuts = prev.outs;
+      let runScored = false;
+      
+      switch (action) {
+        case 'steal':
+          // Advance runner one base
+          if (currentBase === 'first') {
+            newBases.second = runner;
+            newBases.first = null;
+            addPlay(prev.current_inning, prev.inning_half, `Stolen base by #${runnerNumber} (1st to 2nd)`);
+          } else if (currentBase === 'second') {
+            newBases.third = runner;
+            newBases.second = null;
+            addPlay(prev.current_inning, prev.inning_half, `Stolen base by #${runnerNumber} (2nd to 3rd)`);
+          } else if (currentBase === 'third') {
+            // Steal home!
+            newBases.third = null;
+            runScored = true;
+            addPlay(prev.current_inning, prev.inning_half, `STEAL HOME by #${runnerNumber}! Run scores!`);
+          }
+          // Update stolen base stat
+          updateBatterStats(runnerNumber, { stolen_bases: 1 });
+          break;
+          
+        case 'caught_stealing':
+          newBases[currentBase] = null;
+          newOuts++;
+          addPlay(prev.current_inning, prev.inning_half, `Caught stealing - #${runnerNumber} out at ${currentBase === 'first' ? '2nd' : currentBase === 'second' ? '3rd' : 'home'}`);
+          updateBatterStats(runnerNumber, { caught_stealing: 1 });
+          break;
+          
+        case 'picked_off':
+          newBases[currentBase] = null;
+          newOuts++;
+          addPlay(prev.current_inning, prev.inning_half, `Picked off - #${runnerNumber} out at ${currentBase}`);
+          break;
+          
+        case 'move':
+          if (targetBase) {
+            newBases[targetBase] = runner;
+            newBases[currentBase] = null;
+            addPlay(prev.current_inning, prev.inning_half, `Runner #${runnerNumber} moved from ${currentBase} to ${targetBase}`);
+          }
+          break;
+          
+        default:
+          break;
+      }
+      
+      // Handle inning end if 3 outs
+      let newInningHalf = prev.inning_half;
+      let newInning = prev.current_inning;
+      if (newOuts >= 3) {
+        newOuts = 0;
+        newBases = { first: null, second: null, third: null };
+        if (newInningHalf === 'top') {
+          newInningHalf = 'bottom';
+        } else {
+          newInningHalf = 'top';
+          newInning++;
+        }
+      }
+      
+      const isHomeBatting = prev.inning_half === 'bottom';
+      return {
+        ...prev,
+        bases: newBases,
+        outs: newOuts,
+        inning_half: newInningHalf,
+        current_inning: newInning,
+        home_score: runScored && isHomeBatting ? (prev.home_score || 0) + 1 : prev.home_score,
+        away_score: runScored && !isHomeBatting ? (prev.away_score || 0) + 1 : prev.away_score,
+      };
+    });
+    
+    setShowRunnerModal(false);
+    setSelectedRunner(null);
+    setSelectedRunnerBase(null);
+  }, [selectedRunner, selectedRunnerBase, addPlay, updateBatterStats]);
+  
   // Handle pitch result
   const handlePitchResult = useCallback((resultType) => {
     if (resultType === "in_play") {
