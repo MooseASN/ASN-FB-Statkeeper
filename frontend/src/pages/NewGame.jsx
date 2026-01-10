@@ -493,7 +493,8 @@ export default function NewGame({ user, onLogout }) {
               </div>
               )}
 
-              {/* Clock Options */}
+              {/* Clock Options - Not shown for baseball */}
+              {selectedSport !== "baseball" && (
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
