@@ -1357,6 +1357,10 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
+  // Use custom hooks for game history (undo) and play-by-play
+  const { saveStateForUndo, popLastState, canUndo, historyLength } = useGameHistory(20);
+  const { playByPlay, addPlay, removeLastPlay, setPlays } = usePlayByPlay([]);
+  
   // Game state
   const [game, setGame] = useState(initialDemoData);
   const [loading, setLoading] = useState(!demoMode);
@@ -1364,11 +1368,6 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [awayRoster, setAwayRoster] = useState(initialDemoData?.away_roster || []);
   const [homeStats, setHomeStats] = useState(initialDemoData?.home_player_stats || []);
   const [awayStats, setAwayStats] = useState(initialDemoData?.away_player_stats || []);
-  const [playByPlay, setPlayByPlay] = useState([]);
-  
-  // Ref to prevent duplicate play entries (for React strict mode / double renders)
-  const lastPlayIdRef = useRef(null);
-  const playCounterRef = useRef(0);
   
   // Starter configuration state
   const [showStarterConfig, setShowStarterConfig] = useState(false);
@@ -1399,9 +1398,6 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   // Error tracking
   const [homeErrors, setHomeErrors] = useState(0);
   const [awayErrors, setAwayErrors] = useState(0);
-  
-  // Undo history - stores snapshots of the full game state
-  const [undoHistory, setUndoHistory] = useState([]);
   
   // Game control state
   const [showGameControlModal, setShowGameControlModal] = useState(false);
