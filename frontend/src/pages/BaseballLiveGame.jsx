@@ -1728,7 +1728,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       inning_half: newInningHalf,
       current_inning: newInning
     }));
-  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats, advanceRunners]);
+  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats, advanceRunners, saveStateForUndo]);
   
   // Auto-save game state when it changes (debounced)
   useEffect(() => {
