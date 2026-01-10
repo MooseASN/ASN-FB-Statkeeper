@@ -2216,6 +2216,30 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     }
   };
   
+  // Handle inning/score update
+  const handleInningScoreUpdate = (updates) => {
+    saveStateForUndo();
+    
+    setGame(prev => ({
+      ...prev,
+      ...updates,
+    }));
+    
+    // Reset balls, strikes when inning changes
+    if (updates.current_inning !== game?.current_inning || updates.inning_half !== game?.inning_half) {
+      setGame(prev => ({
+        ...prev,
+        balls: 0,
+        strikes: 0,
+        outs: 0,
+        bases: { first: null, second: null, third: null },
+      }));
+      setCurrentBatterIndex(0);
+    }
+    
+    toast.success("Game updated");
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
