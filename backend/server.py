@@ -1602,11 +1602,31 @@ async def create_team(team_data: TeamCreate, user: User = Depends(get_current_us
 
 @api_router.get("/teams", response_model=List[Team])
 async def get_teams(sport: Optional[str] = None, user: User = Depends(get_current_user)):
+    # Get user's own teams
     query = {"user_id": user.user_id}
     if sport:
         query["sport"] = sport
-    teams = await db.teams.find(query, {"_id": 0}).to_list(100)
-    return teams
+    own_teams = await db.teams.find(query, {"_id": 0}).to_list(100)
+    
+    # Get teams from accounts user has shared access to
+    shared_access_records = await db.shared_access.find(
+        {"shared_with_user_id": user.user_id, "is_active": True},
+        {"owner_user_id": 1}
+    ).to_list(100)
+    
+    shared_teams = []
+    for record in shared_access_records:
+        shared_query = {"user_id": record["owner_user_id"]}
+        if sport:
+            shared_query["sport"] = sport
+        owner_teams = await db.teams.find(shared_query, {"_id": 0}).to_list(100)
+        # Mark teams as shared
+        for team in owner_teams:
+            team["is_shared"] = True
+            team["shared_from_user_id"] = record["owner_user_id"]
+        shared_teams.extend(owner_teams)
+    
+    return own_teams + shared_teams
 
 @api_router.get("/teams/{team_id}", response_model=Team)
 async def get_team(team_id: str, user: User = Depends(get_current_user)):
