@@ -49,6 +49,9 @@ export default function NewGame({ user, onLogout }) {
   // Game notes
   const [gameNote, setGameNote] = useState("");
   
+  // Baseball-specific options
+  const [totalInnings, setTotalInnings] = useState(9); // 9 standard, 7 for high school/doubleheaders
+  
   // School/Season linking (for school users)
   const [schoolInfo, setSchoolInfo] = useState(null);
   const [seasons, setSeasons] = useState([]);
