@@ -804,6 +804,17 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     });
   }, [currentBatter, battingRoster.length]);
   
+  // Auto-save game state when it changes (debounced)
+  useEffect(() => {
+    if (!game || demoMode) return;
+    
+    const timeoutId = setTimeout(() => {
+      saveGame(game);
+    }, 1000); // Debounce saves by 1 second
+    
+    return () => clearTimeout(timeoutId);
+  }, [game, demoMode, saveGame]);
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
