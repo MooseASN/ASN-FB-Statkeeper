@@ -605,27 +605,29 @@ const SubstitutionDialog = ({ isOpen, onClose, player, roster, onSubstitute }) =
   );
 };
 
-// Batting Order Component
-const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitute }) => (
+// Batting Order Component - Compact version
+const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitute, teamName }) => (
   <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-    <div className="bg-zinc-800 px-4 py-2 border-b border-zinc-700">
-      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Batting Order</h3>
+    <div className="bg-zinc-800 px-3 py-1.5 border-b border-zinc-700 flex justify-between items-center">
+      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+        {teamName ? `Batting: ${teamName}` : 'Batting Order'}
+      </h3>
     </div>
-    <div className="max-h-64 overflow-y-auto">
+    <div className="max-h-40 overflow-y-auto">
       {players?.map((player, index) => (
         <div 
           key={player.id || player.player_number || index}
-          className={`flex items-center justify-between px-4 py-2 border-b border-zinc-800 cursor-pointer hover:bg-zinc-800 ${
-            index === currentBatterIndex ? 'bg-blue-900/50 border-l-4 border-l-blue-500' : ''
+          className={`flex items-center justify-between px-2 py-1 border-b border-zinc-800/50 cursor-pointer hover:bg-zinc-800 ${
+            index === currentBatterIndex ? 'bg-blue-900/50 border-l-2 border-l-blue-500' : ''
           }`}
           onClick={() => onSelectBatter(index)}
         >
-          <div className="flex items-center gap-3">
-            <span className="text-zinc-500 w-4">{index + 1}.</span>
-            <span className="text-white font-medium">#{player.player_number} {player.player_name}</span>
-          </div>
           <div className="flex items-center gap-2">
-            <span className="text-zinc-400 text-sm">
+            <span className="text-zinc-500 text-xs w-3">{index + 1}.</span>
+            <span className="text-white text-xs font-medium">#{player.player_number} {player.player_name}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-zinc-400 text-xs">
               {player.hits || 0}-{player.at_bats || 0}
             </span>
             <button
@@ -633,10 +635,10 @@ const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitut
                 e.stopPropagation();
                 onSubstitute?.(player);
               }}
-              className="p-1 hover:bg-zinc-700 rounded text-zinc-400 hover:text-white transition-colors"
-              title="Substitute player"
+              className="p-0.5 hover:bg-zinc-700 rounded text-zinc-400 hover:text-white transition-colors"
+              title="Substitute"
             >
-              <ArrowLeftRight className="w-4 h-4" />
+              <ArrowLeftRight className="w-3 h-3" />
             </button>
           </div>
         </div>
