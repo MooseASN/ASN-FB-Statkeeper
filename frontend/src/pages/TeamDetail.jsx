@@ -198,6 +198,44 @@ export default function TeamDetail({ user, onLogout }) {
     }
   };
 
+  // Handle logo file upload
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Invalid file type. Allowed: PNG, JPG, GIF, WEBP');
+      return;
+    }
+    
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File too large. Maximum size is 5MB');
+      return;
+    }
+    
+    setUploadingLogo(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const res = await axios.post(`${API}/teams/${id}/logo/upload`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      setTeamLogo(res.data.logo_url);
+      toast.success('Logo uploaded successfully');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Failed to upload logo');
+    } finally {
+      setUploadingLogo(false);
+      // Reset the file input
+      e.target.value = '';
+    }
+  };
+
   const handleSave = async () => {
     if (!teamName.trim()) {
       toast.error("Team name is required");
