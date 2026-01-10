@@ -1182,6 +1182,63 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     return () => clearTimeout(timeoutId);
   }, [game, demoMode, saveGame]);
   
+  // Handle substitution request
+  const handleSubstitutionRequest = (player, isHomeTeam) => {
+    setPlayerToSubstitute(player);
+    setSubstitutionTeam(isHomeTeam ? 'home' : 'away');
+    setShowSubstitutionDialog(true);
+  };
+  
+  // Execute substitution
+  const executeSubstitution = (oldPlayer, newPlayerNumber, subType) => {
+    const isHome = substitutionTeam === 'home';
+    const roster = isHome ? homeRoster : awayRoster;
+    const newPlayer = roster.find(p => p.player_number === newPlayerNumber);
+    
+    if (!newPlayer) return;
+    
+    // Offensive substitution (batting order)
+    if (subType === 'offensive' || subType === 'both') {
+      if (isHome) {
+        setHomeBattingOrder(prev => 
+          prev.map(p => p.player_number === oldPlayer.player_number ? { ...newPlayer, hits: 0, at_bats: 0 } : p)
+        );
+      } else {
+        setAwayBattingOrder(prev => 
+          prev.map(p => p.player_number === oldPlayer.player_number ? { ...newPlayer, hits: 0, at_bats: 0 } : p)
+        );
+      }
+    }
+    
+    // Defensive substitution (field position)
+    if (subType === 'defensive' || subType === 'both') {
+      const updateDefense = (prevDefense) => {
+        const newDefense = { ...prevDefense };
+        Object.keys(newDefense).forEach(pos => {
+          if (newDefense[pos]?.number === oldPlayer.player_number) {
+            newDefense[pos] = { number: newPlayer.player_number, name: newPlayer.player_name };
+          }
+        });
+        return newDefense;
+      };
+      
+      if (isHome) {
+        setHomeDefense(updateDefense);
+      } else {
+        setAwayDefense(updateDefense);
+      }
+    }
+    
+    // Add substitution to play-by-play
+    addPlay(
+      game?.current_inning || 1, 
+      game?.inning_half || 'top',
+      `Substitution: #${newPlayer.player_number} ${newPlayer.player_name} replaces #${oldPlayer.player_number} ${oldPlayer.player_name} (${subType})`
+    );
+    
+    toast.success(`Substitution complete: #${newPlayer.player_number} ${newPlayer.player_name} in for #${oldPlayer.player_number} ${oldPlayer.player_name}`);
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
