@@ -2504,12 +2504,34 @@ async def start_game(game_id: str, request: StartGameRequest = None, user: User 
 
 @api_router.get("/games", response_model=List[Game])
 async def get_games(sport: Optional[str] = None, user: User = Depends(get_current_user)):
+    # Get user's own games
     query = {"user_id": user.user_id}
-    # Only add sport filter if a valid sport is provided
     if sport and sport.strip():
         query["sport"] = sport.strip()
-    games = await db.games.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
-    return games
+    own_games = await db.games.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Get games from accounts user has shared access to
+    shared_access_records = await db.shared_access.find(
+        {"shared_with_user_id": user.user_id, "is_active": True},
+        {"owner_user_id": 1}
+    ).to_list(100)
+    
+    shared_games = []
+    for record in shared_access_records:
+        shared_query = {"user_id": record["owner_user_id"]}
+        if sport and sport.strip():
+            shared_query["sport"] = sport.strip()
+        owner_games = await db.games.find(shared_query, {"_id": 0}).sort("created_at", -1).to_list(100)
+        # Mark games as shared
+        for game in owner_games:
+            game["is_shared"] = True
+            game["shared_from_user_id"] = record["owner_user_id"]
+        shared_games.extend(owner_games)
+    
+    # Combine and sort by created_at
+    all_games = own_games + shared_games
+    all_games.sort(key=lambda x: x.get("created_at", ""), reverse=True)
+    return all_games
 
 @api_router.get("/games/public/{game_id}")
 async def get_game_public(game_id: str):
