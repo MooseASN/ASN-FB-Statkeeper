@@ -1451,7 +1451,15 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       }
       description += " - Side retired";
       setCurrentBatterIndex(0);
+      // Clear bases on inning end
+      setGame(prev => ({ ...prev, bases: { first: null, second: null, third: null } }));
     } else if (shouldAdvanceBatter) {
+      // Advance base runners for walks and HBP
+      if (resultType === "ball" && newBalls === 0) { // Walk occurred
+        advanceRunners('walk', currentBatter?.player_number, currentBatter?.player_name);
+      } else if (resultType === "hbp" || resultType === "intentional_walk") {
+        advanceRunners('walk', currentBatter?.player_number, currentBatter?.player_name);
+      }
       setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
     }
     
@@ -1477,7 +1485,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       inning_half: newInningHalf,
       current_inning: newInning
     }));
-  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats]);
+  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats, advanceRunners]);
   
   // Handle in-play result
   const handleInPlayResult = useCallback((resultType) => {
