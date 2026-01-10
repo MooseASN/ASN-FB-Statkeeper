@@ -4,7 +4,8 @@ const SportContext = createContext(null);
 
 export const SPORTS = {
   BASKETBALL: "basketball",
-  FOOTBALL: "football"
+  FOOTBALL: "football",
+  BASEBALL: "baseball"
 };
 
 export const SPORT_CONFIG = {
@@ -21,6 +22,13 @@ export const SPORT_CONFIG = {
     color: "#2D5A27",
     bgGradient: "from-green-700 to-green-900",
     description: "Track football stats in real-time"
+  },
+  baseball: {
+    name: "Baseball",
+    icon: "⚾",
+    color: "#C41E3A",
+    bgGradient: "from-red-700 to-red-900",
+    description: "Track baseball stats in real-time"
   }
 };
 
