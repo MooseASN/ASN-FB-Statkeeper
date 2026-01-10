@@ -1,309 +1,252 @@
 """
-Beta Mode Feature Tests
-Tests for the Beta Mode feature that allows admins to password-protect access to specific sports.
-
-Endpoints tested:
-- GET /api/beta-status (public)
-- POST /api/beta-verify (public)
-- GET /api/admin/beta-settings (admin only)
-- PUT /api/admin/beta-settings (admin only)
+Test Site-Wide Beta Mode Feature
+Tests the beta mode endpoints and access control
 """
-
 import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://stat-tracker-13.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://stat-tracker-13.preview.emergentagent.com').rstrip('/')
 
 # Admin credentials
-ADMIN_EMAIL = "admin"
+ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
 ADMIN_PASSWORD = "NoahTheJew1997"
 
 
-class TestBetaModePublicEndpoints:
-    """Tests for public beta mode endpoints (no auth required)"""
+class TestBetaModeEndpoints:
+    """Test beta mode API endpoints"""
     
-    def test_get_beta_status_returns_200(self):
-        """GET /api/beta-status should return 200 with beta status"""
-        response = requests.get(f"{BASE_URL}/api/beta-status")
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        """Setup test session"""
+        self.session = requests.Session()
+        self.session.headers.update({"Content-Type": "application/json"})
         
-        data = response.json()
-        assert "basketball_beta" in data, "Response should contain basketball_beta"
-        assert "football_beta" in data, "Response should contain football_beta"
-        assert isinstance(data["basketball_beta"], bool), "basketball_beta should be boolean"
-        assert isinstance(data["football_beta"], bool), "football_beta should be boolean"
-        print(f"✓ Beta status: basketball={data['basketball_beta']}, football={data['football_beta']}")
-    
-    def test_beta_verify_invalid_sport(self):
-        """POST /api/beta-verify with invalid sport - behavior depends on settings existence"""
-        response = requests.post(
-            f"{BASE_URL}/api/beta-verify",
-            json={"sport": "invalid_sport", "password": "test"}
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        
-        data = response.json()
-        # Note: When no settings exist, returns valid=True (line 932-933 in server.py)
-        # When settings exist but sport is invalid, returns valid=False with error
-        # This is acceptable behavior - invalid sports are handled gracefully
-        print(f"✓ Invalid sport response: {data}")
-    
-    def test_beta_verify_when_not_in_beta(self):
-        """POST /api/beta-verify should return valid=True when sport is not in beta"""
-        # First check current beta status
-        status_response = requests.get(f"{BASE_URL}/api/beta-status")
-        status = status_response.json()
-        
-        # Test basketball if not in beta
-        if not status.get("basketball_beta"):
-            response = requests.post(
-                f"{BASE_URL}/api/beta-verify",
-                json={"sport": "basketball", "password": "any_password"}
-            )
-            assert response.status_code == 200
-            data = response.json()
-            assert data.get("valid") == True, "Should return valid=True when sport is not in beta"
-            print("✓ Basketball (not in beta) returns valid=True")
-        
-        # Test football if not in beta
-        if not status.get("football_beta"):
-            response = requests.post(
-                f"{BASE_URL}/api/beta-verify",
-                json={"sport": "football", "password": "any_password"}
-            )
-            assert response.status_code == 200
-            data = response.json()
-            assert data.get("valid") == True, "Should return valid=True when sport is not in beta"
-            print("✓ Football (not in beta) returns valid=True")
-
-
-class TestBetaModeAdminEndpoints:
-    """Tests for admin-only beta mode endpoints"""
-    
-    @pytest.fixture(scope="class")
-    def admin_session(self):
-        """Login as admin and return session token"""
-        response = requests.post(
-            f"{BASE_URL}/api/auth/login",
-            json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}
-        )
-        if response.status_code != 200:
-            pytest.skip(f"Admin login failed: {response.status_code} - {response.text}")
-        
+    def get_admin_token(self):
+        """Login as admin and get session token"""
+        response = self.session.post(f"{BASE_URL}/api/auth/login", json={
+            "email": ADMIN_EMAIL,
+            "password": ADMIN_PASSWORD
+        })
+        assert response.status_code == 200, f"Admin login failed: {response.text}"
         data = response.json()
         token = data.get("session_token")
-        if not token:
-            pytest.skip("No session token returned from login")
-        
-        print(f"✓ Admin logged in successfully: {data.get('email')}")
+        assert token, "No session token returned"
+        self.session.headers.update({"Authorization": f"Bearer {token}"})
         return token
     
-    def test_get_beta_settings_requires_auth(self):
-        """GET /api/admin/beta-settings without auth should return 401"""
+    def test_site_beta_status_public(self):
+        """Test GET /site-beta-status - public endpoint, no auth required"""
+        response = self.session.get(f"{BASE_URL}/api/site-beta-status")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        data = response.json()
+        # Should return site_beta_enabled and site_beta_message
+        assert "site_beta_enabled" in data, "Missing site_beta_enabled field"
+        assert "site_beta_message" in data, "Missing site_beta_message field"
+        print(f"Site beta status: enabled={data['site_beta_enabled']}, message={data['site_beta_message'][:50]}...")
+    
+    def test_check_beta_access_requires_auth(self):
+        """Test GET /check-beta-access - requires authentication"""
+        # Without auth, should return 401
+        response = requests.get(f"{BASE_URL}/api/check-beta-access")
+        assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
+    
+    def test_check_beta_access_admin(self):
+        """Test GET /check-beta-access - admin always has access"""
+        self.get_admin_token()
+        response = self.session.get(f"{BASE_URL}/api/check-beta-access")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        data = response.json()
+        assert "has_access" in data, "Missing has_access field"
+        # Admin should always have access
+        assert data["has_access"] == True, "Admin should always have beta access"
+        assert data.get("reason") in ["admin", "beta_not_enabled", "whitelisted"], f"Unexpected reason: {data.get('reason')}"
+        print(f"Admin beta access: has_access={data['has_access']}, reason={data.get('reason')}")
+    
+    def test_get_beta_settings_admin_only(self):
+        """Test GET /admin/beta-settings - admin only"""
+        # Without auth, should return 401
         response = requests.get(f"{BASE_URL}/api/admin/beta-settings")
-        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
-        print("✓ GET /api/admin/beta-settings requires authentication")
-    
-    def test_put_beta_settings_requires_auth(self):
-        """PUT /api/admin/beta-settings without auth should return 401"""
-        response = requests.put(
-            f"{BASE_URL}/api/admin/beta-settings",
-            json={"basketball_beta": False, "basketball_password": "", "football_beta": False, "football_password": ""}
-        )
-        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
-        print("✓ PUT /api/admin/beta-settings requires authentication")
-    
-    def test_get_beta_settings_as_admin(self, admin_session):
-        """GET /api/admin/beta-settings as admin should return settings"""
-        response = requests.get(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"}
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
+        assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
         
+        # With admin auth
+        self.get_admin_token()
+        response = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
-        assert "basketball_beta" in data, "Response should contain basketball_beta"
-        assert "basketball_password" in data, "Response should contain basketball_password"
-        assert "football_beta" in data, "Response should contain football_beta"
-        assert "football_password" in data, "Response should contain football_password"
-        print(f"✓ Admin can get beta settings: {data}")
+        
+        # Verify all expected fields
+        expected_fields = [
+            "site_beta_enabled", "site_beta_message", "allowed_emails",
+            "basketball_beta", "basketball_password",
+            "football_beta", "football_password",
+            "baseball_beta", "baseball_password",
+            "school_creation_beta", "school_creation_password"
+        ]
+        for field in expected_fields:
+            assert field in data, f"Missing field: {field}"
+        
+        print(f"Beta settings: site_beta_enabled={data['site_beta_enabled']}, allowed_emails count={len(data.get('allowed_emails', []))}")
     
-    def test_enable_basketball_beta_mode(self, admin_session):
-        """PUT /api/admin/beta-settings to enable basketball beta mode"""
-        test_password = "TEST_basketball_beta_123"
+    def test_update_beta_settings_admin_only(self):
+        """Test PUT /admin/beta-settings - admin only"""
+        # Without auth, should return 401
+        response = requests.put(f"{BASE_URL}/api/admin/beta-settings", json={
+            "site_beta_enabled": False
+        })
+        assert response.status_code == 401, f"Expected 401 without auth, got {response.status_code}"
         
-        # Enable basketball beta mode
-        response = requests.put(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"},
-            json={
-                "basketball_beta": True,
-                "basketball_password": test_password,
-                "football_beta": False,
-                "football_password": ""
-            }
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        print("✓ Basketball beta mode enabled")
+        # With admin auth - get current settings first
+        self.get_admin_token()
+        current_response = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        current_settings = current_response.json()
         
-        # Verify via GET
-        get_response = requests.get(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"}
-        )
-        assert get_response.status_code == 200
-        data = get_response.json()
-        assert data["basketball_beta"] == True, "Basketball beta should be enabled"
-        assert data["basketball_password"] == test_password, "Basketball password should match"
-        print("✓ Basketball beta settings persisted correctly")
-        
-        # Verify public status reflects the change
-        status_response = requests.get(f"{BASE_URL}/api/beta-status")
-        status = status_response.json()
-        assert status["basketball_beta"] == True, "Public status should show basketball in beta"
-        print("✓ Public beta status reflects basketball in beta")
-    
-    def test_beta_verify_with_correct_password(self, admin_session):
-        """POST /api/beta-verify with correct password should return valid=True"""
-        test_password = "TEST_basketball_beta_123"
-        
-        # Ensure basketball is in beta mode
-        requests.put(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"},
-            json={
-                "basketball_beta": True,
-                "basketball_password": test_password,
-                "football_beta": False,
-                "football_password": ""
-            }
-        )
-        
-        # Verify with correct password
-        response = requests.post(
-            f"{BASE_URL}/api/beta-verify",
-            json={"sport": "basketball", "password": test_password}
-        )
-        assert response.status_code == 200
+        # Update with same settings (to not break anything)
+        response = self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=current_settings)
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
-        assert data.get("valid") == True, "Correct password should return valid=True"
-        print("✓ Correct beta password returns valid=True")
+        assert "message" in data, "Missing message in response"
+        assert data["message"] == "Beta settings updated", f"Unexpected message: {data['message']}"
+        print(f"Beta settings update: {data['message']}")
     
-    def test_beta_verify_with_incorrect_password(self, admin_session):
-        """POST /api/beta-verify with incorrect password should return valid=False"""
-        test_password = "TEST_basketball_beta_123"
+    def test_enable_site_beta_and_add_email(self):
+        """Test enabling site beta and adding an email to whitelist"""
+        self.get_admin_token()
         
-        # Ensure basketball is in beta mode
-        requests.put(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"},
-            json={
-                "basketball_beta": True,
-                "basketball_password": test_password,
-                "football_beta": False,
-                "football_password": ""
-            }
-        )
+        # Get current settings
+        current_response = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        current_settings = current_response.json()
         
-        # Verify with incorrect password
-        response = requests.post(
-            f"{BASE_URL}/api/beta-verify",
-            json={"sport": "basketball", "password": "wrong_password"}
-        )
-        assert response.status_code == 200
-        data = response.json()
-        assert data.get("valid") == False, "Incorrect password should return valid=False"
-        print("✓ Incorrect beta password returns valid=False")
-    
-    def test_enable_football_beta_mode(self, admin_session):
-        """PUT /api/admin/beta-settings to enable football beta mode"""
-        test_password = "TEST_football_beta_456"
+        # Enable site beta and add a test email
+        test_email = "test_beta_user@example.com"
+        new_settings = {
+            **current_settings,
+            "site_beta_enabled": True,
+            "site_beta_message": "Test beta message for testing",
+            "allowed_emails": list(set(current_settings.get("allowed_emails", []) + [test_email]))
+        }
         
-        # Enable football beta mode
-        response = requests.put(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"},
-            json={
-                "basketball_beta": False,
-                "basketball_password": "",
-                "football_beta": True,
-                "football_password": test_password
-            }
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        print("✓ Football beta mode enabled")
-        
-        # Verify via public status
-        status_response = requests.get(f"{BASE_URL}/api/beta-status")
-        status = status_response.json()
-        assert status["football_beta"] == True, "Public status should show football in beta"
-        assert status["basketball_beta"] == False, "Basketball should not be in beta"
-        print("✓ Public beta status reflects football in beta")
-        
-        # Verify password works
-        verify_response = requests.post(
-            f"{BASE_URL}/api/beta-verify",
-            json={"sport": "football", "password": test_password}
-        )
-        assert verify_response.json().get("valid") == True
-        print("✓ Football beta password verification works")
-    
-    def test_disable_all_beta_modes(self, admin_session):
-        """PUT /api/admin/beta-settings to disable all beta modes"""
-        response = requests.put(
-            f"{BASE_URL}/api/admin/beta-settings",
-            headers={"Authorization": f"Bearer {admin_session}"},
-            json={
-                "basketball_beta": False,
-                "basketball_password": "",
-                "football_beta": False,
-                "football_password": ""
-            }
-        )
-        assert response.status_code == 200, f"Expected 200, got {response.status_code}: {response.text}"
-        print("✓ All beta modes disabled")
-        
-        # Verify via public status
-        status_response = requests.get(f"{BASE_URL}/api/beta-status")
-        status = status_response.json()
-        assert status["basketball_beta"] == False, "Basketball should not be in beta"
-        assert status["football_beta"] == False, "Football should not be in beta"
-        print("✓ Public beta status shows no sports in beta")
-
-
-class TestAdminAuthCheck:
-    """Tests for admin authentication check endpoint"""
-    
-    def test_admin_check_without_auth(self):
-        """GET /api/admin/check without auth should return 401"""
-        response = requests.get(f"{BASE_URL}/api/admin/check")
-        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
-        print("✓ Admin check requires authentication")
-    
-    def test_admin_check_as_admin(self):
-        """GET /api/admin/check as admin should return is_admin=True"""
-        # Login as admin
-        login_response = requests.post(
-            f"{BASE_URL}/api/auth/login",
-            json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD}
-        )
-        if login_response.status_code != 200:
-            pytest.skip(f"Admin login failed: {login_response.status_code}")
-        
-        token = login_response.json().get("session_token")
-        
-        # Check admin status
-        response = requests.get(
-            f"{BASE_URL}/api/admin/check",
-            headers={"Authorization": f"Bearer {token}"}
-        )
+        response = self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=new_settings)
         assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         
+        # Verify the settings were saved
+        verify_response = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        verify_data = verify_response.json()
+        assert verify_data["site_beta_enabled"] == True, "Site beta should be enabled"
+        assert test_email in verify_data["allowed_emails"], "Test email should be in allowed list"
+        print(f"Site beta enabled with {len(verify_data['allowed_emails'])} allowed emails")
+        
+        # Clean up - remove test email
+        cleanup_settings = {
+            **verify_data,
+            "allowed_emails": [e for e in verify_data["allowed_emails"] if e != test_email]
+        }
+        self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=cleanup_settings)
+    
+    def test_remove_email_from_whitelist(self):
+        """Test removing an email from the whitelist"""
+        self.get_admin_token()
+        
+        # Get current settings
+        current_response = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        current_settings = current_response.json()
+        
+        # Add a test email first
+        test_email = "remove_test@example.com"
+        add_settings = {
+            **current_settings,
+            "allowed_emails": list(set(current_settings.get("allowed_emails", []) + [test_email]))
+        }
+        self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=add_settings)
+        
+        # Verify it was added
+        verify_add = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        assert test_email in verify_add.json()["allowed_emails"], "Test email should be added"
+        
+        # Now remove it
+        remove_settings = {
+            **verify_add.json(),
+            "allowed_emails": [e for e in verify_add.json()["allowed_emails"] if e != test_email]
+        }
+        response = self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=remove_settings)
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
+        
+        # Verify it was removed
+        verify_remove = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        assert test_email not in verify_remove.json()["allowed_emails"], "Test email should be removed"
+        print("Email successfully added and removed from whitelist")
+    
+    def test_beta_status_public_endpoint(self):
+        """Test GET /beta-status - public endpoint for sport-specific beta"""
+        response = self.session.get(f"{BASE_URL}/api/beta-status")
+        assert response.status_code == 200, f"Expected 200, got {response.status_code}"
         data = response.json()
-        assert data.get("is_admin") == True, "Admin user should have is_admin=True"
-        print("✓ Admin check returns is_admin=True for admin user")
+        
+        # Should return sport-specific beta flags
+        expected_fields = ["basketball_beta", "football_beta", "baseball_beta", "school_creation_beta"]
+        for field in expected_fields:
+            assert field in data, f"Missing field: {field}"
+        print(f"Sport beta status: basketball={data['basketball_beta']}, football={data['football_beta']}, baseball={data['baseball_beta']}")
+
+
+class TestBetaModeIntegration:
+    """Integration tests for beta mode flow"""
+    
+    @pytest.fixture(autouse=True)
+    def setup(self):
+        """Setup test session"""
+        self.session = requests.Session()
+        self.session.headers.update({"Content-Type": "application/json"})
+    
+    def get_admin_token(self):
+        """Login as admin and get session token"""
+        response = self.session.post(f"{BASE_URL}/api/auth/login", json={
+            "email": ADMIN_EMAIL,
+            "password": ADMIN_PASSWORD
+        })
+        assert response.status_code == 200, f"Admin login failed: {response.text}"
+        data = response.json()
+        token = data.get("session_token")
+        self.session.headers.update({"Authorization": f"Bearer {token}"})
+        return token
+    
+    def test_full_beta_mode_flow(self):
+        """Test complete beta mode enable/disable flow"""
+        self.get_admin_token()
+        
+        # 1. Get initial settings
+        initial_response = self.session.get(f"{BASE_URL}/api/admin/beta-settings")
+        initial_settings = initial_response.json()
+        initial_beta_enabled = initial_settings.get("site_beta_enabled", False)
+        print(f"Initial site_beta_enabled: {initial_beta_enabled}")
+        
+        # 2. Enable beta mode
+        enable_settings = {
+            **initial_settings,
+            "site_beta_enabled": True,
+            "site_beta_message": "Integration test - beta mode enabled"
+        }
+        enable_response = self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=enable_settings)
+        assert enable_response.status_code == 200
+        
+        # 3. Verify public endpoint shows beta enabled
+        public_response = self.session.get(f"{BASE_URL}/api/site-beta-status")
+        public_data = public_response.json()
+        assert public_data["site_beta_enabled"] == True, "Public endpoint should show beta enabled"
+        
+        # 4. Admin should still have access
+        access_response = self.session.get(f"{BASE_URL}/api/check-beta-access")
+        access_data = access_response.json()
+        assert access_data["has_access"] == True, "Admin should have access even with beta enabled"
+        
+        # 5. Restore original settings
+        restore_settings = {
+            **initial_settings,
+            "site_beta_enabled": initial_beta_enabled
+        }
+        self.session.put(f"{BASE_URL}/api/admin/beta-settings", json=restore_settings)
+        print("Full beta mode flow test completed successfully")
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--tb=short"])
+    pytest.main([__file__, "-v"])
