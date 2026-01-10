@@ -799,6 +799,173 @@ const GameControlModal = ({
   );
 };
 
+// Game Control Modal - For changing inning and score
+const InningScoreControlModal = ({ isOpen, onClose, game, onUpdate }) => {
+  const [inning, setInning] = useState(game?.current_inning || 1);
+  const [inningHalf, setInningHalf] = useState(game?.inning_half || 'top');
+  const [homeScore, setHomeScore] = useState(game?.home_score || 0);
+  const [awayScore, setAwayScore] = useState(game?.away_score || 0);
+  
+  // Update local state when game changes
+  useEffect(() => {
+    if (game) {
+      setInning(game.current_inning || 1);
+      setInningHalf(game.inning_half || 'top');
+      setHomeScore(game.home_score || 0);
+      setAwayScore(game.away_score || 0);
+    }
+  }, [game]);
+  
+  if (!isOpen) return null;
+  
+  const handleApply = () => {
+    onUpdate({
+      current_inning: inning,
+      inning_half: inningHalf,
+      home_score: homeScore,
+      away_score: awayScore,
+    });
+    onClose();
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-zinc-900 rounded-lg p-5 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Game Control
+          </h2>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white">
+            <XIcon className="w-5 h-5" />
+          </button>
+        </div>
+        
+        {/* Inning Control */}
+        <div className="mb-4">
+          <label className="text-sm text-zinc-400 mb-2 block">Inning</label>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setInning(Math.max(1, inning - 1))}
+                className="w-8 h-8 p-0"
+              >
+                -
+              </Button>
+              <span className="text-2xl font-bold text-white w-8 text-center">{inning}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setInning(inning + 1)}
+                className="w-8 h-8 p-0"
+              >
+                +
+              </Button>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant={inningHalf === 'top' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setInningHalf('top')}
+                className={inningHalf === 'top' ? 'bg-amber-600' : ''}
+              >
+                ▲ Top
+              </Button>
+              <Button
+                variant={inningHalf === 'bottom' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setInningHalf('bottom')}
+                className={inningHalf === 'bottom' ? 'bg-amber-600' : ''}
+              >
+                ▼ Bottom
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        {/* Score Control */}
+        <div className="space-y-3">
+          <label className="text-sm text-zinc-400 block">Score</label>
+          
+          {/* Away Team */}
+          <div className="flex items-center justify-between bg-zinc-800 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-3 h-6 rounded"
+                style={{ backgroundColor: game?.away_team_color || '#3b82f6' }}
+              />
+              <span className="text-white font-medium">{game?.away_team_name || 'Away'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAwayScore(Math.max(0, awayScore - 1))}
+                className="w-8 h-8 p-0"
+              >
+                -
+              </Button>
+              <span className="text-2xl font-bold text-white w-10 text-center">{awayScore}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setAwayScore(awayScore + 1)}
+                className="w-8 h-8 p-0"
+              >
+                +
+              </Button>
+            </div>
+          </div>
+          
+          {/* Home Team */}
+          <div className="flex items-center justify-between bg-zinc-800 rounded-lg p-3">
+            <div className="flex items-center gap-2">
+              <div 
+                className="w-3 h-6 rounded"
+                style={{ backgroundColor: game?.home_team_color || '#f97316' }}
+              />
+              <span className="text-white font-medium">{game?.home_team_name || 'Home'}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHomeScore(Math.max(0, homeScore - 1))}
+                className="w-8 h-8 p-0"
+              >
+                -
+              </Button>
+              <span className="text-2xl font-bold text-white w-10 text-center">{homeScore}</span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setHomeScore(homeScore + 1)}
+                className="w-8 h-8 p-0"
+              >
+                +
+              </Button>
+            </div>
+          </div>
+        </div>
+        
+        <Button 
+          onClick={handleApply}
+          className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-3"
+        >
+          <Check className="w-4 h-4 mr-2" />
+          Apply Changes
+        </Button>
+        
+        <Button onClick={onClose} variant="outline" className="w-full mt-2 text-zinc-400">
+          Cancel
+        </Button>
+      </div>
+    </div>
+  );
+};
+
 // Substitution Dialog Component
 const SubstitutionDialog = ({ isOpen, onClose, player, roster, onSubstitute }) => {
   const [subType, setSubType] = useState(null); // 'offensive', 'defensive', 'both'
