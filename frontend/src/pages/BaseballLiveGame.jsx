@@ -421,7 +421,7 @@ const formatPlayerName = (name) => {
 };
 
 // Baseball Diamond Component - Using provided field image
-const BaseballDiamond = ({ bases, fieldingPositions, onSubstitute }) => {
+const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingTeamColor }) => {
   // Position labels with coordinates - SS is LEFT of 2B, 2B is RIGHT of 2B position
   const positions = {
     pitcher: { top: '52%', left: '50%', label: 'P' },
@@ -451,27 +451,51 @@ const BaseballDiamond = ({ bases, fieldingPositions, onSubstitute }) => {
         className="w-full h-auto"
       />
       
-      {/* Base runners indicators */}
+      {/* Base runners indicators with player numbers */}
       {bases?.first && (
         <div 
-          className="absolute w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-lg animate-pulse"
-          style={{ top: basePositions.first.top, left: basePositions.first.left, transform: 'translate(-50%, -50%)' }}
-        />
+          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg animate-pulse text-white text-xs font-bold"
+          style={{ 
+            top: basePositions.first.top, 
+            left: basePositions.first.left, 
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: battingTeamColor || '#f59e0b',
+            borderColor: 'white'
+          }}
+        >
+          {typeof bases.first === 'object' ? bases.first.number : (bases.first || '')}
+        </div>
       )}
       {bases?.second && (
         <div 
-          className="absolute w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-lg animate-pulse"
-          style={{ top: basePositions.second.top, left: basePositions.second.left, transform: 'translate(-50%, -50%)' }}
-        />
+          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg animate-pulse text-white text-xs font-bold"
+          style={{ 
+            top: basePositions.second.top, 
+            left: basePositions.second.left, 
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: battingTeamColor || '#f59e0b',
+            borderColor: 'white'
+          }}
+        >
+          {typeof bases.second === 'object' ? bases.second.number : (bases.second || '')}
+        </div>
       )}
       {bases?.third && (
         <div 
-          className="absolute w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-lg animate-pulse"
-          style={{ top: basePositions.third.top, left: basePositions.third.left, transform: 'translate(-50%, -50%)' }}
-        />
+          className="absolute flex items-center justify-center w-8 h-8 rounded-full border-2 shadow-lg animate-pulse text-white text-xs font-bold"
+          style={{ 
+            top: basePositions.third.top, 
+            left: basePositions.third.left, 
+            transform: 'translate(-50%, -50%)',
+            backgroundColor: battingTeamColor || '#f59e0b',
+            borderColor: 'white'
+          }}
+        >
+          {typeof bases.third === 'object' ? bases.third.number : (bases.third || '')}
+        </div>
       )}
       
-      {/* Fielding position labels with player names */}
+      {/* Fielding position labels with player names - using team color */}
       {Object.entries(positions).map(([pos, coords]) => {
         const player = fieldingPositions?.[pos];
         return (
@@ -480,11 +504,14 @@ const BaseballDiamond = ({ bases, fieldingPositions, onSubstitute }) => {
             className="absolute transform -translate-x-1/2 -translate-y-1/2"
             style={{ top: coords.top, left: coords.left }}
           >
-            <div className="bg-black/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white whitespace-nowrap border border-white/30 shadow-lg">
+            <div 
+              className="backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white whitespace-nowrap border border-white/30 shadow-lg"
+              style={{ backgroundColor: fieldingTeamColor ? `${fieldingTeamColor}cc` : 'rgba(0,0,0,0.8)' }}
+            >
               {player ? (
                 <span className="font-medium">#{player.number}</span>
               ) : (
-                <span className="text-zinc-400">{coords.label}</span>
+                <span className="opacity-80">{coords.label}</span>
               )}
             </div>
           </div>
