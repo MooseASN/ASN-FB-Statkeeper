@@ -419,7 +419,7 @@ export default function SportSelection({ user, onLogout }) {
               Beta Access Required
             </DialogTitle>
             <DialogDescription>
-              {selectedBetaSport === "basketball" ? "Basketball" : "Football"} is currently in beta testing. 
+              {selectedBetaSport === "basketball" ? "Basketball" : selectedBetaSport === "football" ? "Football" : "Baseball"} is currently in beta testing. 
               Enter the beta password to access.
             </DialogDescription>
           </DialogHeader>
