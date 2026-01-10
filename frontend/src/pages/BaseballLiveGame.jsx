@@ -1449,7 +1449,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       setAwayRoster(res.data.away_roster || []);
       setHomeStats(res.data.home_player_stats || []);
       setAwayStats(res.data.away_player_stats || []);
-      setPlayByPlay(res.data.play_by_play || []);
+      setPlays(res.data.play_by_play || []);
     } catch (error) {
       toast.error("Failed to load game");
       navigate("/dashboard");
