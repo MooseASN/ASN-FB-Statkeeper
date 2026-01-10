@@ -1237,6 +1237,7 @@ class PlayerStats(BaseModel):
     team_id: str
     player_number: str
     player_name: str
+    # Basketball stats
     ft_made: int = 0
     ft_missed: int = 0
     fg2_made: int = 0
@@ -1254,6 +1255,37 @@ class PlayerStats(BaseModel):
     # Minutes tracking
     seconds_played: int = 0  # Total seconds played
     last_check_in: Optional[str] = None  # ISO timestamp when player last checked in
+    # Baseball batting stats
+    at_bats: int = 0  # AB
+    hits: int = 0  # H (singles + doubles + triples + home runs)
+    singles: int = 0
+    doubles: int = 0  # 2B
+    triples: int = 0  # 3B
+    home_runs: int = 0  # HR
+    runs: int = 0  # R
+    rbis: int = 0  # RBI
+    walks: int = 0  # BB
+    strikeouts_batting: int = 0  # K (as batter)
+    hit_by_pitch: int = 0  # HBP
+    sacrifice_flies: int = 0  # SF
+    sacrifice_bunts: int = 0  # SAC
+    stolen_bases: int = 0  # SB
+    caught_stealing: int = 0  # CS
+    # Baseball pitching stats
+    innings_pitched: float = 0.0  # IP (e.g., 6.2 = 6 and 2/3 innings)
+    hits_allowed: int = 0  # H
+    runs_allowed: int = 0  # R
+    earned_runs: int = 0  # ER
+    walks_allowed: int = 0  # BB
+    strikeouts_pitching: int = 0  # K (as pitcher)
+    home_runs_allowed: int = 0  # HR
+    pitches_thrown: int = 0
+    strikes_thrown: int = 0
+    balls_thrown: int = 0
+    # Baseball fielding stats
+    putouts: int = 0  # PO
+    fielding_assists: int = 0  # A
+    errors: int = 0  # E
 
 class StatUpdate(BaseModel):
     player_id: str
