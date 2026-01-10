@@ -2377,10 +2377,17 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             <PlayByPlayLog plays={playByPlay} />
             <BattingOrder 
               players={battingRoster}
-              currentBatterIndex={currentBatterIndex}
-              onSelectBatter={setCurrentBatterIndex}
+              currentBatterIndex={activeBatterIndex}
+              onSelectBatter={(idx) => {
+                if (battingTeamIsHome) {
+                  setHomeBatterIndex(idx);
+                } else {
+                  setAwayBatterIndex(idx);
+                }
+              }}
               onSubstitute={(player) => handleSubstitutionRequest(player, battingTeamIsHome)}
               teamName={battingTeamIsHome ? game?.home_team_name : game?.away_team_name}
+              teamColor={battingTeamIsHome ? game?.home_team_color : game?.away_team_color}
             />
           </div>
           
