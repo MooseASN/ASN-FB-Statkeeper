@@ -6323,6 +6323,82 @@ async def get_school_calendar(school_id: str, current_user: User = Depends(get_c
 # Include router after all routes are defined
 app.include_router(api_router)
 
+# Import and include payments router
+from routers.payments import router as payments_router, set_db as set_payments_db
+api_router.include_router(payments_router)
+set_payments_db(db)
+
+# ============ STRIPE WEBHOOK ENDPOINT ============
+@app.post("/api/webhook/stripe")
+async def stripe_webhook(request: Request):
+    """Handle Stripe webhook events"""
+    try:
+        from emergentintegrations.payments.stripe.checkout import StripeCheckout
+        
+        stripe_api_key = os.environ.get("STRIPE_API_KEY")
+        if not stripe_api_key:
+            raise HTTPException(status_code=500, detail="Stripe API key not configured")
+        
+        host_url = str(request.base_url).rstrip("/")
+        webhook_url = f"{host_url}/api/webhook/stripe"
+        stripe_checkout = StripeCheckout(api_key=stripe_api_key, webhook_url=webhook_url)
+        
+        # Get request body
+        body = await request.body()
+        signature = request.headers.get("Stripe-Signature")
+        
+        # Handle webhook
+        webhook_response = await stripe_checkout.handle_webhook(body, signature)
+        
+        logger.info(f"Stripe webhook received: {webhook_response.event_type}")
+        
+        # Process webhook event
+        if webhook_response.event_type == "checkout.session.completed":
+            session_id = webhook_response.session_id
+            if session_id:
+                # Update transaction status
+                transaction = await db.payment_transactions.find_one(
+                    {"session_id": session_id},
+                    {"_id": 0}
+                )
+                if transaction and transaction.get("payment_status") != "paid":
+                    await db.payment_transactions.update_one(
+                        {"session_id": session_id},
+                        {"$set": {
+                            "status": "complete",
+                            "payment_status": "paid",
+                            "updated_at": datetime.now(timezone.utc).isoformat()
+                        }}
+                    )
+                    
+                    # Activate subscription for user
+                    user_id = transaction.get("user_id")
+                    if user_id:
+                        interval = transaction.get("interval", "month")
+                        subscription_end = datetime.now(timezone.utc)
+                        if interval == "year":
+                            subscription_end = subscription_end + timedelta(days=365)
+                        else:
+                            subscription_end = subscription_end + timedelta(days=30)
+                        
+                        await db.users.update_one(
+                            {"user_id": user_id},
+                            {"$set": {
+                                "subscription_status": "active",
+                                "subscription_package": transaction.get("package_id"),
+                                "subscription_start": datetime.now(timezone.utc).isoformat(),
+                                "subscription_end": subscription_end.isoformat(),
+                                "updated_at": datetime.now(timezone.utc).isoformat()
+                            }}
+                        )
+                        logger.info(f"Webhook: Activated subscription for user: {user_id}")
+        
+        return {"received": True}
+        
+    except Exception as e:
+        logger.error(f"Stripe webhook error: {e}")
+        return {"received": True, "error": str(e)}
+
 @app.on_event("startup")
 async def startup_init():
     """Initialize on startup - verify database and create admin user"""
