@@ -14,6 +14,43 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - NEW FEATURES (Session 2) ✅
+
+#### 1. Add Player to Roster Feature ✅
+When a user enters a player number not in the roster during stat tracking:
+- Shows "Player Not Found" warning in amber
+- Prompts "Add #XX to [Team Name]?"
+- Input field for player name
+- "Cancel" and "Add & Select" buttons
+- Player is added to the game roster and selected for the current play
+- Toast notification confirms the addition
+
+#### 2. Optional Game Clock in Simple Football Mode ✅
+- Clock can now be hidden with X button next to controls
+- When hidden, shows "Enable Clock" button with clock icon
+- Quarter controls remain visible when clock is hidden
+- Clock state persists during the game session
+
+#### 3. New LoadingScreen Component ✅
+- Dark gradient background (from-zinc-900 via-black to-zinc-800)
+- White StatMoose logo with moose antler SVG
+- Thin spinning circle animation around the logo
+- Optional loading message text
+- Used across all major game pages:
+  - SimpleFootballLiveGame.jsx
+  - FootballLiveGame.jsx
+  - BaseballLiveGame.jsx
+  - AdvancedLiveGame.jsx
+
+#### 4. Game Creation Bug Fixed ✅
+- Backend: Baseball-specific fields now have proper defaults for all sports
+- No more "Failed to Start Game" errors
+- All sports (basketball, football, baseball) create games successfully
+
+**Testing:** 6/6 features passed (100% success rate)
+
+---
+
 ### January 10, 2026 - SIMPLE FOOTBALL MODE ENHANCEMENTS ✅
 
 #### P0 Features Completed:
