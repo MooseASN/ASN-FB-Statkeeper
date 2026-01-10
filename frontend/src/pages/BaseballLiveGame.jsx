@@ -1104,7 +1104,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             
             <BaseballDiamond 
               bases={game?.bases}
-              fieldingPositions={null}
+              fieldingPositions={currentFieldingDefense}
             />
           </div>
           
@@ -1113,8 +1113,13 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
               <PitchResultButtons 
                 onPitchResult={handlePitchResult}
-                disabled={false}
+                disabled={!startersConfigured}
               />
+              {!startersConfigured && !demoMode && (
+                <p className="text-center text-amber-500 text-sm mt-2">
+                  Configure lineups to start tracking
+                </p>
+              )}
             </div>
           </div>
         </div>
