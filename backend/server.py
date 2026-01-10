@@ -6320,13 +6320,13 @@ async def get_school_calendar(school_id: str, current_user: User = Depends(get_c
     
     return {"games": games, "seasons": seasons}
 
-# Include router after all routes are defined
-app.include_router(api_router)
-
-# Import and include payments router
+# Import and include payments router BEFORE including api_router in app
 from routers.payments import router as payments_router, set_db as set_payments_db
 api_router.include_router(payments_router)
 set_payments_db(db)
+
+# Include router after all routes are defined
+app.include_router(api_router)
 
 # ============ STRIPE WEBHOOK ENDPOINT ============
 @app.post("/api/webhook/stripe")
