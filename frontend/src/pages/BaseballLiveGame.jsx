@@ -2341,7 +2341,13 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
-            <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-zinc-400 hover:text-white"
+              onClick={() => navigate(demoMode ? '/demo/baseball/boxscore' : `/baseball/${id}/boxscore`)}
+              data-testid="boxscore-button"
+            >
               <FileText className="w-4 h-4 mr-2" />
               Box Score
             </Button>
