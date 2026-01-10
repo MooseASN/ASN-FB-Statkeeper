@@ -1372,6 +1372,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   
   // UI state
   const [currentBatterIndex, setCurrentBatterIndex] = useState(0);
+  const [homeBatterIndex, setHomeBatterIndex] = useState(0);  // Track home team's batter separately
+  const [awayBatterIndex, setAwayBatterIndex] = useState(0);  // Track away team's batter separately
   const [currentPitcherIndex, setCurrentPitcherIndex] = useState(0);
   const [showInPlayModal, setShowInPlayModal] = useState(false);
   const [activeStatsTab, setActiveStatsTab] = useState("home");
