@@ -393,8 +393,8 @@ const TeamScoreCard = ({ teamName, teamColor, score, hasPossession, timeouts, on
   </div>
 );
 
-// Compact Game Clock with enhanced controls
-const GameClock = ({ quarter, clockTime, isRunning, onToggle, onQuarterChange, onClockAdjust, gameStatus }) => {
+// Compact Game Clock with enhanced controls - Optional clock mode
+const GameClock = ({ quarter, clockTime, isRunning, onToggle, onQuarterChange, onClockAdjust, gameStatus, clockEnabled, onToggleClockEnabled }) => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -434,40 +434,82 @@ const GameClock = ({ quarter, clockTime, isRunning, onToggle, onQuarterChange, o
           </button>
         </div>
         
-        {/* Clock Display */}
-        <div className="text-4xl font-mono font-black text-white" data-testid="clock-display">
-          {gameStatus === 'Halftime' || gameStatus === 'Final' ? '--:--' : formatTime(clockTime)}
-        </div>
-        
-        {/* Clock Controls - Enhanced */}
-        <div className="flex items-center gap-1 flex-wrap justify-end">
-          <div className="flex gap-1">
-            <button 
-              onClick={() => onClockAdjust(-60)} 
-              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
-              data-testid="clock-minus-1min"
-            >
-              -1m
-            </button>
-            <button 
-              onClick={() => onClockAdjust(-1)} 
-              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
-              data-testid="clock-minus-1sec"
-            >
-              -1s
-            </button>
-          </div>
-          <Button 
-            onClick={onToggle} 
-            size="sm" 
-            variant={isRunning ? "destructive" : "default"}
-            className="h-10 w-10"
-            disabled={gameStatus === 'Halftime' || gameStatus === 'Final'}
-            data-testid="clock-toggle-btn"
+        {/* Clock Display - Show toggle when disabled, show time when enabled */}
+        {clockEnabled ? (
+          <>
+            <div className="text-4xl font-mono font-black text-white" data-testid="clock-display">
+              {gameStatus === 'Halftime' || gameStatus === 'Final' ? '--:--' : formatTime(clockTime)}
+            </div>
+            
+            {/* Clock Controls - Enhanced */}
+            <div className="flex items-center gap-1 flex-wrap justify-end">
+              <div className="flex gap-1">
+                <button 
+                  onClick={() => onClockAdjust(-60)} 
+                  className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+                  data-testid="clock-minus-1min"
+                >
+                  -1m
+                </button>
+                <button 
+                  onClick={() => onClockAdjust(-1)} 
+                  className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+                  data-testid="clock-minus-1sec"
+                >
+                  -1s
+                </button>
+              </div>
+              <Button 
+                onClick={onToggle} 
+                size="sm" 
+                variant={isRunning ? "destructive" : "default"}
+                className="h-10 w-10"
+                disabled={gameStatus === 'Halftime' || gameStatus === 'Final'}
+                data-testid="clock-toggle-btn"
+              >
+                {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
+              </Button>
+              <div className="flex gap-1">
+                <button 
+                  onClick={() => onClockAdjust(1)} 
+                  className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+                  data-testid="clock-plus-1sec"
+                >
+                  +1s
+                </button>
+                <button 
+                  onClick={() => onClockAdjust(60)} 
+                  className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+                  data-testid="clock-plus-1min"
+                >
+                  +1m
+                </button>
+              </div>
+              {/* Toggle to hide clock */}
+              <button 
+                onClick={onToggleClockEnabled}
+                className="text-xs bg-zinc-800 hover:bg-red-900 px-2 py-1 rounded text-zinc-500 ml-1"
+                title="Hide clock"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          </>
+        ) : (
+          /* Clock Disabled - Show button to enable */
+          <button
+            onClick={onToggleClockEnabled}
+            className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-lg text-zinc-400 hover:text-white transition-colors"
+            data-testid="enable-clock-btn"
           >
-            {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-          </Button>
-          <div className="flex gap-1">
+            <Clock className="w-5 h-5" />
+            <span className="text-sm font-medium">Enable Clock</span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
             <button 
               onClick={() => onClockAdjust(1)} 
               className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
