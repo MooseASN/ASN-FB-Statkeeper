@@ -28,6 +28,7 @@ import {
   ArrowLeft,
   Check
 } from "lucide-react";
+import { X as XIcon } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -95,11 +96,25 @@ const StarterConfigDialog = ({
     setCurrentBattingOrder(newOrder);
   };
   
+  const handleClearBattingSpot = (spotIndex) => {
+    const newOrder = [...currentBattingOrder];
+    newOrder[spotIndex] = '';
+    setCurrentBattingOrder(newOrder);
+  };
+  
   const handleDefenseChange = (positionKey, playerId) => {
     setCurrentDefense(prev => ({
       ...prev,
       [positionKey]: playerId
     }));
+  };
+  
+  const handleClearDefensePosition = (positionKey) => {
+    setCurrentDefense(prev => {
+      const newDefense = { ...prev };
+      delete newDefense[positionKey];
+      return newDefense;
+    });
   };
   
   const canProceed = () => {
