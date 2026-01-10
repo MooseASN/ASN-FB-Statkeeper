@@ -14,6 +14,36 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 2026 - SIMPLE FOOTBALL STAT-TRACKING MODE ✅
+
+#### SimpleFootballLiveGame.jsx - COMPLETED ✅
+Created a broadcaster-friendly simple stat tracking mode for football:
+
+**Design Goals:**
+- Minimal clicks for common actions
+- Large, easy-to-tap buttons
+- Essential stats only (no complex play-by-play)
+- Quick score recording with one tap
+
+**Features:**
+| Feature | Description |
+|---------|-------------|
+| **Quick Score Buttons** | +6 TD (green), +1 XP (blue), +2 2PT (purple), +3 FG (amber), +2 Safety (red) |
+| **Possession Tracking** | Yellow ring indicator, one-tap to switch teams |
+| **Game Clock** | Start/Stop, quick adjustments (±10s, ±1m), auto-reset per quarter |
+| **Quarter Control** | Up/down arrows, auto-resets clock on quarter change |
+| **Team Stats Panel** | Total Yards, Pass Yards, Rush Yards, Turnovers, 1st Downs |
+| **Yards Dialogs** | Pass/Rush yards input with quick-select buttons |
+| **Timeout Tracking** | 3 per team, visual indicators, stops clock when used |
+| **Game Log** | Chronological event log with quarter markers |
+| **Undo Support** | Reverts last 20 actions |
+
+**Routes:**
+- Demo: `/demo/football/simple`
+- Authenticated: `/football/:id/simple`
+
+**File:** `/app/frontend/src/pages/SimpleFootballLiveGame.jsx` (629 lines)
+
 ### January 2026 - CUSTOM HOOKS INTEGRATION ✅
 
 #### BaseballLiveGame.jsx Refactoring - COMPLETED ✅
