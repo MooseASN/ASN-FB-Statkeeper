@@ -32,18 +32,9 @@ import ConnectionStatus from "@/components/ConnectionStatus";
 // Import custom hooks for game state management
 import { useGameClock } from "@/hooks/useGameClock";
 import { useTimeouts } from "@/hooks/useTimeouts";
-// TODO: REFACTORING - useDriveState hook integration
-// The useDriveState hook at @/hooks/useDriveState.js provides:
-// - possession, ballPosition, down, distance, quarter, firstDownMarker
-// - currentDrive, allDrives, homeTimeOfPossession, awayTimeOfPossession
-// - Helper functions: advanceDown, changePossession, flipPossession, etc.
-// To refactor:
-// 1. Import useDriveState and replace useState declarations (lines ~461-491)
-// 2. Update saveFootballState to use getStateForSave()
-// 3. Update fetchGame to use initializeFromState()
-// 4. Replace direct state updates with hook functions (advanceDown, etc.)
-// See /app/frontend/src/hooks/useDriveState.js for full API
 import { useDriveState } from "@/hooks/useDriveState";
+import { useGameHistory } from "@/hooks/useGameHistory";
+import { useFootballPlayWorkflow } from "@/hooks/useFootballPlayWorkflow";
 
 // Import extracted football components
 import FootballField from "@/components/football/FootballField";
