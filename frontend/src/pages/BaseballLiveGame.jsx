@@ -410,30 +410,40 @@ const CurrentPlayerInfo = ({ batter, pitcher, batterStats, pitcherStats }) => (
   </div>
 );
 
+// Helper function to format player name as "F. LastName"
+const formatPlayerName = (name) => {
+  if (!name) return '';
+  const parts = name.trim().split(' ');
+  if (parts.length === 1) return name;
+  const firstName = parts[0];
+  const lastName = parts.slice(1).join(' ');
+  return `${firstName.charAt(0)}. ${lastName}`;
+};
+
 // Baseball Diamond Component - Using provided field image
-const BaseballDiamond = ({ bases, fieldingPositions }) => {
-  // Position labels with coordinates for overlay on the field image
+const BaseballDiamond = ({ bases, fieldingPositions, onSubstitute }) => {
+  // Position labels with coordinates - SS is LEFT of 2B, 2B is RIGHT of 2B position
   const positions = {
     pitcher: { top: '52%', left: '50%', label: 'P' },
-    catcher: { top: '82%', left: '50%', label: 'C' },
-    first: { top: '52%', left: '72%', label: '1B' },
-    second: { top: '38%', left: '50%', label: '2B' },
-    third: { top: '52%', left: '28%', label: '3B' },
-    shortstop: { top: '42%', left: '38%', label: 'SS' },
-    left: { top: '18%', left: '20%', label: 'LF' },
-    center: { top: '10%', left: '50%', label: 'CF' },
-    right: { top: '18%', left: '80%', label: 'RF' },
+    catcher: { top: '85%', left: '50%', label: 'C' },
+    first: { top: '52%', left: '75%', label: '1B' },
+    second: { top: '38%', left: '60%', label: '2B' },  // RIGHT of 2nd base
+    third: { top: '52%', left: '25%', label: '3B' },
+    shortstop: { top: '38%', left: '40%', label: 'SS' },  // LEFT of 2nd base
+    left: { top: '12%', left: '15%', label: 'LF' },
+    center: { top: '5%', left: '50%', label: 'CF' },
+    right: { top: '12%', left: '85%', label: 'RF' },
   };
   
   // Base positions for highlighting runners
   const basePositions = {
-    first: { top: '52%', left: '68%' },
-    second: { top: '35%', left: '50%' },
-    third: { top: '52%', left: '32%' },
+    first: { top: '52%', left: '70%' },
+    second: { top: '32%', left: '50%' },
+    third: { top: '52%', left: '30%' },
   };
   
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className="relative w-full max-w-lg mx-auto">
       {/* Baseball field image */}
       <img 
         src="https://customer-assets.emergentagent.com/job_baseball-tracker-2/artifacts/xsmgreca_Field.png"
@@ -461,7 +471,7 @@ const BaseballDiamond = ({ bases, fieldingPositions }) => {
         />
       )}
       
-      {/* Fielding position labels */}
+      {/* Fielding position labels with player names */}
       {Object.entries(positions).map(([pos, coords]) => {
         const player = fieldingPositions?.[pos];
         return (
