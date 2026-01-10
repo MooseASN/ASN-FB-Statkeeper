@@ -645,22 +645,21 @@ const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitut
   </div>
 );
 
-// Play by Play Log Component
+// Play by Play Log Component - Compact version
 const PlayByPlayLog = ({ plays }) => (
   <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-    <div className="bg-zinc-800 px-4 py-2 border-b border-zinc-700">
-      <h3 className="text-sm font-bold text-white uppercase tracking-wider">Play by Play Log</h3>
+    <div className="bg-zinc-800 px-3 py-1.5 border-b border-zinc-700">
+      <h3 className="text-xs font-bold text-white uppercase tracking-wider">Play by Play</h3>
     </div>
-    <div className="max-h-48 overflow-y-auto p-4">
+    <div className="max-h-32 overflow-y-auto p-2">
       {plays?.length > 0 ? (
-        plays.map((play) => (
-          <div key={play.id} className="text-sm text-zinc-300 mb-2 pb-2 border-b border-zinc-800">
-            <span className="text-zinc-500">{play.inning} - </span>
-            {play.description}
+        plays.slice(0, 10).map((play) => (
+          <div key={play.id} className="text-xs text-zinc-300 mb-1 pb-1 border-b border-zinc-800/50">
+            <span className="text-zinc-500">{play.inning}</span> {play.description}
           </div>
         ))
       ) : (
-        <div className="text-zinc-500 text-center py-4">No plays yet</div>
+        <div className="text-zinc-500 text-center py-2 text-xs">No plays yet</div>
       )}
     </div>
   </div>
