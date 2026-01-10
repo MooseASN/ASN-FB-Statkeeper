@@ -20,7 +20,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://statmoose-demo.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://baseball-tracker-2.preview.emergentagent.com')
 
 # Admin credentials
 ADMIN_EMAIL = "antlersportsnetwork@gmail.com"

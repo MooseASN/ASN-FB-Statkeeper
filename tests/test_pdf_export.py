@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://statmoose-demo.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://baseball-tracker-2.preview.emergentagent.com')
 
 # Test credentials
 TEST_USERNAME = "admin"
