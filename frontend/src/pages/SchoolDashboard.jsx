@@ -1012,6 +1012,7 @@ export default function SchoolDashboard() {
                 <SelectContent>
                   <SelectItem value="basketball">🏀 Basketball</SelectItem>
                   <SelectItem value="football">🏈 Football</SelectItem>
+                  <SelectItem value="baseball">⚾ Baseball</SelectItem>
                 </SelectContent>
               </Select>
             </div>
