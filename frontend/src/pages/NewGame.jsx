@@ -472,7 +472,7 @@ export default function NewGame({ user, onLogout }) {
                         className={totalInnings === 7 ? "bg-red-600 hover:bg-red-700" : ""}
                         data-testid="innings-7"
                       >
-                        7 Innings
+                        7
                       </Button>
                       <Button
                         type="button"
@@ -482,11 +482,31 @@ export default function NewGame({ user, onLogout }) {
                         className={totalInnings === 9 ? "bg-red-600 hover:bg-red-700" : ""}
                         data-testid="innings-9"
                       >
-                        9 Innings
+                        9
                       </Button>
+                      <div className="flex items-center gap-2">
+                        <Input
+                          type="number"
+                          min="1"
+                          max="99"
+                          value={totalInnings !== 7 && totalInnings !== 9 ? totalInnings : ''}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value);
+                            if (val >= 1 && val <= 99) {
+                              setTotalInnings(val);
+                            }
+                          }}
+                          placeholder="Custom"
+                          className="w-20 h-9"
+                          data-testid="innings-custom"
+                        />
+                        <span className="text-sm text-muted-foreground">innings</span>
+                      </div>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1">
-                      {totalInnings === 7 ? "7 innings - Common for high school and doubleheaders" : "9 innings - Standard regulation game"}
+                      {totalInnings === 7 ? "7 innings - Common for high school and doubleheaders" : 
+                       totalInnings === 9 ? "9 innings - Standard regulation game" :
+                       `${totalInnings} innings - Custom game length`}
                     </p>
                   </div>
                 </div>
