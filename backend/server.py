@@ -4941,6 +4941,75 @@ async def add_demo_play(game_type: str, data: dict = Body(...)):
     """Accept demo play additions but don't persist them"""
     return {"success": True, "message": "Demo mode - play recorded locally only"}
 
+# Baseball Demo Data
+BASEBALL_DEMO_HOME_ROSTER = [
+    {"player_number": "1", "player_name": "Mike Johnson", "position": "C"},
+    {"player_number": "5", "player_name": "Chris Davis", "position": "1B"},
+    {"player_number": "7", "player_name": "James Wilson", "position": "2B"},
+    {"player_number": "12", "player_name": "Tom Anderson", "position": "SS"},
+    {"player_number": "15", "player_name": "Alex Rodriguez", "position": "3B"},
+    {"player_number": "21", "player_name": "Derek Martinez", "position": "LF"},
+    {"player_number": "24", "player_name": "Ken Thompson", "position": "CF"},
+    {"player_number": "27", "player_name": "Mike Williams", "position": "RF"},
+    {"player_number": "34", "player_name": "David Garcia", "position": "P"},
+]
+
+BASEBALL_DEMO_AWAY_ROSTER = [
+    {"player_number": "2", "player_name": "Ryan Smith", "position": "C"},
+    {"player_number": "4", "player_name": "Kevin Brown", "position": "1B"},
+    {"player_number": "8", "player_name": "Matt Taylor", "position": "2B"},
+    {"player_number": "11", "player_name": "Josh Lee", "position": "SS"},
+    {"player_number": "14", "player_name": "Andrew Harris", "position": "3B"},
+    {"player_number": "18", "player_name": "Brandon White", "position": "LF"},
+    {"player_number": "22", "player_name": "Tyler Clark", "position": "CF"},
+    {"player_number": "25", "player_name": "Jason Lewis", "position": "RF"},
+    {"player_number": "31", "player_name": "Eric Walker", "position": "P"},
+]
+
+@app.get("/api/demo/baseball")
+async def get_baseball_demo_game():
+    """Get demo baseball game data"""
+    home_stats = [
+        {**p, "at_bats": 0, "hits": 0, "runs": 0, "rbi": 0, "strikeouts_batting": 0, "walks": 0, "home_runs": 0}
+        for p in BASEBALL_DEMO_HOME_ROSTER
+    ]
+    away_stats = [
+        {**p, "at_bats": 0, "hits": 0, "runs": 0, "rbi": 0, "strikeouts_batting": 0, "walks": 0, "home_runs": 0}
+        for p in BASEBALL_DEMO_AWAY_ROSTER
+    ]
+    
+    demo_game = {
+        "id": "demo-baseball",
+        "_id": "demo-baseball",
+        "sport": "baseball",
+        "status": "live",
+        "is_demo": True,
+        "home_team_id": "demo-home-baseball",
+        "away_team_id": "demo-away-baseball",
+        "home_team_name": "Riverside Sluggers",
+        "away_team_name": "Valley Hawks",
+        "home_team_color": "#dc2626",
+        "away_team_color": "#2563eb",
+        "home_score": 0,
+        "away_score": 0,
+        "current_inning": 1,
+        "inning_half": "top",
+        "total_innings": 9,
+        "balls": 0,
+        "strikes": 0,
+        "outs": 0,
+        "bases": {"first": False, "second": False, "third": False},
+        "home_roster": BASEBALL_DEMO_HOME_ROSTER,
+        "away_roster": BASEBALL_DEMO_AWAY_ROSTER,
+        "home_player_stats": home_stats,
+        "away_player_stats": away_stats,
+        "inning_scores": {"home": [], "away": []},
+        "play_by_play": [],
+        "share_code": "demo-baseball"
+    }
+    
+    return demo_game
+
 # ============= CONTACT FORM =============
 import resend
 
