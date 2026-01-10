@@ -1,194 +1,177 @@
 <analysis>**original_problem_statement:**
-The user wants to build a Baseball stat-tracking feature, which includes infrastructure, a Classic Mode UI, and game creation options. The user is also facing several issues:
-1.  A recurring P0 bug where users cannot log in immediately after a new deployment (this was fixed in the session).
-2.  A new recurring issue where newly created teams do not appear on the teams page for all sports.
-3.  Requested Stripe integration for subscriptions.
-4.  A series of specific UI/UX enhancements for the Baseball stat tracker, including a new field image, a condensed layout, a pre-game starter dialogue for setting lineups, substitution functionality, and fixing navigation.
+The user's primary goal is to build out a comprehensive Baseball stat-tracking feature.
+
+Initial requests included fixing a bug where newly created teams would not appear on the teams list.
+
+Subsequent feature requests for the baseball tracker included:
+1.  **UI/UX Overhaul:**
+    *   A compact, no-scroll layout with the field in the center, play-by-play/batting order on the left, and pitch results/stats on the right.
+    *   Fix outfielder (LF, CF, RF) positions on the field diagram based on a user-provided image.
+    *   Move the Balls/Strikes/Outs indicators to be centered next to the inning display.
+    *   Show player numbers on the bases for runners.
+    *   Use team colors for player indicators on the field.
+    *   Ensure the full 9-player batting order is always visible and switches correctly when the team at bat changes, remembering the position in the lineup.
+2.  **Functionality:**
+    *   Implement a base runner management system:
+        *   Clicking on a runner opens a modal with options (Steal, Caught Stealing, Pick Off, Move).
+        *   Implement automatic base advancement logic for hits, walks, etc.
+    *   Implement a full-featured Undo button to revert the last play and all associated state changes (stats, runner positions).
+    *   Add game management controls:
+        *   A Wrap-Up flow to finalize a game by selecting winning, losing, and saving pitchers.
+        *   A Game Control modal to manually edit the current inning and score.
+3.  **Bug Fixes & Stat Accuracy:**
+    *   Fix an issue where plays were being duplicated in the play-by-play log.
+    *   Ensure player stats (in the At Bat and Pitcher boxes) and team stats (R, H, E, SO, BB) update in real-time and are accurate.
+    *   Fix an issue where the batting order would reset for a team instead of continuing where it left off in a new inning.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Baseball Stat Tracker:**
-    *   Create a Baseball sport option. (DONE)
-    *   Admin dashboard beta-mode toggle for Baseball. (DONE)
-    *   Game creation to allow custom innings count, notes, and primetime mode. (IN PROGRESS)
-    *   Build a live stat-tracking UI () with a specific layout, fielding/batting displays, and substitution logic. (IN PROGRESS)
-    *   Use a user-provided image for the baseball field. (DONE)
-2.  **Team Management Bug:**
-    *   Diagnose and fix the issue where teams are not consistently visible on the  page after being created.
-3.  **Navigation:**
-    *   The Home button within a sport's specific pages should navigate to the sport's dashboard, not the application's main homepage. (DONE)
-    *   The back button in all live game trackers should go to the respective sport's home page.
-4.  **Stripe Integration:**
-    *   Connect Stripe to handle monthly/annual subscriptions. (STARTED)
+Refer to the original problem statement. Most of the work has been on the Baseball stat tracker.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The Baseball sport infrastructure is fully implemented. The  component is functional, with a demo mode, backend persistence for game state, and a pre-game starter dialogue for setting batting/fielding lineups. An initial Stripe integration has been added with backend routes and a frontend pricing page. The critical login bug from the previous session has been fixed. The UI for the baseball field has been updated to use a user-provided image. The teams not showing up issue was investigated, and while the agent believes it to be a testing or caching problem, the user still reports it.
+The application has a highly advanced and feature-rich baseball stat tracker. The critical bug where teams were not appearing on the teams list has been fixed and verified.
+
+The  component has undergone a massive overhaul and now includes:
+*   A compact, no-scroll, three-column layout.
+*   A complete base runner management system, including a modal for manual actions (stealing, pickoffs) and automatic advancement logic on hits/walks.
+*   A fully functional Undo system that reverts game state, stats, and play-by-play logs.
+*   A Wrap-Up modal to finalize the game and a Game Control modal to manually adjust the score and inning.
+*   Real-time stat tracking for players and teams.
+*   A batting order display that shows the full 9-player roster and switches between teams.
 
 **Last working item**:
-- **Last item agent was working:** The agent was in the midst of a major UI refactor for  to match the user's latest requests. This included creating a condensed layout, adding a clear button to the starter dialog, and updating the baseball diamond to display player names in a specific format () and correct fielder positions.
+- **Last item agent was working:** Fixing a bug where the batting order for a team incorrectly resets to the first batter at the start of a new inning, instead of continuing from where that team left off. The agent had made one incorrect fix attempt and then correctly identified the true root cause.
+- **Reasoning for the bug:** When the third out of an inning occurs (e.g., on a strikeout), the existing logic checks for  and triggers the inning-change sequence *before* it advances the batter index for the team that was at bat. The batter index for that team is therefore never incremented on the play that ends the inning.
 - **Status:** IN PROGRESS
 - **Agent Testing Done:** N
-- **Which testing method agent to use?** Frontend testing agent. The tests should verify the new condensed layout, the functionality of the starter dialogue (including clearing selections), the correct display of players on the field, and the new substitution flow.
+- **Which testing method agent to use?** Frontend testing agent. The test should verify that the batting order continues correctly across innings.
+    **Test Scenario:**
+    1.  Start a new demo game.
+    2.  In the Top of the 1st, record three strikeouts for the first three batters.
+    3.  In the Bottom of the 1st, record three strikeouts for the first three batters.
+    4.  At the start of the Top of the 2nd, verify that the 4th batter in the lineup is correctly shown as the current batter.
 - **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Newly created teams do not appear on the Teams page (P0)**
+- **Issue 1: Batting order resets instead of continuing in a new inning (P0)**
 
 **Issues Detail:**
-- **Issue 1: Newly created teams do not appear on the Teams page**
-    - **Attempted fixes:** The agent confirmed backend API calls work correctly. It was identified that a  mismatch caused test failures, but the UI seemed to work in screenshots. The agent added more console logging, a manual refresh button to the  page, and a  event listener to force re-fetching. Despite these measures, the user still reports the problem.
-    - **Next debug checklist:**
-        1.  Re-examine the  component's state management and the  dependencies (, ).
-        2.  Investigate potential race conditions between navigation, context updates (), and the  API call.
-        3.  Add extensive client-side logging to capture the value of  at the moment  is called, the raw API response, and the component's state before and after the fetch.
-        4.  Verify that the  interceptor is consistently applying the auth token for all requests originating from .
-    - **Why fix this issue and what will be achieved with the fix?** This is a core functionality bug that prevents users from managing their teams, making the application feel broken and unreliable.
-    - **Status:** IN PROGRESS
-    - **Is recurring issue?** Y
-    - **Should Test frontend/backend/both after fix?** Both. Frontend testing to confirm the UI updates correctly, and backend to ensure the API is flawless.
+- **Issue 1: Batting order resets instead of continuing in a new inning**
+  - **Attempted fixes:** The agent first tried removing logic that explicitly reset the batter index, which was incorrect. The agent then correctly identified the true cause but has not yet implemented the fix.
+  - **Next debug checklist:**
+    1.  Locate the conditional blocks for  inside  and  in .
+    2.  Modify the logic to ensure that if the play results in the third out, the batter index for the current batting team is advanced *before* the inning change sequence is initiated. This will likely involve moving the  call to be outside and before the  check.
+  - **Why fix this issue and what will be achieved with the fix?** This is a critical bug for accurate stat tracking, as it completely breaks the continuity of the batting order, which is fundamental to baseball.
+  - **Status:** IN PROGRESS
+  - **Is recurring issue?** N
+  - **Should Test frontend/backend/both after fix?** Frontend
+  - **Blocked on other issue:** None
 
 **In progress Task List**:
-- **Task 1: Complete UI/UX enhancements for the Baseball Stat Tracker (P1)**
-    - **Where to resume:** Continue refactoring the  component. The agent just modified the  and the  components. The next steps are to rebuild the main layout of  to be more condensed.
-    - **What will be achieved with this?** A more compact and user-friendly interface for baseball stat tracking that meets all of the user's specific design requirements.
-    - **Status:** IN PROGRESS
-    - **Should Test frontend/backend/both after fix?** Frontend.
-    - **Blocked on something:** None.
+None. The agent is currently fixing a bug.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **P1: Implement Substitution Logic:**
-        - Add a switch icon () to the batting order and on player labels on the field.
-        - Create a substitution dialog that asks if the change is offensive, defensive, or both.
-        - Implement the logic to swap players in the batting order and/or on the field based on the user's choice.
-    - **P1: Finalize Baseball Stat Tracker Functionality:**
-        - Ensure the batting order automatically advances to the next player after an at-bat concludes.
-        - Ensure the correct defensive players are shown on the field based on which team is batting.
-    - **P1: Fix Back Button Navigation:**
-        - In all live stat trackers (, , , ), ensure the back button navigates to the sport's main page/dashboard, not the global one.
+    - **P1: Implement PDF Box Score:** The PDF Box Score button exists in the Wrap-Up modal but is a placeholder. This task involves creating the PDF generation logic.
+    - **P1: Implement Live Stat Output:** The Live Stat Output button is also a placeholder. This likely involves creating a public, shareable, read-only view of the live game.
 - **Future Tasks:**
-    - **P2: Configure Stripe Pricing Tiers:** The integration is present, but the pricing page needs to be connected to actual subscription plans and feature-gating logic.
-    - **P2: Complete  Decomposition:** Break the monolithic  into smaller, domain-specific routers (e.g., , ).
+    - **P2: Configure Stripe Pricing Tiers:** The integration is present, but the pricing page needs to be connected to actual subscription plans.
+    - **P2: Complete  Decomposition:** Continue breaking the monolithic  into smaller, domain-specific routers.
     - **P2: Refactor :** Integrate the  hook to reduce complexity.
-    - **P2: Implement PDF Export for Baseball:** Create a PDF box score for completed baseball games.
     - **P2: Season Clone Feature:** Add functionality to clone an entire season's structure.
+    - **P3: Implement Redo Button:** A user-suggested enhancement to undo an undo action.
 
 **Completed work in this session**
-- **Bugfix: Critical Login Failure (DONE):** Resolved the recurring production login bug by unifying password hashing and verification under 's .
-- **Feature: Baseball Stat Tracker v1 (DONE):** Built the  component, including the UI, backend data persistence, and a fully functional demo mode at .
-- **Feature: Baseball Game Creation (DONE):** Implemented the UI in  to support creating baseball games with options for innings, notes, and primetime mode.
-- **Feature: Baseball Pre-Game Setup (DONE):** Created a multi-step Starter Dialogue to set the batting order and defensive positions for both teams before a game begins.
-- **Feature: Stripe Integration (STARTED):** Called the  and implemented backend endpoints for Stripe checkout () and created frontend  and .
-- **UI/UX: Baseball Field Enhancement (DONE):** Replaced the programmatically drawn field with a user-provided background image and adjusted fielder position labels.
-- **UI/UX: Navigation Fix (DONE):** The Home button in the main layout now correctly navigates to the  page instead of the marketing homepage.
-- **Bugfix: Team Page Debugging (IN PROGRESS):** Added a manual refresh button and improved logging to the  page to help diagnose the team loading issue.
-
-**Earlier issues found/mentioned but not fixed**
-- **Issue 1:  refactor.** This is a technical debt item from the initial handoff, deferred to avoid regression.
-
-**Known issue recurrence from previous fork**
-- **Issue recurrence in previous fork:** Production login bug.
-- **Recurrence count:** High.
-- **Status:** RESOLVED.
+- **Bugfix: Team Sport Persistence (RESOLVED):** Fixed a critical bug where updating a team's roster would incorrectly change its sport to basketball. The fix was applied to both the frontend () and backend ().
+- **Feature: Baseball Stat Tracker UI Overhaul (DONE):** Completely redesigned the  page into a compact, no-scroll, three-column layout as per user specifications.
+- **Feature: Real-time Stat Tracking (DONE):** Implemented logic to accurately track and display player and team stats (Runs, Hits, Errors, Strikeouts, Walks) in real-time.
+- **Feature: Base Runner Management System (DONE):**
+    - Created a  to allow manual actions like steals, pick-offs, and runner movement.
+    - Implemented  logic for automatic base advancement on hits and walks.
+- **Feature: Undo System (DONE):** Implemented a robust undo feature that allows users to revert the last play, rolling back all associated game state, stats, and runner positions.
+- **Feature: Game Management Controls (DONE):**
+    - Added a Wrap-Up flow to finalize a game, including selecting winning/losing/saving pitchers.
+    - Added a Game Control modal to allow manual editing of the score and inning.
+- **Feature: Batting Order Rework (DONE):** The batting order component now displays the full 9-player roster and correctly switches between the home and away teams.
+- **Bugfix: Play-by-Play Doubling (RESOLVED):** Fixed an issue where plays were appearing twice in the log by adding unique IDs and deduplication logic.
+- **Bugfix: Live Game Navigation (RESOLVED):** Corrected the Back button navigation in , , and  to point to the sport's dashboard.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Password Hashing:** Fixed a critical bug caused by a mismatch between 's  for user registration and direct  calls for admin user creation and login verification.
-- **Stripe Integration:** Used  to get a playbook for Stripe. Implemented backend routes for creating checkout sessions and handling webhooks. Used a test key from the environment.
-- **Complex Modal State:** Managed a multi-step modal () in React to guide the user through a complex setup process (setting batting order and defensive positions for two teams).
-- **Frontend State & Caching:** Debugged a persistent issue with data not appearing on the  page, leading to the implementation of multiple fallback strategies like manual refresh and event listeners.
-- **Incremental Refactoring:** Began decomposing the monolithic  by creating new router files but only integrated the  router to minimize risk. Left comments in  for a future refactor instead of performing it and risking regression.
+- **State History for Undo:** Implemented an undo feature by maintaining an array of previous game states () and restoring from it.
+- **Complex State Management:** Managed multiple complex, interconnected states for the baseball game, including separate batter indices for each team (, ), modal visibility, and game history.
+- **State Update Race Conditions:** Debugged and identified a subtle bug caused by the order of operations in state update callbacks, where a batter index was not being incremented before an inning change was processed.
+- **Component-based Modals:** Created multiple, reusable modal components (, , ) for different user interactions.
+- **Defensive Backend Programming:** Added a safeguard to the backend  endpoint to preserve the  field even if the frontend fails to send it.
 
 **key DB schema**
-- **games:**
+- **games:** (updated with finalization data)
+    -  (e.g., in_progress, final)
     - 
     - 
-    -  (e.g., top, bottom)
-    - , , 
-    - , 
-    - , 
     - 
-- **BaseballPlayerStats:**
-    - added , 
 
 **changes in tech stack**
-- Added  and  to the backend dependencies.
+- No changes to the tech stack in this session.
 
 **All files of reference**
-- : The primary file for the baseball stat tracker. It is currently undergoing a major layout refactor.
-- : The file related to the recurring bug where teams don't show up. It has been modified with debugging aids.
-- : The main backend file. Contains the fix for the login bug and the logic for creating/updating baseball games.
-- : The game creation form, modified to allow custom innings for baseball.
-- : The new file containing all Stripe-related API endpoints.
-- : The user-provided image for the baseball field.
+- : The central file for all work in this session. It contains the logic for the UI, stat tracking, undo, base running, and game controls.
+- : Modified to fix the initial team-saving bug.
+- : Modified to fix the initial team-saving bug.
 
 **Areas that need refactoring**:
-- ****: The decomposition into domain-specific routers has only just begun and needs to be completed.
-- ****: The refactor to use the  hook is still pending.
-- ****: Is currently being refactored into a new condensed layout. The code is in a transitional state.
+- The  component is now extremely large (over 2000 lines). While functional, it could be broken down into smaller custom hooks and components to improve maintainability (e.g.,  for undo,  for core game logic,  for stat updates).
 
 **key api endpoints**
-- : The login endpoint that was fixed.
-- : Endpoint for creating teams.
-- : Endpoint for fetching teams, now filtered by .
-- : Endpoint for creating games, now with baseball-specific logic.
-- : Endpoint for saving live game state.
-- : New endpoint for Stripe integration.
-- : New endpoint to provide mock data for the baseball demo.
+- : The endpoint related to the fixed team bug. It now correctly preserves the  attribute.
+- : Used extensively to save game state, including finalization data.
 
 **Critical Info for New Agent**
-- **The user's most recent requests are highest priority.** Focus on completing the condensed layout for  and implementing the substitution logic exactly as described.
-- **The teams not showing up issue is critical.** The user has reported it multiple times. Do not dismiss it as a caching issue. A thorough investigation is required. The debugging code added by the previous agent (console logs, refresh button) should be used to gather more information from the user if the issue persists.
-- **The  component is large and complex.** It's currently being refactored. Proceed with caution and test changes incrementally. The component now contains the , which handles the pre-game lineup setup.
-- **Back button navigation needs to be fixed across all live game components**, not just baseball.
+- **You are in the middle of a bug fix.** The immediate priority is to fix the batting order reset bug. The root cause has been identified: the batter index is not advanced on the 3rd out of an inning. You need to implement the fix in  and  in .
+- **The  file is very large.** Be careful when making changes. The agent has implemented many complex, interconnected features. Use the existing patterns.
+- **The user is highly engaged and provides detailed, iterative feedback.** Expect to receive more feature requests for the baseball tracker after this bug is fixed. The next logical features are the PDF Box Score and Live Stat Output.
 
 **documents and test reports created in this job**
--  (updated)
 - 
 - 
 - 
+-  (updated multiple times)
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **Request:** Fix team loading, use a new field image, fix home button nav, create starter dialogue, show defensive players on field. (Status: **IN PROGRESS**)
-2.  **Request:** Allow custom innings, add clear button to starter dialogue, make stat tracker condensed, add substitution logic with a dialog, auto-advance batter, fix back button in all live games. (Status: **IN PROGRESS**)
-3.  **Issue Report:** Still having issues with saved teams not showing up. (Status: **IN PROGRESS**)
-4.  **Confirmation:** All next actions except for PDF export. (Status: **RESOLVED**)
-5.  **Request:** I want all teams separated by the sport they were created in. (Status: **RESOLVED** - Agent confirmed this is already working but added safeguards).
-6.  **Summary Provided:** Agent summarized work on baseball tracker and team issue investigation. (Status: **RESOLVED**)
-7.  **Issue Report:** User re-iterates that created teams are not showing up. (Status: **IN PROGRESS**)
-8.  **Request:** Improve baseball field UI with a logo and make it more realistic. (Status: **RESOLVED** - Superseded by the request to use an image).
-9.  **Summary Provided:** Agent summarized completion of baseball tracker v1. (Status: **RESOLVED**)
-10. **Info/Request:** User provided a Stripe key and asked to finish the baseball stat tracker, deferring pricing tier configuration. (Status: **RESOLVED**)
+1.  **Request:** Add game control button to finalize game (select W/L/S pitchers). (Status: **COMPLETED**)
+2.  **Request:** Rename Game Control to Wrap-Up and add a *new* Game Control button to change inning/score. (Status: **COMPLETED**)
+3.  **Request:** Ensure full batting order is visible, switches between teams, and maintains substitution/lineup position. (Status: **IN PROGRESS**)
+4.  **Issue Report (by agent):** The batting order is resetting to the first batter instead of continuing. (Status: **IN PROGRESS**)
+5.  **Agent Analysis:** Identified the root cause of the batting order reset bug. (Status: **IN PROGRESS**)
+6.  **Request:** Fix outfielder positions again (with image) and add an Undo feature. (Status: **COMPLETED**)
+7.  **Request:** Base runner logic (clickable runners, modal with options, auto-advance), fix outfielder positions, update team stats display, and center B/S/O counters. (Status: **COMPLETED**)
+8.  **Request:** Reorganize layout (field center, no scroll), and ensure real-time stat updates. (Status: **COMPLETED**)
+9.  **Request:** Fix play-by-play doubling, show players in all plays, show runner numbers on bases, use team colors for players. (Status: **COMPLETED**)
+10. **Confirmation:** Prioritize team bug, then all P1 items, then new baseball UI issues. (Status: **COMPLETED**)
 
 **Project Health Check:**
-- **Broken:** Team management is unreliable due to the bug where newly created teams sometimes don't appear on the list, despite being in the database.
-- **Mocked:** The demo modes for all sports use mock data generators or static data from within the frontend components ().
-- **Needs Refactoring:**
-    -  is a large monolithic file that needs to be fully decomposed into routers.
-    -  still requires a refactor to use the  hook.
+- **Broken:** The batting order continuity is broken, which is a critical gameplay issue for the baseball tracker.
+- **Mocked:** The demo mode for baseball () uses static initial data but is fully interactive.
+- **Needs Refactoring:**  has become a monolithic component and is a prime candidate for being broken down into smaller, more manageable hooks and components.
 
 **3rd Party Integrations**
 -   **Resend:** Used for sending transactional emails.
 -   **reportlab:** Used for PDF generation.
 -   **lucide-react:** Used for icons.
--   **Stripe:** (New) Added for handling recurring subscriptions. Requires a user-provided API key (test key  is in ).
+-   **Stripe:** (Existing) For handling recurring subscriptions.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES
--   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** None
--   **Known regressions:** The user reports that the teams not showing issue is a regression or a persistent problem.
+- **Testing agent used after significant changes:** YES. The testing agent was used three times and successfully identified a critical bug with the score not updating, which the main agent then fixed.
+- **Troubleshoot agent used after agent stuck in loop:** NO
+- **Test files created:** None
+- **Known regressions:** None. The batting order issue is a new bug found during the implementation of a new feature.
 
 **Credentials to test flow:**
 -   **Admin User:**  / 
 -   **School Admin User (preview only):**  / 
 
 **What agent forgot to execute**
-The agent was actively working on a large set of user requests. It did not forget any, but the following are the primary items left to implement from the user's last message:
--   Rebuilding the main  layout into a condensed format.
--   Adding the substitution icon and functionality (with the offensive/defensive/both dialog).
--   Ensuring the batting order auto-advances.
--   Fixing the back button navigation in all live stat trackers.</analysis>
+The agent has been diligent in following user requests. The current task is an in-progress bug fix that was discovered during the implementation of the last user request. Nothing was forgotten.</analysis>

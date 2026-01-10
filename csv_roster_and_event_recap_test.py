@@ -14,7 +14,7 @@ import io
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://baseball-stats-2.preview.emergentagent.com/api"
+BACKEND_URL = "https://baseballtracker-1.preview.emergentagent.com/api"
 
 # Test credentials and data
 ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
