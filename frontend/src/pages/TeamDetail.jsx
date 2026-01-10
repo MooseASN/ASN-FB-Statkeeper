@@ -188,7 +188,8 @@ export default function TeamDetail({ user, onLogout }) {
         name: teamName,
         logo_url: teamLogo || null,
         color: teamColor,
-        roster: rosterData
+        roster: rosterData,
+        sport: teamSport  // CRITICAL: Preserve the team's sport to avoid switching to default
       });
       setHasUnsavedChanges(false);
     } catch (error) {
