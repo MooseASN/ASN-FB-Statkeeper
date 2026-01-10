@@ -98,6 +98,13 @@ export default function Teams({ user, onLogout }) {
   const [newTeam, setNewTeam] = useState({ name: "", logo_url: "", color: "#dc2626" });
 
   const fetchTeams = useCallback(async () => {
+    // Don't fetch if no sport is selected
+    if (!selectedSport) {
+      setTeams([]);
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
       const res = await axios.get(`${API}/teams`, {
