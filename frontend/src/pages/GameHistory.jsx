@@ -32,10 +32,17 @@ export default function GameHistory({ user, onLogout }) {
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    fetchGames();
+    if (selectedSport) {
+      fetchGames();
+    }
   }, [selectedSport]);
 
   const fetchGames = async () => {
+    if (!selectedSport) {
+      setGames([]);
+      setLoading(false);
+      return;
+    }
     try {
       const res = await axios.get(`${API}/games`, { params: { sport: selectedSport } });
       setGames(res.data);
