@@ -1176,6 +1176,9 @@ export default function SchoolDashboard() {
                       {selectedGame.sport === "football" && (
                         <span className="text-xs text-green-400">Always On</span>
                       )}
+                      {selectedGame.sport === "baseball" && (
+                        <span className="text-xs text-slate-400">N/A - Innings Based</span>
+                      )}
                     </div>
                     
                     {(gameSetup.clockEnabled || selectedGame.sport === "football") && selectedGame.sport !== "baseball" && (
