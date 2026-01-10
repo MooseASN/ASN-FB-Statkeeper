@@ -1537,6 +1537,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       awayStats: JSON.parse(JSON.stringify(awayStats)),
       playByPlay: JSON.parse(JSON.stringify(playByPlay)),
       currentBatterIndex,
+      homeBatterIndex,
+      awayBatterIndex,
       homeBattingOrder: JSON.parse(JSON.stringify(homeBattingOrder)),
       awayBattingOrder: JSON.parse(JSON.stringify(awayBattingOrder)),
       homeDefense: JSON.parse(JSON.stringify(homeDefense)),
@@ -1545,7 +1547,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       awayErrors,
     };
     setUndoHistory(prev => [...prev.slice(-19), snapshot]); // Keep last 20 states
-  }, [game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors]);
+  }, [game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBatterIndex, awayBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors]);
   
   // Handle undo - restore the previous state
   const handleUndo = useCallback(() => {
@@ -1562,6 +1564,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     setAwayStats(lastState.awayStats);
     setPlayByPlay(lastState.playByPlay);
     setCurrentBatterIndex(lastState.currentBatterIndex);
+    setHomeBatterIndex(lastState.homeBatterIndex);
+    setAwayBatterIndex(lastState.awayBatterIndex);
     setHomeBattingOrder(lastState.homeBattingOrder);
     setAwayBattingOrder(lastState.awayBattingOrder);
     setHomeDefense(lastState.homeDefense);
