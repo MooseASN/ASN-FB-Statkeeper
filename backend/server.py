@@ -3479,12 +3479,32 @@ async def update_game_note(game_id: str, note_data: GameNoteUpdate, user: User =
 
 @api_router.get("/events")
 async def get_events(sport: Optional[str] = None, user: User = Depends(get_current_user)):
-    """Get all events for the current user"""
+    """Get all events for the current user including shared access events"""
+    # Get user's own events
     query = {"user_id": user.user_id}
     if sport:
         query["sport"] = sport
-    events = await db.events.find(query, {"_id": 0}).to_list(100)
-    return events
+    own_events = await db.events.find(query, {"_id": 0}).to_list(100)
+    
+    # Get events from accounts user has shared access to
+    shared_access_records = await db.shared_access.find(
+        {"shared_with_user_id": user.user_id, "is_active": True},
+        {"owner_user_id": 1}
+    ).to_list(100)
+    
+    shared_events = []
+    for record in shared_access_records:
+        shared_query = {"user_id": record["owner_user_id"]}
+        if sport:
+            shared_query["sport"] = sport
+        owner_events = await db.events.find(shared_query, {"_id": 0}).to_list(100)
+        # Mark events as shared
+        for event in owner_events:
+            event["is_shared"] = True
+            event["shared_from_user_id"] = record["owner_user_id"]
+        shared_events.extend(owner_events)
+    
+    return own_events + shared_events
 
 @api_router.get("/events/{event_id}")
 async def get_event(event_id: str, user: User = Depends(get_current_user)):
