@@ -311,63 +311,62 @@ const DemoModeBar = () => (
   </div>
 );
 
-// Ball/Strike/Out Indicator Component
-const CountIndicator = ({ label, count, maxCount, activeColor, inactiveColor = "bg-zinc-700" }) => (
-  <div className="flex flex-col items-center gap-1">
-    <span className="text-xs text-zinc-400 uppercase tracking-wider">{label}</span>
-    <div className="flex gap-1">
+// Ball/Strike/Out Indicator Component - Compact inline version
+const CountIndicator = ({ label, count, maxCount, activeColor, inactiveColor = "bg-zinc-600" }) => (
+  <div className="flex items-center gap-1">
+    <span className="text-[10px] text-zinc-400 uppercase w-4">{label}</span>
+    <div className="flex gap-0.5">
       {Array.from({ length: maxCount }).map((_, i) => (
         <div 
           key={i} 
-          className={`w-4 h-4 rounded-full ${i < count ? activeColor : inactiveColor}`}
+          className={`w-3 h-3 rounded-full ${i < count ? activeColor : inactiveColor}`}
         />
       ))}
     </div>
   </div>
 );
 
-// Scoreboard Component
-const Scoreboard = ({ game, onInningChange }) => {
-  const innings = game?.inning_scores || { home: [], away: [] };
-  const totalInnings = game?.total_innings || 9;
-  
+// Scoreboard Component - Compact with centered inning + counts
+const Scoreboard = ({ game }) => {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-      {/* Team Scores */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-4">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+      {/* Team Scores with Inning & Count in Center */}
+      <div className="flex items-center justify-between">
+        {/* Away Team */}
+        <div className="flex items-center gap-3">
           <div 
-            className="w-4 h-8 rounded"
+            className="w-3 h-6 rounded"
             style={{ backgroundColor: game?.away_team_color || "#3b82f6" }}
           />
-          <span className="text-xl font-bold text-white">{game?.away_team_name || "Away"}</span>
-          <span className="text-3xl font-bold text-white">{game?.away_score || 0}</span>
+          <span className="text-lg font-bold text-white">{game?.away_team_name || "Away"}</span>
+          <span className="text-2xl font-bold text-white">{game?.away_score || 0}</span>
         </div>
         
-        <div className="flex flex-col items-center">
-          <div className="flex items-center gap-2 mb-2">
-            <div className={`w-0 h-0 border-l-[8px] border-r-[8px] border-b-[12px] border-l-transparent border-r-transparent ${game?.inning_half === 'top' ? 'border-b-yellow-500' : 'border-b-zinc-600'}`} />
-            <span className="text-2xl font-bold text-yellow-500">{game?.current_inning || 1}</span>
-            <div className={`w-0 h-0 border-l-[8px] border-r-[8px] border-t-[12px] border-l-transparent border-r-transparent ${game?.inning_half === 'bottom' ? 'border-t-yellow-500' : 'border-t-zinc-600'}`} />
+        {/* Center: Inning + Count */}
+        <div className="flex flex-col items-center gap-1">
+          {/* Inning */}
+          <div className="flex items-center gap-2">
+            <div className={`w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent ${game?.inning_half === 'top' ? 'border-b-yellow-500' : 'border-b-zinc-600'}`} />
+            <span className="text-xl font-bold text-yellow-500">{game?.current_inning || 1}</span>
+            <div className={`w-0 h-0 border-l-[6px] border-r-[6px] border-t-[10px] border-l-transparent border-r-transparent ${game?.inning_half === 'bottom' ? 'border-t-yellow-500' : 'border-t-zinc-600'}`} />
           </div>
-          <span className="text-xs text-zinc-500 uppercase">{game?.inning_half === 'top' ? 'Top' : 'Bottom'}</span>
+          {/* B/S/O Count */}
+          <div className="flex items-center gap-3">
+            <CountIndicator label="B" count={game?.balls || 0} maxCount={4} activeColor="bg-green-500" />
+            <CountIndicator label="S" count={game?.strikes || 0} maxCount={3} activeColor="bg-red-500" />
+            <CountIndicator label="O" count={game?.outs || 0} maxCount={3} activeColor="bg-yellow-500" />
+          </div>
         </div>
         
-        <div className="flex items-center gap-4">
-          <span className="text-3xl font-bold text-white">{game?.home_score || 0}</span>
-          <span className="text-xl font-bold text-white">{game?.home_team_name || "Home"}</span>
+        {/* Home Team */}
+        <div className="flex items-center gap-3">
+          <span className="text-2xl font-bold text-white">{game?.home_score || 0}</span>
+          <span className="text-lg font-bold text-white">{game?.home_team_name || "Home"}</span>
           <div 
-            className="w-4 h-8 rounded"
+            className="w-3 h-6 rounded"
             style={{ backgroundColor: game?.home_team_color || "#f97316" }}
           />
         </div>
-      </div>
-      
-      {/* Count Indicators */}
-      <div className="flex justify-center gap-8">
-        <CountIndicator label="Balls" count={game?.balls || 0} maxCount={4} activeColor="bg-green-500" />
-        <CountIndicator label="Strikes" count={game?.strikes || 0} maxCount={3} activeColor="bg-red-500" />
-        <CountIndicator label="Outs" count={game?.outs || 0} maxCount={3} activeColor="bg-yellow-500" />
       </div>
     </div>
   );
