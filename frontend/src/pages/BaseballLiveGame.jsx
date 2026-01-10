@@ -982,98 +982,99 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const handleInPlayResult = useCallback((resultType) => {
     setShowInPlayModal(false);
     
-    setGame(prev => {
-      if (!prev) return prev;
-      
-      let newOuts = prev.outs;
-      let newHomeScore = prev.home_score;
-      let newAwayScore = prev.away_score;
-      let newInningHalf = prev.inning_half;
-      let newInning = prev.current_inning;
-      let description = "";
-      
-      const isHomeTeamBatting = prev.inning_half === "bottom";
-      
-      switch (resultType) {
-        case "single":
-          description = `Single by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          break;
-        case "double":
-          description = `Double by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          break;
-        case "triple":
-          description = `Triple by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          break;
-        case "home_run":
-          description = `HOME RUN by #${currentBatter?.player_number} ${currentBatter?.player_name}!`;
-          // Score a run
-          if (isHomeTeamBatting) {
-            newHomeScore += 1;
-          } else {
-            newAwayScore += 1;
-          }
-          break;
-        case "ground_out":
-        case "fly_out":
-        case "line_out":
-        case "pop_out":
-          description = `${resultType.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          newOuts += 1;
-          break;
-        case "double_play":
-          description = `Double play - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          newOuts += 2;
-          break;
-        case "sacrifice_fly":
-        case "sacrifice_bunt":
-          description = `${resultType.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          newOuts += 1;
-          break;
-        case "error":
-          description = `Error - #${currentBatter?.player_number} ${currentBatter?.player_name} reaches on error`;
-          break;
-        case "fielders_choice":
-          description = `Fielder's choice - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          break;
-        default:
-          break;
-      }
-      
-      // Reset count and advance batter
-      setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
-      
-      // Check for end of half inning
-      if (newOuts >= 3) {
-        newOuts = 0;
-        if (newInningHalf === "top") {
-          newInningHalf = "bottom";
+    const currentGame = game;
+    if (!currentGame) return;
+    
+    let newOuts = currentGame.outs;
+    let newHomeScore = currentGame.home_score || 0;
+    let newAwayScore = currentGame.away_score || 0;
+    let newInningHalf = currentGame.inning_half;
+    let newInning = currentGame.current_inning;
+    let description = "";
+    
+    const isHomeTeamBatting = currentGame.inning_half === "bottom";
+    
+    switch (resultType) {
+      case "single":
+        description = `Single by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        break;
+      case "double":
+        description = `Double by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        break;
+      case "triple":
+        description = `Triple by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        break;
+      case "home_run":
+        description = `HOME RUN by #${currentBatter?.player_number} ${currentBatter?.player_name}!`;
+        if (isHomeTeamBatting) {
+          newHomeScore += 1;
         } else {
-          newInningHalf = "top";
-          newInning = prev.current_inning + 1;
+          newAwayScore += 1;
         }
-        description += " - Side retired";
-        setCurrentBatterIndex(0);
+        break;
+      case "ground_out":
+      case "fly_out":
+      case "line_out":
+      case "pop_out":
+        description = `${resultType.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        newOuts += 1;
+        break;
+      case "strikeout":
+        description = `Strikeout - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        newOuts += 1;
+        break;
+      case "double_play":
+        description = `Double play - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        newOuts += 2;
+        break;
+      case "sacrifice_fly":
+      case "sacrifice_bunt":
+        description = `${resultType.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        newOuts += 1;
+        break;
+      case "error":
+        description = `Error - #${currentBatter?.player_number} ${currentBatter?.player_name} reaches on error`;
+        break;
+      case "fielders_choice":
+        description = `Fielder's choice - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        break;
+      default:
+        break;
+    }
+    
+    // Check for end of half inning
+    if (newOuts >= 3) {
+      newOuts = 0;
+      if (newInningHalf === "top") {
+        newInningHalf = "bottom";
+      } else {
+        newInningHalf = "top";
+        newInning = currentGame.current_inning + 1;
       }
-      
-      // Add to play by play
-      setPlayByPlay(plays => [{
-        inning: `${prev.current_inning}${prev.inning_half === 'top' ? '▲' : '▼'}`,
-        description,
-        timestamp: new Date().toISOString()
-      }, ...plays]);
-      
-      return {
-        ...prev,
-        balls: 0,
-        strikes: 0,
-        outs: newOuts,
-        home_score: newHomeScore,
-        away_score: newAwayScore,
-        inning_half: newInningHalf,
-        current_inning: newInning
-      };
-    });
-  }, [currentBatter, battingRoster.length]);
+      description += " - Side retired";
+      setCurrentBatterIndex(0);
+    } else {
+      // Advance batter
+      setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
+    }
+    
+    // Add play to log
+    if (description) {
+      addPlay(currentGame.current_inning, currentGame.inning_half, description);
+    }
+    
+    // Update game state
+    setGame(prev => ({
+      ...prev,
+      balls: 0,
+      strikes: 0,
+      outs: newOuts,
+      home_score: newHomeScore,
+      away_score: newAwayScore,
+      inning_half: newInningHalf,
+      current_inning: newInning
+    }));
+  }, [game, currentBatter, battingRoster.length, addPlay]);
   
   // Auto-save game state when it changes (debounced)
   useEffect(() => {
