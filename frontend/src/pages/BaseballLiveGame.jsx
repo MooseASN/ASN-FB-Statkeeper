@@ -1411,7 +1411,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     setShowRunnerModal(false);
     setSelectedRunner(null);
     setSelectedRunnerBase(null);
-  }, [selectedRunner, selectedRunnerBase, addPlay, updateBatterStats]);
+  }, [selectedRunner, selectedRunnerBase, addPlay, updateBatterStats, saveStateForUndo]);
   
   // Handle pitch result
   const handlePitchResult = useCallback((resultType) => {
@@ -1419,6 +1419,9 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       setShowInPlayModal(true);
       return;
     }
+    
+    // Save state before making changes
+    saveStateForUndo();
     
     // Get current game state for the play description
     const currentGame = game;
