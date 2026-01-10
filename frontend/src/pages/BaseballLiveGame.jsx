@@ -2007,6 +2007,45 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     toast.success(`Substitution complete: #${newPlayer.player_number} ${newPlayer.player_name} in for #${oldPlayer.player_number} ${oldPlayer.player_name}`);
   };
   
+  // Handle game finalization
+  const handleFinalizeGame = async (finalizationData) => {
+    setGameResult(finalizationData);
+    setGameFinalized(true);
+    
+    // Update game status
+    setGame(prev => ({
+      ...prev,
+      status: 'final',
+      winning_pitcher: finalizationData.winningPitcher,
+      losing_pitcher: finalizationData.losingPitcher,
+      saving_pitcher: finalizationData.savingPitcher,
+    }));
+    
+    // Add finalization to play-by-play
+    addPlay(
+      game?.current_inning || 1,
+      game?.inning_half || 'top',
+      `FINAL: ${game?.away_team_name} ${game?.away_score || 0} - ${game?.home_score || 0} ${game?.home_team_name}`
+    );
+    
+    toast.success("Game finalized! Status: FINAL");
+    
+    // Save to backend if not demo mode
+    if (!demoMode && game?.id) {
+      try {
+        await axios.put(`${API}/games/${game.id}`, {
+          ...game,
+          status: 'final',
+          winning_pitcher: finalizationData.winningPitcher,
+          losing_pitcher: finalizationData.losingPitcher,
+          saving_pitcher: finalizationData.savingPitcher,
+        });
+      } catch (error) {
+        console.error("Failed to save finalized game:", error);
+      }
+    }
+  };
+  
   if (loading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
