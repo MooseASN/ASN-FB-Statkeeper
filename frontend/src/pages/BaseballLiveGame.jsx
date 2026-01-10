@@ -600,6 +600,205 @@ const BaseRunnerModal = ({ isOpen, onClose, runner, currentBase, onAction }) => 
   );
 };
 
+// Game Control Modal Component
+const GameControlModal = ({ 
+  isOpen, 
+  onClose, 
+  game, 
+  homeRoster, 
+  awayRoster,
+  onFinalize,
+  onLiveOutput,
+  onPdfExport
+}) => {
+  const [showFinalize, setShowFinalize] = useState(false);
+  const [winningPitcher, setWinningPitcher] = useState('');
+  const [losingPitcher, setLosingPitcher] = useState('');
+  const [savingPitcher, setSavingPitcher] = useState('');
+  
+  if (!isOpen) return null;
+  
+  const homeScore = game?.home_score || 0;
+  const awayScore = game?.away_score || 0;
+  const homeIsWinning = homeScore >= awayScore;
+  
+  const winningTeamRoster = homeIsWinning ? homeRoster : awayRoster;
+  const losingTeamRoster = homeIsWinning ? awayRoster : homeRoster;
+  const winningTeamName = homeIsWinning ? game?.home_team_name : game?.away_team_name;
+  const losingTeamName = homeIsWinning ? game?.away_team_name : game?.home_team_name;
+  
+  const canEndGame = winningPitcher && losingPitcher && savingPitcher;
+  
+  const handleEndGame = () => {
+    onFinalize({
+      winningPitcher,
+      losingPitcher,
+      savingPitcher: savingPitcher === 'no_save' ? null : savingPitcher,
+      finalScore: { home: homeScore, away: awayScore }
+    });
+    setShowFinalize(false);
+    onClose();
+  };
+  
+  const resetFinalize = () => {
+    setShowFinalize(false);
+    setWinningPitcher('');
+    setLosingPitcher('');
+    setSavingPitcher('');
+  };
+  
+  return (
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={onClose}>
+      <div className="bg-zinc-900 rounded-lg p-5 max-w-md w-full mx-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Settings className="w-5 h-5" />
+            Game Controls
+          </h2>
+          <button onClick={onClose} className="text-zinc-400 hover:text-white">
+            <XIcon className="w-5 h-5" />
+          </button>
+        </div>
+        
+        {!showFinalize ? (
+          <div className="space-y-2">
+            {/* Live Stat Output */}
+            <Button 
+              onClick={() => {
+                onLiveOutput?.();
+                toast.info("Live stat output coming soon!");
+              }}
+              className="w-full bg-green-700 hover:bg-green-600 text-white py-3 justify-start"
+            >
+              <Radio className="w-4 h-4 mr-3" />
+              Live Stat Output
+              <span className="ml-auto text-xs text-green-300">(Coming Soon)</span>
+            </Button>
+            
+            {/* PDF Box Score */}
+            <Button 
+              onClick={() => {
+                onPdfExport?.();
+                toast.info("PDF box score coming soon!");
+              }}
+              className="w-full bg-blue-700 hover:bg-blue-600 text-white py-3 justify-start"
+            >
+              <FileDown className="w-4 h-4 mr-3" />
+              PDF Box Score
+              <span className="ml-auto text-xs text-blue-300">(Coming Soon)</span>
+            </Button>
+            
+            {/* Finalize Game */}
+            <Button 
+              onClick={() => setShowFinalize(true)}
+              className="w-full bg-amber-700 hover:bg-amber-600 text-white py-3 justify-start"
+            >
+              <Flag className="w-4 h-4 mr-3" />
+              Finalize Game
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="bg-zinc-800 rounded-lg p-3 mb-4">
+              <div className="flex justify-between items-center">
+                <span className="text-zinc-400">Current Score:</span>
+                <span className="text-white font-bold">
+                  {game?.away_team_name} {awayScore} - {homeScore} {game?.home_team_name}
+                </span>
+              </div>
+            </div>
+            
+            {/* Winning Pitcher */}
+            <div>
+              <label className="text-sm text-zinc-400 mb-1 block">
+                Winning Pitcher ({winningTeamName})
+              </label>
+              <Select value={winningPitcher} onValueChange={setWinningPitcher}>
+                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectValue placeholder="Select winning pitcher..." />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-800 border-zinc-700">
+                  {winningTeamRoster?.map(p => (
+                    <SelectItem key={p.player_number || p.number} value={p.player_number || p.number} className="text-white">
+                      #{p.player_number || p.number} {p.player_name || p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Losing Pitcher */}
+            <div>
+              <label className="text-sm text-zinc-400 mb-1 block">
+                Losing Pitcher ({losingTeamName})
+              </label>
+              <Select value={losingPitcher} onValueChange={setLosingPitcher}>
+                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectValue placeholder="Select losing pitcher..." />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-800 border-zinc-700">
+                  {losingTeamRoster?.map(p => (
+                    <SelectItem key={p.player_number || p.number} value={p.player_number || p.number} className="text-white">
+                      #{p.player_number || p.number} {p.player_name || p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Saving Pitcher */}
+            <div>
+              <label className="text-sm text-zinc-400 mb-1 block">
+                Saving Pitcher ({winningTeamName})
+              </label>
+              <Select value={savingPitcher} onValueChange={setSavingPitcher}>
+                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                  <SelectValue placeholder="Select saving pitcher..." />
+                </SelectTrigger>
+                <SelectContent className="bg-zinc-800 border-zinc-700">
+                  <SelectItem value="no_save" className="text-zinc-400">
+                    No Save
+                  </SelectItem>
+                  {winningTeamRoster?.filter(p => (p.player_number || p.number) !== winningPitcher).map(p => (
+                    <SelectItem key={p.player_number || p.number} value={p.player_number || p.number} className="text-white">
+                      #{p.player_number || p.number} {p.player_name || p.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* End Game Button - only visible when all selections made */}
+            {canEndGame && (
+              <Button 
+                onClick={handleEndGame}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-3 font-bold"
+              >
+                <Trophy className="w-4 h-4 mr-2" />
+                End Game - Mark as FINAL
+              </Button>
+            )}
+            
+            <Button 
+              onClick={resetFinalize}
+              variant="outline"
+              className="w-full text-zinc-400"
+            >
+              Back to Controls
+            </Button>
+          </div>
+        )}
+        
+        {!showFinalize && (
+          <Button onClick={onClose} variant="outline" className="w-full mt-4 text-zinc-400">
+            Close
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+};
+
 // Substitution Dialog Component
 const SubstitutionDialog = ({ isOpen, onClose, player, roster, onSubstitute }) => {
   const [subType, setSubType] = useState(null); // 'offensive', 'defensive', 'both'
