@@ -163,7 +163,11 @@ export default function NewGame({ user, onLogout }) {
       toast.success("Game started!");
       // Navigate based on sport and mode
       if (selectedSport === "football") {
-        navigate(`/football/${res.data.id}`);
+        if (statMode === "simple") {
+          navigate(`/football/${res.data.id}/simple`);
+        } else {
+          navigate(`/football/${res.data.id}`);
+        }
       } else if (selectedSport === "baseball") {
         navigate(`/baseball/${res.data.id}`);
       } else if (statMode === "advanced") {
