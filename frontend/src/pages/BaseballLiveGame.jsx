@@ -850,6 +850,30 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     toast.success("Starters configured! Game is ready.");
   };
   
+  // Helper function to add a play to the log (with deduplication)
+  const addPlay = useCallback((inning, inningHalf, description) => {
+    playCounterRef.current += 1;
+    const playId = `play_${Date.now()}_${playCounterRef.current}`;
+    
+    // Prevent duplicate plays (e.g., from React strict mode double renders)
+    if (lastPlayIdRef.current === description) {
+      return;
+    }
+    lastPlayIdRef.current = description;
+    
+    setPlayByPlay(plays => [{
+      id: playId,
+      inning: `${inning}${inningHalf === 'top' ? '▲' : '▼'}`,
+      description,
+      timestamp: new Date().toISOString()
+    }, ...plays]);
+    
+    // Reset the duplicate check after a short delay
+    setTimeout(() => {
+      lastPlayIdRef.current = null;
+    }, 100);
+  }, []);
+  
   // Handle pitch result
   const handlePitchResult = useCallback((resultType) => {
     if (resultType === "in_play") {
@@ -857,107 +881,102 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       return;
     }
     
-    setGame(prev => {
-      if (!prev) return prev;
-      
-      let newBalls = prev.balls;
-      let newStrikes = prev.strikes;
-      let newOuts = prev.outs;
-      let newInningHalf = prev.inning_half;
-      let newInning = prev.current_inning;
-      let description = "";
-      
-      switch (resultType) {
-        case "ball":
-          newBalls = prev.balls + 1;
-          if (newBalls >= 4) {
-            // Walk
-            description = `Walk to #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-            newBalls = 0;
-            newStrikes = 0;
-            // TODO: Advance runner, move to next batter
-            setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
-          } else {
-            description = `Ball ${newBalls}`;
-          }
-          break;
-          
-        case "strike_swinging":
-        case "strike_looking":
-          newStrikes = prev.strikes + 1;
-          if (newStrikes >= 3) {
-            // Strikeout
-            description = `Strikeout ${resultType === "strike_swinging" ? "(swinging)" : "(looking)"} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-            newStrikes = 0;
-            newBalls = 0;
-            newOuts = prev.outs + 1;
-            setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
-          } else {
-            description = `Strike ${newStrikes} (${resultType === "strike_swinging" ? "swinging" : "looking"})`;
-          }
-          break;
-          
-        case "foul":
-          if (prev.strikes < 2) {
-            newStrikes = prev.strikes + 1;
-          }
-          description = `Foul ball (${newStrikes}-${newBalls})`;
-          break;
-          
-        case "hbp":
-          description = `Hit by pitch - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+    // Get current game state for the play description
+    const currentGame = game;
+    if (!currentGame) return;
+    
+    let newBalls = currentGame.balls;
+    let newStrikes = currentGame.strikes;
+    let newOuts = currentGame.outs;
+    let newInningHalf = currentGame.inning_half;
+    let newInning = currentGame.current_inning;
+    let description = "";
+    let shouldAdvanceBatter = false;
+    
+    switch (resultType) {
+      case "ball":
+        newBalls = currentGame.balls + 1;
+        if (newBalls >= 4) {
+          description = `Walk to #${currentBatter?.player_number} ${currentBatter?.player_name}`;
           newBalls = 0;
           newStrikes = 0;
-          // TODO: Advance runner
-          setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
-          break;
-          
-        case "intentional_walk":
-          description = `Intentional walk - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
-          newBalls = 0;
+          shouldAdvanceBatter = true;
+        } else {
+          description = `Ball ${newBalls} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        }
+        break;
+        
+      case "strike_swinging":
+      case "strike_looking":
+        newStrikes = currentGame.strikes + 1;
+        if (newStrikes >= 3) {
+          description = `Strikeout ${resultType === "strike_swinging" ? "(swinging)" : "(looking)"} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
           newStrikes = 0;
-          // TODO: Advance runner
-          setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
-          break;
-          
-        default:
-          break;
-      }
-      
-      // Check for end of half inning
-      if (newOuts >= 3) {
-        newOuts = 0;
+          newBalls = 0;
+          newOuts = currentGame.outs + 1;
+          shouldAdvanceBatter = true;
+        } else {
+          description = `Strike ${newStrikes} (${resultType === "strike_swinging" ? "swinging" : "looking"}) - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        }
+        break;
+        
+      case "foul":
+        if (currentGame.strikes < 2) {
+          newStrikes = currentGame.strikes + 1;
+        }
+        description = `Foul ball (${newStrikes}-${newBalls}) - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        break;
+        
+      case "hbp":
+        description = `Hit by pitch - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newBalls = 0;
         newStrikes = 0;
-        if (newInningHalf === "top") {
-          newInningHalf = "bottom";
-        } else {
-          newInningHalf = "top";
-          newInning = prev.current_inning + 1;
-        }
-        description += " - Side retired";
-        setCurrentBatterIndex(0);
+        shouldAdvanceBatter = true;
+        break;
+        
+      case "intentional_walk":
+        description = `Intentional walk - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        newBalls = 0;
+        newStrikes = 0;
+        shouldAdvanceBatter = true;
+        break;
+        
+      default:
+        break;
+    }
+    
+    // Check for end of half inning
+    if (newOuts >= 3) {
+      newOuts = 0;
+      newBalls = 0;
+      newStrikes = 0;
+      if (newInningHalf === "top") {
+        newInningHalf = "bottom";
+      } else {
+        newInningHalf = "top";
+        newInning = currentGame.current_inning + 1;
       }
-      
-      // Add to play by play
-      if (description) {
-        setPlayByPlay(plays => [{
-          inning: `${prev.current_inning}${prev.inning_half === 'top' ? '▲' : '▼'}`,
-          description,
-          timestamp: new Date().toISOString()
-        }, ...plays]);
-      }
-      
-      return {
-        ...prev,
-        balls: newBalls,
-        strikes: newStrikes,
-        outs: newOuts,
-        inning_half: newInningHalf,
-        current_inning: newInning
-      };
-    });
-  }, [currentBatter, battingRoster.length]);
+      description += " - Side retired";
+      setCurrentBatterIndex(0);
+    } else if (shouldAdvanceBatter) {
+      setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
+    }
+    
+    // Add play to log
+    if (description) {
+      addPlay(currentGame.current_inning, currentGame.inning_half, description);
+    }
+    
+    // Update game state
+    setGame(prev => ({
+      ...prev,
+      balls: newBalls,
+      strikes: newStrikes,
+      outs: newOuts,
+      inning_half: newInningHalf,
+      current_inning: newInning
+    }));
+  }, [game, currentBatter, battingRoster.length, addPlay]);
   
   // Handle in-play result
   const handleInPlayResult = useCallback((resultType) => {
