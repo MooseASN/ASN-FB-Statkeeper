@@ -1169,7 +1169,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
           <DialogHeader><DialogTitle>Rush Play</DialogTitle></DialogHeader>
           {workflowStep === 1 && (
-            <PlayerNumberInput roster={offenseRoster || []} onSelect={handleRushPlayerSelect} onCancel={closeWorkflow} title="Select Ball Carrier" />
+            <PlayerNumberInput roster={offenseRoster || []} onSelect={handleRushPlayerSelect} onCancel={closeWorkflow} title="Select Ball Carrier" onAddPlayer={addToOffenseRoster} teamName={offenseTeamName} />
           )}
           {workflowStep === 2 && (
             <YardsInput onSubmit={handleRushYards} onCancel={closeWorkflow} title={`Rushing Yards for #${workflowData.rusher?.player_number}`} />
@@ -1185,13 +1185,13 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
           <DialogHeader><DialogTitle>Pass Play</DialogTitle></DialogHeader>
           {workflowStep === 1 && (
-            <PlayerNumberInput roster={offenseRoster || []} onSelect={handlePassQBSelect} onCancel={closeWorkflow} title="Select Quarterback" rememberOption={true} rememberedPlayer={rememberedQB} onRememberChange={setRememberedQB} />
+            <PlayerNumberInput roster={offenseRoster || []} onSelect={handlePassQBSelect} onCancel={closeWorkflow} title="Select Quarterback" rememberOption={true} rememberedPlayer={rememberedQB} onRememberChange={setRememberedQB} onAddPlayer={addToOffenseRoster} teamName={offenseTeamName} />
           )}
           {workflowStep === 2 && (
             <YardsInput onSubmit={handlePassYards} onCancel={closeWorkflow} title={`Passing Yards from #${workflowData.qb?.player_number}`} />
           )}
           {workflowStep === 3 && (
-            <PlayerNumberInput roster={offenseRoster || []} onSelect={handlePassReceiverSelect} onCancel={closeWorkflow} title="Select Receiver" />
+            <PlayerNumberInput roster={offenseRoster || []} onSelect={handlePassReceiverSelect} onCancel={closeWorkflow} title="Select Receiver" onAddPlayer={addToOffenseRoster} teamName={offenseTeamName} />
           )}
           {workflowStep === 4 && (
             <TacklerSelect roster={defenseRoster || []} onSelect={handlePassTackler} onNoTackle={() => handlePassTackler(null)} onCancel={closeWorkflow} title="Select Tackler" />
@@ -1204,7 +1204,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
           <DialogHeader><DialogTitle>Field Goal</DialogTitle></DialogHeader>
           {workflowStep === 1 && (
-            <PlayerNumberInput roster={offenseRoster || []} onSelect={handleFGKickerSelect} onCancel={closeWorkflow} title="Select Kicker" />
+            <PlayerNumberInput roster={offenseRoster || []} onSelect={handleFGKickerSelect} onCancel={closeWorkflow} title="Select Kicker" onAddPlayer={addToOffenseRoster} teamName={offenseTeamName} />
           )}
           {workflowStep === 2 && (
             <div className="space-y-4">
