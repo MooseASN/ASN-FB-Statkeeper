@@ -449,6 +449,45 @@ export default function AdminDashboard({ user, onLogout }) {
               )}
             </div>
             
+            {/* Baseball Beta */}
+            <div className="p-4 border rounded-lg space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="text-2xl">⚾</span>
+                  <div>
+                    <Label className="text-base font-medium">Baseball Beta Mode</Label>
+                    <p className="text-sm text-muted-foreground">Require password to access Baseball</p>
+                  </div>
+                </div>
+                <Switch
+                  checked={betaSettings.baseball_beta}
+                  onCheckedChange={(checked) => setBetaSettings(prev => ({ ...prev, baseball_beta: checked }))}
+                  data-testid="baseball-beta-toggle"
+                />
+              </div>
+              {betaSettings.baseball_beta && (
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      type={showBaseballPassword ? "text" : "password"}
+                      placeholder="Enter beta password for Baseball"
+                      value={betaSettings.baseball_password}
+                      onChange={(e) => setBetaSettings(prev => ({ ...prev, baseball_password: e.target.value }))}
+                      className="pr-10"
+                      data-testid="baseball-password-input"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowBaseballPassword(!showBaseballPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showBaseballPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+            
             {/* School Creation Beta */}
             <div className="p-4 border rounded-lg space-y-4">
               <div className="flex items-center justify-between">
