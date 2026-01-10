@@ -2367,15 +2367,15 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         possession="home",  # Default possession to home team
         note=game_data.note,  # Game note/description
         sport=game_data.sport,  # Pass the sport from the request!
-        # Baseball-specific initialization
+        # Baseball-specific initialization - use defaults if not baseball
         total_innings=game_data.total_innings if game_data.sport == "baseball" else 9,
-        current_inning=1 if game_data.sport == "baseball" else None,
-        inning_half="top" if game_data.sport == "baseball" else None,
-        balls=0 if game_data.sport == "baseball" else None,
-        strikes=0 if game_data.sport == "baseball" else None,
-        outs=0 if game_data.sport == "baseball" else None,
-        bases={"first": False, "second": False, "third": False} if game_data.sport == "baseball" else None,
-        inning_scores={"home": [], "away": []} if game_data.sport == "baseball" else None
+        current_inning=1,
+        inning_half="top",
+        balls=0,
+        strikes=0,
+        outs=0,
+        bases={"first": False, "second": False, "third": False},
+        inning_scores={"home": [], "away": []}
     )
     game.user_id = user.user_id
     
