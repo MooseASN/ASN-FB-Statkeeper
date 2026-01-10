@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, User, Mail, Lock, Shield, Eye, EyeOff, Check, AlertCircle } from "lucide-react";
+import { ArrowLeft, User, Mail, Lock, Shield, Eye, EyeOff, Check, AlertCircle, Users, UserPlus, UserMinus, Share2 } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
