@@ -684,16 +684,23 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [showInPlayModal, setShowInPlayModal] = useState(false);
   const [activeStatsTab, setActiveStatsTab] = useState("home");
   
-  // Get current batting team's roster and stats
+  // Get current batting team's roster and stats (use configured batting order if available)
   const battingTeamIsHome = game?.inning_half === "bottom";
-  const battingRoster = battingTeamIsHome ? homeRoster : awayRoster;
+  const battingRoster = battingTeamIsHome 
+    ? (homeBattingOrder.length > 0 ? homeBattingOrder : homeRoster)
+    : (awayBattingOrder.length > 0 ? awayBattingOrder : awayRoster);
   const battingStats = battingTeamIsHome ? homeStats : awayStats;
   const pitchingRoster = battingTeamIsHome ? awayRoster : homeRoster;
   const pitchingStats = battingTeamIsHome ? awayStats : homeStats;
   
+  // Get current fielding team's defense (the team that's NOT batting)
+  const currentFieldingDefense = battingTeamIsHome ? awayDefense : homeDefense;
+  
   const currentBatter = battingRoster[currentBatterIndex];
   const currentBatterStats = battingStats.find(s => s.player_number === currentBatter?.player_number);
-  const currentPitcher = pitchingRoster[currentPitcherIndex];
+  const currentPitcher = currentFieldingDefense?.pitcher 
+    ? pitchingRoster.find(p => p.player_number === currentFieldingDefense.pitcher.number) 
+    : pitchingRoster[currentPitcherIndex];
   const currentPitcherStats = pitchingStats.find(s => s.player_number === currentPitcher?.player_number);
   
   // Fetch game data
