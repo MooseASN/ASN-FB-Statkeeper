@@ -1064,6 +1064,8 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
             onQuarterChange={handleQuarterChange} 
             onClockAdjust={(s) => setClockTime(p => Math.max(0, p + s))} 
             gameStatus={gameStatus}
+            clockEnabled={clockEnabled}
+            onToggleClockEnabled={() => setClockEnabled(p => !p)}
           />
           
           {/* Stats */}
