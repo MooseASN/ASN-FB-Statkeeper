@@ -28,7 +28,12 @@ import {
   ArrowLeft,
   Check,
   ArrowLeftRight,
-  Undo2
+  Undo2,
+  MoreVertical,
+  Trophy,
+  Radio,
+  FileDown,
+  Flag
 } from "lucide-react";
 import { X as XIcon } from "lucide-react";
 
