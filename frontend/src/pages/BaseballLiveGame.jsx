@@ -1415,7 +1415,16 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   // Get current fielding team's defense (the team that's NOT batting)
   const currentFieldingDefense = battingTeamIsHome ? awayDefense : homeDefense;
   
-  const currentBatter = battingRoster[currentBatterIndex];
+  // Get the correct batter index for the current batting team
+  const activeBatterIndex = battingTeamIsHome ? homeBatterIndex : awayBatterIndex;
+  const setActiveBatterIndex = battingTeamIsHome ? setHomeBatterIndex : setAwayBatterIndex;
+  
+  // Sync currentBatterIndex with the team-specific index
+  useEffect(() => {
+    setCurrentBatterIndex(activeBatterIndex);
+  }, [activeBatterIndex, battingTeamIsHome]);
+  
+  const currentBatter = battingRoster[activeBatterIndex];
   const currentBatterStats = battingStats.find(s => s.player_number === currentBatter?.player_number);
   const currentPitcher = currentFieldingDefense?.pitcher 
     ? pitchingRoster.find(p => p.player_number === currentFieldingDefense.pitcher.number) 
