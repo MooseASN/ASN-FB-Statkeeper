@@ -241,7 +241,7 @@ export default function SportSelection({ user, onLogout }) {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {/* Basketball Card */}
           <Card
             className={`group overflow-hidden border-2 transition-all duration-300 bg-slate-800/50 ${
@@ -343,6 +343,60 @@ export default function SportSelection({ user, onLogout }) {
                       <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Receiving</span>
                       <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Defense</span>
                       <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded-full">Special Teams</span>
+                    </div>
+                  </>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Baseball Card */}
+          <Card
+            className={`group overflow-hidden border-2 transition-all duration-300 bg-slate-800/50 ${
+              isSportLocked("baseball")
+                ? "cursor-pointer border-transparent hover:border-red-500/50 hover:bg-slate-800"
+                : "cursor-pointer border-transparent hover:border-red-500 hover:bg-slate-800"
+            }`}
+            onClick={() => handleSelectSport(SPORTS.BASEBALL)}
+          >
+            <CardContent className="p-0">
+              <div className={`bg-gradient-to-br ${SPORT_CONFIG.baseball.bgGradient} p-8 flex items-center justify-center relative`}>
+                <span className={`text-8xl transition-transform duration-300 ${isSportLocked("baseball") ? "" : "group-hover:scale-110"}`}>
+                  {SPORT_CONFIG.baseball.icon}
+                </span>
+                {isSportLocked("baseball") && (
+                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                    <div className="text-center">
+                      <Lock className="w-10 h-10 text-white/80 mx-auto mb-2" />
+                      <span className="text-white/80 text-sm font-medium">Beta Access</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              <div className="p-6 text-center">
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {SPORT_CONFIG.baseball.name}
+                </h2>
+                {isSportLocked("baseball") ? (
+                  <div className="py-2">
+                    <p className="text-amber-400 font-semibold mb-2">
+                      Beta Access Required
+                    </p>
+                    <p className="text-slate-500 text-sm">
+                      Click to enter beta password
+                    </p>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-slate-400 mb-4">
+                      {SPORT_CONFIG.baseball.description}
+                    </p>
+                    <div className="flex flex-wrap gap-2 justify-center text-xs">
+                      <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded-full">Batting</span>
+                      <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded-full">Pitching</span>
+                      <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded-full">Fielding</span>
+                      <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded-full">Runs</span>
+                      <span className="px-2 py-1 bg-red-500/20 text-red-400 rounded-full">RBIs</span>
                     </div>
                   </>
                 )}
