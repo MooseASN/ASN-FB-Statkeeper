@@ -1395,6 +1395,9 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [gameFinalized, setGameFinalized] = useState(false);
   const [gameResult, setGameResult] = useState(null);
   
+  // Inning/Score control modal state
+  const [showInningScoreModal, setShowInningScoreModal] = useState(false);
+  
   // Get current batting team's roster and stats (use configured batting order if available)
   const battingTeamIsHome = game?.inning_half === "bottom";
   const battingRoster = battingTeamIsHome 
