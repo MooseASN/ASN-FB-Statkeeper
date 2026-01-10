@@ -123,6 +123,7 @@ export default function TeamDetail({ user, onLogout }) {
         setTeamName(res.data.name);
         setTeamLogo(res.data.logo_url || "");
         setTeamColor(res.data.color || "#000000");
+        setTeamSport(res.data.sport || "basketball"); // CRITICAL: Store the team's sport
         setRoster(res.data.roster || []);
       } catch (error) {
         toast.error("Failed to load team");
@@ -141,6 +142,7 @@ export default function TeamDetail({ user, onLogout }) {
       setTeamName(res.data.name);
       setTeamLogo(res.data.logo_url || "");
       setTeamColor(res.data.color || "#000000");
+      setTeamSport(res.data.sport || "basketball"); // CRITICAL: Store the team's sport
       setRoster(res.data.roster || []);
     } catch (error) {
       toast.error("Failed to load team");
