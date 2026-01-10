@@ -41,6 +41,9 @@ import DemoLiveGameClassic from "@/pages/DemoLiveGameClassic";
 import DemoLiveGameAdvanced from "@/pages/DemoLiveGameAdvanced";
 import DemoLiveGameQuick from "@/pages/DemoLiveGameQuick";
 import DemoFootballLiveGame from "@/pages/DemoFootballLiveGame";
+// Payment pages
+import PricingPage from "@/pages/PricingPage";
+import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
