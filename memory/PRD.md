@@ -14,6 +14,62 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - SIMPLE FOOTBALL MODE ENHANCEMENTS ✅
+
+#### P0 Features Completed:
+
+**1. Back Button Navigation Fix ✅**
+- NewGame.jsx back button now navigates to /dashboard instead of home page
+- Works for all sports (basketball, football, baseball)
+
+**2. Simple Football UI Styling Updates ✅**
+- Scoring buttons (TD, XP, 2PT, FG, Safety): Dark grey background with white outline, larger text (text-3xl)
+- Stat buttons color-coded:
+  - Rush Yards: Emerald green (bg-emerald-700)
+  - Pass Yards: Blue (bg-blue-700)
+  - 1st Down: Amber (bg-amber-700)
+  - Turnover: Red (bg-red-700)
+  - Penalty: Orange (bg-orange-700)
+
+**3. Clock Controls Enhanced ✅**
+- Replaced ±10 second buttons with: +1s, -1s, +1m, -1m
+- Enlarged play/pause button (h-10 w-10)
+- Shows keyboard shortcut hint in header: "(Space/\ = Clock)"
+
+**4. Quarter/Game Flow Logic ✅**
+- End of Q2: Prompt with "Go to Halftime" or "Start 3rd Quarter"
+- After halftime: Browser confirm to reset timeouts
+- End of Q4: Prompt with "End Game (Final)" or "Start 1st Overtime"
+- All quarter advances require user confirmation
+- Game status states: 'in_progress', 'Halftime', 'Final'
+
+**5. Enhanced Turnover Workflows ✅**
+- **Interception**: Step 1 (Select type) → Step 2 (Who threw it - offense) → Step 3 (Who intercepted - defense)
+- **Fumble**: Step 1 (Select type) → Step 2 (Who fumbled - offense) → Step 3 (Who recovered - can be either team)
+- **Turnover on Downs**: One-click, no player selection needed
+
+**6. Keyboard Shortcuts ✅**
+- Spacebar: Toggle clock start/stop (both Simple and Advanced modes)
+- Backslash (\): Toggle clock start/stop (both Simple and Advanced modes)
+- Added to both SimpleFootballLiveGame.jsx and FootballLiveGame.jsx
+- Help dialog in Advanced mode updated to show both shortcuts
+
+#### P1 Features Completed:
+
+**7. Football Stat Mode Selector on Game Creation ✅**
+- NewGame.jsx shows Simple vs Advanced mode selector for football
+- Simple mode: Orange border when selected, shows feature list
+- Advanced mode: Green border when selected (default), shows feature list
+- Navigation routes:
+  - Simple mode → `/football/{id}/simple`
+  - Advanced mode → `/football/{id}`
+
+**Backend Fix Applied:**
+- server.py lines 2371-2378: Baseball-specific fields now have proper defaults (not None) for all sports
+- Fixes Pydantic validation error when creating football/basketball games
+
+**Testing:** 14/14 features passed (100% success rate)
+
 ### January 2026 - SIMPLE FOOTBALL STAT-TRACKING MODE v2 ✅
 
 #### SimpleFootballLiveGame.jsx - REDESIGNED ✅
