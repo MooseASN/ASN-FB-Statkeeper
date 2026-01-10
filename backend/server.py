@@ -908,6 +908,11 @@ async def check_admin_status(user: User = Depends(get_current_user)):
 # ============ BETA MODE SETTINGS ============
 
 class BetaModeSettings(BaseModel):
+    # Site-wide beta mode
+    site_beta_enabled: bool = False
+    site_beta_message: str = "StatMoose is currently in private beta. Contact the administrator for access."
+    allowed_emails: List[str] = []
+    # Sport-specific beta (existing)
     basketball_beta: bool = False
     basketball_password: str = ""
     football_beta: bool = False
@@ -923,6 +928,9 @@ async def get_beta_settings(admin: User = Depends(get_admin_user)):
     settings = await db.settings.find_one({"type": "beta_mode"}, {"_id": 0})
     if not settings:
         return {
+            "site_beta_enabled": False,
+            "site_beta_message": "StatMoose is currently in private beta. Contact the administrator for access.",
+            "allowed_emails": [],
             "basketball_beta": False,
             "basketball_password": "",
             "football_beta": False,
@@ -933,6 +941,9 @@ async def get_beta_settings(admin: User = Depends(get_admin_user)):
             "school_creation_password": ""
         }
     return {
+        "site_beta_enabled": settings.get("site_beta_enabled", False),
+        "site_beta_message": settings.get("site_beta_message", "StatMoose is currently in private beta. Contact the administrator for access."),
+        "allowed_emails": settings.get("allowed_emails", []),
         "basketball_beta": settings.get("basketball_beta", False),
         "basketball_password": settings.get("basketball_password", ""),
         "football_beta": settings.get("football_beta", False),
@@ -950,6 +961,9 @@ async def update_beta_settings(settings: BetaModeSettings, admin: User = Depends
         {"type": "beta_mode"},
         {"$set": {
             "type": "beta_mode",
+            "site_beta_enabled": settings.site_beta_enabled,
+            "site_beta_message": settings.site_beta_message,
+            "allowed_emails": settings.allowed_emails,
             "basketball_beta": settings.basketball_beta,
             "basketball_password": settings.basketball_password,
             "football_beta": settings.football_beta,
@@ -963,6 +977,44 @@ async def update_beta_settings(settings: BetaModeSettings, admin: User = Depends
         upsert=True
     )
     return {"message": "Beta settings updated", "settings": settings.model_dump()}
+
+@api_router.get("/site-beta-status")
+async def get_site_beta_status():
+    """Get public site beta status (no auth required) - used by frontend to check if site is locked"""
+    settings = await db.settings.find_one({"type": "beta_mode"}, {"_id": 0})
+    if not settings:
+        return {
+            "site_beta_enabled": False,
+            "site_beta_message": ""
+        }
+    return {
+        "site_beta_enabled": settings.get("site_beta_enabled", False),
+        "site_beta_message": settings.get("site_beta_message", "StatMoose is currently in private beta.")
+    }
+
+@api_router.get("/check-beta-access")
+async def check_beta_access(user: User = Depends(get_current_user)):
+    """Check if current user has beta access"""
+    settings = await db.settings.find_one({"type": "beta_mode"}, {"_id": 0})
+    
+    # If beta mode is not enabled, everyone has access
+    if not settings or not settings.get("site_beta_enabled", False):
+        return {"has_access": True, "reason": "beta_not_enabled"}
+    
+    # Admin always has access
+    if is_admin_user(user):
+        return {"has_access": True, "reason": "admin"}
+    
+    # Check if user email is in allowed list
+    allowed_emails = settings.get("allowed_emails", [])
+    if user.email.lower() in [e.lower() for e in allowed_emails]:
+        return {"has_access": True, "reason": "whitelisted"}
+    
+    return {
+        "has_access": False, 
+        "reason": "not_whitelisted",
+        "message": settings.get("site_beta_message", "")
+    }
 
 @api_router.get("/beta-status")
 async def get_beta_status():
