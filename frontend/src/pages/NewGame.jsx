@@ -238,7 +238,13 @@ export default function NewGame({ user, onLogout }) {
     <Layout user={user} onLogout={onLogout}>
       <div className="max-w-2xl mx-auto space-y-6" data-testid="new-game-page">
         <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/")} data-testid="back-btn">
+          <Button variant="ghost" size="icon" onClick={() => {
+            // Navigate to sport-specific dashboard
+            if (selectedSport === "football") navigate("/dashboard");
+            else if (selectedSport === "baseball") navigate("/dashboard");
+            else if (selectedSport === "basketball") navigate("/dashboard");
+            else navigate("/dashboard");
+          }} data-testid="back-btn">
             <ArrowLeft className="w-5 h-5" />
           </Button>
           <div>
