@@ -168,21 +168,17 @@ const BaseballDiamond = ({ bases, fieldingPositions }) => {
           top: '8%',
           left: '50%',
           transform: 'translateX(-50%)',
-          opacity: 0.12,
-          width: '35%',
+          opacity: 0.15,
+          width: '30%',
         }}
       >
         <img 
-          src="/statmoose-logo.png" 
+          src="/logo-white.png" 
           alt=""
           className="w-full h-auto"
-          style={{ filter: 'grayscale(100%) brightness(0.8)' }}
+          style={{ filter: 'brightness(1.2) contrast(0.8)' }}
           onError={(e) => { e.target.style.display = 'none'; }}
         />
-        {/* Fallback text logo if image doesn't load */}
-        <div className="text-center font-black text-4xl text-white tracking-wider" style={{ textShadow: '0 0 10px rgba(0,0,0,0.5)' }}>
-          STATMOOSE
-        </div>
       </div>
       
       {/* Warning track (darker ring around outfield) */}
