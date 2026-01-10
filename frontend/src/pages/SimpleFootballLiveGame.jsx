@@ -510,26 +510,6 @@ const GameClock = ({ quarter, clockTime, isRunning, onToggle, onQuarterChange, o
     </div>
   );
 };
-            <button 
-              onClick={() => onClockAdjust(1)} 
-              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
-              data-testid="clock-plus-1sec"
-            >
-              +1s
-            </button>
-            <button 
-              onClick={() => onClockAdjust(60)} 
-              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
-              data-testid="clock-plus-1min"
-            >
-              +1m
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
 
 // Quick Stats (Compact horizontal)
 const QuickStats = ({ homeStats, awayStats }) => (
