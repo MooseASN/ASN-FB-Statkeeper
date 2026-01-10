@@ -13,6 +13,32 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - GAME CONTROL & WRAP-UP BUTTONS ✅
+
+#### Two Control Buttons - COMPLETED ✅
+1. **Game Control** (Blue button)
+   - Opens modal to change inning and score
+   - Inning: "-/+" buttons and Top/Bottom toggle
+   - Score: "-/+" controls for each team with team colors
+   - "Apply Changes" button updates game state
+   - Changes are undoable via Undo button
+
+2. **Wrap-Up** (Amber button, becomes green "Game FINAL" when finalized)
+   - Live Stat Output (Coming Soon)
+   - PDF Box Score (Coming Soon)
+   - Finalize Game flow with pitcher selection
+
+#### Game Control Modal Features - COMPLETED ✅
+- **Inning selector**: Number with -/+ buttons
+- **Top/Bottom toggle**: Visual toggle buttons
+- **Team score controls**: Each team shows:
+  - Team color indicator
+  - Team name
+  - Current score with -/+ buttons
+- **Apply Changes**: Green button to save changes
+- **Toast notification**: "Game updated" on success
+- **Undo support**: Changes saved to undo history
+
 ### January 10, 2026 - GAME CONTROLS & FINALIZATION ✅
 
 #### Game Controls Button - COMPLETED ✅
