@@ -374,6 +374,8 @@ export default function SchoolDashboard() {
     
     if (selectedGame.sport === "football") {
       navigate(`/football/${selectedGame.id}`);
+    } else if (selectedGame.sport === "baseball") {
+      navigate(`/baseball/${selectedGame.id}`);
     } else if (gameSetup.statMode === "advanced") {
       navigate(`/game/${selectedGame.id}/advanced`);
     } else {
