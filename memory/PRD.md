@@ -13,6 +13,36 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - Major UI/UX Updates
+
+#### Navigation Fix - COMPLETED
+- **Home Button**: Now goes to `/dashboard` (sport's main page) instead of homepage
+- **StatMoose Logo**: Correctly goes to `/` (homepage) 
+- This ensures users stay within their sport context when navigating
+
+#### Baseball Field Image - UPDATED
+- Replaced SVG-based field with user-provided professional field image
+- URL: `https://customer-assets.emergentagent.com/job_baseball-tracker-2/artifacts/xsmgreca_Field.png`
+- Position labels (P, C, 1B, 2B, 3B, SS, LF, CF, RF) overlaid on field
+- Base runner indicators show when runners are on base
+
+#### Baseball Starter Configuration Dialog - COMPLETED
+- **4-Step Wizard** before game starts:
+  1. **Home Team Batting Order**: 9 dropdowns (positions 1-9) select from roster
+  2. **Home Team Defense**: 9 position dropdowns (P, C, 1B, 2B, 3B, SS, LF, CF, RF)
+  3. **Away Team Batting Order**: Same 9 dropdowns for away team
+  4. **Away Team Defense**: Same 9 position dropdowns
+- Progress bar shows current step
+- Players already selected are disabled in other dropdowns
+- "Lineups" button in header allows reconfiguring starters
+- **Dynamic Field Display**: Shows current fielding team's defensive positions
+
+#### Teams Page Improvements - COMPLETED
+- Added **Refresh Button** (🔄) to manually reload teams
+- Added visibility change listener to auto-refresh when tab becomes active
+- Added console logging for debugging team creation issues
+- Fixed data-testid consistency (`create-team-submit`)
+
 ### January 10, 2026 - Baseball Game Creation & Persistence COMPLETED
 
 #### Baseball Game Creation UI - FULLY FUNCTIONAL
