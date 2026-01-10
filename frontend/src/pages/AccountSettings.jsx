@@ -53,6 +53,7 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
 
   useEffect(() => {
     fetchProfile();
+    fetchSharedAccess();
   }, []);
 
   const fetchProfile = async () => {
