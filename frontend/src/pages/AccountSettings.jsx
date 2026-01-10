@@ -505,6 +505,122 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
           </CardContent>
         </Card>
 
+        {/* Shared Access */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Share2 className="w-5 h-5" />
+              Shared Access
+            </CardTitle>
+            <CardDescription>
+              Share your teams, games, and events with other StatMoose users
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Grant Access Section */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Grant Access to Another User</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Enter user's email address"
+                  value={newShareEmail}
+                  onChange={(e) => setNewShareEmail(e.target.value)}
+                  className="flex-1"
+                  disabled={sharingAccess}
+                />
+                <Button 
+                  onClick={handleGrantAccess} 
+                  disabled={sharingAccess || !newShareEmail.trim()}
+                >
+                  {sharingAccess ? (
+                    "Granting..."
+                  ) : (
+                    <>
+                      <UserPlus className="w-4 h-4 mr-2" />
+                      Grant Access
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Users you grant access to can view and manage all your teams, games, and events across all sports.
+              </p>
+            </div>
+            
+            {/* Users I've Shared With */}
+            {sharedAccessList.length > 0 && (
+              <div className="space-y-3 border-t pt-4">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Users with Access to My Data ({sharedAccessList.length})
+                </Label>
+                <div className="space-y-2">
+                  {sharedAccessList.map((access) => (
+                    <div 
+                      key={access.id} 
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border"
+                    >
+                      <div>
+                        <p className="font-medium">{access.shared_with_email}</p>
+                        {access.shared_with_username && (
+                          <p className="text-sm text-muted-foreground">@{access.shared_with_username}</p>
+                        )}
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRevokeAccess(access.id, access.shared_with_email)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <UserMinus className="w-4 h-4 mr-1" />
+                        Revoke
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+            
+            {/* Accounts I Have Access To */}
+            {receivedAccessList.length > 0 && (
+              <div className="space-y-3 border-t pt-4">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Share2 className="w-4 h-4" />
+                  Accounts I Have Access To ({receivedAccessList.length})
+                </Label>
+                <div className="space-y-2">
+                  {receivedAccessList.map((access) => (
+                    <div 
+                      key={access.id} 
+                      className="flex items-center justify-between p-3 bg-blue-50 rounded-lg border border-blue-200"
+                    >
+                      <div>
+                        <p className="font-medium text-blue-700">{access.owner_email}</p>
+                        {access.owner_username && (
+                          <p className="text-sm text-blue-500">@{access.owner_username}</p>
+                        )}
+                      </div>
+                      <span className="text-xs text-blue-600 bg-blue-100 px-2 py-1 rounded">
+                        Shared with me
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Teams, games, and events from these accounts will appear alongside your own data.
+                </p>
+              </div>
+            )}
+            
+            {sharedAccessList.length === 0 && receivedAccessList.length === 0 && !loadingSharedAccess && (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No shared access configured. Grant access to another user above, or ask another user to share their account with you.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Account Info */}
         <Card>
           <CardHeader>
