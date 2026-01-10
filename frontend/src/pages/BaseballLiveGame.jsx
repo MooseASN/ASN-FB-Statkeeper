@@ -1198,6 +1198,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             <BaseballDiamond 
               bases={game?.bases}
               fieldingPositions={currentFieldingDefense}
+              fieldingTeamColor={battingTeamIsHome ? game?.away_team_color : game?.home_team_color}
+              battingTeamColor={battingTeamIsHome ? game?.home_team_color : game?.away_team_color}
             />
           </div>
           
