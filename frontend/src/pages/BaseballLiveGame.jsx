@@ -1016,6 +1016,9 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const [homeErrors, setHomeErrors] = useState(0);
   const [awayErrors, setAwayErrors] = useState(0);
   
+  // Undo history - stores snapshots of the full game state
+  const [undoHistory, setUndoHistory] = useState([]);
+  
   // Get current batting team's roster and stats (use configured batting order if available)
   const battingTeamIsHome = game?.inning_half === "bottom";
   const battingRoster = battingTeamIsHome 
