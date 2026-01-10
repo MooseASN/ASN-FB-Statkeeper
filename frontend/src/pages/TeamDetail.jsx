@@ -359,14 +359,77 @@ export default function TeamDetail({ user, onLogout }) {
                 />
               </div>
               <div>
-                <Label htmlFor="teamLogo">Logo URL</Label>
-                <Input
-                  id="teamLogo"
-                  value={teamLogo}
-                  onChange={(e) => setTeamLogo(e.target.value)}
-                  placeholder="https://example.com/logo.png"
-                  data-testid="edit-team-logo"
-                />
+                <Label htmlFor="teamLogo">Team Logo</Label>
+                <div className="flex items-center gap-4 mt-2">
+                  {/* Logo Preview */}
+                  <div className="relative">
+                    {teamLogo ? (
+                      <img 
+                        src={teamLogo} 
+                        alt="Team Logo" 
+                        className="w-20 h-20 rounded-lg object-contain border border-slate-200 bg-white"
+                        data-testid="logo-preview"
+                      />
+                    ) : (
+                      <div 
+                        className="w-20 h-20 rounded-lg flex items-center justify-center text-white font-bold text-2xl"
+                        style={{ backgroundColor: teamColor || '#000000' }}
+                      >
+                        {teamName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Upload Controls */}
+                  <div className="flex-1 space-y-2">
+                    <div className="flex gap-2">
+                      <input
+                        type="file"
+                        id="logoUpload"
+                        onChange={handleLogoUpload}
+                        accept="image/png,image/jpeg,image/gif,image/webp"
+                        className="hidden"
+                        data-testid="logo-file-input"
+                      />
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => document.getElementById('logoUpload').click()}
+                        disabled={uploadingLogo}
+                        data-testid="upload-logo-btn"
+                      >
+                        {uploadingLogo ? (
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        ) : (
+                          <Upload className="w-4 h-4 mr-2" />
+                        )}
+                        Upload Image
+                      </Button>
+                      {teamLogo && (
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => setTeamLogo("")}
+                          className="text-red-500 hover:text-red-600"
+                          data-testid="remove-logo-btn"
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      PNG, JPG, GIF or WEBP. Max 5MB.
+                    </p>
+                    <Input
+                      id="teamLogo"
+                      value={teamLogo}
+                      onChange={(e) => setTeamLogo(e.target.value)}
+                      placeholder="Or paste image URL..."
+                      className="text-sm"
+                      data-testid="edit-team-logo"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div>
