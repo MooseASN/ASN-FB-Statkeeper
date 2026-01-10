@@ -1899,7 +1899,12 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         newInning = currentGame.current_inning + 1;
       }
       description += " - Side retired";
-      setCurrentBatterIndex(0);
+      // Reset the OTHER team's batter to lead-off (the new batting team)
+      if (newInningHalf === 'top') {
+        setAwayBatterIndex(0);
+      } else {
+        setHomeBatterIndex(0);
+      }
       // Clear bases on inning end
       setGame(prev => ({ ...prev, bases: { first: null, second: null, third: null } }));
     } else if (shouldAdvanceBatter) {
@@ -1909,7 +1914,12 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       } else if (resultType === "hbp" || resultType === "intentional_walk") {
         advanceRunners('walk', currentBatter?.player_number, currentBatter?.player_name);
       }
-      setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
+      // Advance the CURRENT batting team's batter index
+      if (battingTeamIsHome) {
+        setHomeBatterIndex(i => (i + 1) % battingRoster.length);
+      } else {
+        setAwayBatterIndex(i => (i + 1) % battingRoster.length);
+      }
     }
     
     // Update stats
