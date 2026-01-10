@@ -2549,6 +2549,266 @@ async def reset_game_stats(game_id: str, user: User = Depends(get_current_user))
     
     return {"message": "All stats reset successfully"}
 
+# Baseball Box Score PDF Generation
+@api_router.get("/games/{game_id}/boxscore/pdf")
+async def generate_baseball_boxscore_pdf(game_id: str, user: User = Depends(get_current_user)):
+    """Generate a PDF box score for a baseball game"""
+    game = await db.games.find_one({"id": game_id}, {"_id": 0})
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found")
+    
+    # Create PDF buffer
+    buffer = io.BytesIO()
+    
+    # Use landscape letter size to fit more content
+    doc = SimpleDocTemplate(
+        buffer, 
+        pagesize=letter,
+        rightMargin=36,
+        leftMargin=36,
+        topMargin=36,
+        bottomMargin=36
+    )
+    
+    # Get styles
+    styles = getSampleStyleSheet()
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Title'],
+        fontSize=14,
+        spaceAfter=6,
+        alignment=1  # Center
+    )
+    subtitle_style = ParagraphStyle(
+        'Subtitle',
+        parent=styles['Normal'],
+        fontSize=10,
+        spaceAfter=12,
+        alignment=1  # Center
+    )
+    section_style = ParagraphStyle(
+        'Section',
+        parent=styles['Heading2'],
+        fontSize=10,
+        spaceAfter=4,
+        spaceBefore=8
+    )
+    
+    elements = []
+    
+    # Title
+    away_name = game.get('away_team_name', 'Away Team')
+    home_name = game.get('home_team_name', 'Home Team')
+    away_score = game.get('away_score', 0)
+    home_score = game.get('home_score', 0)
+    
+    title_text = f"{away_name} vs {home_name}"
+    elements.append(Paragraph(title_text, title_style))
+    
+    # Date and location
+    game_date = game.get('date', '')
+    if game_date:
+        try:
+            dt = datetime.fromisoformat(game_date.replace('Z', '+00:00'))
+            game_date = dt.strftime('%B %d, %Y')
+        except:
+            pass
+    
+    location = game.get('location', '')
+    subtitle = f"{game_date}" + (f" at {location}" if location else "")
+    elements.append(Paragraph(subtitle, subtitle_style))
+    
+    # Final Score
+    status = game.get('status', 'in_progress')
+    score_text = f"<b>{'FINAL' if status == 'final' else 'In Progress'}: {away_name} {away_score} - {home_score} {home_name}</b>"
+    elements.append(Paragraph(score_text, subtitle_style))
+    elements.append(Spacer(1, 8))
+    
+    # Score by Innings Table
+    innings = list(range(1, max(10, (game.get('current_inning', 9) or 9) + 1)))
+    inning_scores = game.get('inning_scores', {})
+    
+    header_row = ['Team'] + [str(i) for i in innings] + ['R', 'H', 'E']
+    away_row = [away_name[:12]]
+    home_row = [home_name[:12]]
+    
+    for inning in innings:
+        away_row.append(str(inning_scores.get(f'away_{inning}', 0)))
+        home_row.append(str(inning_scores.get(f'home_{inning}', 0)))
+    
+    away_row.extend([str(away_score), str(game.get('away_hits', 0)), str(game.get('away_errors', 0))])
+    home_row.extend([str(home_score), str(game.get('home_hits', 0)), str(game.get('home_errors', 0))])
+    
+    innings_table = Table([header_row, away_row, home_row], repeatRows=1)
+    innings_table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, -1), 8),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 4),
+        ('TOPPADDING', (0, 0), (-1, 0), 4),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+        ('BACKGROUND', (-3, 0), (-1, -1), colors.lightgrey),
+    ]))
+    elements.append(innings_table)
+    elements.append(Spacer(1, 12))
+    
+    # Helper function to create batting table
+    def create_batting_table(team_name, roster, stats):
+        elements.append(Paragraph(f"{team_name} - Batting", section_style))
+        
+        header = ['Player', 'Pos', 'AB', 'R', 'H', 'RBI', 'BB', 'SO']
+        rows = [header]
+        
+        totals = {'ab': 0, 'r': 0, 'h': 0, 'rbi': 0, 'bb': 0, 'so': 0}
+        
+        for player in (roster or []):
+            p_num = player.get('player_number', '')
+            p_name = player.get('player_name', '')[:15]
+            p_pos = player.get('position', '-')
+            
+            # Find stats for this player
+            p_stats = next((s for s in (stats or []) if s.get('player_number') == p_num), {})
+            
+            ab = p_stats.get('at_bats', 0)
+            r = p_stats.get('runs', 0)
+            h = p_stats.get('hits', 0)
+            rbi = p_stats.get('rbis', 0)
+            bb = p_stats.get('walks', 0)
+            so = p_stats.get('strikeouts_batting', 0)
+            
+            totals['ab'] += ab
+            totals['r'] += r
+            totals['h'] += h
+            totals['rbi'] += rbi
+            totals['bb'] += bb
+            totals['so'] += so
+            
+            rows.append([f"#{p_num} {p_name}", p_pos, str(ab), str(r), str(h), str(rbi), str(bb), str(so)])
+        
+        rows.append(['Totals', '', str(totals['ab']), str(totals['r']), str(totals['h']), 
+                     str(totals['rbi']), str(totals['bb']), str(totals['so'])])
+        
+        col_widths = [140, 30, 25, 25, 25, 25, 25, 25]
+        table = Table(rows, colWidths=col_widths, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkblue),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 3),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ]))
+        return table
+    
+    # Helper function to create pitching table
+    def create_pitching_table(team_name, roster, stats):
+        elements.append(Paragraph(f"{team_name} - Pitching", section_style))
+        
+        # Filter to only pitchers
+        pitcher_stats = [s for s in (stats or []) if s.get('pitches_thrown', 0) > 0 or s.get('innings_pitched', 0) > 0]
+        
+        if not pitcher_stats:
+            return Paragraph("No pitching stats recorded", styles['Normal'])
+        
+        header = ['Player', 'IP', 'H', 'R', 'ER', 'BB', 'SO', 'NP']
+        rows = [header]
+        
+        totals = {'ip': 0, 'h': 0, 'r': 0, 'er': 0, 'bb': 0, 'so': 0, 'np': 0}
+        
+        for p_stats in pitcher_stats:
+            p_num = p_stats.get('player_number', '')
+            player = next((p for p in (roster or []) if p.get('player_number') == p_num), {})
+            p_name = player.get('player_name', 'Unknown')[:15]
+            
+            ip = p_stats.get('innings_pitched', 0)
+            h = p_stats.get('hits_allowed', 0)
+            r = p_stats.get('runs_allowed', 0)
+            er = p_stats.get('earned_runs', 0)
+            bb = p_stats.get('walks_allowed', 0)
+            so = p_stats.get('strikeouts_pitching', 0)
+            np = p_stats.get('pitches_thrown', 0)
+            
+            totals['ip'] += ip
+            totals['h'] += h
+            totals['r'] += r
+            totals['er'] += er
+            totals['bb'] += bb
+            totals['so'] += so
+            totals['np'] += np
+            
+            rows.append([f"#{p_num} {p_name}", str(ip) if ip else '-', str(h), str(r), str(er), str(bb), str(so), str(np)])
+        
+        rows.append(['Totals', str(totals['ip']), str(totals['h']), str(totals['r']), 
+                     str(totals['er']), str(totals['bb']), str(totals['so']), str(totals['np'])])
+        
+        col_widths = [140, 30, 25, 25, 25, 25, 25, 30]
+        table = Table(rows, colWidths=col_widths, repeatRows=1)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.darkred),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, -1), 7),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 3),
+            ('BACKGROUND', (0, -1), (-1, -1), colors.lightgrey),
+            ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ]))
+        return table
+    
+    # Away Team Batting
+    away_batting = create_batting_table(away_name, game.get('away_roster'), game.get('away_player_stats'))
+    elements.append(away_batting)
+    elements.append(Spacer(1, 6))
+    
+    # Home Team Batting
+    home_batting = create_batting_table(home_name, game.get('home_roster'), game.get('home_player_stats'))
+    elements.append(home_batting)
+    elements.append(Spacer(1, 6))
+    
+    # Away Team Pitching
+    away_pitching = create_pitching_table(away_name, game.get('away_roster'), game.get('away_player_stats'))
+    elements.append(away_pitching)
+    elements.append(Spacer(1, 6))
+    
+    # Home Team Pitching
+    home_pitching = create_pitching_table(home_name, game.get('home_roster'), game.get('home_player_stats'))
+    elements.append(home_pitching)
+    elements.append(Spacer(1, 8))
+    
+    # Win/Loss/Save info
+    if status == 'final':
+        game_result = []
+        if game.get('winning_pitcher'):
+            game_result.append(f"W: #{game.get('winning_pitcher')}")
+        if game.get('losing_pitcher'):
+            game_result.append(f"L: #{game.get('losing_pitcher')}")
+        if game.get('saving_pitcher'):
+            game_result.append(f"S: #{game.get('saving_pitcher')}")
+        if game_result:
+            elements.append(Paragraph(" | ".join(game_result), styles['Normal']))
+    
+    # Build PDF
+    doc.build(elements)
+    buffer.seek(0)
+    
+    # Return PDF as response
+    filename = f"boxscore_{away_name}_vs_{home_name}.pdf".replace(' ', '_')
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
+    )
+
 # Clock Control Endpoints
 class ClockUpdate(BaseModel):
     time: Optional[int] = None  # Time in seconds
