@@ -888,17 +888,17 @@ const InPlayModal = ({ isOpen, onClose, onResult }) => {
 
 // Stats Tabs Component
 // Team Stats Summary Component - Compact version showing real stats
-const TeamStatsSummary = ({ homeStats, awayStats, homeTeamName, awayTeamName }) => {
+// Team Stats Summary Component - Shows R, H, E, SO, BB
+const TeamStatsSummary = ({ homeStats, awayStats, homeTeamName, awayTeamName, homeErrors = 0, awayErrors = 0 }) => {
   // Calculate team totals
   const calcTotals = (stats) => {
-    if (!stats || stats.length === 0) return { hits: 0, at_bats: 0, runs: 0, strikeouts: 0, walks: 0 };
+    if (!stats || stats.length === 0) return { runs: 0, hits: 0, strikeouts: 0, walks: 0 };
     return stats.reduce((acc, player) => ({
-      hits: acc.hits + (player.hits || 0),
-      at_bats: acc.at_bats + (player.at_bats || 0),
       runs: acc.runs + (player.runs || 0),
+      hits: acc.hits + (player.hits || 0),
       strikeouts: acc.strikeouts + (player.strikeouts_batting || 0),
       walks: acc.walks + (player.walks || 0),
-    }), { hits: 0, at_bats: 0, runs: 0, strikeouts: 0, walks: 0 });
+    }), { runs: 0, hits: 0, strikeouts: 0, walks: 0 });
   };
   
   const homeTotals = calcTotals(homeStats);
@@ -912,25 +912,25 @@ const TeamStatsSummary = ({ homeStats, awayStats, homeTeamName, awayTeamName }) 
       <div className="p-2 text-xs">
         <div className="grid grid-cols-6 gap-1 text-center text-zinc-400 mb-1">
           <div></div>
-          <div>H</div>
-          <div>AB</div>
           <div>R</div>
-          <div>K</div>
+          <div>H</div>
+          <div>E</div>
+          <div>SO</div>
           <div>BB</div>
         </div>
         <div className="grid grid-cols-6 gap-1 text-center text-white mb-1">
           <div className="text-left truncate text-zinc-300">{homeTeamName?.slice(0, 8)}</div>
+          <div className="text-green-400 font-bold">{homeTotals.runs}</div>
           <div>{homeTotals.hits}</div>
-          <div>{homeTotals.at_bats}</div>
-          <div>{homeTotals.runs}</div>
+          <div className="text-red-400">{homeErrors}</div>
           <div>{homeTotals.strikeouts}</div>
           <div>{homeTotals.walks}</div>
         </div>
         <div className="grid grid-cols-6 gap-1 text-center text-white">
           <div className="text-left truncate text-zinc-300">{awayTeamName?.slice(0, 8)}</div>
+          <div className="text-green-400 font-bold">{awayTotals.runs}</div>
           <div>{awayTotals.hits}</div>
-          <div>{awayTotals.at_bats}</div>
-          <div>{awayTotals.runs}</div>
+          <div className="text-red-400">{awayErrors}</div>
           <div>{awayTotals.strikeouts}</div>
           <div>{awayTotals.walks}</div>
         </div>
