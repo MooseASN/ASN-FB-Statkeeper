@@ -33,7 +33,9 @@ import {
   ChevronUp,
   ChevronDown,
   Check,
-  X
+  X,
+  Plus,
+  Minus
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
@@ -328,37 +330,96 @@ const TeamScoreCard = ({ teamName, teamColor, score, hasPossession, timeouts, on
   </div>
 );
 
-// Compact Game Clock
-const GameClock = ({ quarter, clockTime, isRunning, onToggle, onQuarterChange, onClockAdjust }) => {
+// Compact Game Clock with enhanced controls
+const GameClock = ({ quarter, clockTime, isRunning, onToggle, onQuarterChange, onClockAdjust, gameStatus }) => {
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
   
-  const quarterLabels = ['1st', '2nd', '3rd', '4th', 'OT'];
+  const getQuarterLabel = () => {
+    if (gameStatus === 'Halftime') return 'HALF';
+    if (gameStatus === 'Final') return 'FINAL';
+    if (quarter >= 5) return `${quarter - 4}OT`;
+    return ['1st', '2nd', '3rd', '4th'][quarter - 1] || '1st';
+  };
   
   return (
     <div className="bg-zinc-900 rounded-xl p-3 text-center border border-zinc-700">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
+        {/* Quarter Control */}
         <div className="flex items-center gap-1">
-          <button onClick={() => onQuarterChange(-1)} className="text-zinc-500 hover:text-white p-1" disabled={quarter <= 1}>
+          <button 
+            onClick={() => onQuarterChange(-1)} 
+            className="text-zinc-500 hover:text-white p-1 disabled:opacity-30" 
+            disabled={quarter <= 1 || gameStatus === 'Final'}
+            data-testid="quarter-down-btn"
+          >
             <ChevronDown className="w-4 h-4" />
           </button>
-          <span className="text-lg font-bold text-orange-500 w-10">{quarterLabels[quarter - 1]}</span>
-          <button onClick={() => onQuarterChange(1)} className="text-zinc-500 hover:text-white p-1">
+          <span className="text-lg font-bold text-orange-500 w-12" data-testid="quarter-display">
+            {getQuarterLabel()}
+          </span>
+          <button 
+            onClick={() => onQuarterChange(1)} 
+            className="text-zinc-500 hover:text-white p-1 disabled:opacity-30"
+            disabled={gameStatus === 'Final'}
+            data-testid="quarter-up-btn"
+          >
             <ChevronUp className="w-4 h-4" />
           </button>
         </div>
         
-        <div className="text-4xl font-mono font-black text-white">{formatTime(clockTime)}</div>
+        {/* Clock Display */}
+        <div className="text-4xl font-mono font-black text-white" data-testid="clock-display">
+          {gameStatus === 'Halftime' || gameStatus === 'Final' ? '--:--' : formatTime(clockTime)}
+        </div>
         
-        <div className="flex items-center gap-1">
-          <button onClick={() => onClockAdjust(-10)} className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400">-10</button>
-          <Button onClick={onToggle} size="sm" variant={isRunning ? "destructive" : "default"}>
-            {isRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+        {/* Clock Controls - Enhanced */}
+        <div className="flex items-center gap-1 flex-wrap justify-end">
+          <div className="flex gap-1">
+            <button 
+              onClick={() => onClockAdjust(-60)} 
+              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+              data-testid="clock-minus-1min"
+            >
+              -1m
+            </button>
+            <button 
+              onClick={() => onClockAdjust(-1)} 
+              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+              data-testid="clock-minus-1sec"
+            >
+              -1s
+            </button>
+          </div>
+          <Button 
+            onClick={onToggle} 
+            size="sm" 
+            variant={isRunning ? "destructive" : "default"}
+            className="h-10 w-10"
+            disabled={gameStatus === 'Halftime' || gameStatus === 'Final'}
+            data-testid="clock-toggle-btn"
+          >
+            {isRunning ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
           </Button>
-          <button onClick={() => onClockAdjust(10)} className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400">+10</button>
+          <div className="flex gap-1">
+            <button 
+              onClick={() => onClockAdjust(1)} 
+              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+              data-testid="clock-plus-1sec"
+            >
+              +1s
+            </button>
+            <button 
+              onClick={() => onClockAdjust(60)} 
+              className="text-xs bg-zinc-800 hover:bg-zinc-700 px-2 py-1 rounded text-zinc-400"
+              data-testid="clock-plus-1min"
+            >
+              +1m
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -410,6 +471,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const [clockRunning, setClockRunning] = useState(false);
   const [homeTimeouts, setHomeTimeouts] = useState(0);
   const [awayTimeouts, setAwayTimeouts] = useState(0);
+  const [gameStatus, setGameStatus] = useState('in_progress'); // 'in_progress', 'Halftime', 'Final'
   
   // Remembered QBs
   const [homeQB, setHomeQB] = useState(null);
@@ -432,6 +494,10 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const [activeWorkflow, setActiveWorkflow] = useState(null); // 'rush' | 'pass' | 'fg' | 'flag' | 'turnover'
   const [workflowStep, setWorkflowStep] = useState(0);
   const [workflowData, setWorkflowData] = useState({});
+  
+  // Quarter transition dialog
+  const [showQuarterDialog, setShowQuarterDialog] = useState(false);
+  const [pendingQuarterChange, setPendingQuarterChange] = useState(null);
   
   // Demo data
   useEffect(() => {
@@ -477,6 +543,34 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     return () => clearInterval(interval);
   }, [clockRunning, clockTime]);
   
+  // Keyboard shortcuts - spacebar and backslash for clock control
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ignore if user is typing in an input
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+      
+      switch (e.key) {
+        case ' ': // Spacebar
+          e.preventDefault();
+          if (gameStatus !== 'Halftime' && gameStatus !== 'Final') {
+            setClockRunning(prev => !prev);
+          }
+          break;
+        case '\\': // Backslash
+          e.preventDefault();
+          if (gameStatus !== 'Halftime' && gameStatus !== 'Final') {
+            setClockRunning(prev => !prev);
+          }
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameStatus]);
+  
   const fetchGame = async () => {
     try {
       const res = await axios.get(`${API}/games/${id}`);
@@ -495,9 +589,9 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     setUndoHistory(prev => [...prev.slice(-19), {
       homeScore, awayScore, possession, quarter, clockTime, homeStats: {...homeStats}, 
       awayStats: {...awayStats}, events: [...events], homeTimeouts, awayTimeouts,
-      playerStats: JSON.parse(JSON.stringify(playerStats))
+      playerStats: JSON.parse(JSON.stringify(playerStats)), gameStatus
     }]);
-  }, [homeScore, awayScore, possession, quarter, clockTime, homeStats, awayStats, events, homeTimeouts, awayTimeouts, playerStats]);
+  }, [homeScore, awayScore, possession, quarter, clockTime, homeStats, awayStats, events, homeTimeouts, awayTimeouts, playerStats, gameStatus]);
   
   const handleUndo = () => {
     if (undoHistory.length === 0) { toast.error("Nothing to undo"); return; }
@@ -513,13 +607,15 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     setHomeTimeouts(last.homeTimeouts);
     setAwayTimeouts(last.awayTimeouts);
     setPlayerStats(last.playerStats);
+    setGameStatus(last.gameStatus || 'in_progress');
     setUndoHistory(prev => prev.slice(0, -1));
     toast.success("Undone!");
   };
   
   const addEvent = (desc) => {
     const qLabels = ['1Q', '2Q', '3Q', '4Q', 'OT'];
-    setEvents(prev => [{ id: `e-${Date.now()}`, quarter: qLabels[quarter-1], description: desc }, ...prev]);
+    const qLabel = quarter > 4 ? `${quarter - 4}OT` : qLabels[quarter - 1];
+    setEvents(prev => [{ id: `e-${Date.now()}`, quarter: qLabel, description: desc }, ...prev]);
   };
   
   const updatePlayerStat = (playerNumber, team, statKey, value) => {
@@ -535,6 +631,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const offenseRoster = possession === 'home' ? game?.home_roster : game?.away_roster;
   const defenseRoster = possession === 'home' ? game?.away_roster : game?.home_roster;
   const offenseTeamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+  const defenseTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
   const defenseTeam = possession === 'home' ? 'away' : 'home';
   const rememberedQB = possession === 'home' ? homeQB : awayQB;
   const setRememberedQB = possession === 'home' ? setHomeQB : setAwayQB;
@@ -647,14 +744,68 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     closeWorkflow();
   };
   
-  // Turnover workflow handlers
+  // Enhanced Turnover workflow handlers with player details
   const handleTurnoverType = (type) => {
+    setWorkflowData(prev => ({ ...prev, turnoverType: type }));
+    if (type === 'Turnover on Downs') {
+      // No player details needed for turnover on downs
+      saveState();
+      const setStats = possession === 'home' ? setHomeStats : setAwayStats;
+      setStats(prev => ({ ...prev, turnovers: prev.turnovers + 1 }));
+      setPossession(possession === 'home' ? 'away' : 'home');
+      addEvent(`TURNOVER: Turnover on Downs - ${offenseTeamName}`);
+      toast.error("Turnover on Downs!");
+      closeWorkflow();
+    } else {
+      setWorkflowStep(2); // Go to player selection
+    }
+  };
+  
+  // For interception: Step 2 = who threw it (offense), Step 3 = who intercepted (defense)
+  const handleInterceptionThrower = (player) => {
+    setWorkflowData(prev => ({ ...prev, thrower: player }));
+    setWorkflowStep(3);
+  };
+  
+  const handleInterceptionInterceptor = (player) => {
     saveState();
+    const { thrower } = workflowData;
     const setStats = possession === 'home' ? setHomeStats : setAwayStats;
     setStats(prev => ({ ...prev, turnovers: prev.turnovers + 1 }));
+    updatePlayerStat(thrower.player_number, possession, 'interceptions', 1);
+    updatePlayerStat(player.player_number, defenseTeam, 'interceptedPasses', 1);
     setPossession(possession === 'home' ? 'away' : 'home');
-    addEvent(`TURNOVER: ${type} - ${offenseTeamName}`);
-    toast.error("Turnover!");
+    addEvent(`INTERCEPTION: #${thrower.player_number} pass intercepted by #${player.player_number} (${defenseTeamName})`);
+    toast.error("Interception!");
+    closeWorkflow();
+  };
+  
+  // For fumble: Step 2 = who fumbled (offense), Step 3 = who recovered (either team)
+  const handleFumbler = (player) => {
+    setWorkflowData(prev => ({ ...prev, fumbler: player }));
+    setWorkflowStep(3);
+  };
+  
+  const handleFumbleRecovery = (player, recoveringTeam) => {
+    saveState();
+    const { fumbler } = workflowData;
+    updatePlayerStat(fumbler.player_number, possession, 'fumblesLost', 1);
+    updatePlayerStat(player.player_number, recoveringTeam, 'fumbleRecoveries', 1);
+    
+    const recoveryTeamName = recoveringTeam === 'home' ? game?.home_team_name : game?.away_team_name;
+    
+    if (recoveringTeam !== possession) {
+      // Turnover - defense recovered
+      const setStats = possession === 'home' ? setHomeStats : setAwayStats;
+      setStats(prev => ({ ...prev, turnovers: prev.turnovers + 1 }));
+      setPossession(recoveringTeam);
+      addEvent(`FUMBLE: #${fumbler.player_number} fumbled, recovered by #${player.player_number} (${recoveryTeamName}) - TURNOVER`);
+      toast.error("Fumble - Turnover!");
+    } else {
+      // Offense recovered their own fumble
+      addEvent(`FUMBLE: #${fumbler.player_number} fumbled, recovered by #${player.player_number} (${recoveryTeamName})`);
+      toast.info("Fumble recovered by offense");
+    }
     closeWorkflow();
   };
   
@@ -708,15 +859,84 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     }
   };
   
+  // Quarter change with confirmation dialogs
   const handleQuarterChange = (delta) => {
-    const newQ = Math.max(1, Math.min(5, quarter + delta));
-    if (newQ !== quarter) {
-      saveState();
-      setQuarter(newQ);
-      setClockTime(900);
-      if (newQ === 3) { setHomeTimeouts(0); setAwayTimeouts(0); }
-      addEvent(`Quarter ${newQ} begins`);
+    const newQ = Math.max(1, quarter + delta);
+    
+    if (delta > 0) {
+      // Going forward - check for special transitions
+      if (quarter === 2) {
+        // End of Q2 - prompt for halftime
+        setPendingQuarterChange(3);
+        setShowQuarterDialog(true);
+        return;
+      } else if (quarter === 4) {
+        // End of Q4 - prompt for Final or Overtime
+        setPendingQuarterChange(5);
+        setShowQuarterDialog(true);
+        return;
+      } else {
+        // Other quarter transitions - always confirm
+        setPendingQuarterChange(newQ);
+        setShowQuarterDialog(true);
+        return;
+      }
+    } else {
+      // Going backward - just do it
+      if (newQ !== quarter) {
+        saveState();
+        setQuarter(newQ);
+        setClockTime(900);
+        setGameStatus('in_progress');
+        addEvent(`Quarter ${newQ} begins`);
+      }
     }
+  };
+  
+  const confirmQuarterChange = (action) => {
+    saveState();
+    
+    if (action === 'halftime') {
+      setGameStatus('Halftime');
+      setClockRunning(false);
+      addEvent('HALFTIME');
+      toast.info('Halftime!');
+    } else if (action === 'start_3rd') {
+      setQuarter(3);
+      setClockTime(900);
+      setGameStatus('in_progress');
+      // Ask about timeout reset
+      setShowQuarterDialog(false);
+      setTimeout(() => {
+        if (window.confirm('Reset timeouts for the second half?')) {
+          setHomeTimeouts(0);
+          setAwayTimeouts(0);
+          toast.success('Timeouts reset for second half');
+        }
+      }, 100);
+      addEvent('3rd Quarter begins');
+      return;
+    } else if (action === 'final') {
+      setGameStatus('Final');
+      setClockRunning(false);
+      addEvent('FINAL');
+      toast.success('Game Over!');
+    } else if (action === 'overtime') {
+      setQuarter(5);
+      setClockTime(900);
+      setGameStatus('in_progress');
+      addEvent('1st Overtime begins');
+      toast.info('Overtime!');
+    } else if (action === 'next_quarter') {
+      // Regular quarter transition
+      setQuarter(pendingQuarterChange);
+      setClockTime(900);
+      setGameStatus('in_progress');
+      addEvent(`Quarter ${pendingQuarterChange} begins`);
+    }
+    
+    setShowQuarterDialog(false);
+    setPendingQuarterChange(null);
   };
   
   if (loading) {
@@ -727,13 +947,14 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     <div className="h-screen bg-black text-white flex flex-col overflow-hidden" data-testid="simple-football-page">
       {/* Header */}
       <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2 flex items-center justify-between shrink-0">
-        <Button variant="ghost" size="sm" onClick={() => navigate(demoMode ? "/select-sport" : "/dashboard/football")} className="text-zinc-400">
+        <Button variant="ghost" size="sm" onClick={() => navigate(demoMode ? "/select-sport" : "/dashboard")} className="text-zinc-400" data-testid="back-btn">
           <ArrowLeft className="w-4 h-4 mr-1" />Back
         </Button>
         <div className="flex items-center gap-1 text-orange-500">
           <Trophy className="w-4 h-4" /><span className="font-bold text-sm">SIMPLE MODE</span>
+          <span className="text-xs text-zinc-500 ml-2">(Space/\ = Clock)</span>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleUndo} disabled={undoHistory.length === 0} className={undoHistory.length > 0 ? 'text-amber-500' : 'text-zinc-600'}>
+        <Button variant="ghost" size="sm" onClick={handleUndo} disabled={undoHistory.length === 0} className={undoHistory.length > 0 ? 'text-amber-500' : 'text-zinc-600'} data-testid="undo-btn">
           <Undo2 className="w-4 h-4 mr-1" />Undo
         </Button>
       </div>
@@ -749,52 +970,60 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
           </div>
           
           {/* Clock */}
-          <GameClock quarter={quarter} clockTime={clockTime} isRunning={clockRunning} onToggle={() => setClockRunning(p => !p)} onQuarterChange={handleQuarterChange} onClockAdjust={(s) => setClockTime(p => Math.max(0, Math.min(900, p + s)))} />
+          <GameClock 
+            quarter={quarter} 
+            clockTime={clockTime} 
+            isRunning={clockRunning} 
+            onToggle={() => setClockRunning(p => !p)} 
+            onQuarterChange={handleQuarterChange} 
+            onClockAdjust={(s) => setClockTime(p => Math.max(0, p + s))} 
+            gameStatus={gameStatus}
+          />
           
           {/* Stats */}
           <QuickStats homeStats={homeStats} awayStats={awayStats} />
           
-          {/* Action Buttons Grid */}
+          {/* Action Buttons Grid - Updated styling */}
           <div className="grid grid-cols-5 gap-2 flex-1">
-            {/* Scoring */}
-            <button onClick={handleTouchdown} className="bg-green-600 hover:bg-green-500 rounded-xl p-2 flex flex-col items-center justify-center">
-              <span className="text-2xl font-black">+6</span><span className="text-xs">TD</span>
+            {/* Scoring - Dark grey with white outline, larger text */}
+            <button onClick={handleTouchdown} className="bg-zinc-700 hover:bg-zinc-600 border-2 border-white rounded-xl p-2 flex flex-col items-center justify-center" data-testid="td-btn">
+              <span className="text-3xl font-black">+6</span><span className="text-sm font-semibold">TD</span>
             </button>
-            <button onClick={handleExtraPoint} className="bg-blue-600 hover:bg-blue-500 rounded-xl p-2 flex flex-col items-center justify-center">
-              <span className="text-2xl font-black">+1</span><span className="text-xs">XP</span>
+            <button onClick={handleExtraPoint} className="bg-zinc-700 hover:bg-zinc-600 border-2 border-white rounded-xl p-2 flex flex-col items-center justify-center" data-testid="xp-btn">
+              <span className="text-3xl font-black">+1</span><span className="text-sm font-semibold">XP</span>
             </button>
-            <button onClick={handleTwoPoint} className="bg-purple-600 hover:bg-purple-500 rounded-xl p-2 flex flex-col items-center justify-center">
-              <span className="text-2xl font-black">+2</span><span className="text-xs">2PT</span>
+            <button onClick={handleTwoPoint} className="bg-zinc-700 hover:bg-zinc-600 border-2 border-white rounded-xl p-2 flex flex-col items-center justify-center" data-testid="2pt-btn">
+              <span className="text-3xl font-black">+2</span><span className="text-sm font-semibold">2PT</span>
             </button>
-            <button onClick={startFGWorkflow} className="bg-amber-600 hover:bg-amber-500 rounded-xl p-2 flex flex-col items-center justify-center">
-              <span className="text-2xl font-black">FG</span><span className="text-xs">Field Goal</span>
+            <button onClick={startFGWorkflow} className="bg-zinc-700 hover:bg-zinc-600 border-2 border-white rounded-xl p-2 flex flex-col items-center justify-center" data-testid="fg-btn">
+              <span className="text-3xl font-black">FG</span><span className="text-sm font-semibold">Field Goal</span>
             </button>
-            <button onClick={handleSafety} className="bg-red-600 hover:bg-red-500 rounded-xl p-2 flex flex-col items-center justify-center">
-              <span className="text-2xl font-black">+2</span><span className="text-xs">Safety</span>
+            <button onClick={handleSafety} className="bg-zinc-700 hover:bg-zinc-600 border-2 border-white rounded-xl p-2 flex flex-col items-center justify-center" data-testid="safety-btn">
+              <span className="text-3xl font-black">+2</span><span className="text-sm font-semibold">Safety</span>
             </button>
             
-            {/* Stats */}
-            <button onClick={startRushWorkflow} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center">
-              <Zap className="w-5 h-5 text-green-400 mb-1" /><span className="text-xs">Rush</span>
+            {/* Stats - Color coded */}
+            <button onClick={startRushWorkflow} className="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="rush-btn">
+              <Zap className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Rush Yds</span>
             </button>
-            <button onClick={startPassWorkflow} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center">
-              <Zap className="w-5 h-5 text-blue-400 mb-1" /><span className="text-xs">Pass</span>
+            <button onClick={startPassWorkflow} className="bg-blue-700 hover:bg-blue-600 border border-blue-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="pass-btn">
+              <Zap className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Pass Yds</span>
             </button>
-            <button onClick={handleFirstDown} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center">
-              <Flag className="w-5 h-5 text-yellow-400 mb-1" /><span className="text-xs">1st Down</span>
+            <button onClick={handleFirstDown} className="bg-amber-700 hover:bg-amber-600 border border-amber-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="first-down-btn">
+              <Flag className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">1st Down</span>
             </button>
-            <button onClick={startTurnoverWorkflow} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-red-400 mb-1" /><span className="text-xs">Turnover</span>
+            <button onClick={startTurnoverWorkflow} className="bg-red-700 hover:bg-red-600 border border-red-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="turnover-btn">
+              <AlertTriangle className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Turnover</span>
             </button>
-            <button onClick={startFlagWorkflow} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center">
-              <Flag className="w-5 h-5 text-orange-400 mb-1" /><span className="text-xs">Penalty</span>
+            <button onClick={startFlagWorkflow} className="bg-orange-700 hover:bg-orange-600 border border-orange-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="penalty-btn">
+              <Flag className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Penalty</span>
             </button>
             
             {/* Timeouts */}
-            <button onClick={() => handleTimeout('home')} disabled={homeTimeouts >= 3} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center disabled:opacity-50 col-span-2">
+            <button onClick={() => handleTimeout('home')} disabled={homeTimeouts >= 3} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center disabled:opacity-50 col-span-2" data-testid="home-timeout-btn">
               <Clock className="w-4 h-4 mb-1" /><span className="text-xs">{game?.home_team_name?.slice(0,8)} TO ({3-homeTimeouts})</span>
             </button>
-            <button onClick={() => handleTimeout('away')} disabled={awayTimeouts >= 3} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center disabled:opacity-50 col-span-2">
+            <button onClick={() => handleTimeout('away')} disabled={awayTimeouts >= 3} className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl p-2 flex flex-col items-center justify-center disabled:opacity-50 col-span-2" data-testid="away-timeout-btn">
               <Clock className="w-4 h-4 mb-1" /><span className="text-xs">{game?.away_team_name?.slice(0,8)} TO ({3-awayTimeouts})</span>
             </button>
             <div></div>
@@ -934,19 +1163,167 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
         </DialogContent>
       </Dialog>
       
-      {/* Turnover Workflow Dialog */}
+      {/* Enhanced Turnover Workflow Dialog */}
       <Dialog open={activeWorkflow === 'turnover'} onOpenChange={() => closeWorkflow()}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
           <DialogHeader><DialogTitle>Turnover</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="text-center text-lg font-semibold">Select Turnover Type</div>
-            <div className="grid grid-cols-1 gap-3">
-              <Button onClick={() => handleTurnoverType('Fumble')} className="h-14 bg-red-700 hover:bg-red-600">Fumble</Button>
-              <Button onClick={() => handleTurnoverType('Interception')} className="h-14 bg-red-700 hover:bg-red-600">Interception</Button>
-              <Button onClick={() => handleTurnoverType('Turnover on Downs')} className="h-14 bg-red-700 hover:bg-red-600">Turnover on Downs</Button>
+          
+          {/* Step 1: Select turnover type */}
+          {workflowStep === 1 && (
+            <div className="space-y-4">
+              <div className="text-center text-lg font-semibold">Select Turnover Type</div>
+              <div className="grid grid-cols-1 gap-3">
+                <Button onClick={() => handleTurnoverType('Interception')} className="h-14 bg-red-700 hover:bg-red-600" data-testid="turnover-int-btn">
+                  Interception
+                </Button>
+                <Button onClick={() => handleTurnoverType('Fumble')} className="h-14 bg-red-700 hover:bg-red-600" data-testid="turnover-fumble-btn">
+                  Fumble
+                </Button>
+                <Button onClick={() => handleTurnoverType('Turnover on Downs')} className="h-14 bg-red-700 hover:bg-red-600" data-testid="turnover-downs-btn">
+                  Turnover on Downs
+                </Button>
+              </div>
+              <Button variant="outline" onClick={closeWorkflow} className="w-full border-zinc-700">Cancel</Button>
             </div>
-            <Button variant="outline" onClick={closeWorkflow} className="w-full border-zinc-700">Cancel</Button>
-          </div>
+          )}
+          
+          {/* Interception Step 2: Who threw it (offense) */}
+          {workflowStep === 2 && workflowData.turnoverType === 'Interception' && (
+            <PlayerNumberInput 
+              roster={offenseRoster || []} 
+              onSelect={handleInterceptionThrower} 
+              onCancel={closeWorkflow} 
+              title={`Who threw the interception? (${offenseTeamName})`}
+            />
+          )}
+          
+          {/* Interception Step 3: Who intercepted (defense) */}
+          {workflowStep === 3 && workflowData.turnoverType === 'Interception' && (
+            <PlayerNumberInput 
+              roster={defenseRoster || []} 
+              onSelect={handleInterceptionInterceptor} 
+              onCancel={closeWorkflow} 
+              title={`Who made the interception? (${defenseTeamName})`}
+            />
+          )}
+          
+          {/* Fumble Step 2: Who fumbled (offense) */}
+          {workflowStep === 2 && workflowData.turnoverType === 'Fumble' && (
+            <PlayerNumberInput 
+              roster={offenseRoster || []} 
+              onSelect={handleFumbler} 
+              onCancel={closeWorkflow} 
+              title={`Who fumbled? (${offenseTeamName})`}
+            />
+          )}
+          
+          {/* Fumble Step 3: Who recovered (either team) */}
+          {workflowStep === 3 && workflowData.turnoverType === 'Fumble' && (
+            <div className="space-y-4">
+              <div className="text-center text-lg font-semibold">Who recovered the fumble?</div>
+              <div className="text-center text-sm text-zinc-400 mb-2">
+                #{workflowData.fumbler?.player_number} fumbled
+              </div>
+              
+              {/* Offense recovery section */}
+              <div className="border border-zinc-700 rounded-lg p-3">
+                <div className="text-sm font-semibold text-green-400 mb-2">{offenseTeamName} (Offense)</div>
+                <div className="grid grid-cols-4 gap-1">
+                  {(offenseRoster || []).slice(0, 8).map(player => (
+                    <button
+                      key={player.player_number}
+                      onClick={() => handleFumbleRecovery(player, possession)}
+                      className="p-2 bg-zinc-800 hover:bg-green-700 rounded text-sm"
+                    >
+                      #{player.player_number}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Defense recovery section */}
+              <div className="border border-zinc-700 rounded-lg p-3">
+                <div className="text-sm font-semibold text-red-400 mb-2">{defenseTeamName} (Defense) - TURNOVER</div>
+                <div className="grid grid-cols-4 gap-1">
+                  {(defenseRoster || []).slice(0, 8).map(player => (
+                    <button
+                      key={player.player_number}
+                      onClick={() => handleFumbleRecovery(player, defenseTeam)}
+                      className="p-2 bg-zinc-800 hover:bg-red-700 rounded text-sm"
+                    >
+                      #{player.player_number}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <Button variant="outline" onClick={closeWorkflow} className="w-full border-zinc-700">Cancel</Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
+      {/* Quarter Transition Dialog */}
+      <Dialog open={showQuarterDialog} onOpenChange={setShowQuarterDialog}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {quarter === 2 ? 'End of 2nd Quarter' : quarter === 4 ? 'End of 4th Quarter' : 'Advance Quarter'}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {/* End of Q2 - Halftime options */}
+          {quarter === 2 && (
+            <div className="space-y-4">
+              <p className="text-zinc-400 text-center">The 2nd quarter has ended. What would you like to do?</p>
+              <div className="grid grid-cols-1 gap-3">
+                <Button onClick={() => confirmQuarterChange('halftime')} className="h-14 bg-blue-600 hover:bg-blue-500">
+                  Go to Halftime
+                </Button>
+                <Button onClick={() => confirmQuarterChange('start_3rd')} className="h-14 bg-green-600 hover:bg-green-500">
+                  Start 3rd Quarter
+                </Button>
+              </div>
+              <Button variant="outline" onClick={() => setShowQuarterDialog(false)} className="w-full border-zinc-700">
+                Cancel
+              </Button>
+            </div>
+          )}
+          
+          {/* End of Q4 - Final or Overtime */}
+          {quarter === 4 && (
+            <div className="space-y-4">
+              <p className="text-zinc-400 text-center">The 4th quarter has ended. What would you like to do?</p>
+              <div className="grid grid-cols-1 gap-3">
+                <Button onClick={() => confirmQuarterChange('final')} className="h-14 bg-green-600 hover:bg-green-500">
+                  End Game (Final)
+                </Button>
+                <Button onClick={() => confirmQuarterChange('overtime')} className="h-14 bg-amber-600 hover:bg-amber-500">
+                  Start 1st Overtime
+                </Button>
+              </div>
+              <Button variant="outline" onClick={() => setShowQuarterDialog(false)} className="w-full border-zinc-700">
+                Cancel
+              </Button>
+            </div>
+          )}
+          
+          {/* Other quarter transitions */}
+          {quarter !== 2 && quarter !== 4 && (
+            <div className="space-y-4">
+              <p className="text-zinc-400 text-center">
+                Advance to {pendingQuarterChange > 4 ? `Overtime ${pendingQuarterChange - 4}` : `Quarter ${pendingQuarterChange}`}?
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Button onClick={() => confirmQuarterChange('next_quarter')} className="h-12 bg-green-600 hover:bg-green-500">
+                  Yes, Advance
+                </Button>
+                <Button variant="outline" onClick={() => setShowQuarterDialog(false)} className="h-12 border-zinc-700">
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>
