@@ -126,6 +126,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/demo/basketball/advanced" element={<DemoLiveGameAdvanced />} />
       <Route path="/demo/basketball/simple" element={<DemoLiveGameQuick />} />
       <Route path="/demo/football" element={<DemoFootballLiveGame />} />
+      <Route path="/demo/football/simple" element={<SimpleFootballLiveGame demoMode={true} />} />
       <Route path="/demo/baseball" element={<DemoBaseballLiveGame />} />
       <Route path="/demo/baseball/boxscore" element={<BaseballBoxScore />} />
       
