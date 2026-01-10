@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { Button } from '../components/ui/button';
@@ -14,15 +14,7 @@ export default function PaymentSuccessPage() {
   const [status, setStatus] = useState('loading'); // loading, success, error
   const [paymentData, setPaymentData] = useState(null);
 
-  useEffect(() => {
-    if (sessionId) {
-      checkPaymentStatus();
-    } else {
-      setStatus('error');
-    }
-  }, [sessionId]);
-
-  const checkPaymentStatus = async (attempts = 0) => {
+  const checkPaymentStatus = useCallback(async (attempts = 0) => {
     const maxAttempts = 10;
     const pollInterval = 2000;
 
@@ -53,7 +45,15 @@ export default function PaymentSuccessPage() {
         setStatus('error');
       }
     }
-  };
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (sessionId) {
+      checkPaymentStatus();
+    } else {
+      setStatus('error');
+    }
+  }, [sessionId, checkPaymentStatus]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center p-4">
