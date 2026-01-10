@@ -1533,15 +1533,12 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const handleUndo = useCallback(() => {
     const lastState = popLastState();
     if (!lastState) return;
-    }
-    
-    const lastState = undoHistory[undoHistory.length - 1];
     
     // Restore all state
     setGame(lastState.game);
     setHomeStats(lastState.homeStats);
     setAwayStats(lastState.awayStats);
-    setPlayByPlay(lastState.playByPlay);
+    setPlays(lastState.playByPlay);
     setCurrentBatterIndex(lastState.currentBatterIndex);
     setHomeBatterIndex(lastState.homeBatterIndex);
     setAwayBatterIndex(lastState.awayBatterIndex);
@@ -1552,11 +1549,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     setHomeErrors(lastState.homeErrors);
     setAwayErrors(lastState.awayErrors);
     
-    // Remove the used state from history
-    setUndoHistory(prev => prev.slice(0, -1));
-    
     toast.success("Play undone");
-  }, [undoHistory]);
+  }, [popLastState, setPlays]);
   
   // Helper function to update batter stats
   const updateBatterStats = useCallback((playerNumber, updates) => {
