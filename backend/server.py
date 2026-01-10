@@ -37,16 +37,22 @@ db = client[db_name]
 # Password hashing - use bcrypt directly for better compatibility
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Helper function to verify password using bcrypt directly (avoids passlib warning)
+# Helper function to verify password - use passlib for robust compatibility
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
-        return bcrypt_lib.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
-    except Exception:
-        return False
+        # Use passlib's verify which handles multiple bcrypt variations
+        return pwd_context.verify(plain_password, hashed_password)
+    except Exception as e:
+        logging.error(f"Password verification exception: {e}")
+        # Fallback to direct bcrypt check
+        try:
+            return bcrypt_lib.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+        except Exception:
+            return False
 
-# Helper function to hash password
+# Helper function to hash password - use passlib for consistency
 def hash_password(password: str) -> str:
-    return bcrypt_lib.hashpw(password.encode('utf-8'), bcrypt_lib.gensalt()).decode('utf-8')
+    return pwd_context.hash(password)
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
