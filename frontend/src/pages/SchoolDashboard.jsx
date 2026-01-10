@@ -1166,7 +1166,7 @@ export default function SchoolDashboard() {
                         <Timer className="w-4 h-4 text-slate-400" />
                         <Label className="text-sm font-semibold text-slate-200">Game Clock</Label>
                       </div>
-                      {selectedGame.sport !== "football" && (
+                      {selectedGame.sport !== "football" && selectedGame.sport !== "baseball" && (
                         <Switch
                           checked={gameSetup.clockEnabled}
                           onCheckedChange={(v) => setGameSetup(prev => ({ ...prev, clockEnabled: v }))}
