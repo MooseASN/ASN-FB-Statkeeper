@@ -563,8 +563,8 @@ const PlayByPlayLog = ({ plays }) => (
     </div>
     <div className="max-h-48 overflow-y-auto p-4">
       {plays?.length > 0 ? (
-        plays.map((play, index) => (
-          <div key={index} className="text-sm text-zinc-300 mb-2 pb-2 border-b border-zinc-800">
+        plays.map((play) => (
+          <div key={play.id} className="text-sm text-zinc-300 mb-2 pb-2 border-b border-zinc-800">
             <span className="text-zinc-500">{play.inning} - </span>
             {play.description}
           </div>
