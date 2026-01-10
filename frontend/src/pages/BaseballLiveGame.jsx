@@ -1220,21 +1220,33 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     let newInningHalf = currentGame.inning_half;
     let newInning = currentGame.current_inning;
     let description = "";
+    let batterStatUpdate = { at_bats: 1, plate_appearances: 1 };
+    let pitcherStatUpdate = { pitches_thrown: 1 };
     
     const isHomeTeamBatting = currentGame.inning_half === "bottom";
     
     switch (resultType) {
       case "single":
         description = `Single by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        batterStatUpdate.hits = 1;
+        batterStatUpdate.singles = 1;
         break;
       case "double":
         description = `Double by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        batterStatUpdate.hits = 1;
+        batterStatUpdate.doubles = 1;
         break;
       case "triple":
         description = `Triple by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        batterStatUpdate.hits = 1;
+        batterStatUpdate.triples = 1;
         break;
       case "home_run":
         description = `HOME RUN by #${currentBatter?.player_number} ${currentBatter?.player_name}!`;
+        batterStatUpdate.hits = 1;
+        batterStatUpdate.home_runs = 1;
+        batterStatUpdate.runs = 1;
+        batterStatUpdate.rbis = 1;
         if (isHomeTeamBatting) {
           newHomeScore += 1;
         } else {
@@ -1251,15 +1263,24 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       case "strikeout":
         description = `Strikeout - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newOuts += 1;
+        batterStatUpdate.strikeouts_batting = 1;
+        pitcherStatUpdate.strikeouts_pitching = 1;
         break;
       case "double_play":
         description = `Double play - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newOuts += 2;
         break;
       case "sacrifice_fly":
-      case "sacrifice_bunt":
-        description = `${resultType.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase())} - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        description = `Sacrifice fly - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newOuts += 1;
+        batterStatUpdate.sacrifice_flies = 1;
+        batterStatUpdate.at_bats = 0; // Sac fly doesn't count as AB
+        break;
+      case "sacrifice_bunt":
+        description = `Sacrifice bunt - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        newOuts += 1;
+        batterStatUpdate.sacrifice_bunts = 1;
+        batterStatUpdate.at_bats = 0; // Sac bunt doesn't count as AB
         break;
       case "error":
         description = `Error - #${currentBatter?.player_number} ${currentBatter?.player_name} reaches on error`;
@@ -1287,6 +1308,14 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
     }
     
+    // Update stats
+    if (currentBatter?.player_number) {
+      updateBatterStats(currentBatter.player_number, batterStatUpdate);
+    }
+    if (currentPitcher?.player_number || currentPitcher?.number) {
+      updatePitcherStats(currentPitcher.player_number || currentPitcher.number, pitcherStatUpdate);
+    }
+    
     // Add play to log
     if (description) {
       addPlay(currentGame.current_inning, currentGame.inning_half, description);
@@ -1303,7 +1332,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       inning_half: newInningHalf,
       current_inning: newInning
     }));
-  }, [game, currentBatter, battingRoster.length, addPlay]);
+  }, [game, currentBatter, currentPitcher, battingRoster.length, addPlay, updateBatterStats, updatePitcherStats]);
   
   // Auto-save game state when it changes (debounced)
   useEffect(() => {
