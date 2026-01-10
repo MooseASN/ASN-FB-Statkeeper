@@ -13,6 +13,27 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - UNDO FEATURE & OUTFIELDER REPOSITIONING ✅
+
+#### Undo Feature - COMPLETED ✅
+- **Undo Button** in header shows count of undoable actions
+- **Full State Rollback** - undoes everything:
+  - Game state (score, outs, balls, strikes, inning)
+  - Base runners (moves them back)
+  - Player stats (removes added stats)
+  - Play-by-play log (removes the last play)
+  - Batting order index (restores previous batter)
+  - Team errors
+- **20-state history** - keeps last 20 actions for undo
+- **Toast notification** - "Play undone" confirmation
+
+#### Outfielder Repositioning - COMPLETED ✅
+Per user-provided reference image:
+- **LF**: top: 24%, left: 18%
+- **CF**: top: 6%, left: 50%  
+- **RF**: top: 24%, left: 82%
+All outfielders now positioned correctly on the outfield grass
+
 ### January 10, 2026 - BASE RUNNER SYSTEM & UI ENHANCEMENTS ✅
 
 #### Base Runner Advancement Logic - COMPLETED ✅
