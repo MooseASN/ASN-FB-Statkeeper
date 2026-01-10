@@ -37,6 +37,10 @@ import {
 } from "lucide-react";
 import { X as XIcon } from "lucide-react";
 
+// Import custom hooks for game state management
+import { useGameHistory } from "@/hooks/useGameHistory";
+import { usePlayByPlay } from "@/hooks/usePlayByPlay";
+
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Defensive positions for baseball
