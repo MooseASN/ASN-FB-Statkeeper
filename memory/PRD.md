@@ -14,6 +14,34 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 2026 - CUSTOM HOOKS INTEGRATION ✅
+
+#### BaseballLiveGame.jsx Refactoring - COMPLETED ✅
+Integrated custom hooks to manage game state:
+- `useGameHistory` - Undo/redo state management with `saveStateForUndo`, `popLastState`, `canUndo`
+- `usePlayByPlay` - Play-by-play log with `addPlay`, `removeLastPlay`, `setPlays`
+- Removed redundant useState declarations and useRef for play deduplication
+- Current: 2482 lines (reduced from 2513)
+
+#### FootballLiveGame.jsx Refactoring - COMPLETED ✅
+Integrated `useDriveState` hook for drive tracking:
+- Now using destructured state from hook: `possession`, `ballPosition`, `down`, `distance`, `quarter`
+- Drive management: `currentDrive`, `allDrives`, `homeTimeOfPossession`, `awayTimeOfPossession`
+- Helper functions: `advanceDown`, `changePossession`, `flipPossession`, `spotBall`, `getYardLineDisplay`
+- Current: 5023 lines (reduced from 5039)
+
+#### New Custom Hooks Created
+| Hook | Lines | Purpose |
+|------|-------|---------|
+| `useBaseballGameState.js` | 322 | Baseball game state management |
+| `useFootballGameState.js` | 274 | Football game state management |
+| `useFootballPlayWorkflow.js` | 222 | Play workflow state for football |
+| `useDriveState.js` | 233 | Drive tracking for football |
+| `useBaseRunners.js` | 194 | Base runner management |
+| `usePlayerStats.js` | 116 | Player stat updates |
+| `usePlayByPlay.js` | 78 | Play-by-play log management |
+| `useGameHistory.js` | 64 | Undo/redo functionality |
+
 ### January 2026 - TEAM LOGO UPLOAD, BASEBALL IN SCHOOLS, ADMIN SHARED ACCESS ✅
 
 #### Team Logo Upload - COMPLETED ✅
