@@ -1509,32 +1509,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     toast.success("Starters configured! Game is ready.");
   };
   
-  // Helper function to add a play to the log (with deduplication)
-  const addPlay = useCallback((inning, inningHalf, description) => {
-    playCounterRef.current += 1;
-    const playId = `play_${Date.now()}_${playCounterRef.current}`;
-    
-    // Prevent duplicate plays (e.g., from React strict mode double renders)
-    if (lastPlayIdRef.current === description) {
-      return;
-    }
-    lastPlayIdRef.current = description;
-    
-    setPlayByPlay(plays => [{
-      id: playId,
-      inning: `${inning}${inningHalf === 'top' ? '▲' : '▼'}`,
-      description,
-      timestamp: new Date().toISOString()
-    }, ...plays]);
-    
-    // Reset the duplicate check after a short delay
-    setTimeout(() => {
-      lastPlayIdRef.current = null;
-    }, 100);
-  }, []);
-  
-  // Save current state for undo functionality
-  const saveStateForUndo = useCallback(() => {
+  // Save current state for undo functionality (wraps the hook's saveStateForUndo)
+  const saveCurrentStateForUndo = useCallback(() => {
     const snapshot = {
       game: game ? JSON.parse(JSON.stringify(game)) : null,
       homeStats: JSON.parse(JSON.stringify(homeStats)),
@@ -1550,14 +1526,13 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       homeErrors,
       awayErrors,
     };
-    setUndoHistory(prev => [...prev.slice(-19), snapshot]); // Keep last 20 states
-  }, [game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBatterIndex, awayBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors]);
+    saveStateForUndo(snapshot);
+  }, [game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBatterIndex, awayBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors, saveStateForUndo]);
   
   // Handle undo - restore the previous state
   const handleUndo = useCallback(() => {
-    if (undoHistory.length === 0) {
-      toast.error("Nothing to undo");
-      return;
+    const lastState = popLastState();
+    if (!lastState) return;
     }
     
     const lastState = undoHistory[undoHistory.length - 1];
