@@ -1896,6 +1896,16 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       newOuts = 0;
       newBalls = 0;
       newStrikes = 0;
+      
+      // Advance batter for CURRENT team even on 3rd out (so they continue here next inning)
+      if (shouldAdvanceBatter) {
+        if (battingTeamIsHome) {
+          setHomeBatterIndex(i => (i + 1) % battingRoster.length);
+        } else {
+          setAwayBatterIndex(i => (i + 1) % battingRoster.length);
+        }
+      }
+      
       if (newInningHalf === "top") {
         newInningHalf = "bottom";
       } else {
@@ -1903,7 +1913,6 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         newInning = currentGame.current_inning + 1;
       }
       description += " - Side retired";
-      // NOTE: Do NOT reset batter index - each team continues where they left off in the batting order
       // Clear bases on inning end
       setGame(prev => ({ ...prev, bases: { first: null, second: null, third: null } }));
     } else if (shouldAdvanceBatter) {
