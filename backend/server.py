@@ -1630,10 +1630,24 @@ async def get_teams(sport: Optional[str] = None, user: User = Depends(get_curren
 
 @api_router.get("/teams/{team_id}", response_model=Team)
 async def get_team(team_id: str, user: User = Depends(get_current_user)):
+    # First try to find in user's own teams
     team = await db.teams.find_one({"id": team_id, "user_id": user.user_id}, {"_id": 0})
-    if not team:
-        raise HTTPException(status_code=404, detail="Team not found")
-    return team
+    if team:
+        return team
+    
+    # Check if user has shared access to this team's owner
+    team = await db.teams.find_one({"id": team_id}, {"_id": 0})
+    if team:
+        shared_access = await db.shared_access.find_one({
+            "owner_user_id": team.get("user_id"),
+            "shared_with_user_id": user.user_id,
+            "is_active": True
+        })
+        if shared_access:
+            team["is_shared"] = True
+            return team
+    
+    raise HTTPException(status_code=404, detail="Team not found")
 
 @api_router.put("/teams/{team_id}", response_model=Team)
 async def update_team(team_id: str, team_data: TeamCreate, user: User = Depends(get_current_user)):
