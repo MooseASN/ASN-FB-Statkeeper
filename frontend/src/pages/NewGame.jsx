@@ -451,6 +451,48 @@ export default function NewGame({ user, onLogout }) {
               </div>
               )}
 
+              {/* Baseball Options - Innings Selection */}
+              {selectedSport === "baseball" && (
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">⚾</span>
+                  <Label className="text-base font-semibold">Game Settings</Label>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Innings Selection */}
+                  <div>
+                    <Label className="text-sm font-medium">Number of Innings</Label>
+                    <div className="flex gap-2 mt-2 flex-wrap">
+                      <Button
+                        type="button"
+                        variant={totalInnings === 7 ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTotalInnings(7)}
+                        className={totalInnings === 7 ? "bg-red-600 hover:bg-red-700" : ""}
+                        data-testid="innings-7"
+                      >
+                        7 Innings
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={totalInnings === 9 ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => setTotalInnings(9)}
+                        className={totalInnings === 9 ? "bg-red-600 hover:bg-red-700" : ""}
+                        data-testid="innings-9"
+                      >
+                        9 Innings
+                      </Button>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {totalInnings === 7 ? "7 innings - Common for high school and doubleheaders" : "9 innings - Standard regulation game"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              )}
+
               {/* Clock Options */}
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center justify-between">
