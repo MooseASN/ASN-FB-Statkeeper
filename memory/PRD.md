@@ -13,6 +13,55 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 2026 - P0 BUG FIX: BATTING ORDER CONTINUITY ✅
+
+#### Batting Order Reset Bug - FIXED ✅
+**Issue**: The batting order for a team incorrectly reset to the first batter at the start of a new inning, instead of continuing from where that team left off.
+
+**Root Cause**: In `handleInPlayResult`, when the 3rd out occurred (e.g., ground out, fly out), the batter index was NOT being advanced because the advancement code was inside an `else` block that only ran when outs < 3.
+
+**Fix Applied**:
+- Moved batter index advancement to occur BEFORE the 3-out check
+- Now all in-play results advance the batter unconditionally
+- Each team's batter index is tracked separately (`homeBatterIndex`, `awayBatterIndex`)
+
+**Verified**: Testing agent confirmed batting order continues correctly across innings.
+
+### January 2026 - TOTAL PITCHES FEATURE ✅
+
+#### Pitch Count Added to Team Stats - COMPLETED ✅
+- Added **P (Pitches)** column to Team Stats display
+- Shows total pitches thrown by each team's pitchers
+- Displayed in blue text for visual distinction
+- Updates in real-time after each pitch is recorded
+- 7-column layout: R, H, E, SO, BB, P
+
+### January 2026 - CODE REFACTORING ✅
+
+#### Custom Hooks Created ✅
+Extracted reusable game logic from `BaseballLiveGame.jsx` into custom hooks at `/app/frontend/src/hooks/`:
+
+1. **`useGameHistory.js`** - Undo/redo state management
+   - `saveStateForUndo()` - Snapshot current state
+   - `popLastState()` - Restore previous state
+   - `canUndo` - Check if undo available
+   
+2. **`usePlayerStats.js`** - Player stat updates
+   - `updateBatterStats()` - Increment batter stats
+   - `updatePitcherStats()` - Increment pitcher stats
+   - `calcTeamTotals()` - Aggregate team statistics
+   
+3. **`useBaseRunners.js`** - Base runner management
+   - `advanceRunners()` - Automatic base advancement for hits/walks
+   - `moveRunner()` - Manual runner movement
+   - `handleSteal()` - Stolen base logic
+   - `removeRunner()` - Caught stealing/pickoff
+   
+4. **`usePlayByPlay.js`** - Play-by-play log management
+   - `addPlay()` - Add play with deduplication
+   - `removeLastPlay()` - For undo
+   - Prevents duplicate entries from React strict mode
+
 ### January 10, 2026 - GAME CONTROL & WRAP-UP BUTTONS ✅
 
 #### Two Control Buttons - COMPLETED ✅
