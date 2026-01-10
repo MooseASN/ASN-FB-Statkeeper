@@ -2528,11 +2528,7 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-950 flex items-center justify-center">
-        <div className="text-white text-lg">Loading game...</div>
-      </div>
-    );
+    return <LoadingScreen message="Loading game..." />;
   }
 
   const homeTeamName = game?.home_team_name || "Home";
