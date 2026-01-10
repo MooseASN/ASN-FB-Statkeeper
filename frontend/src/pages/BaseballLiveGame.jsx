@@ -123,187 +123,76 @@ const CurrentPlayerInfo = ({ batter, pitcher, batterStats, pitcherStats }) => (
   </div>
 );
 
-// Baseball Diamond Component
+// Baseball Diamond Component - Using provided field image
 const BaseballDiamond = ({ bases, fieldingPositions }) => {
+  // Position labels with coordinates for overlay on the field image
   const positions = {
-    pitcher: { top: '55%', left: '50%' },
-    catcher: { top: '88%', left: '50%' },
-    first: { top: '58%', left: '78%' },
-    second: { top: '32%', left: '50%' },
-    third: { top: '58%', left: '22%' },
-    shortstop: { top: '45%', left: '35%' },
-    left: { top: '12%', left: '18%' },
-    center: { top: '5%', left: '50%' },
-    right: { top: '12%', left: '82%' },
+    pitcher: { top: '52%', left: '50%', label: 'P' },
+    catcher: { top: '82%', left: '50%', label: 'C' },
+    first: { top: '52%', left: '72%', label: '1B' },
+    second: { top: '38%', left: '50%', label: '2B' },
+    third: { top: '52%', left: '28%', label: '3B' },
+    shortstop: { top: '42%', left: '38%', label: 'SS' },
+    left: { top: '18%', left: '20%', label: 'LF' },
+    center: { top: '10%', left: '50%', label: 'CF' },
+    right: { top: '18%', left: '80%', label: 'RF' },
+  };
+  
+  // Base positions for highlighting runners
+  const basePositions = {
+    first: { top: '52%', left: '68%' },
+    second: { top: '35%', left: '50%' },
+    third: { top: '52%', left: '32%' },
   };
   
   return (
-    <div className="relative w-full aspect-square max-w-md mx-auto overflow-hidden rounded-t-full">
-      {/* Outfield grass with realistic gradient */}
-      <div 
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(180deg, #1a5f2a 0%, #228b22 30%, #2d8c3e 60%, #1e7a32 100%)'
-        }}
+    <div className="relative w-full max-w-md mx-auto">
+      {/* Baseball field image */}
+      <img 
+        src="https://customer-assets.emergentagent.com/job_baseball-tracker-2/artifacts/xsmgreca_Field.png"
+        alt="Baseball Field"
+        className="w-full h-auto"
       />
       
-      {/* Grass mowing pattern stripes */}
-      <div className="absolute inset-0" style={{ opacity: 0.15 }}>
-        {[...Array(12)].map((_, i) => (
-          <div 
-            key={i}
-            className="absolute w-full h-6"
-            style={{
-              top: `${i * 8}%`,
-              background: i % 2 === 0 ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-            }}
-          />
-        ))}
-      </div>
-      
-      {/* Faded StatMoose logo in centerfield */}
-      <div 
-        className="absolute"
-        style={{
-          top: '8%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          opacity: 0.15,
-          width: '30%',
-        }}
-      >
-        <img 
-          src="/logo-white.png" 
-          alt=""
-          className="w-full h-auto"
-          style={{ filter: 'brightness(1.2) contrast(0.8)' }}
-          onError={(e) => { e.target.style.display = 'none'; }}
+      {/* Base runners indicators */}
+      {bases?.first && (
+        <div 
+          className="absolute w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-lg animate-pulse"
+          style={{ top: basePositions.first.top, left: basePositions.first.left, transform: 'translate(-50%, -50%)' }}
         />
-      </div>
-      
-      {/* Warning track (darker ring around outfield) */}
-      <div 
-        className="absolute inset-0 rounded-t-full"
-        style={{
-          background: 'radial-gradient(ellipse at 50% 100%, transparent 60%, #8B4513 62%, #8B4513 65%, transparent 67%)',
-          opacity: 0.6
-        }}
-      />
-      
-      {/* Outfield wall */}
-      <div 
-        className="absolute inset-0 rounded-t-full"
-        style={{
-          boxShadow: 'inset 0 -3px 0 0 #1a472a, inset 0 3px 8px 0 rgba(0,0,0,0.3)'
-        }}
-      />
-      
-      {/* Infield dirt - more realistic diamond shape */}
-      <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100">
-        {/* Infield dirt arc and diamond */}
-        <defs>
-          <radialGradient id="dirtGradient" cx="50%" cy="100%" r="60%" fx="50%" fy="90%">
-            <stop offset="0%" stopColor="#c4a77d" />
-            <stop offset="50%" stopColor="#a0845c" />
-            <stop offset="100%" stopColor="#8b6f47" />
-          </radialGradient>
-          <radialGradient id="moundGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#c4a77d" />
-            <stop offset="100%" stopColor="#8b6f47" />
-          </radialGradient>
-        </defs>
-        
-        {/* Infield dirt area */}
-        <path 
-          d="M 50 92 
-             Q 20 75 15 50 
-             Q 20 35 50 25 
-             Q 80 35 85 50 
-             Q 80 75 50 92 Z" 
-          fill="url(#dirtGradient)"
+      )}
+      {bases?.second && (
+        <div 
+          className="absolute w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-lg animate-pulse"
+          style={{ top: basePositions.second.top, left: basePositions.second.left, transform: 'translate(-50%, -50%)' }}
         />
-        
-        {/* Base paths with chalk lines */}
-        <path 
-          d="M 50 88 L 78 55 L 50 22 L 22 55 Z" 
-          fill="none" 
-          stroke="rgba(255,255,255,0.9)" 
-          strokeWidth="1.5"
+      )}
+      {bases?.third && (
+        <div 
+          className="absolute w-4 h-4 bg-yellow-400 rounded-full border-2 border-yellow-600 shadow-lg animate-pulse"
+          style={{ top: basePositions.third.top, left: basePositions.third.left, transform: 'translate(-50%, -50%)' }}
         />
-        
-        {/* Batter's box area */}
-        <rect x="42" y="86" width="16" height="8" fill="#a0845c" rx="1" />
-        
-        {/* Home plate */}
-        <polygon 
-          points="50,90 46,86 46,84 54,84 54,86" 
-          fill="white" 
-          stroke="#666"
-          strokeWidth="0.3"
-        />
-        
-        {/* First base */}
-        <rect 
-          x="76" y="53" width="5" height="5" 
-          fill={bases?.first ? "#22c55e" : "white"} 
-          stroke={bases?.first ? "#16a34a" : "#ccc"}
-          strokeWidth="0.5"
-          transform="rotate(45 78.5 55.5)"
-        />
-        
-        {/* Second base */}
-        <rect 
-          x="47.5" y="19.5" width="5" height="5" 
-          fill={bases?.second ? "#22c55e" : "white"} 
-          stroke={bases?.second ? "#16a34a" : "#ccc"}
-          strokeWidth="0.5"
-          transform="rotate(45 50 22)"
-        />
-        
-        {/* Third base */}
-        <rect 
-          x="19.5" y="53" width="5" height="5" 
-          fill={bases?.third ? "#22c55e" : "white"} 
-          stroke={bases?.third ? "#16a34a" : "#ccc"}
-          strokeWidth="0.5"
-          transform="rotate(45 22 55.5)"
-        />
-        
-        {/* Pitcher's mound */}
-        <ellipse cx="50" cy="55" rx="6" ry="5" fill="url(#moundGradient)" />
-        <ellipse cx="50" cy="55" rx="3.5" ry="2.5" fill="#a0845c" />
-        {/* Pitcher's rubber */}
-        <rect x="48" y="54" width="4" height="1" fill="white" rx="0.3" />
-        
-        {/* Foul lines extending to outfield */}
-        <line x1="50" y1="88" x2="5" y2="45" stroke="white" strokeWidth="0.8" />
-        <line x1="50" y1="88" x2="95" y2="45" stroke="white" strokeWidth="0.8" />
-        
-        {/* On-deck circles */}
-        <circle cx="35" cy="92" r="2.5" fill="none" stroke="white" strokeWidth="0.5" opacity="0.7" />
-        <circle cx="65" cy="92" r="2.5" fill="none" stroke="white" strokeWidth="0.5" opacity="0.7" />
-        
-        {/* Coaches boxes */}
-        <rect x="18" y="68" width="6" height="10" fill="none" stroke="white" strokeWidth="0.3" opacity="0.5" />
-        <rect x="76" y="68" width="6" height="10" fill="none" stroke="white" strokeWidth="0.3" opacity="0.5" />
-      </svg>
+      )}
       
       {/* Fielding position labels */}
-      {Object.entries(positions).map(([pos, coords]) => (
-        <div 
-          key={pos}
-          className="absolute transform -translate-x-1/2 -translate-y-1/2"
-          style={{ top: coords.top, left: coords.left }}
-        >
-          <div className="bg-black/70 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] text-white whitespace-nowrap border border-white/20 shadow-lg">
-            {fieldingPositions?.[pos] ? (
-              <>#{fieldingPositions[pos].number}</>
-            ) : (
-              <span className="text-zinc-400 uppercase text-[9px] tracking-wider">{pos}</span>
-            )}
+      {Object.entries(positions).map(([pos, coords]) => {
+        const player = fieldingPositions?.[pos];
+        return (
+          <div 
+            key={pos}
+            className="absolute transform -translate-x-1/2 -translate-y-1/2"
+            style={{ top: coords.top, left: coords.left }}
+          >
+            <div className="bg-black/80 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] text-white whitespace-nowrap border border-white/30 shadow-lg">
+              {player ? (
+                <span className="font-medium">#{player.number}</span>
+              ) : (
+                <span className="text-zinc-400">{coords.label}</span>
+              )}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 };
