@@ -194,13 +194,28 @@ export default function Teams({ user, onLogout }) {
             <p className="text-muted-foreground">Manage your {sportConfig.name.toLowerCase()} teams and rosters</p>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="bg-[#000000] hover:bg-[#333333]" data-testid="create-team-btn">
-                <Plus className="w-4 h-4 mr-2" />
-                Create Team
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center gap-2">
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={fetchTeams}
+              disabled={loading}
+              title="Refresh teams"
+              data-testid="refresh-teams-btn"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={loading ? "animate-spin" : ""}>
+                <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8" />
+                <path d="M21 3v5h-5" />
+              </svg>
+            </Button>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button className="bg-[#000000] hover:bg-[#333333]" data-testid="create-team-btn">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Team
+                </Button>
+              </DialogTrigger>
             <DialogContent>
               <DialogHeader>
                 <DialogTitle>Create New {sportConfig.name} Team</DialogTitle>
