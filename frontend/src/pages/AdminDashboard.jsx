@@ -375,10 +375,129 @@ export default function AdminDashboard({ user, onLogout }) {
               Beta Mode Settings
             </CardTitle>
             <p className="text-sm text-muted-foreground">
-              Lock sports behind a password for beta testing. Users without the password cannot access that sport.
+              Control site access and lock sports behind passwords for beta testing.
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* SITE-WIDE BETA MODE */}
+            <div className={`p-4 rounded-lg space-y-4 ${betaSettings.site_beta_enabled ? 'bg-amber-500/10 border-2 border-amber-500' : 'border border-zinc-200'}`}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${betaSettings.site_beta_enabled ? 'bg-amber-500' : 'bg-zinc-200'}`}>
+                    <Shield className={`w-5 h-5 ${betaSettings.site_beta_enabled ? 'text-white' : 'text-zinc-500'}`} />
+                  </div>
+                  <div>
+                    <Label className="text-lg font-bold">Site-Wide Beta Mode</Label>
+                    <p className="text-sm text-muted-foreground">
+                      {betaSettings.site_beta_enabled 
+                        ? "🔒 ENABLED - Only whitelisted users can access the site"
+                        : "Restrict entire site to approved users only"
+                      }
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={betaSettings.site_beta_enabled}
+                  onCheckedChange={(checked) => setBetaSettings(prev => ({ ...prev, site_beta_enabled: checked }))}
+                  data-testid="site-beta-toggle"
+                />
+              </div>
+              
+              {betaSettings.site_beta_enabled && (
+                <div className="space-y-4 pt-2">
+                  {/* Beta message */}
+                  <div>
+                    <Label className="text-sm font-medium">Message for blocked users</Label>
+                    <Input
+                      type="text"
+                      placeholder="Message shown to users without access"
+                      value={betaSettings.site_beta_message}
+                      onChange={(e) => setBetaSettings(prev => ({ ...prev, site_beta_message: e.target.value }))}
+                      className="mt-1"
+                      data-testid="beta-message-input"
+                    />
+                  </div>
+                  
+                  {/* Allowed emails list */}
+                  <div>
+                    <Label className="text-sm font-medium">Allowed Users ({betaSettings.allowed_emails?.length || 0})</Label>
+                    <p className="text-xs text-muted-foreground mb-2">Admin users always have access. Add email addresses below to grant beta access.</p>
+                    
+                    {/* Add new email */}
+                    <div className="flex gap-2 mb-3">
+                      <Input
+                        type="email"
+                        placeholder="user@example.com"
+                        value={newAllowedEmail}
+                        onChange={(e) => setNewAllowedEmail(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' && newAllowedEmail.trim()) {
+                            e.preventDefault();
+                            const email = newAllowedEmail.trim().toLowerCase();
+                            if (!betaSettings.allowed_emails?.includes(email)) {
+                              setBetaSettings(prev => ({
+                                ...prev,
+                                allowed_emails: [...(prev.allowed_emails || []), email]
+                              }));
+                            }
+                            setNewAllowedEmail("");
+                          }
+                        }}
+                        className="flex-1"
+                        data-testid="add-email-input"
+                      />
+                      <Button
+                        type="button"
+                        size="sm"
+                        onClick={() => {
+                          const email = newAllowedEmail.trim().toLowerCase();
+                          if (email && !betaSettings.allowed_emails?.includes(email)) {
+                            setBetaSettings(prev => ({
+                              ...prev,
+                              allowed_emails: [...(prev.allowed_emails || []), email]
+                            }));
+                          }
+                          setNewAllowedEmail("");
+                        }}
+                        disabled={!newAllowedEmail.trim()}
+                        data-testid="add-email-btn"
+                      >
+                        Add
+                      </Button>
+                    </div>
+                    
+                    {/* List of allowed emails */}
+                    {betaSettings.allowed_emails?.length > 0 && (
+                      <div className="border rounded-lg divide-y max-h-48 overflow-y-auto">
+                        {betaSettings.allowed_emails.map((email, index) => (
+                          <div key={email} className="flex items-center justify-between px-3 py-2 text-sm">
+                            <span>{email}</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setBetaSettings(prev => ({
+                                  ...prev,
+                                  allowed_emails: prev.allowed_emails.filter((_, i) => i !== index)
+                                }));
+                              }}
+                              className="text-red-500 hover:text-red-700"
+                              data-testid={`remove-email-${index}`}
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="border-t pt-4">
+              <p className="text-sm text-muted-foreground mb-4">Sport-specific beta modes (require password to access specific sports):</p>
+            </div>
+            
             {/* Basketball Beta */}
             <div className="p-4 border rounded-lg space-y-4">
               <div className="flex items-center justify-between">
