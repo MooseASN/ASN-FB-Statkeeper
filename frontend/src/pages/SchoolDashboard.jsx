@@ -1178,7 +1178,7 @@ export default function SchoolDashboard() {
                       )}
                     </div>
                     
-                    {(gameSetup.clockEnabled || selectedGame.sport === "football") && (
+                    {(gameSetup.clockEnabled || selectedGame.sport === "football") && selectedGame.sport !== "baseball" && (
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <Label className="text-xs text-slate-400">Minutes per Period</Label>
