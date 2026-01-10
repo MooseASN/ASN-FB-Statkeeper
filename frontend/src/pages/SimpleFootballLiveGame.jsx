@@ -66,7 +66,7 @@ const PENALTIES = [
   { name: "Ineligible Receiver Downfield", defaultYards: 5 },
 ];
 
-// Player Number Input Component
+// Player Number Input Component with Add to Roster functionality
 const PlayerNumberInput = ({ 
   roster, 
   onSelect, 
@@ -74,15 +74,26 @@ const PlayerNumberInput = ({
   title, 
   rememberOption = false,
   rememberedPlayer = null,
-  onRememberChange = null 
+  onRememberChange = null,
+  onAddPlayer = null,
+  teamName = ""
 }) => {
   const [inputValue, setInputValue] = useState(rememberedPlayer || '');
   const [remember, setRemember] = useState(!!rememberedPlayer);
+  const [showAddPlayer, setShowAddPlayer] = useState(false);
+  const [newPlayerName, setNewPlayerName] = useState('');
   const inputRef = useRef(null);
+  const nameInputRef = useRef(null);
   
   useEffect(() => {
     inputRef.current?.focus();
   }, []);
+  
+  useEffect(() => {
+    if (showAddPlayer) {
+      nameInputRef.current?.focus();
+    }
+  }, [showAddPlayer]);
   
   const handleSubmit = (e) => {
     e?.preventDefault();
@@ -92,8 +103,27 @@ const PlayerNumberInput = ({
         onRememberChange(remember ? inputValue : null);
       }
       onSelect(player);
+    } else if (inputValue && onAddPlayer) {
+      // Player not found - show add to roster option
+      setShowAddPlayer(true);
     } else if (inputValue) {
       toast.error(`Player #${inputValue} not found on roster`);
+    }
+  };
+  
+  const handleAddPlayer = () => {
+    if (newPlayerName.trim() && inputValue) {
+      const newPlayer = {
+        player_number: inputValue,
+        player_name: newPlayerName.trim(),
+        position: ""
+      };
+      onAddPlayer(newPlayer);
+      // Select the new player immediately
+      if (rememberOption && onRememberChange) {
+        onRememberChange(remember ? inputValue : null);
+      }
+      onSelect(newPlayer);
     }
   };
   
@@ -101,6 +131,39 @@ const PlayerNumberInput = ({
     p.player_number?.startsWith(inputValue) || 
     p.player_name?.toLowerCase().includes(inputValue.toLowerCase())
   ).slice(0, 5);
+  
+  // Show "Add to roster" prompt
+  if (showAddPlayer) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center">
+          <div className="text-amber-400 text-sm font-medium mb-1">Player Not Found</div>
+          <div className="text-white text-lg font-semibold">Add #{inputValue} to {teamName}?</div>
+        </div>
+        <div>
+          <label className="text-sm text-zinc-400 mb-1 block">Player Name</label>
+          <Input
+            ref={nameInputRef}
+            type="text"
+            value={newPlayerName}
+            onChange={(e) => setNewPlayerName(e.target.value)}
+            placeholder="Enter player name"
+            className="bg-zinc-800 border-zinc-700 text-white text-xl text-center h-14"
+            onKeyDown={(e) => { if (e.key === 'Enter') handleAddPlayer(); }}
+          />
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => { setShowAddPlayer(false); setNewPlayerName(''); }} className="flex-1 border-zinc-700">
+            Cancel
+          </Button>
+          <Button onClick={handleAddPlayer} className="flex-1 bg-green-600 hover:bg-green-500" disabled={!newPlayerName.trim()}>
+            <Plus className="w-4 h-4 mr-2" />
+            Add & Select
+          </Button>
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className="space-y-4">
