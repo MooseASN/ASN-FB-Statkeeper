@@ -92,6 +92,7 @@ export default function SportSelection({ user, onLogout }) {
     
     if (sport === "basketball") return betaStatus.basketball_beta;
     if (sport === "football") return betaStatus.football_beta;
+    if (sport === "baseball") return betaStatus.baseball_beta;
     return false;
   };
 
