@@ -1510,16 +1510,19 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         description = `Single by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         batterStatUpdate.hits = 1;
         batterStatUpdate.singles = 1;
+        advanceRunners('single', currentBatter?.player_number, currentBatter?.player_name);
         break;
       case "double":
         description = `Double by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         batterStatUpdate.hits = 1;
         batterStatUpdate.doubles = 1;
+        advanceRunners('double', currentBatter?.player_number, currentBatter?.player_name);
         break;
       case "triple":
         description = `Triple by #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         batterStatUpdate.hits = 1;
         batterStatUpdate.triples = 1;
+        advanceRunners('triple', currentBatter?.player_number, currentBatter?.player_name);
         break;
       case "home_run":
         description = `HOME RUN by #${currentBatter?.player_number} ${currentBatter?.player_name}!`;
@@ -1527,11 +1530,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         batterStatUpdate.home_runs = 1;
         batterStatUpdate.runs = 1;
         batterStatUpdate.rbis = 1;
-        if (isHomeTeamBatting) {
-          newHomeScore += 1;
-        } else {
-          newAwayScore += 1;
-        }
+        advanceRunners('home_run', currentBatter?.player_number, currentBatter?.player_name);
+        // Score is handled by advanceRunners now
         break;
       case "ground_out":
       case "fly_out":
@@ -1549,24 +1549,76 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       case "double_play":
         description = `Double play - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newOuts += 2;
+        // Clear a base runner for double play
+        setGame(prev => {
+          const newBases = { ...prev?.bases };
+          if (newBases.first) newBases.first = null;
+          else if (newBases.second) newBases.second = null;
+          return { ...prev, bases: newBases };
+        });
         break;
       case "sacrifice_fly":
         description = `Sacrifice fly - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newOuts += 1;
         batterStatUpdate.sacrifice_flies = 1;
         batterStatUpdate.at_bats = 0; // Sac fly doesn't count as AB
+        // Score runner from 3rd
+        if (game?.bases?.third) {
+          const isHomeBatting = currentGame.inning_half === 'bottom';
+          setGame(prev => ({
+            ...prev,
+            bases: { ...prev.bases, third: null },
+            home_score: isHomeBatting ? (prev.home_score || 0) + 1 : prev.home_score,
+            away_score: !isHomeBatting ? (prev.away_score || 0) + 1 : prev.away_score,
+          }));
+          batterStatUpdate.rbis = 1;
+        }
         break;
       case "sacrifice_bunt":
         description = `Sacrifice bunt - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
         newOuts += 1;
         batterStatUpdate.sacrifice_bunts = 1;
         batterStatUpdate.at_bats = 0; // Sac bunt doesn't count as AB
+        // Advance runners on sac bunt
+        setGame(prev => {
+          const newBases = { ...prev?.bases };
+          if (newBases.second) {
+            newBases.third = newBases.second;
+            newBases.second = null;
+          }
+          if (newBases.first) {
+            newBases.second = newBases.first;
+            newBases.first = null;
+          }
+          return { ...prev, bases: newBases };
+        });
         break;
       case "error":
         description = `Error - #${currentBatter?.player_number} ${currentBatter?.player_name} reaches on error`;
+        // Track error for fielding team
+        const isHomeBatting = currentGame.inning_half === 'bottom';
+        if (isHomeBatting) {
+          setAwayErrors(e => e + 1);
+        } else {
+          setHomeErrors(e => e + 1);
+        }
+        // Batter reaches first on error
+        advanceRunners('single', currentBatter?.player_number, currentBatter?.player_name);
         break;
       case "fielders_choice":
         description = `Fielder's choice - #${currentBatter?.player_number} ${currentBatter?.player_name}`;
+        // One runner out, batter reaches first
+        setGame(prev => {
+          const newBases = { ...prev?.bases };
+          // Remove lead runner
+          if (newBases.third) newBases.third = null;
+          else if (newBases.second) newBases.second = null;
+          else if (newBases.first) newBases.first = null;
+          // Batter to first
+          newBases.first = { number: currentBatter?.player_number, name: currentBatter?.player_name };
+          return { ...prev, bases: newBases };
+        });
+        newOuts += 1;
         break;
       default:
         break;
@@ -1583,6 +1635,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       }
       description += " - Side retired";
       setCurrentBatterIndex(0);
+      // Clear bases
+      setGame(prev => ({ ...prev, bases: { first: null, second: null, third: null } }));
     } else {
       // Advance batter
       setCurrentBatterIndex(i => (i + 1) % battingRoster.length);
