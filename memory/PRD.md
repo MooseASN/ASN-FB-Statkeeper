@@ -14,6 +14,37 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - SITE-WIDE BETA MODE ✅
+
+**New Feature: Admin can lock down the entire site to authorized users only**
+
+#### Backend Endpoints:
+- `GET /api/site-beta-status` - Public endpoint to check if site is in beta mode
+- `GET /api/check-beta-access` - Auth required, checks if current user has beta access
+- `GET /api/admin/beta-settings` - Admin only, get all beta settings
+- `PUT /api/admin/beta-settings` - Admin only, update beta settings
+
+#### Frontend Components:
+- **AdminDashboard.jsx** - Added Site-Wide Beta Mode toggle section with:
+  - Enable/disable toggle with amber highlight when active
+  - Custom message input for blocked users
+  - Email whitelist management (add/remove emails)
+- **BetaAccessRequired.jsx** - New page shown to blocked users with:
+  - Dark gradient background with StatMoose logo
+  - Lock icon and "Private Beta" message
+  - "Check Again" and "Sign Out" buttons
+- **App.js** - Added beta access checking after login
+
+#### Access Control Rules:
+1. Admin users ALWAYS have access (bypass beta mode)
+2. Whitelisted emails have access when beta is enabled
+3. All other logged-in users see BetaAccessRequired page
+4. Demo pages (/demo/*) and public pages remain accessible
+
+**Testing:** 9/9 backend tests passed, 100% frontend success
+
+---
+
 ### January 10, 2026 - NEW FEATURES (Session 2) ✅
 
 #### 1. Add Player to Roster Feature ✅
