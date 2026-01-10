@@ -1839,6 +1839,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               fieldingPositions={currentFieldingDefense}
               fieldingTeamColor={battingTeamIsHome ? game?.away_team_color : game?.home_team_color}
               battingTeamColor={battingTeamIsHome ? game?.home_team_color : game?.away_team_color}
+              onRunnerClick={handleRunnerClick}
             />
           </div>
           
@@ -1860,6 +1861,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               awayStats={awayStats}
               homeTeamName={game?.home_team_name}
               awayTeamName={game?.away_team_name}
+              homeErrors={homeErrors}
+              awayErrors={awayErrors}
             />
           </div>
         </div>
@@ -1876,6 +1879,19 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         player={playerToSubstitute}
         roster={substitutionTeam === 'home' ? homeRoster : awayRoster}
         onSubstitute={executeSubstitution}
+      />
+      
+      {/* Base Runner Modal */}
+      <BaseRunnerModal
+        isOpen={showRunnerModal}
+        onClose={() => {
+          setShowRunnerModal(false);
+          setSelectedRunner(null);
+          setSelectedRunnerBase(null);
+        }}
+        runner={selectedRunner}
+        currentBase={selectedRunnerBase}
+        onAction={handleRunnerAction}
       />
       
       {/* In Play Modal */}
