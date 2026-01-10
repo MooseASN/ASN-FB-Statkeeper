@@ -1156,15 +1156,21 @@ class QuarterScores(BaseModel):
     away: List[int] = [0, 0, 0, 0]
 
 class PlayByPlayEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    quarter: int
-    team: str  # "home" or "away"
-    player_name: str
-    player_number: str
-    action: str  # "FT Made", "FT Missed", "2PT Made", etc.
+    # Basketball fields
+    quarter: Optional[int] = None
+    team: Optional[str] = None  # "home" or "away"
+    player_name: Optional[str] = None
+    player_number: Optional[str] = None
+    action: Optional[str] = None  # "FT Made", "FT Missed", "2PT Made", etc.
     points: int = 0
     home_score: int = 0
     away_score: int = 0
+    # Baseball fields
+    inning: Optional[str] = None
+    description: Optional[str] = None
+    timestamp: Optional[str] = None
 
 class Game(BaseModel):
     model_config = ConfigDict(extra="ignore")
