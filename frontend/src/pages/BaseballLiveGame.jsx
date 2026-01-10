@@ -565,6 +565,30 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     }
   }, [id, navigate, demoMode]);
   
+  // Save game state to backend
+  const saveGame = useCallback(async (updatedGame) => {
+    if (demoMode) return; // Don't save in demo mode
+    
+    try {
+      await axios.put(`${API}/games/${id}`, {
+        home_score: updatedGame.home_score,
+        away_score: updatedGame.away_score,
+        current_inning: updatedGame.current_inning,
+        inning_half: updatedGame.inning_half,
+        balls: updatedGame.balls,
+        strikes: updatedGame.strikes,
+        outs: updatedGame.outs,
+        bases: updatedGame.bases,
+        inning_scores: updatedGame.inning_scores,
+        home_player_stats: homeStats,
+        away_player_stats: awayStats,
+        play_by_play: playByPlay
+      });
+    } catch (error) {
+      console.error("Failed to save game:", error);
+    }
+  }, [id, demoMode, homeStats, awayStats, playByPlay]);
+  
   useEffect(() => {
     if (!demoMode) {
       fetchGame();
