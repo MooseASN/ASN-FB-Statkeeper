@@ -906,6 +906,8 @@ class BetaModeSettings(BaseModel):
     basketball_password: str = ""
     football_beta: bool = False
     football_password: str = ""
+    baseball_beta: bool = False
+    baseball_password: str = ""
     school_creation_beta: bool = False
     school_creation_password: str = ""
 
@@ -919,6 +921,8 @@ async def get_beta_settings(admin: User = Depends(get_admin_user)):
             "basketball_password": "",
             "football_beta": False,
             "football_password": "",
+            "baseball_beta": False,
+            "baseball_password": "",
             "school_creation_beta": False,
             "school_creation_password": ""
         }
@@ -927,6 +931,8 @@ async def get_beta_settings(admin: User = Depends(get_admin_user)):
         "basketball_password": settings.get("basketball_password", ""),
         "football_beta": settings.get("football_beta", False),
         "football_password": settings.get("football_password", ""),
+        "baseball_beta": settings.get("baseball_beta", False),
+        "baseball_password": settings.get("baseball_password", ""),
         "school_creation_beta": settings.get("school_creation_beta", False),
         "school_creation_password": settings.get("school_creation_password", "")
     }
@@ -942,6 +948,8 @@ async def update_beta_settings(settings: BetaModeSettings, admin: User = Depends
             "basketball_password": settings.basketball_password,
             "football_beta": settings.football_beta,
             "football_password": settings.football_password,
+            "baseball_beta": settings.baseball_beta,
+            "baseball_password": settings.baseball_password,
             "school_creation_beta": settings.school_creation_beta,
             "school_creation_password": settings.school_creation_password,
             "updated_at": datetime.now(timezone.utc).isoformat()
@@ -958,11 +966,13 @@ async def get_beta_status():
         return {
             "basketball_beta": False,
             "football_beta": False,
+            "baseball_beta": False,
             "school_creation_beta": False
         }
     return {
         "basketball_beta": settings.get("basketball_beta", False),
         "football_beta": settings.get("football_beta", False),
+        "baseball_beta": settings.get("baseball_beta", False),
         "school_creation_beta": settings.get("school_creation_beta", False)
     }
 
