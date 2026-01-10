@@ -4905,6 +4905,10 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
           <div className="space-y-3 mt-4">
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div className="flex items-center gap-2">
+                <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">Space</kbd>
+                <span>Start/Stop Clock</span>
+              </div>
+              <div className="flex items-center gap-2">
                 <kbd className="bg-zinc-800 px-2 py-1 rounded text-xs font-mono">\</kbd>
                 <span>Start/Stop Clock</span>
               </div>
