@@ -1,0 +1,92 @@
+{
+  "summary": "P1 Feature Testing: Football Stat Mode Selector UI. All UI components are correctly implemented. Backend game creation is failing with 500 error (unrelated to P1 feature).",
+  "backend_issues": {
+    "critical": [
+      {
+        "endpoint": "POST /api/games",
+        "issue": "Returns 500 Internal Server Error - Pydantic validation error for baseball-specific fields (current_inning, inning_half, outs, balls, strikes, bases, inning_scores) being None when creating football games",
+        "priority": "CRITICAL"
+      }
+    ],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [
+      {
+        "flow": "Game creation",
+        "issue": "Cannot create new games due to backend 500 error - navigation to /football/{id}/simple cannot be verified end-to-end",
+        "affected_selectors": ["[data-testid='start-game-btn']"]
+      }
+    ],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/test_reports/iteration_35.json"
+  ],
+  "action_items": [
+    "FIX CRITICAL: Backend Game model needs default values for baseball-specific fields (current_inning=1, inning_half='top', outs=0, balls=0, strikes=0, bases={}, inning_scores={}) to allow football game creation",
+    "After backend fix, verify navigation to /football/{id}/simple for Simple mode and /football/{id} for Advanced mode"
+  ],
+  "critical_code_review_comments": [
+    "NewGame.jsx lines 174-179: Navigation logic correctly routes to /football/{id}/simple for simple mode and /football/{id} for advanced mode",
+    "NewGame.jsx lines 61-67: Default stat mode correctly set to 'advanced' for football",
+    "NewGame.jsx lines 473-545: Football stat mode selector UI correctly implemented with data-testid attributes",
+    "App.js lines 193-194: Routes correctly defined for /football/:id and /football/:id/simple"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "0% (game creation failing)",
+    "frontend": "100% (UI components working)"
+  },
+  "test_credentials": {
+    "email": "antlersportsnetwork@gmail.com",
+    "password": "NoahTheJew1997"
+  },
+  "seed_data_creation": "None - using existing test teams",
+  "retest_needed": true,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "P1 Football Stat Mode Selector UI is correctly implemented. Backend has a critical bug in POST /api/games - Pydantic validation fails for baseball fields when creating football games. Once backend is fixed, verify end-to-end navigation to /football/{id}/simple and /football/{id}.",
+  "features_tested": {
+    "stat_mode_selector_visible": {
+      "status": "PASS",
+      "notes": "Football stat mode selector appears when selectedSport === 'football'"
+    },
+    "advanced_mode_default": {
+      "status": "PASS",
+      "notes": "Advanced mode is pre-selected by default (border-green-500 class applied)"
+    },
+    "simple_mode_description": {
+      "status": "PASS",
+      "notes": "Simple mode shows 'Broadcaster-friendly, minimal input' description"
+    },
+    "simple_mode_features": {
+      "status": "PASS",
+      "notes": "Simple mode features list: Quick scoring, Team stats (yards, turnovers), Game clock control, Keyboard shortcuts, Play-by-play log, No scroll layout"
+    },
+    "advanced_mode_description": {
+      "status": "PASS",
+      "notes": "Advanced mode shows 'Full play-by-play tracking' description"
+    },
+    "advanced_mode_features": {
+      "status": "PASS",
+      "notes": "Advanced mode features list: Full play-by-play, Field position tracking, Down & distance, Drive summaries, Player stats, Keyboard hotkeys"
+    },
+    "mode_selection_toggle": {
+      "status": "PASS",
+      "notes": "Clicking Simple/Advanced buttons correctly toggles selection (orange border for Simple, green border for Advanced)"
+    },
+    "simple_mode_navigation": {
+      "status": "BLOCKED",
+      "notes": "Cannot verify - backend game creation failing with 500 error. Code review confirms navigation to /football/{id}/simple"
+    },
+    "advanced_mode_navigation": {
+      "status": "BLOCKED",
+      "notes": "Cannot verify - backend game creation failing with 500 error. Code review confirms navigation to /football/{id}"
+    },
+    "back_button_navigation": {
+      "status": "PASS",
+      "notes": "Back button correctly navigates to /dashboard"
+    }
+  }
+}
