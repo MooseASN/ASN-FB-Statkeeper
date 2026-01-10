@@ -587,6 +587,10 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       
       switch (e.key.toLowerCase()) {
+        case ' ': // Spacebar
+          e.preventDefault();
+          setClockRunning(prev => !prev);
+          break;
         case '\\':
           e.preventDefault();
           setClockRunning(prev => !prev);
