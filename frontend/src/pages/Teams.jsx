@@ -122,6 +122,18 @@ export default function Teams({ user, onLogout }) {
   useEffect(() => {
     fetchTeams();
   }, [fetchTeams, location.pathname, location.key]);
+  
+  // Refetch teams when tab becomes visible (user might have left and come back)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchTeams();
+      }
+    };
+    
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [fetchTeams]);
 
   const handleCreateTeam = async () => {
     if (!newTeam.name.trim()) {
