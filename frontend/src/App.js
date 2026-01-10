@@ -35,6 +35,7 @@ import SchoolDashboard from "@/pages/SchoolDashboard";
 import SchoolJoin from "@/pages/SchoolJoin";
 import SeasonManagement from "@/pages/SeasonManagement";
 import SeasonStats from "@/pages/SeasonStats";
+import BetaAccessRequired from "@/pages/BetaAccessRequired";
 // Demo pages
 import BasketballDemoSelector from "@/pages/BasketballDemoSelector";
 import DemoLiveGameClassic from "@/pages/DemoLiveGameClassic";
