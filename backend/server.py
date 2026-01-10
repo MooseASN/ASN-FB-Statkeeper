@@ -1339,6 +1339,16 @@ class GameUpdate(BaseModel):
     possession: Optional[str] = None
     home_time_of_possession: Optional[int] = None
     away_time_of_possession: Optional[int] = None
+    # Baseball-specific state
+    current_inning: Optional[int] = None
+    inning_half: Optional[str] = None  # "top" or "bottom"
+    balls: Optional[int] = None
+    strikes: Optional[int] = None
+    outs: Optional[int] = None
+    bases: Optional[dict] = None  # {"first": bool, "second": bool, "third": bool}
+    inning_scores: Optional[dict] = None  # {"home": [int], "away": [int]}
+    home_player_stats: Optional[List[dict]] = None
+    away_player_stats: Optional[List[dict]] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
