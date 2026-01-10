@@ -191,6 +191,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/game/:id" element={<SportProtectedRoute user={user}><LiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/game/:id/advanced" element={<SportProtectedRoute user={user}><AdvancedLiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/football/:id" element={<SportProtectedRoute user={user}><FootballLiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
+      <Route path="/football/:id/simple" element={<SportProtectedRoute user={user}><SimpleFootballLiveGame /></SportProtectedRoute>} />
       <Route path="/football/:id/stats" element={<FootballStatsView />} />
       <Route path="/baseball/:id" element={<SportProtectedRoute user={user}><BaseballLiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/baseball/:id/boxscore" element={<BaseballBoxScore />} />
