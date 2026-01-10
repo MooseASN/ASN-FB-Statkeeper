@@ -61,7 +61,7 @@ export default function Dashboard({ user, onLogout }) {
     fetchData();
     fetchSponsorBanners();
     // Set document title based on sport
-    const sportAbbrev = selectedSport === 'basketball' ? 'BKB' : 'FB';
+    const sportAbbrev = selectedSport === 'basketball' ? 'BKB' : selectedSport === 'football' ? 'FB' : 'BB';
     document.title = `StatMoose ${sportAbbrev}`;
   }, [selectedSport]);
 
