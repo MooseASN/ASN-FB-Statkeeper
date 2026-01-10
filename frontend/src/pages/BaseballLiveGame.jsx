@@ -1265,15 +1265,16 @@ const InPlayModal = ({ isOpen, onClose, onResult }) => {
 // Team Stats Summary Component - Compact version showing real stats
 // Team Stats Summary Component - Shows R, H, E, SO, BB
 const TeamStatsSummary = ({ homeStats, awayStats, homeTeamName, awayTeamName, homeErrors = 0, awayErrors = 0 }) => {
-  // Calculate team totals
+  // Calculate team totals including pitches thrown
   const calcTotals = (stats) => {
-    if (!stats || stats.length === 0) return { runs: 0, hits: 0, strikeouts: 0, walks: 0 };
+    if (!stats || stats.length === 0) return { runs: 0, hits: 0, strikeouts: 0, walks: 0, pitches: 0 };
     return stats.reduce((acc, player) => ({
       runs: acc.runs + (player.runs || 0),
       hits: acc.hits + (player.hits || 0),
       strikeouts: acc.strikeouts + (player.strikeouts_batting || 0),
       walks: acc.walks + (player.walks || 0),
-    }), { runs: 0, hits: 0, strikeouts: 0, walks: 0 });
+      pitches: acc.pitches + (player.pitches_thrown || 0),
+    }), { runs: 0, hits: 0, strikeouts: 0, walks: 0, pitches: 0 });
   };
   
   const homeTotals = calcTotals(homeStats);
@@ -1285,29 +1286,32 @@ const TeamStatsSummary = ({ homeStats, awayStats, homeTeamName, awayTeamName, ho
         <h3 className="text-xs font-bold text-white uppercase tracking-wider">Team Stats</h3>
       </div>
       <div className="p-2 text-xs">
-        <div className="grid grid-cols-6 gap-1 text-center text-zinc-400 mb-1">
+        <div className="grid grid-cols-7 gap-1 text-center text-zinc-400 mb-1">
           <div></div>
           <div>R</div>
           <div>H</div>
           <div>E</div>
           <div>SO</div>
           <div>BB</div>
+          <div>P</div>
         </div>
-        <div className="grid grid-cols-6 gap-1 text-center text-white mb-1">
+        <div className="grid grid-cols-7 gap-1 text-center text-white mb-1">
           <div className="text-left truncate text-zinc-300">{homeTeamName?.slice(0, 8)}</div>
           <div className="text-green-400 font-bold">{homeTotals.runs}</div>
           <div>{homeTotals.hits}</div>
           <div className="text-red-400">{homeErrors}</div>
           <div>{homeTotals.strikeouts}</div>
           <div>{homeTotals.walks}</div>
+          <div className="text-blue-400">{homeTotals.pitches}</div>
         </div>
-        <div className="grid grid-cols-6 gap-1 text-center text-white">
+        <div className="grid grid-cols-7 gap-1 text-center text-white">
           <div className="text-left truncate text-zinc-300">{awayTeamName?.slice(0, 8)}</div>
           <div className="text-green-400 font-bold">{awayTotals.runs}</div>
           <div>{awayTotals.hits}</div>
           <div className="text-red-400">{awayErrors}</div>
           <div>{awayTotals.strikeouts}</div>
           <div>{awayTotals.walks}</div>
+          <div className="text-blue-400">{awayTotals.pitches}</div>
         </div>
       </div>
     </div>
@@ -2094,6 +2098,14 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         break;
     }
     
+    // Always advance the batter after any in-play result (even on 3rd out)
+    // This ensures the batting order continues correctly when the team bats again
+    if (battingTeamIsHome) {
+      setHomeBatterIndex(i => (i + 1) % battingRoster.length);
+    } else {
+      setAwayBatterIndex(i => (i + 1) % battingRoster.length);
+    }
+    
     // Check for end of half inning
     if (newOuts >= 3) {
       newOuts = 0;
@@ -2104,16 +2116,8 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         newInning = currentGame.current_inning + 1;
       }
       description += " - Side retired";
-      // NOTE: Do NOT reset batter index - each team continues where they left off in the batting order
       // Clear bases
       setGame(prev => ({ ...prev, bases: { first: null, second: null, third: null } }));
-    } else {
-      // Advance the CURRENT batting team's batter index
-      if (battingTeamIsHome) {
-        setHomeBatterIndex(i => (i + 1) % battingRoster.length);
-      } else {
-        setAwayBatterIndex(i => (i + 1) % battingRoster.length);
-      }
     }
     
     // Update stats
