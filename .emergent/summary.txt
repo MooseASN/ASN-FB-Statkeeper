@@ -1,174 +1,194 @@
 <analysis>**original_problem_statement:**
-The user is building StatMoose, a comprehensive sports stat-tracking application. The current session focuses on a major redesign of the public-facing homepage and implementing a full-featured Demo Mode for the basketball and football stat-keepers.
+The user wants to build a Baseball stat-tracking feature, which includes infrastructure, a Classic Mode UI, and game creation options. The user is also facing several issues:
+1.  A recurring P0 bug where users cannot log in immediately after a new deployment (this was fixed in the session).
+2.  A new recurring issue where newly created teams do not appear on the teams page for all sports.
+3.  Requested Stripe integration for subscriptions.
+4.  A series of specific UI/UX enhancements for the Baseball stat tracker, including a new field image, a condensed layout, a pre-game starter dialogue for setting lineups, substitution functionality, and fixing navigation.
 
 **PRODUCT REQUIREMENTS:**
-1.  **Homepage Redesign:**
-    *   Create a new homepage inspired by  with a dark theme (black, white, grey).
-    *   Use the official StatMoose logo. A large version should be at the top with a light-sweep animation that follows the logo's shape.
-    *   The hero section text should be updated.
-    *   All sections should have a fade-in animation when scrolled into view.
-    *   Add a Sports Offered section for Basketball, Football, and Baseball (coming soon), with specific styling for text and image opacity.
-    *   Add feature sections for Schools, Broadcasters, and Venues, using user-provided images. These sections should have a slideshow-style text effect that transitions automatically every 7 seconds without navigation controls.
-    *   Get Started button should navigate to the Contact page.
-2.  **Contact Page & Email Integration:**
-    *   Create a contact page with fields for Name, Email, School, State, Role, and a message.
-    *   Integrate the Resend API to ensure form submissions are emailed directly to .
-3.  **Demo Mode Implementation:**
-    *   Create non-editable demos for both Basketball and Football.
-    *   All demo pages must have a persistent orange Demo Mode bar at the top.
-    *   Use fake teams and players (10 for basketball, 50 for football).
-    *   Demos must use the **true, existing stat-keeping UI components**, not simplified placeholders.
-    *   Users should be able to interact with features like box score downloads and the jumbotron.
-    *   Add a View Demo button to the Sports Offered section on the homepage.
-    *   The Basketball demo requires a selector page allowing users to choose between Classic, Advanced, and Simple modes, with a screenshot of each UI to guide them.
+1.  **Baseball Stat Tracker:**
+    *   Create a Baseball sport option. (DONE)
+    *   Admin dashboard beta-mode toggle for Baseball. (DONE)
+    *   Game creation to allow custom innings count, notes, and primetime mode. (IN PROGRESS)
+    *   Build a live stat-tracking UI () with a specific layout, fielding/batting displays, and substitution logic. (IN PROGRESS)
+    *   Use a user-provided image for the baseball field. (DONE)
+2.  **Team Management Bug:**
+    *   Diagnose and fix the issue where teams are not consistently visible on the  page after being created.
+3.  **Navigation:**
+    *   The Home button within a sport's specific pages should navigate to the sport's dashboard, not the application's main homepage. (DONE)
+    *   The back button in all live game trackers should go to the respective sport's home page.
+4.  **Stripe Integration:**
+    *   Connect Stripe to handle monthly/annual subscriptions. (STARTED)
 
 **User's preferred language**: English
 
 **what currently exists?**
-The agent has successfully redesigned the homepage () and the contact page () to match the user's vision, including the dark theme, animations, and slideshow sections. The Resend email integration is complete and functional, sending contact form submissions as requested. The routing has been updated to support the new public-facing pages.
-
-The agent has created the initial structure for the demo mode, including:
--   Fake data in .
--   A  page.
--   Routes in  for the demo pages.
--   View Demo buttons on the homepage.
--   Wrapper components (, etc.) that are intended to render the real UI with fake data.
+The Baseball sport infrastructure is fully implemented. The  component is functional, with a demo mode, backend persistence for game state, and a pre-game starter dialogue for setting batting/fielding lineups. An initial Stripe integration has been added with backend routes and a frontend pricing page. The critical login bug from the previous session has been fixed. The UI for the baseball field has been updated to use a user-provided image. The teams not showing up issue was investigated, and while the agent believes it to be a testing or caching problem, the user still reports it.
 
 **Last working item**:
--   **Last item agent was working:** The agent was in the process of implementing the Demo Mode feature. After an initial attempt with placeholder components, the user clarified that the demos must use the *actual* stat-keeping UI. The agent was creating wrapper components and backend endpoints to inject fake data into the real UI components. The work is incomplete, and the agent was about to create a simplified component for the Advanced mode demo, which contradicts the user's request.
--   **Status:** IN PROGRESS
--   **Agent Testing Done:** N
--   **Which testing method agent to use?** Frontend testing agent. The test should verify the entire demo flow: clicking View Demo on the homepage, selecting a basketball mode, and seeing the correct stat-keeping UI load with the orange Demo Mode banner and fake data.
--   **User Testing Done:** N
+- **Last item agent was working:** The agent was in the midst of a major UI refactor for  to match the user's latest requests. This included creating a condensed layout, adding a clear button to the starter dialog, and updating the baseball diamond to display player names in a specific format () and correct fielder positions.
+- **Status:** IN PROGRESS
+- **Agent Testing Done:** N
+- **Which testing method agent to use?** Frontend testing agent. The tests should verify the new condensed layout, the functionality of the starter dialogue (including clearing selections), the correct display of players on the field, and the new substitution flow.
+- **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-- **Issue 1: Hardcoded API Key (P1)**
-  - **Description:** The Resend API key is hardcoded in . This is a security risk.
+- **Issue 1: Newly created teams do not appear on the Teams page (P0)**
 
 **Issues Detail:**
-- **Issue 1: Hardcoded API Key**
-    - **Attempted fixes:** None.
+- **Issue 1: Newly created teams do not appear on the Teams page**
+    - **Attempted fixes:** The agent confirmed backend API calls work correctly. It was identified that a  mismatch caused test failures, but the UI seemed to work in screenshots. The agent added more console logging, a manual refresh button to the  page, and a  event listener to force re-fetching. Despite these measures, the user still reports the problem.
     - **Next debug checklist:**
-        1.  Create a  variable in the  file.
-        2.  Update  to read the key using .
-        3.  Ensure the key is correctly passed to the Resend library.
-    - **Why fix this issue and what will be achieved with the fix?** To improve security by removing sensitive credentials from source code.
-    - **Status:** NOT STARTED
-    - **Is recurring issue?** N
-    - **Should Test frontend/backend/both after fix?** Backend (by re-testing the contact form).
-    - **Blocked on other issue:** None.
+        1.  Re-examine the  component's state management and the  dependencies (, ).
+        2.  Investigate potential race conditions between navigation, context updates (), and the  API call.
+        3.  Add extensive client-side logging to capture the value of  at the moment  is called, the raw API response, and the component's state before and after the fetch.
+        4.  Verify that the  interceptor is consistently applying the auth token for all requests originating from .
+    - **Why fix this issue and what will be achieved with the fix?** This is a core functionality bug that prevents users from managing their teams, making the application feel broken and unreliable.
+    - **Status:** IN PROGRESS
+    - **Is recurring issue?** Y
+    - **Should Test frontend/backend/both after fix?** Both. Frontend testing to confirm the UI updates correctly, and backend to ensure the API is flawless.
 
 **In progress Task List**:
-- **Task 1: Complete Demo Mode Implementation (P0)**
-    - **Where to resume:** The agent needs to ensure all demo pages (, , , ) correctly wrap and render the *actual* UI components (, , ) with the fake demo data. The simplified placeholders must be replaced with the real UI. Additionally, screenshots of the three basketball modes need to be taken and added to the  page.
-    - **What will be achieved with this?** A fully functional demo system that allows prospective users to experience the application's core features with pre-populated, non-editable data, matching the user's specific requirements.
+- **Task 1: Complete UI/UX enhancements for the Baseball Stat Tracker (P1)**
+    - **Where to resume:** Continue refactoring the  component. The agent just modified the  and the  components. The next steps are to rebuild the main layout of  to be more condensed.
+    - **What will be achieved with this?** A more compact and user-friendly interface for baseball stat tracking that meets all of the user's specific design requirements.
     - **Status:** IN PROGRESS
-    - **Should Test frontend/backend/both after fix?** Both.
+    - **Should Test frontend/backend/both after fix?** Frontend.
     - **Blocked on something:** None.
 
 **Upcoming and Future Tasks**
 - **Upcoming Tasks:**
-    - **P1: Refactor :** Integrate the  custom hook to complete the component refactoring.
-    - **P2: Implement Demo Jumbotron:** The basketball demo allows users to click the Jumbotron button, but it needs to be wired up to a demo-specific Jumbotron view.
-    - **P2: Implement Baseball Demo:** Create the demo for baseball once the stat-keeper for that sport is built.
+    - **P1: Implement Substitution Logic:**
+        - Add a switch icon () to the batting order and on player labels on the field.
+        - Create a substitution dialog that asks if the change is offensive, defensive, or both.
+        - Implement the logic to swap players in the batting order and/or on the field based on the user's choice.
+    - **P1: Finalize Baseball Stat Tracker Functionality:**
+        - Ensure the batting order automatically advances to the next player after an at-bat concludes.
+        - Ensure the correct defensive players are shown on the field based on which team is batting.
+    - **P1: Fix Back Button Navigation:**
+        - In all live stat trackers (, , , ), ensure the back button navigates to the sport's main page/dashboard, not the global one.
 - **Future Tasks:**
-    - **P2: Refactor  (ON HOLD):** Break the large file into smaller, domain-specific routers.
-    - **P2: Season Clone Feature:** Add functionality to clone an entire season structure.
+    - **P2: Configure Stripe Pricing Tiers:** The integration is present, but the pricing page needs to be connected to actual subscription plans and feature-gating logic.
+    - **P2: Complete  Decomposition:** Break the monolithic  into smaller, domain-specific routers (e.g., , ).
+    - **P2: Refactor :** Integrate the  hook to reduce complexity.
+    - **P2: Implement PDF Export for Baseball:** Create a PDF box score for completed baseball games.
+    - **P2: Season Clone Feature:** Add functionality to clone an entire season's structure.
 
 **Completed work in this session**
-- **Feature: Homepage Redesign (DONE):** Created  with a dark theme, animations, user-provided images, and slideshow sections, based on the Sidearm Sports example.
-- **Feature: Contact Page and Email Integration (DONE):** Created  and integrated the Resend API in  to email form submissions.
-- **Feature: Homepage Animations (DONE):** Implemented a shape-aware logo sweep animation and scroll-triggered fade-in animations for all page sections.
-- **Feature: Sports Offered Section (DONE):** Added a new section to the homepage with styled images and text for Basketball, Football, and Baseball.
-- **Bugfix: Jumbotron Layout (DONE):** Fixed an issue on  where player text was cut off.
-- **Task: Routing Refactor (DONE):** Updated  to set the new  as the root () and moved the main authenticated application to .
-- **Task: FootballLiveGame.jsx Partial Refactor (DONE):** Successfully integrated  and  hooks into the component.
+- **Bugfix: Critical Login Failure (DONE):** Resolved the recurring production login bug by unifying password hashing and verification under 's .
+- **Feature: Baseball Stat Tracker v1 (DONE):** Built the  component, including the UI, backend data persistence, and a fully functional demo mode at .
+- **Feature: Baseball Game Creation (DONE):** Implemented the UI in  to support creating baseball games with options for innings, notes, and primetime mode.
+- **Feature: Baseball Pre-Game Setup (DONE):** Created a multi-step Starter Dialogue to set the batting order and defensive positions for both teams before a game begins.
+- **Feature: Stripe Integration (STARTED):** Called the  and implemented backend endpoints for Stripe checkout () and created frontend  and .
+- **UI/UX: Baseball Field Enhancement (DONE):** Replaced the programmatically drawn field with a user-provided background image and adjusted fielder position labels.
+- **UI/UX: Navigation Fix (DONE):** The Home button in the main layout now correctly navigates to the  page instead of the marketing homepage.
+- **Bugfix: Team Page Debugging (IN PROGRESS):** Added a manual refresh button and improved logging to the  page to help diagnose the team loading issue.
 
 **Earlier issues found/mentioned but not fixed**
--   **Issue 1: Refactor **
-    -   **Debug checklist:** The component has been partially refactored. The final step is to integrate the  hook to manage drive and possession state.
-    -   **Why to solve this issue and what will be achieved with this?** To simplify the massive ~4900 line component, reduce state management complexity, and improve readability.
-    -   **Should Test frontend/backend/both after fix:** Frontend.
-    -   **Is recurring issue?** Y
-    - **Status:** IN PROGRESS (partially done).
+- **Issue 1:  refactor.** This is a technical debt item from the initial handoff, deferred to avoid regression.
 
 **Known issue recurrence from previous fork**
-- None in this session.
+- **Issue recurrence in previous fork:** Production login bug.
+- **Recurrence count:** High.
+- **Status:** RESOLVED.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Email Integration (Resend):** Using the  Python library to send transactional emails via API. The API key needs to be moved to an environment variable.
--   **Advanced CSS Animation:** Using  to create a non-rectangular animation effect on the logo and  to trigger animations on scroll.
--   **Component Composition for Demos:** The current strategy is to wrap existing, complex UI components (, ) in new Demo components. These wrappers provide a demo context and inject fake data, allowing the reuse of the real UI without extensive modifications.
--   **Routing Strategy:** Separated the public-facing marketing site (at ) from the authenticated application (at ), a common pattern for SaaS applications.
+- **Password Hashing:** Fixed a critical bug caused by a mismatch between 's  for user registration and direct  calls for admin user creation and login verification.
+- **Stripe Integration:** Used  to get a playbook for Stripe. Implemented backend routes for creating checkout sessions and handling webhooks. Used a test key from the environment.
+- **Complex Modal State:** Managed a multi-step modal () in React to guide the user through a complex setup process (setting batting order and defensive positions for two teams).
+- **Frontend State & Caching:** Debugged a persistent issue with data not appearing on the  page, leading to the implementation of multiple fallback strategies like manual refresh and event listeners.
+- **Incremental Refactoring:** Began decomposing the monolithic  by creating new router files but only integrated the  router to minimize risk. Left comments in  for a future refactor instead of performing it and risking regression.
 
 **key DB schema**
-- **contact_submissions**:  (NEW)
+- **games:**
+    - 
+    - 
+    -  (e.g., top, bottom)
+    - , , 
+    - , 
+    - , 
+    - 
+- **BaseballPlayerStats:**
+    - added , 
 
 **changes in tech stack**
-- **resend**: New Python package added for email functionality.
+- Added  and  to the backend dependencies.
 
 **All files of reference**
--   **/app/frontend/src/pages/HomePage.jsx**: The new public-facing homepage.
--   **/app/frontend/src/pages/ContactPage.jsx**: The new contact page with the Resend-powered form.
--   **/app/backend/server.py**: Contains the  endpoint and the hardcoded Resend API key that needs to be moved.
--   **/app/frontend/src/App.js**: Contains the new routing structure for the homepage and demo pages.
--   **/app/frontend/src/pages/BasketballDemoSelector.jsx**: The selection page for basketball demos, which needs UI screenshots.
--   **/app/frontend/src/pages/DemoLiveGameClassic.jsx**: Wrapper for the real  component. Needs to be verified.
+- : The primary file for the baseball stat tracker. It is currently undergoing a major layout refactor.
+- : The file related to the recurring bug where teams don't show up. It has been modified with debugging aids.
+- : The main backend file. Contains the fix for the login bug and the logic for creating/updating baseball games.
+- : The game creation form, modified to allow custom innings for baseball.
+- : The new file containing all Stripe-related API endpoints.
+- : The user-provided image for the baseball field.
 
 **Areas that need refactoring**:
--   ****: The Resend API key is hardcoded and must be moved to an environment variable.
--   ****: Still a very large component. The refactoring needs to be completed by integrating the  hook.
+- ****: The decomposition into domain-specific routers has only just begun and needs to be completed.
+- ****: The refactor to use the  hook is still pending.
+- ****: Is currently being refactored into a new condensed layout. The code is in a transitional state.
 
 **key api endpoints**
--   **NEW:** : Submits the contact form and triggers a Resend email.
--   **NEW:**  / : Endpoints intended to provide fake game data for the demo modes.
+- : The login endpoint that was fixed.
+- : Endpoint for creating teams.
+- : Endpoint for fetching teams, now filtered by .
+- : Endpoint for creating games, now with baseball-specific logic.
+- : Endpoint for saving live game state.
+- : New endpoint for Stripe integration.
+- : New endpoint to provide mock data for the baseball demo.
 
 **Critical Info for New Agent**
--   The highest priority is to **complete the Demo Mode implementation**. The user was very specific: use the **real UI components**, not simplified placeholders. The primary task is to correctly wrap the existing stat-keeper components (, , ) and feed them the fake demo data.
--   Before completing the  page, you must **take screenshots of the three basketball UI modes** (Simple, Classic, Advanced) to display on the selector cards.
--   The **Resend API key is currently hardcoded** in . This is a security risk and must be moved to a  environment variable in  as a P1 task.
+- **The user's most recent requests are highest priority.** Focus on completing the condensed layout for  and implementing the substitution logic exactly as described.
+- **The teams not showing up issue is critical.** The user has reported it multiple times. Do not dismiss it as a caching issue. A thorough investigation is required. The debugging code added by the previous agent (console logs, refresh button) should be used to gather more information from the user if the issue persists.
+- **The  component is large and complex.** It's currently being refactored. Proceed with caution and test changes incrementally. The component now contains the , which handles the pre-game lineup setup.
+- **Back button navigation needs to be fixed across all live game components**, not just baseball.
 
 **documents and test reports created in this job**
--   /app/memory/PRD.md (updated with homepage and demo tasks)
+-  (updated)
+- 
+- 
+- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **Request:** Create demos for Basketball and Football using the *true* statkeeping UI with fake teams/players. Add an orange Demo Mode bar and View Demo buttons. The basketball demo needs a mode selector with UI screenshots. (Status: **IN PROGRESS**)
-2.  **Confirmation:** Perfect! - Approving the final opacity on homepage sport photos. (Status: **RESOLVED**)
-3.  **Request:** Reduce sport photo opacity by another 20% (total 30%). (Status: **RESOLVED**)
-4.  **Request:** Reduce sport photo opacity by 10%. (Status: **RESOLVED**)
-5.  **Request:** Make the sport text bigger with more character separation. (Status: **RESOLVED**)
-6.  **Implicit Request:** Add a Sports Offered section using provided images. (Status: **RESOLVED**)
-7.  **Request:** Fix the logo sweep animation to be shape-aware. Confirmation that other animations and the email test worked. (Status: **RESOLVED**)
-8.  **Request:** Add scroll-in animations for all sections and a large logo on the hero. Asks for info needed for Resend integration. (Status: **RESOLVED**)
-9.  **User providing Resend API key.** Request for a light sweep reveal animation on the main logo. (Status: **RESOLVED**)
-10. **Request:** Implement various homepage UI tweaks (text alignment, fade transitions, new text) and asks how to set up the contact form email delivery. (Status: **RESOLVED**)
+1.  **Request:** Fix team loading, use a new field image, fix home button nav, create starter dialogue, show defensive players on field. (Status: **IN PROGRESS**)
+2.  **Request:** Allow custom innings, add clear button to starter dialogue, make stat tracker condensed, add substitution logic with a dialog, auto-advance batter, fix back button in all live games. (Status: **IN PROGRESS**)
+3.  **Issue Report:** Still having issues with saved teams not showing up. (Status: **IN PROGRESS**)
+4.  **Confirmation:** All next actions except for PDF export. (Status: **RESOLVED**)
+5.  **Request:** I want all teams separated by the sport they were created in. (Status: **RESOLVED** - Agent confirmed this is already working but added safeguards).
+6.  **Summary Provided:** Agent summarized work on baseball tracker and team issue investigation. (Status: **RESOLVED**)
+7.  **Issue Report:** User re-iterates that created teams are not showing up. (Status: **IN PROGRESS**)
+8.  **Request:** Improve baseball field UI with a logo and make it more realistic. (Status: **RESOLVED** - Superseded by the request to use an image).
+9.  **Summary Provided:** Agent summarized completion of baseball tracker v1. (Status: **RESOLVED**)
+10. **Info/Request:** User provided a Stripe key and asked to finish the baseball stat tracker, deferring pricing tier configuration. (Status: **RESOLVED**)
 
 **Project Health Check:**
--   **Broken:** The demo pages are incomplete and may not be using the correct approach (i.e., using placeholders instead of the real UI).
--   **Mocked:**  contains the mocked data for the demos.
--   **Needs Refactoring:**
-    -    has a hardcoded API key.
-    -    refactoring is incomplete.
+- **Broken:** Team management is unreliable due to the bug where newly created teams sometimes don't appear on the list, despite being in the database.
+- **Mocked:** The demo modes for all sports use mock data generators or static data from within the frontend components ().
+- **Needs Refactoring:**
+    -  is a large monolithic file that needs to be fully decomposed into routers.
+    -  still requires a refactor to use the  hook.
 
 **3rd Party Integrations**
--   **Resend:** Used for sending transactional emails from the contact form. Key is currently hardcoded. Version  was installed.
+-   **Resend:** Used for sending transactional emails.
 -   **reportlab:** Used for PDF generation.
 -   **lucide-react:** Used for icons.
+-   **Stripe:** (New) Added for handling recurring subscriptions. Requires a user-provided API key (test key  is in ).
 
 **Testing status**
--   **Testing agent used after significant changes:** NO (not in this session).
--   **Troubleshoot agent used after agent stuck in loop:** NO.
--   **Test files created:** None.
--   **Known regressions:** None.
+-   **Testing agent used after significant changes:** YES
+-   **Troubleshoot agent used after agent stuck in loop:** NO
+-   **Test files created:** None
+-   **Known regressions:** The user reports that the teams not showing issue is a regression or a persistent problem.
 
 **Credentials to test flow:**
--   **School Admin User:**  / 
--   **Main Admin User:**  / 
+-   **Admin User:**  / 
+-   **School Admin User (preview only):**  / 
 
 **What agent forgot to execute**
--   The agent did not move the hardcoded Resend API key to an environment variable.
--   The agent has not yet generated the required UI screenshots for the basketball demo selector page.
--   The agent started creating placeholder/simplified demo components *after* the user clarified they wanted the true UI, indicating a potential misunderstanding of the latest request.</analysis>
+The agent was actively working on a large set of user requests. It did not forget any, but the following are the primary items left to implement from the user's last message:
+-   Rebuilding the main  layout into a condensed format.
+-   Adding the substitution icon and functionality (with the offensive/defensive/both dialog).
+-   Ensuring the batting order auto-advances.
+-   Fixing the back button navigation in all live stat trackers.</analysis>
