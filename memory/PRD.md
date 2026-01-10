@@ -9,8 +9,50 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 - Share live game stats with public viewers
 - Manage events/tournaments
 - **Multi-tenant school/organization management system**
+- **Subscription-based pricing with Stripe integration**
 
 ## Latest Updates (January 2026)
+
+### January 10, 2026 - P2 Tasks Completed
+
+#### Stripe Payment Integration - COMPLETED
+- **Pricing Page** (`/pricing`) - Displays 4 subscription packages:
+  - Basic Monthly ($9.99/mo) - Unlimited teams, basic stats, game history
+  - Pro Monthly ($19.99/mo) - Advanced stats, PDF reports, priority support
+  - Basic Annual ($99.99/yr) - 17% discount
+  - Pro Annual ($199.99/yr) - 17% discount
+- **Payment Flow**:
+  1. User selects package → Stripe Checkout redirect
+  2. Payment transaction recorded in `payment_transactions` collection
+  3. On success → Polls status → Updates user subscription
+- **Backend Routes**:
+  - GET `/api/payments/packages` - List all packages
+  - POST `/api/payments/checkout` - Create Stripe checkout session
+  - GET `/api/payments/status/{session_id}` - Check payment status
+  - GET `/api/payments/my-subscription` - Get user's subscription
+  - GET `/api/payments/history` - Get payment history
+  - POST `/api/webhook/stripe` - Handle Stripe webhooks
+- **Database Collections**:
+  - `payment_transactions` - Stores all payment records
+  - `users` - Extended with subscription fields (subscription_status, subscription_package, subscription_start, subscription_end)
+
+#### Login Bug Fix - COMPLETED
+- **Issue**: Users receiving "Invalid email or password" after deployment
+- **Root Cause**: Mismatch between password hashing (passlib) and verification (direct bcrypt)
+- **Fix**: Updated `verify_password()` to use `pwd_context.verify()` for robust compatibility
+
+#### Server.py Decomposition - STARTED
+- Created `/app/backend/routers/` with modular router files:
+  - `payments.py` - Stripe payment integration (INTEGRATED)
+  - `auth.py` - Authentication routes (prepared for future integration)
+  - `admin.py` - Admin routes (prepared for future integration)
+- Documentation added for future router integration
+
+#### FootballLiveGame Refactoring - DOCUMENTED
+- Added import for `useDriveState` hook
+- Added detailed TODO comments for integration steps
+- Hook ready at `/app/frontend/src/hooks/useDriveState.js`
+- Refactoring approach documented for safe incremental migration
 
 ### January 10, 2026 - Baseball Sport Infrastructure
 - **Added Baseball to Sport Selection** - Now displays 3 sports: Basketball, Football, Baseball
