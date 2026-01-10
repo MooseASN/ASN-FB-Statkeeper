@@ -208,7 +208,8 @@ export default function NewGame({ user, onLogout }) {
         sport: selectedSport,
         ...getClockSettings(),
         ...getTimeoutSettings(),
-        ...getPrimetimeSettings()
+        ...getPrimetimeSettings(),
+        ...(selectedSport === "baseball" ? { total_innings: totalInnings } : {})
       };
       
       // Add season linkage if selected
