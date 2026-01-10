@@ -87,7 +87,7 @@ const ScoreByInningsTable = ({ game, awayTeamName, homeTeamName }) => {
 };
 
 // Batting Stats Table Component
-const BattingStatsTable = ({ teamName, teamColor, players, stats }) => {
+const BattingStatsTable = ({ teamName, teamColor, teamLogo, players, stats }) => {
   // Merge player roster with stats
   const playerStats = players?.map(player => {
     const stat = stats?.find(s => s.player_number === player.player_number) || {};
@@ -120,6 +120,13 @@ const BattingStatsTable = ({ teamName, teamColor, players, stats }) => {
         className="flex items-center gap-3 px-4 py-2 rounded-t-lg"
         style={{ backgroundColor: teamColor || '#374151' }}
       >
+        {teamLogo && (
+          <img 
+            src={teamLogo} 
+            alt={`${teamName} logo`}
+            className="w-8 h-8 object-contain"
+          />
+        )}
         <h3 className="text-white font-bold text-lg">{teamName}</h3>
       </div>
       <div className="overflow-x-auto">
