@@ -554,6 +554,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const [quarter, setQuarter] = useState(1);
   const [clockTime, setClockTime] = useState(900);
   const [clockRunning, setClockRunning] = useState(false);
+  const [clockEnabled, setClockEnabled] = useState(true); // Optional clock for Simple mode
   const [homeTimeouts, setHomeTimeouts] = useState(0);
   const [awayTimeouts, setAwayTimeouts] = useState(0);
   const [gameStatus, setGameStatus] = useState('in_progress'); // 'in_progress', 'Halftime', 'Final'
