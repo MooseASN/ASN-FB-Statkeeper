@@ -552,10 +552,19 @@ export default function BaseballBoxScore() {
             <div className="flex items-center justify-center gap-8 mb-4">
               {/* Away Team */}
               <div className="text-center">
-                <div 
-                  className="w-4 h-16 mx-auto mb-2 rounded"
-                  style={{ backgroundColor: game.away_team_color || '#3b82f6' }}
-                />
+                {game.away_team_logo ? (
+                  <img 
+                    src={game.away_team_logo} 
+                    alt={`${game.away_team_name} logo`}
+                    className="w-20 h-20 mx-auto mb-2 object-contain"
+                    data-testid="away-team-logo"
+                  />
+                ) : (
+                  <div 
+                    className="w-16 h-16 mx-auto mb-2 rounded-full"
+                    style={{ backgroundColor: game.away_team_color || '#3b82f6' }}
+                  />
+                )}
                 <div className="text-xl font-bold">{game.away_team_name}</div>
                 <div className="text-4xl font-bold mt-2">{game.away_score || 0}</div>
               </div>
@@ -571,10 +580,19 @@ export default function BaseballBoxScore() {
               
               {/* Home Team */}
               <div className="text-center">
-                <div 
-                  className="w-4 h-16 mx-auto mb-2 rounded"
-                  style={{ backgroundColor: game.home_team_color || '#dc2626' }}
-                />
+                {game.home_team_logo ? (
+                  <img 
+                    src={game.home_team_logo} 
+                    alt={`${game.home_team_name} logo`}
+                    className="w-20 h-20 mx-auto mb-2 object-contain"
+                    data-testid="home-team-logo"
+                  />
+                ) : (
+                  <div 
+                    className="w-16 h-16 mx-auto mb-2 rounded-full"
+                    style={{ backgroundColor: game.home_team_color || '#dc2626' }}
+                  />
+                )}
                 <div className="text-xl font-bold">{game.home_team_name}</div>
                 <div className="text-4xl font-bold mt-2">{game.home_score || 0}</div>
               </div>
