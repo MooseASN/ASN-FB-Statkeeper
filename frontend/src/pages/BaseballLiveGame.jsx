@@ -1393,7 +1393,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         <Scoreboard game={game} />
         
         {/* Current Batter/Pitcher */}
-        <div className="mt-4">
+        <div className="mt-3">
           <CurrentPlayerInfo 
             batter={currentBatter}
             pitcher={currentPitcher}
@@ -1402,33 +1402,22 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
           />
         </div>
         
-        {/* Main Grid */}
-        <div className="grid grid-cols-12 gap-4 mt-4">
+        {/* Main Grid - 3 columns: Left (Play-by-play + Batting), Center (Field), Right (Pitch + Stats) */}
+        <div className="grid grid-cols-12 gap-3 mt-3">
           {/* Left Column - Play by Play & Batting Order */}
-          <div className="col-span-3 space-y-4">
+          <div className="col-span-3 space-y-2">
             <PlayByPlayLog plays={playByPlay} />
-            <StatsTabs 
-              activeTab={activeStatsTab}
-              onTabChange={setActiveStatsTab}
-              homeStats={homeStats}
-              awayStats={awayStats}
+            <BattingOrder 
+              players={battingRoster}
+              currentBatterIndex={currentBatterIndex}
+              onSelectBatter={setCurrentBatterIndex}
+              onSubstitute={(player) => handleSubstitutionRequest(player, battingTeamIsHome)}
+              teamName={battingTeamIsHome ? game?.home_team_name : game?.away_team_name}
             />
           </div>
           
-          {/* Center - Batting Order & Diamond */}
-          <div className="col-span-6 space-y-4">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3">
-                Batting: {battingTeamIsHome ? game?.home_team_name : game?.away_team_name}
-              </h3>
-              <BattingOrder 
-                players={battingRoster}
-                currentBatterIndex={currentBatterIndex}
-                onSelectBatter={setCurrentBatterIndex}
-                onSubstitute={(player) => handleSubstitutionRequest(player, battingTeamIsHome)}
-              />
-            </div>
-            
+          {/* Center - Baseball Diamond */}
+          <div className="col-span-6">
             <BaseballDiamond 
               bases={game?.bases}
               fieldingPositions={currentFieldingDefense}
@@ -1437,19 +1426,25 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             />
           </div>
           
-          {/* Right Column - Pitch Results */}
-          <div className="col-span-3">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-4">
+          {/* Right Column - Pitch Results & Stats */}
+          <div className="col-span-3 space-y-2">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
               <PitchResultButtons 
                 onPitchResult={handlePitchResult}
                 disabled={!startersConfigured}
               />
               {!startersConfigured && !demoMode && (
-                <p className="text-center text-amber-500 text-sm mt-2">
-                  Configure lineups to start tracking
+                <p className="text-center text-amber-500 text-xs mt-2">
+                  Configure lineups to start
                 </p>
               )}
             </div>
+            <TeamStatsSummary 
+              homeStats={homeStats}
+              awayStats={awayStats}
+              homeTeamName={game?.home_team_name}
+              awayTeamName={game?.away_team_name}
+            />
           </div>
         </div>
       </div>
