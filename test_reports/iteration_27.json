@@ -1,0 +1,79 @@
+{
+  "summary": "Completed testing of team sport persistence bug fix and baseball tracker features. All 7 requested features verified working: team creation/persistence, play-by-play log (no doubling), player names in plays, runner numbers on bases, fielder boxes with team colors, and substitution dialog with offensive/defensive/both options.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/tests/test_team_sport_persistence.py",
+    "/app/test_reports/pytest/pytest_team_sport.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "TeamDetail.jsx correctly tracks teamSport state (line 104) and includes it in PUT requests (lines 191-192, 209-210)",
+    "Backend PUT /api/teams correctly preserves sport field when incoming default is 'basketball' but existing is different (lines 1424-1430)",
+    "BaseballLiveGame.jsx uses addPlay() helper with lastPlayIdRef for deduplication to prevent play-by-play doubling (lines 949-970)",
+    "BaseballDiamond component accepts fieldingTeamColor and battingTeamColor props for team-colored fielder boxes (line 424)",
+    "SubstitutionDialog component provides offensive/defensive/both options (lines 525-606)"
+  ],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "100% (7/7 tests passed)",
+    "frontend": "100% (7/7 features verified)"
+  },
+  "test_credentials": {
+    "admin": "antlersportsnetwork@gmail.com / NoahTheJew1997"
+  },
+  "seed_data_creation": "Created test team: TEST_Baseball_Team_e51ac1 (auto-cleaned by test fixtures)",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All requested bug fixes verified working. Team sport persistence fix ensures baseball teams stay in baseball list after editing. Baseball tracker features all functional: play-by-play log uses deduplication, player names shown in all plays, substitution dialog has 3 options (offensive/defensive/both), fielder boxes use team colors, runner indicators show player numbers.",
+  "features_tested": {
+    "team_creation_persistence": {
+      "status": "PASS",
+      "notes": "Created baseball team, added roster, saved, navigated back - team visible in baseball teams list. Sport field preserved correctly."
+    },
+    "play_by_play_no_doubling": {
+      "status": "PASS",
+      "notes": "Clicked Ball button 4 times, got exactly 4 entries (Ball 1, Ball 2, Ball 3, Walk). No duplicates. Uses lastPlayIdRef for deduplication."
+    },
+    "player_names_in_plays": {
+      "status": "PASS",
+      "notes": "All plays show player number and name: 'Walk to #2 Ryan Smith', 'Ball 1 - #2 Ryan Smith', etc."
+    },
+    "runner_numbers_on_bases": {
+      "status": "PASS",
+      "notes": "BaseballDiamond component shows runner indicators with player numbers using battingTeamColor. Code verified at lines 455-496."
+    },
+    "fielder_boxes_team_colors": {
+      "status": "PASS",
+      "notes": "Fielder position boxes (LF, CF, RF, SS, 2B, 3B, 1B, P, C) use fieldingTeamColor prop. Visible as red boxes for Riverside Sluggers."
+    },
+    "substitution_icon_in_batting_order": {
+      "status": "PASS",
+      "notes": "Found 9 ArrowLeftRight substitution icons in batting order, one per player."
+    },
+    "substitution_dialog_options": {
+      "status": "PASS",
+      "notes": "Dialog shows 3 options: 'Offensive Only (Batting Order)' green, 'Defensive Only (Field Position)' blue, 'Both (Full Substitution)' purple. Player selection dropdown appears after choosing type."
+    }
+  },
+  "backend_tests_summary": {
+    "test_file": "/app/tests/test_team_sport_persistence.py",
+    "tests_run": 7,
+    "tests_passed": 7,
+    "tests_failed": 0,
+    "key_tests": [
+      "test_create_baseball_team - Creates baseball team, verifies sport='baseball'",
+      "test_update_baseball_team_preserves_sport - Updates team with sport field, verifies preserved",
+      "test_update_without_sport_preserves_existing - Backend preserves sport when default 'basketball' sent",
+      "test_add_roster_to_baseball_team - Adds 9 players, verifies sport preserved",
+      "test_full_workflow_create_edit_navigate_back - Full workflow test matching user bug report"
+    ]
+  }
+}
