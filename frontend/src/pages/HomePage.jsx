@@ -17,7 +17,7 @@ const sportsData = [
   {
     name: "Baseball",
     image: "https://customer-assets.emergentagent.com/job_statmoose-sports-1/artifacts/uhv3smdr_Baseball.jpg",
-    comingSoon: true
+    comingSoon: false
   }
 ];
 
