@@ -435,9 +435,9 @@ const BaseballDiamond = ({ bases, fieldingPositions, fieldingTeamColor, battingT
     second: { top: '42%', left: '58%', label: '2B' },
     third: { top: '55%', left: '28%', label: '3B' },
     shortstop: { top: '42%', left: '42%', label: 'SS' },
-    left: { top: '24%', left: '18%', label: 'LF' },      // Updated per reference
-    center: { top: '6%', left: '50%', label: 'CF' },     // Updated per reference  
-    right: { top: '24%', left: '82%', label: 'RF' },     // Updated per reference
+    left: { top: '28%', left: '25%', label: 'LF' },      // Positioned in left field grass
+    center: { top: '18%', left: '50%', label: 'CF' },    // Positioned in center field grass  
+    right: { top: '28%', left: '75%', label: 'RF' },     // Positioned in right field grass
   };
   
   // Base positions for highlighting runners
