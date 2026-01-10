@@ -128,12 +128,17 @@ export default function Teams({ user, onLogout }) {
       toast.error("Team name is required");
       return;
     }
+    
+    // Debug: Log the sport being used
+    console.log("Creating team with sport:", selectedSport, "and data:", newTeam);
 
     try {
       const res = await axios.post(`${API}/teams`, {
         ...newTeam,
         sport: selectedSport
       });
+      
+      console.log("Team created successfully:", res.data);
       
       // Immediately add the new team to the local state
       setTeams(prevTeams => [...prevTeams, res.data]);
@@ -146,6 +151,7 @@ export default function Teams({ user, onLogout }) {
       // Use state to indicate we came from team creation - this helps with back navigation
       navigate(`/teams/${res.data.id}`, { state: { fromTeamCreation: true } });
     } catch (error) {
+      console.error("Failed to create team:", error.response?.data || error.message);
       toast.error("Failed to create team");
     }
   };
