@@ -66,6 +66,9 @@ export default function AdminDashboard({ user, onLogout }) {
   
   // Beta mode settings
   const [betaSettings, setBetaSettings] = useState({
+    site_beta_enabled: false,
+    site_beta_message: "StatMoose is currently in private beta. Contact the administrator for access.",
+    allowed_emails: [],
     basketball_beta: false,
     basketball_password: "",
     football_beta: false,
@@ -75,6 +78,7 @@ export default function AdminDashboard({ user, onLogout }) {
     school_creation_beta: false,
     school_creation_password: ""
   });
+  const [newAllowedEmail, setNewAllowedEmail] = useState("");
   const [savingBeta, setSavingBeta] = useState(false);
   const [showBasketballPassword, setShowBasketballPassword] = useState(false);
   const [showFootballPassword, setShowFootballPassword] = useState(false);
