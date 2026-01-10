@@ -215,6 +215,24 @@ function AppRoutes({ user, onLogin, onLogout }) {
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [betaAccessDenied, setBetaAccessDenied] = useState(false);
+
+  // Check beta access for a user
+  const checkBetaAccess = async () => {
+    try {
+      const res = await axios.get(`${API}/check-beta-access`);
+      if (!res.data.has_access) {
+        setBetaAccessDenied(true);
+        return false;
+      }
+      setBetaAccessDenied(false);
+      return true;
+    } catch (error) {
+      // If check fails (network error), allow access
+      setBetaAccessDenied(false);
+      return true;
+    }
+  };
 
   useEffect(() => {
     // Check for existing session
@@ -227,6 +245,8 @@ function App() {
           // Verify token is still valid
           const res = await axios.get(`${API}/auth/me`);
           setUser(res.data);
+          // Check beta access after confirming user is authenticated
+          await checkBetaAccess();
         } catch (error) {
           // Only clear auth on 401 (unauthorized) - not on network errors
           if (error.response && error.response.status === 401) {
@@ -235,6 +255,8 @@ function App() {
             // Network error - trust the stored user data
             try {
               setUser(JSON.parse(savedUser));
+              // Check beta access
+              await checkBetaAccess();
             } catch (e) {
               clearAuth();
             }
@@ -247,8 +269,10 @@ function App() {
     checkAuth();
   }, []);
 
-  const handleLogin = (userData) => {
+  const handleLogin = async (userData) => {
     setUser(userData);
+    // Check beta access after login
+    await checkBetaAccess();
   };
 
   const handleLogout = async () => {
@@ -259,12 +283,30 @@ function App() {
     }
     clearAuth();
     setUser(null);
+    setBetaAccessDenied(false);
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-800 flex items-center justify-center">
         <div className="text-white text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  // If user is logged in but doesn't have beta access, show the beta access page
+  if (user && betaAccessDenied) {
+    return (
+      <div className="app-container">
+        <BrowserRouter>
+          <Routes>
+            {/* Allow admin dashboard for admins */}
+            <Route path="/admin" element={<AdminDashboard user={user} onLogout={handleLogout} />} />
+            {/* All other routes show beta access required */}
+            <Route path="*" element={<BetaAccessRequired user={user} onLogout={handleLogout} />} />
+          </Routes>
+        </BrowserRouter>
+        <Toaster position="top-right" duration={1500} dismissible={true} />
       </div>
     );
   }
