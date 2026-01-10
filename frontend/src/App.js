@@ -44,6 +44,7 @@ import DemoFootballLiveGame from "@/pages/DemoFootballLiveGame";
 import DemoBaseballLiveGame from "@/pages/DemoBaseballLiveGame";
 // Baseball pages
 import BaseballLiveGame from "@/pages/BaseballLiveGame";
+import BaseballBoxScore from "@/pages/BaseballBoxScore";
 // Payment pages
 import PricingPage from "@/pages/PricingPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
