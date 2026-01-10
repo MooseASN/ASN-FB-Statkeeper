@@ -103,6 +103,7 @@ export default function TeamDetail({ user, onLogout }) {
   const [teamColor, setTeamColor] = useState("#000000");
   const [teamSport, setTeamSport] = useState("basketball"); // CRITICAL: Track team sport to preserve on save
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   
   // Bulk add state
   const [bulkAddOpen, setBulkAddOpen] = useState(false);
