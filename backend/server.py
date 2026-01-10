@@ -1008,6 +1008,201 @@ async def verify_beta_password(sport: str = Body(...), password: str = Body(...)
     
     return {"valid": False, "error": "Invalid type"}
 
+# ==================== SHARED ACCESS / ADMIN ACCESS MANAGEMENT ====================
+
+class SharedAccessCreate(BaseModel):
+    email: str  # Email of user to share access with
+
+class SharedAccessResponse(BaseModel):
+    id: str
+    owner_user_id: str
+    owner_email: str
+    owner_username: str
+    shared_with_user_id: str
+    shared_with_email: str
+    shared_with_username: str
+    is_active: bool
+    created_at: str
+
+@api_router.get("/admin/shared-access")
+async def get_shared_access_list(user: User = Depends(get_current_user)):
+    """Get list of users who have been granted shared access by the current user"""
+    # Get all shared access records where current user is the owner
+    shared_records = await db.shared_access.find(
+        {"owner_user_id": user.user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with user details
+    result = []
+    for record in shared_records:
+        shared_user = await db.users.find_one(
+            {"user_id": record["shared_with_user_id"]},
+            {"_id": 0, "email": 1, "username": 1}
+        )
+        if shared_user:
+            result.append({
+                "id": record["id"],
+                "owner_user_id": record["owner_user_id"],
+                "shared_with_user_id": record["shared_with_user_id"],
+                "shared_with_email": shared_user.get("email", ""),
+                "shared_with_username": shared_user.get("username", ""),
+                "is_active": record.get("is_active", True),
+                "created_at": record.get("created_at", "")
+            })
+    
+    return result
+
+@api_router.get("/admin/shared-access/received")
+async def get_received_shared_access(user: User = Depends(get_current_user)):
+    """Get list of accounts the current user has been granted access to"""
+    # Get all shared access records where current user is the recipient
+    shared_records = await db.shared_access.find(
+        {"shared_with_user_id": user.user_id, "is_active": True},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Enrich with owner details
+    result = []
+    for record in shared_records:
+        owner_user = await db.users.find_one(
+            {"user_id": record["owner_user_id"]},
+            {"_id": 0, "email": 1, "username": 1}
+        )
+        if owner_user:
+            result.append({
+                "id": record["id"],
+                "owner_user_id": record["owner_user_id"],
+                "owner_email": owner_user.get("email", ""),
+                "owner_username": owner_user.get("username", ""),
+                "shared_with_user_id": record["shared_with_user_id"],
+                "is_active": record.get("is_active", True),
+                "created_at": record.get("created_at", "")
+            })
+    
+    return result
+
+@api_router.post("/admin/shared-access")
+async def grant_shared_access(request: SharedAccessCreate, user: User = Depends(get_current_user)):
+    """Grant shared access to another user by their email"""
+    # Find the user to share with
+    target_user = await db.users.find_one(
+        {"email": request.email.lower().strip()},
+        {"_id": 0, "user_id": 1, "email": 1, "username": 1}
+    )
+    
+    if not target_user:
+        raise HTTPException(status_code=404, detail="User not found with that email")
+    
+    if target_user["user_id"] == user.user_id:
+        raise HTTPException(status_code=400, detail="Cannot share access with yourself")
+    
+    # Check if access already exists
+    existing = await db.shared_access.find_one({
+        "owner_user_id": user.user_id,
+        "shared_with_user_id": target_user["user_id"]
+    })
+    
+    if existing:
+        # Reactivate if it was deactivated
+        if not existing.get("is_active", True):
+            await db.shared_access.update_one(
+                {"id": existing["id"]},
+                {"$set": {"is_active": True, "updated_at": datetime.now(timezone.utc).isoformat()}}
+            )
+            return {"message": f"Shared access reactivated for {target_user['email']}"}
+        raise HTTPException(status_code=400, detail="Access already granted to this user")
+    
+    # Create shared access record
+    access_id = str(uuid.uuid4())
+    shared_access = {
+        "id": access_id,
+        "owner_user_id": user.user_id,
+        "shared_with_user_id": target_user["user_id"],
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    await db.shared_access.insert_one(shared_access)
+    
+    return {
+        "message": f"Access granted to {target_user['email']}",
+        "shared_access": {
+            "id": access_id,
+            "shared_with_email": target_user["email"],
+            "shared_with_username": target_user.get("username", ""),
+            "is_active": True
+        }
+    }
+
+@api_router.delete("/admin/shared-access/{access_id}")
+async def revoke_shared_access(access_id: str, user: User = Depends(get_current_user)):
+    """Revoke shared access from a user"""
+    # Find and verify ownership
+    access_record = await db.shared_access.find_one(
+        {"id": access_id, "owner_user_id": user.user_id},
+        {"_id": 0}
+    )
+    
+    if not access_record:
+        raise HTTPException(status_code=404, detail="Shared access record not found")
+    
+    # Soft delete (deactivate)
+    await db.shared_access.update_one(
+        {"id": access_id},
+        {"$set": {"is_active": False, "revoked_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {"message": "Shared access revoked successfully"}
+
+@api_router.get("/admin/shared-access/switch/{owner_user_id}")
+async def switch_to_shared_account(owner_user_id: str, user: User = Depends(get_current_user)):
+    """Get data for switching to a shared account view. Returns the owner's teams, events, games."""
+    # Verify the user has access to this owner's account
+    access_record = await db.shared_access.find_one({
+        "owner_user_id": owner_user_id,
+        "shared_with_user_id": user.user_id,
+        "is_active": True
+    })
+    
+    if not access_record:
+        raise HTTPException(status_code=403, detail="You don't have access to this account")
+    
+    # Get owner's teams
+    teams = await db.teams.find(
+        {"user_id": owner_user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get owner's events
+    events = await db.events.find(
+        {"user_id": owner_user_id},
+        {"_id": 0}
+    ).to_list(100)
+    
+    # Get owner's games
+    games = await db.games.find(
+        {"user_id": owner_user_id},
+        {"_id": 0}
+    ).to_list(500)
+    
+    # Get owner info
+    owner = await db.users.find_one(
+        {"user_id": owner_user_id},
+        {"_id": 0, "email": 1, "username": 1}
+    )
+    
+    return {
+        "owner": {
+            "user_id": owner_user_id,
+            "email": owner.get("email", "") if owner else "",
+            "username": owner.get("username", "") if owner else ""
+        },
+        "teams": teams,
+        "events": events,
+        "games": games
+    }
+
 @api_router.post("/admin/migrate-teams-sport")
 async def migrate_teams_to_basketball(admin: User = Depends(get_admin_user)):
     """Migrate all teams without a sport field to basketball (admin only)"""
