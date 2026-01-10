@@ -1421,6 +1421,14 @@ async def update_team(team_id: str, team_data: TeamCreate, user: User = Depends(
         raise HTTPException(status_code=404, detail="Team not found")
     
     update_data = team_data.model_dump()
+    # CRITICAL: If the sport field wasn't explicitly provided or is the default,
+    # preserve the existing sport to prevent accidental overwrites
+    if update_data.get("sport") == "basketball" and existing.get("sport") and existing.get("sport") != "basketball":
+        # Only preserve if the existing sport is different and the incoming is the default
+        # This handles the case where frontend doesn't send sport, so it defaults to basketball
+        # But if the team was already basketball, this is fine
+        update_data["sport"] = existing.get("sport")
+    
     await db.teams.update_one({"id": team_id, "user_id": user.user_id}, {"$set": update_data})
     
     updated = await db.teams.find_one({"id": team_id}, {"_id": 0})
