@@ -151,6 +151,8 @@ const SportCard = ({ sport, index }) => {
       navigate("/demo/basketball");
     } else if (sport.name === "Football") {
       navigate("/demo/football");
+    } else if (sport.name === "Baseball") {
+      navigate("/demo/baseball");
     }
   };
 
