@@ -1695,7 +1695,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     if (!runner || !currentBase) return;
     
     // Save state before making changes
-    saveStateForUndo();
+    saveCurrentStateForUndo();
     
     const runnerNumber = typeof runner === 'object' ? runner.number : runner;
     
@@ -1791,7 +1791,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     }
     
     // Save state before making changes
-    saveStateForUndo();
+    saveCurrentStateForUndo();
     
     // Get current game state for the play description
     const currentGame = game;
@@ -1932,7 +1932,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     setShowInPlayModal(false);
     
     // Save state before making changes
-    saveStateForUndo();
+    saveCurrentStateForUndo();
     
     const currentGame = game;
     if (!currentGame) return;
@@ -2227,7 +2227,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   
   // Handle inning/score update
   const handleInningScoreUpdate = (updates) => {
-    saveStateForUndo();
+    saveCurrentStateForUndo();
     
     setGame(prev => ({
       ...prev,
