@@ -100,19 +100,24 @@ export default function Teams({ user, onLogout }) {
   const fetchTeams = useCallback(async () => {
     // Don't fetch if no sport is selected
     if (!selectedSport) {
+      console.log("fetchTeams: No sport selected, clearing teams");
       setTeams([]);
       setLoading(false);
       return;
     }
     
     setLoading(true);
+    console.log("fetchTeams: Fetching teams for sport:", selectedSport);
     try {
       const res = await axios.get(`${API}/teams`, {
         params: { sport: selectedSport }
       });
-      setTeams(res.data);
+      console.log("fetchTeams: Received", res.data?.length || 0, "teams");
+      setTeams(res.data || []);
     } catch (error) {
+      console.error("fetchTeams: Error:", error.response?.data || error.message);
       toast.error("Failed to load teams");
+      setTeams([]);
     } finally {
       setLoading(false);
     }
