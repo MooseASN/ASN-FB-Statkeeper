@@ -2299,12 +2299,12 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               variant="ghost" 
               size="sm" 
               onClick={handleUndo}
-              disabled={undoHistory.length === 0}
-              className={`${undoHistory.length > 0 ? 'text-amber-500 hover:text-amber-400' : 'text-zinc-600'}`}
+              disabled={!canUndo}
+              className={`${canUndo ? 'text-amber-500 hover:text-amber-400' : 'text-zinc-600'}`}
               data-testid="undo-btn"
             >
               <Undo2 className="w-4 h-4 mr-2" />
-              Undo {undoHistory.length > 0 ? `(${undoHistory.length})` : ''}
+              Undo {canUndo ? `(${historyLength})` : ''}
             </Button>
             <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
               <Share2 className="w-4 h-4 mr-2" />
