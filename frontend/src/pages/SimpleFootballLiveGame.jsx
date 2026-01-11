@@ -1525,6 +1525,15 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
           )}
         </DialogContent>
       </Dialog>
+      
+      {/* Embed Snippet Generator */}
+      <EmbedSnippetGenerator
+        open={showEmbedDialog}
+        onOpenChange={setShowEmbedDialog}
+        shareCode={game?.share_code || id}
+        sport="football"
+        gameTitle={`${game?.away_team_name || 'Away'} vs ${game?.home_team_name || 'Home'}`}
+      />
     </div>
   );
 }
