@@ -49,7 +49,13 @@ import {
   ChevronRight,
   ChevronDown,
   Trash2,
-  X
+  X,
+  DollarSign,
+  Crown,
+  UserCog,
+  Check,
+  Edit2,
+  Save
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
