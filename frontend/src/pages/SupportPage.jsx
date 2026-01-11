@@ -194,7 +194,7 @@ export default function SupportPage() {
           </p>
 
           {/* Basketball Guides */}
-          <CollapsibleSection title="🏀 Basketball Stat-Keeping" icon={Trophy} defaultOpen={true}>
+          <CollapsibleSection title="Basketball Stat-Keeping" iconSrc={SPORT_ICONS.basketball} defaultOpen={true}>
             <SubSection title="Getting Started">
               <Step number="1" title="Create a Team" description="Go to Dashboard → New Team → Select Basketball" />
               <Step number="2" title="Add Your Roster" description="Enter player names, numbers, and positions" />
@@ -223,7 +223,7 @@ export default function SupportPage() {
           </CollapsibleSection>
 
           {/* Football Guides */}
-          <CollapsibleSection title="🏈 Football Stat-Keeping" icon={Flag}>
+          <CollapsibleSection title="Football Stat-Keeping" iconSrc={SPORT_ICONS.football}>
             <SubSection title="Simple Mode vs Advanced Mode">
               <p className="mb-3">StatMoose offers two football stat-keeping modes:</p>
               <div className="grid md:grid-cols-2 gap-4">
