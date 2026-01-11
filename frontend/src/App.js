@@ -197,6 +197,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/football/:id/stats" element={<FootballStatsView />} />
       <Route path="/baseball/:id" element={<SportProtectedRoute user={user}><BaseballLiveGame user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       <Route path="/baseball/:id/boxscore" element={<BaseballBoxScore />} />
+      <Route path="/baseball/:id/stats" element={<BaseballLiveStats />} />
       <Route path="/history" element={<SportProtectedRoute user={user}><GameHistory user={user} onLogout={handleLogout} /></SportProtectedRoute>} />
       
       {/* Public shareable live stats view */}
