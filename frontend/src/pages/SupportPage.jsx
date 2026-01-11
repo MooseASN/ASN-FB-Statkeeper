@@ -27,15 +27,15 @@ import { Button } from "@/components/ui/button";
 
 const MARTY_IMAGE = "https://customer-assets.emergentagent.com/job_sportspro-dash/artifacts/xqkfq63l_Marty.png";
 
-// Sport icons
+// Sport icons as styled emojis
 const SPORT_ICONS = {
-  basketball: "/basketball-icon.png",
-  football: "/football-icon.png", 
-  baseball: "/baseball-icon.png"
+  basketball: "🏀",
+  football: "🏈", 
+  baseball: "⚾"
 };
 
-// Collapsible Section Component - supports both Lucide icons and image URLs
-function CollapsibleSection({ title, icon: Icon, iconSrc, children, defaultOpen = false }) {
+// Collapsible Section Component - supports Lucide icons, emojis, or image URLs
+function CollapsibleSection({ title, icon: Icon, sportIcon, iconSrc, children, defaultOpen = false }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
@@ -45,7 +45,9 @@ function CollapsibleSection({ title, icon: Icon, iconSrc, children, defaultOpen 
         className="w-full px-4 py-3 bg-zinc-900 hover:bg-zinc-800 transition-colors flex items-center justify-between text-left"
       >
         <div className="flex items-center gap-3">
-          {iconSrc ? (
+          {sportIcon ? (
+            <span className="text-2xl">{sportIcon}</span>
+          ) : iconSrc ? (
             <img src={iconSrc} alt="" className="w-6 h-6 object-contain" />
           ) : Icon ? (
             <Icon className="w-5 h-5 text-orange-500" />
