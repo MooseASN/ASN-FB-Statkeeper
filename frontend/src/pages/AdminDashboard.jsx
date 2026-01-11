@@ -1351,6 +1351,91 @@ export default function AdminDashboard({ user, onLogout }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Role Change Confirmation Dialog */}
+      <Dialog open={showRoleDialog} onOpenChange={setShowRoleDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-purple-600">
+              <UserCog className="w-5 h-5" />
+              {roleChangeUser?.effective_role === "admin" ? "Revoke Admin Access" : "Grant Admin Access"}
+            </DialogTitle>
+            <DialogDescription>
+              {roleChangeUser?.effective_role === "admin" 
+                ? "This will remove admin privileges from this user."
+                : "This will give this user full admin access to the platform."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {roleChangeUser && (
+            <div className="py-4 space-y-2">
+              <div className={`p-3 rounded-lg border ${
+                roleChangeUser.effective_role === "admin" 
+                  ? "bg-amber-50 border-amber-200" 
+                  : "bg-purple-50 border-purple-200"
+              }`}>
+                <p className={`font-medium ${
+                  roleChangeUser.effective_role === "admin" ? "text-amber-800" : "text-purple-800"
+                }`}>
+                  {roleChangeUser.name || roleChangeUser.username || "Unknown User"}
+                </p>
+                <p className={`text-sm ${
+                  roleChangeUser.effective_role === "admin" ? "text-amber-600" : "text-purple-600"
+                }`}>
+                  {roleChangeUser.email}
+                </p>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Current role:</span>
+                  <Badge variant={roleChangeUser.effective_role === "admin" ? "default" : "secondary"}>
+                    {roleChangeUser.effective_role === "admin" ? "Admin" : "User"}
+                  </Badge>
+                  <span className="text-xs text-muted-foreground">→</span>
+                  <Badge variant={roleChangeUser.effective_role === "admin" ? "secondary" : "default"}>
+                    {roleChangeUser.effective_role === "admin" ? "User" : "Admin"}
+                  </Badge>
+                </div>
+              </div>
+              {roleChangeUser.effective_role !== "admin" && (
+                <p className="text-sm text-muted-foreground">
+                  Admin users can access the admin dashboard, manage users, view all data, and configure platform settings.
+                </p>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowRoleDialog(false);
+                setRoleChangeUser(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleToggleAdmin(roleChangeUser)}
+              disabled={updatingRole === roleChangeUser?.user_id}
+              className={roleChangeUser?.effective_role === "admin" 
+                ? "bg-amber-600 hover:bg-amber-700" 
+                : "bg-purple-600 hover:bg-purple-700"}
+              data-testid="confirm-role-change-btn"
+            >
+              {roleChangeUser?.effective_role === "admin" ? (
+                <>
+                  <Shield className="w-4 h-4 mr-2" />
+                  Revoke Admin
+                </>
+              ) : (
+                <>
+                  <Crown className="w-4 h-4 mr-2" />
+                  Grant Admin
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
