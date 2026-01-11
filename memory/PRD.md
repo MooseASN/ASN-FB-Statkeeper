@@ -14,6 +14,57 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 11, 2026 - PRICING PAGE & SUBSCRIPTION TIERS ✅
+
+**New Feature: Complete pricing page with 3 subscription tiers**
+
+#### Tiers:
+| Feature | 🥉 Bronze (Free) | 🥈 Silver ($15/mo) | 🥇 Gold ($20/mo) |
+|---------|------------------|-------------------|------------------|
+| Teams & Games | Unlimited | Unlimited | Unlimited |
+| Game History | Unlimited | Unlimited | Unlimited |
+| PDF Box Scores | ✅ | ✅ | ✅ |
+| Stat Tracking Modes | Simple + Advanced | Simple + Advanced | Simple + Advanced |
+| Play-by-Play Logging | ✅ | ✅ | ✅ |
+| Public Live Stats Pages | ❌ | ✅ | ✅ |
+| Embed Widgets | ❌ | ✅ | ✅ |
+| Sponsor Banners | ❌ | 5 slots | Unlimited |
+| Season Stats & Leaderboards | ❌ | ✅ | ✅ |
+| CSV Export | ❌ | ✅ | ✅ |
+| Shared Access (Invite Staff) | ❌ | ❌ | ✅ |
+| Custom Branding (Live Stats) | ❌ | ❌ | ✅ |
+| White-Label Embeds | ❌ | ❌ | ✅ |
+| Custom Team Logos | ❌ | ❌ | ✅ |
+| Priority Support | ❌ | ❌ | ✅ |
+
+#### Implementation:
+- **Frontend:** `/app/frontend/src/pages/PricingPage.jsx`
+  - Table format with tier logos above each column
+  - Feature comparison with checkmarks/X marks
+  - "MOST POPULAR" badge on Gold tier
+  - Subscribe buttons connected to Stripe checkout
+  
+- **Backend:** `/app/backend/routers/payments.py`
+  - `GET /api/payments/packages` - Returns all subscription packages
+  - `GET /api/payments/tier-features/{tier}` - Returns feature flags for a tier
+  - `POST /api/payments/checkout` - Creates Stripe checkout session
+  - `GET /api/payments/my-subscription` - Returns user's current tier
+  - Bronze tier (free) skips Stripe checkout
+
+**Testing:** 100% success rate (14/14 features, 12/12 API tests)
+
+---
+
+### January 11, 2026 - BASEBALL DASHBOARD FIX ✅
+
+**Bug Fix:** Baseball live games on dashboard now show correct inning format
+
+- Changed "Q1" to "Top 1" / "Bot 3" for baseball games
+- Fixed game routing to /baseball/{id} instead of /game/{id}
+- Fixed score calculation to use home_score/away_score for baseball
+
+---
+
 ### January 10, 2026 - BASEBALL LIVE STATS OUTPUT ✅
 
 **New Feature: Public, shareable live stats page for baseball games**
