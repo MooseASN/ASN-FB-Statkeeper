@@ -62,7 +62,6 @@ SUBSCRIPTION_PACKAGES = {
             "Public live stats pages",
             "Embed widgets",
             "5 sponsor banner slots",
-            "Season stats & leaderboards",
             "CSV export"
         ]
     },
@@ -96,7 +95,6 @@ SUBSCRIPTION_PACKAGES = {
             "Public live stats pages",
             "Embed widgets",
             "5 sponsor banner slots",
-            "Season stats & leaderboards",
             "CSV export"
         ]
     },
