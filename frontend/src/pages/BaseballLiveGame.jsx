@@ -2301,9 +2301,28 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               <Undo2 className="w-4 h-4 mr-2" />
               Undo {canUndo ? `(${historyLength})` : ''}
             </Button>
-            <Button variant="ghost" size="sm" className="text-zinc-400 hover:text-white">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-zinc-400 hover:text-white"
+              onClick={() => {
+                const liveStatsUrl = `${window.location.origin}/baseball/${id}/stats`;
+                navigator.clipboard.writeText(liveStatsUrl);
+                toast.success("Live stats link copied!");
+              }}
+            >
               <Share2 className="w-4 h-4 mr-2" />
               Share
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-zinc-400 hover:text-white"
+              onClick={() => window.open(`/baseball/${id}/stats`, '_blank')}
+              data-testid="live-stats-button"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Live Stats
             </Button>
             <Button 
               variant="ghost" 
