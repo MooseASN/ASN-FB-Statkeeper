@@ -176,6 +176,7 @@ export default function PricingPage() {
                       <span className="text-3xl font-black text-white">$15</span>
                       <span className="text-zinc-400 text-sm">/month</span>
                     </div>
+                    <span className="text-emerald-400 text-xs font-medium mt-1">14-day free trial</span>
                     <Button 
                       onClick={() => handleSubscribe('silver')}
                       disabled={processingTier === 'silver'}
@@ -185,7 +186,7 @@ export default function PricingPage() {
                       {processingTier === 'silver' ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
                       ) : (
-                        'Subscribe'
+                        'Start Free Trial'
                       )}
                     </Button>
                   </div>
