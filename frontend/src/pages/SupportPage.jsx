@@ -196,7 +196,7 @@ export default function SupportPage() {
           </p>
 
           {/* Basketball Guides */}
-          <CollapsibleSection title="Basketball Stat-Keeping" iconSrc={SPORT_ICONS.basketball} defaultOpen={true}>
+          <CollapsibleSection title="Basketball Stat-Keeping" sportIcon={SPORT_ICONS.basketball} defaultOpen={true}>
             <SubSection title="Getting Started">
               <Step number="1" title="Create a Team" description="Go to Dashboard → New Team → Select Basketball" />
               <Step number="2" title="Add Your Roster" description="Enter player names, numbers, and positions" />
