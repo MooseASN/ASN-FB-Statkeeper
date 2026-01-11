@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LoadingScreen } from "@/components/LoadingScreen";
 import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
+import { useSubscriptionFeatures } from "@/hooks/useSubscriptionFeatures";
 import { 
   Dialog,
   DialogContent,
