@@ -21,7 +21,6 @@ const TIER_FEATURES = {
     embed_widgets: false,
     sponsor_banners: 0,
     csv_export: false,
-    season_stats: false,
     shared_access: false,
     custom_branding: false,
     white_label_embeds: false,
@@ -41,7 +40,6 @@ const TIER_FEATURES = {
     embed_widgets: true,
     sponsor_banners: 5,
     csv_export: true,
-    season_stats: true,
     // Gold-only features
     shared_access: false,
     custom_branding: false,
@@ -61,7 +59,6 @@ const TIER_FEATURES = {
     embed_widgets: true,
     sponsor_banners: -1, // Unlimited
     csv_export: true,
-    season_stats: true,
     // Gold-only features
     shared_access: true,
     custom_branding: true,
