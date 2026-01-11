@@ -2936,16 +2936,30 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              className="border-zinc-600 text-zinc-300 hover:text-white"
-              onClick={() => setShowEmbedDialog(true)}
-              data-testid="football-embed-btn"
-            >
-              <Code className="w-4 h-4 mr-2" />
-              Embed
-            </Button>
+            {/* Embed - Silver+ feature */}
+            {(demoMode || canAccess('embed_widgets')) ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-zinc-600 text-zinc-300 hover:text-white"
+                onClick={() => setShowEmbedDialog(true)}
+                data-testid="football-embed-btn"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                Embed
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-zinc-700 text-zinc-600 cursor-not-allowed"
+                onClick={() => toast.error(`Embed widgets require ${getRequiredTierFor('embed_widgets')} tier. Upgrade at /pricing`)}
+                data-testid="football-embed-btn-locked"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                Embed 🔒
+              </Button>
+            )}
           </div>
         </div>
       </header>
