@@ -552,6 +552,9 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
+  // Subscription features for gating
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
+  
   // Game state
   const [game, setGame] = useState(initialDemoData);
   const [loading, setLoading] = useState(!demoMode);
