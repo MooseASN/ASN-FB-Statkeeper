@@ -887,86 +887,145 @@ export default function AdminDashboard({ user, onLogout }) {
                     Last updated: {lastUpdated.toLocaleTimeString()}
                   </p>
                 )}
-                <ScrollArea className="h-64">
+                <ScrollArea className="h-[400px]">
                   <div className="rounded-md border overflow-x-auto">
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead>User ID</TableHead>
                           <TableHead>Email</TableHead>
-                          <TableHead>Username</TableHead>
                           <TableHead>Name</TableHead>
-                          <TableHead>Auth</TableHead>
+                          <TableHead>Role</TableHead>
+                          <TableHead>Tier</TableHead>
+                          <TableHead>Subscription</TableHead>
                           <TableHead className="text-center">Teams</TableHead>
                           <TableHead className="text-center">Games</TableHead>
-                    <TableHead className="text-center">Events</TableHead>
-                    <TableHead>Created</TableHead>
-                    <TableHead className="text-center">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">
-                        {searchTerm ? "No users match your search" : "No users found"}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredUsers.map((u, idx) => (
-                      <TableRow key={`${u.user_id}_${idx}`}>
-                        <TableCell className="font-mono text-xs">{u.user_id}</TableCell>
-                        <TableCell>
-                          <span className={u.email === "antlersportsnetwork@gmail.com" ? "font-bold text-amber-600" : ""}>
-                            {u.email}
-                          </span>
-                          {u.email === "antlersportsnetwork@gmail.com" && (
-                            <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-amber-100 text-amber-700 rounded">ADMIN</span>
-                          )}
-                        </TableCell>
-                        <TableCell>{u.username || "-"}</TableCell>
-                        <TableCell>{u.name || "-"}</TableCell>
-                        <TableCell>
-                          <span className={`px-2 py-0.5 rounded text-xs ${
-                            u.auth_provider === "google" 
-                              ? "bg-blue-100 text-blue-700" 
-                              : "bg-gray-100 text-gray-700"
-                          }`}>
-                            {u.auth_provider || "local"}
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-center">{u.team_count || 0}</TableCell>
-                        <TableCell className="text-center">{u.game_count || 0}</TableCell>
-                        <TableCell className="text-center">{u.event_count || 0}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">
-                          {u.created_at ? new Date(u.created_at).toLocaleDateString() : "-"}
-                        </TableCell>
-                        <TableCell className="text-center">
-                          {u.email !== "antlersportsnetwork@gmail.com" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setDeletingUser(u);
-                                setShowDeleteUserDialog(true);
-                              }}
-                              className="text-red-500 hover:text-red-700 hover:bg-red-50"
-                              data-testid={`delete-user-${u.user_id}`}
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </Button>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </ScrollArea>
-        </CardContent>
-      </CollapsibleContent>
-    </Card>
-  </Collapsible>
+                          <TableHead>Created</TableHead>
+                          <TableHead className="text-center">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredUsers.length === 0 ? (
+                          <TableRow>
+                            <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
+                              {searchTerm ? "No users match your search" : "No users found"}
+                            </TableCell>
+                          </TableRow>
+                        ) : (
+                          filteredUsers.map((u, idx) => (
+                            <TableRow key={`${u.user_id}_${idx}`}>
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <span className={u.effective_role === "primary_admin" ? "font-bold text-amber-600" : ""}>
+                                    {u.email}
+                                  </span>
+                                  {u.username && (
+                                    <span className="text-xs text-muted-foreground">@{u.username}</span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell>{u.name || "-"}</TableCell>
+                              <TableCell>
+                                {u.effective_role === "primary_admin" && (
+                                  <Badge className="bg-amber-500 hover:bg-amber-600">
+                                    <Crown className="w-3 h-3 mr-1" />
+                                    Primary Admin
+                                  </Badge>
+                                )}
+                                {u.effective_role === "admin" && (
+                                  <Badge className="bg-purple-500 hover:bg-purple-600">
+                                    <Shield className="w-3 h-3 mr-1" />
+                                    Admin
+                                  </Badge>
+                                )}
+                                {u.effective_role === "user" && (
+                                  <Badge variant="secondary">User</Badge>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <Badge 
+                                  variant="outline" 
+                                  className={
+                                    u.subscription_tier === "gold" 
+                                      ? "border-yellow-500 text-yellow-600 bg-yellow-50" 
+                                      : u.subscription_tier === "silver" 
+                                        ? "border-gray-400 text-gray-600 bg-gray-50" 
+                                        : "border-orange-400 text-orange-600 bg-orange-50"
+                                  }
+                                >
+                                  {u.subscription_tier === "gold" && "🥇 "}
+                                  {u.subscription_tier === "silver" && "🥈 "}
+                                  {u.subscription_tier === "bronze" && "🥉 "}
+                                  {(u.subscription_tier || "bronze").charAt(0).toUpperCase() + (u.subscription_tier || "bronze").slice(1)}
+                                </Badge>
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-col">
+                                  <span className={`text-xs px-2 py-0.5 rounded ${
+                                    u.subscription_status === "active" 
+                                      ? "bg-green-100 text-green-700" 
+                                      : "bg-gray-100 text-gray-600"
+                                  }`}>
+                                    {u.subscription_status === "active" ? "Active" : "Free"}
+                                  </span>
+                                  {u.subscription_end && u.subscription_status === "active" && (
+                                    <span className="text-[10px] text-muted-foreground mt-0.5">
+                                      Ends: {new Date(u.subscription_end).toLocaleDateString()}
+                                    </span>
+                                  )}
+                                </div>
+                              </TableCell>
+                              <TableCell className="text-center">{u.team_count || 0}</TableCell>
+                              <TableCell className="text-center">{u.game_count || 0}</TableCell>
+                              <TableCell className="text-sm text-muted-foreground">
+                                {u.created_at ? new Date(u.created_at).toLocaleDateString() : "-"}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center justify-center gap-1">
+                                  {/* Grant/Revoke Admin button - only show for non-primary admins */}
+                                  {u.effective_role !== "primary_admin" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setRoleChangeUser(u);
+                                        setShowRoleDialog(true);
+                                      }}
+                                      disabled={updatingRole === u.user_id}
+                                      className="text-purple-500 hover:text-purple-700 hover:bg-purple-50"
+                                      data-testid={`toggle-admin-${u.user_id}`}
+                                      title={u.effective_role === "admin" ? "Revoke Admin" : "Grant Admin"}
+                                    >
+                                      <UserCog className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                  {/* Delete button - only show for non-admin users */}
+                                  {u.effective_role !== "primary_admin" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setDeletingUser(u);
+                                        setShowDeleteUserDialog(true);
+                                      }}
+                                      className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                                      data-testid={`delete-user-${u.user_id}`}
+                                    >
+                                      <Trash2 className="w-4 h-4" />
+                                    </Button>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))
+                        )}
+                      </TableBody>
+                    </Table>
+                  </div>
+                </ScrollArea>
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       </div>
 
       {/* School Details Dialog */}
