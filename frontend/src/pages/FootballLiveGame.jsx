@@ -22,8 +22,10 @@ import {
   ChevronLeft,
   ChevronRight,
   Undo2,
+  Redo2,
   Share2,
   HelpCircle,
+  Code,
 } from "lucide-react";
 import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
 import { RULESETS } from "@/data/penaltyCatalog";
