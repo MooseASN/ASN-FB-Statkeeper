@@ -123,6 +123,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       {/* Public homepage and contact */}
       <Route path="/" element={<HomePage />} />
       <Route path="/contact" element={<ContactPage />} />
+      <Route path="/support" element={<SupportPage />} />
       
       {/* Demo routes - public, no auth required */}
       <Route path="/demo/basketball" element={<BasketballDemoSelector />} />
