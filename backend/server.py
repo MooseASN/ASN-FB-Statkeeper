@@ -6937,6 +6937,125 @@ async def delete_season(
     
     return {"success": True, "message": "Season and all associated games deleted"}
 
+class SeasonCloneRequest(BaseModel):
+    new_name: str
+    include_roster: bool = True
+    include_schedule: bool = False  # Whether to clone game schedule (dates cleared)
+
+@api_router.post("/schools/{school_id}/seasons/{season_id}/clone")
+async def clone_season(
+    school_id: str, 
+    season_id: str, 
+    data: SeasonCloneRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Clone a season structure (and optionally roster/schedule) to a new season"""
+    user = await db.users.find_one({"user_id": current_user.user_id}, {"_id": 0})
+    if not user or user.get("school_id") != school_id or user.get("school_role") != "admin":
+        raise HTTPException(status_code=403, detail="Only admins can clone seasons")
+    
+    # Get the source season
+    source_season = await db.seasons.find_one(
+        {"season_id": season_id, "school_id": school_id},
+        {"_id": 0}
+    )
+    if not source_season:
+        raise HTTPException(status_code=404, detail="Season not found")
+    
+    # Create new season ID
+    new_season_id = f"season_{uuid.uuid4().hex[:12]}"
+    
+    # Create new season document
+    new_season = {
+        "season_id": new_season_id,
+        "school_id": school_id,
+        "name": data.new_name.strip(),
+        "sport": source_season.get("sport"),
+        "gender": source_season.get("gender"),
+        "level": source_season.get("level"),
+        "team_id": None,  # Will be set if roster is cloned
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": current_user.user_id,
+        "cloned_from": season_id
+    }
+    
+    cloned_team_id = None
+    roster_count = 0
+    games_cloned = 0
+    
+    # Clone team/roster if requested
+    if data.include_roster and source_season.get("team_id"):
+        source_team = await db.teams.find_one(
+            {"id": source_season["team_id"]},
+            {"_id": 0}
+        )
+        if source_team:
+            new_team_id = f"team_{uuid.uuid4().hex[:12]}"
+            new_team = {
+                "id": new_team_id,
+                "name": f"{source_team.get('name', 'Team')} ({data.new_name})",
+                "user_id": current_user.user_id,
+                "school_id": school_id,
+                "sport": source_team.get("sport"),
+                "roster": source_team.get("roster", []),  # Copy entire roster
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "cloned_from": source_team["id"]
+            }
+            await db.teams.insert_one(new_team)
+            cloned_team_id = new_team_id
+            new_season["team_id"] = new_team_id
+            roster_count = len(source_team.get("roster", []))
+    
+    # Clone schedule (games without stats) if requested
+    if data.include_schedule:
+        source_games = await db.games.find(
+            {"season_id": season_id},
+            {"_id": 0}
+        ).to_list(200)
+        
+        for game in source_games:
+            new_game_id = f"game_{uuid.uuid4().hex[:12]}"
+            new_game = {
+                "id": new_game_id,
+                "user_id": current_user.user_id,
+                "school_id": school_id,
+                "season_id": new_season_id,
+                "team_id": cloned_team_id,
+                "sport": game.get("sport"),
+                "opponent": game.get("opponent", ""),
+                "location": game.get("location", "home"),
+                "venue": game.get("venue", ""),
+                "scheduled_date": None,  # Clear the date
+                "status": "scheduled",
+                "home_score": 0,
+                "away_score": 0,
+                "stats": {},
+                "play_by_play": [],
+                "created_at": datetime.now(timezone.utc).isoformat(),
+                "cloned_from": game["id"]
+            }
+            await db.games.insert_one(new_game)
+            games_cloned += 1
+    
+    # Insert new season
+    await db.seasons.insert_one(new_season)
+    
+    # Remove _id if present
+    new_season.pop("_id", None)
+    
+    return {
+        "success": True,
+        "message": f"Season cloned successfully",
+        "season_id": new_season_id,
+        "season": new_season,
+        "stats": {
+            "roster_cloned": data.include_roster,
+            "roster_count": roster_count,
+            "games_cloned": games_cloned,
+            "team_id": cloned_team_id
+        }
+    }
+
 @api_router.get("/schools/{school_id}/rosters")
 async def get_school_rosters(school_id: str, current_user: User = Depends(get_current_user)):
     """Get all rosters from all seasons for a school (for roster duplication)"""
