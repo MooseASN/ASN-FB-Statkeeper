@@ -967,7 +967,6 @@ DEFAULT_PRICING_CONFIG = {
             "Public live stats pages",
             "Embed widgets",
             "5 sponsor banner slots",
-            "Season stats & leaderboards",
             "CSV export"
         ]
     },
