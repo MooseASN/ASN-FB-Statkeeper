@@ -4773,16 +4773,29 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
             <div className="bg-zinc-900 rounded-lg p-4 h-full">
               <div className="flex items-center justify-between mb-3">
                 <div className="text-xs text-zinc-500 uppercase tracking-wide">Play-by-Play</div>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-zinc-400 hover:text-white h-6 px-2"
-                  onClick={undoLastPlay}
-                  disabled={playLog.length === 0}
-                >
-                  <Undo2 className="w-3 h-3 mr-1" />
-                  Undo
-                </Button>
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-amber-400 hover:text-amber-300 h-6 px-2"
+                    onClick={undoLastPlay}
+                    disabled={playLog.length === 0}
+                  >
+                    <Undo2 className="w-3 h-3 mr-1" />
+                    Undo
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    className="text-green-400 hover:text-green-300 h-6 px-2"
+                    onClick={redoLastPlay}
+                    disabled={redoStack.length === 0}
+                    data-testid="football-redo-btn"
+                  >
+                    <Redo2 className="w-3 h-3 mr-1" />
+                    Redo
+                  </Button>
+                </div>
               </div>
               <div className="space-y-2 max-h-[500px] overflow-y-auto">
                 {playLog.length === 0 ? (
