@@ -48,6 +48,7 @@ import SimpleFootballLiveGame from "@/pages/SimpleFootballLiveGame";
 // Baseball pages
 import BaseballLiveGame from "@/pages/BaseballLiveGame";
 import BaseballBoxScore from "@/pages/BaseballBoxScore";
+import BaseballLiveStats from "@/pages/BaseballLiveStats";
 // Payment pages
 import PricingPage from "@/pages/PricingPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
