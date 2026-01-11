@@ -40,6 +40,7 @@ SUBSCRIPTION_PACKAGES = {
         "currency": "usd",
         "interval": "month",
         "tier": "bronze",
+        "trial_days": 0,
         "features": [
             "Unlimited teams & games",
             "Unlimited game history",
@@ -54,6 +55,7 @@ SUBSCRIPTION_PACKAGES = {
         "currency": "usd",
         "interval": "month",
         "tier": "silver",
+        "trial_days": 14,
         "features": [
             "Everything in Bronze",
             "Public live stats pages",
@@ -69,6 +71,7 @@ SUBSCRIPTION_PACKAGES = {
         "currency": "usd",
         "interval": "month",
         "tier": "gold",
+        "trial_days": 14,
         "features": [
             "Everything in Silver",
             "Shared access (invite staff)",
@@ -86,6 +89,7 @@ SUBSCRIPTION_PACKAGES = {
         "currency": "usd",
         "interval": "year",
         "tier": "silver",
+        "trial_days": 14,
         "features": [
             "Everything in Bronze",
             "Public live stats pages",
@@ -101,6 +105,7 @@ SUBSCRIPTION_PACKAGES = {
         "currency": "usd",
         "interval": "year",
         "tier": "gold",
+        "trial_days": 14,
         "features": [
             "Everything in Silver",
             "Shared access (invite staff)",
