@@ -1533,7 +1533,24 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   
   // Handle undo - restore the previous state
   const handleUndo = useCallback(() => {
-    const lastState = popLastState();
+    // Create current state snapshot for redo
+    const currentSnapshot = {
+      game,
+      homeStats,
+      awayStats,
+      playByPlay,
+      currentBatterIndex,
+      homeBatterIndex,
+      awayBatterIndex,
+      homeBattingOrder,
+      awayBattingOrder,
+      homeDefense,
+      awayDefense,
+      homeErrors,
+      awayErrors
+    };
+    
+    const lastState = popLastState(currentSnapshot);
     if (!lastState) return;
     
     // Restore all state
@@ -1552,7 +1569,46 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     setAwayErrors(lastState.awayErrors);
     
     toast.success("Play undone");
-  }, [popLastState, setPlays]);
+  }, [popLastState, setPlays, game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBatterIndex, awayBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors]);
+  
+  const handleRedo = useCallback(() => {
+    // Create current state snapshot for undo
+    const currentSnapshot = {
+      game,
+      homeStats,
+      awayStats,
+      playByPlay,
+      currentBatterIndex,
+      homeBatterIndex,
+      awayBatterIndex,
+      homeBattingOrder,
+      awayBattingOrder,
+      homeDefense,
+      awayDefense,
+      homeErrors,
+      awayErrors
+    };
+    
+    const stateToRestore = redoLastState(currentSnapshot);
+    if (!stateToRestore) return;
+    
+    // Restore all state
+    setGame(stateToRestore.game);
+    setHomeStats(stateToRestore.homeStats);
+    setAwayStats(stateToRestore.awayStats);
+    setPlays(stateToRestore.playByPlay);
+    setCurrentBatterIndex(stateToRestore.currentBatterIndex);
+    setHomeBatterIndex(stateToRestore.homeBatterIndex);
+    setAwayBatterIndex(stateToRestore.awayBatterIndex);
+    setHomeBattingOrder(stateToRestore.homeBattingOrder);
+    setAwayBattingOrder(stateToRestore.awayBattingOrder);
+    setHomeDefense(stateToRestore.homeDefense);
+    setAwayDefense(stateToRestore.awayDefense);
+    setHomeErrors(stateToRestore.homeErrors);
+    setAwayErrors(stateToRestore.awayErrors);
+    
+    toast.success("Play redone");
+  }, [redoLastState, setPlays, game, homeStats, awayStats, playByPlay, currentBatterIndex, homeBatterIndex, awayBatterIndex, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense, homeErrors, awayErrors]);
   
   // Helper function to update batter stats
   const updateBatterStats = useCallback((playerNumber, updates) => {
