@@ -34,7 +34,8 @@ import {
   Trophy,
   Radio,
   FileDown,
-  Flag
+  Flag,
+  ExternalLink
 } from "lucide-react";
 import { X as XIcon } from "lucide-react";
 
