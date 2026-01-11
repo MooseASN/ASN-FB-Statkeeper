@@ -14,6 +14,40 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 11, 2026 - SUPPORT PAGE WITH MARTY THE STATMOOSE ✅
+
+**New Feature: Comprehensive Support Page**
+- Created `/support` page with Marty the StatMoose mascot welcome
+- Three collapsible sections: Guides, Features, Tips & Tricks
+- Quick navigation buttons that smooth-scroll to sections
+
+**Content Included:**
+- **Guides:**
+  - 🏀 Basketball Stat-Keeping (getting started, recording stats, quarter management)
+  - 🏈 Football Stat-Keeping (Simple vs Advanced mode, play-by-play)
+  - ⚾ Baseball Stat-Keeping (at-bats, base running, pitching stats)
+- **Features:**
+  - Team Creation & Management
+  - Roster Management
+  - Live Stats Sharing & Embed Widgets
+  - PDF Box Scores
+  - Game Clock Controls
+  - Undo & Redo
+  - Sponsor Banners
+- **Tips & Tricks:**
+  - Keyboard shortcuts (Space/\ for clock)
+  - Best device recommendations
+  - Two-screen setup
+  - Pre-game preparation tips
+  - Demo mode for practice
+
+**Files Created/Modified:**
+- `/app/frontend/src/pages/SupportPage.jsx` (NEW)
+- `/app/frontend/src/App.js` (added route)
+- `/app/frontend/src/pages/HomePage.jsx` (added nav link)
+
+---
+
 ### January 11, 2026 - UI UPDATES & EMBED INTEGRATION ✅
 
 **Features Implemented:**
