@@ -772,15 +772,42 @@ async def get_all_users(admin: User = Depends(get_admin_user)):
     for item in event_agg:
         event_counts[item["_id"]] = item["count"]
     
-    # Enrich users with counts
+    # Enrich users with counts and role info
     enriched_users = []
     for user in users:
         user_id = user.get("user_id")
+        user_email = user.get("email", "").lower()
+        
+        # Determine effective role
+        if user_email in PRIMARY_ADMIN_EMAILS:
+            effective_role = "primary_admin"
+        elif user.get("role") == "admin":
+            effective_role = "admin"
+        else:
+            effective_role = "user"
+        
+        # Determine subscription tier
+        tier = user.get("subscription_tier")
+        if not tier and user.get("subscription_package"):
+            # Extract tier from package ID (e.g., "monthly_silver" -> "silver")
+            package_id = user.get("subscription_package", "")
+            if "gold" in package_id:
+                tier = "gold"
+            elif "silver" in package_id:
+                tier = "silver"
+            else:
+                tier = "bronze"
+        tier = tier or "bronze"  # Default to bronze
+        
         enriched_users.append({
             **user,
             "team_count": team_counts.get(user_id, 0),
             "game_count": game_counts.get(user_id, 0),
-            "event_count": event_counts.get(user_id, 0)
+            "event_count": event_counts.get(user_id, 0),
+            "effective_role": effective_role,
+            "subscription_tier": tier,
+            "subscription_status": user.get("subscription_status", "none"),
+            "subscription_end": user.get("subscription_end")
         })
     
     return {
