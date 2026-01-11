@@ -555,6 +555,9 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   // Play-by-play log
   const [playLog, setPlayLog] = useState([]);
   
+  // Redo stack for undone plays
+  const [redoStack, setRedoStack] = useState([]);
+  
   // Clock - Using useGameClock hook
   const {
     clockTime,
