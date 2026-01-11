@@ -2574,6 +2574,15 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         onClose={() => setShowInPlayModal(false)}
         onResult={handleInPlayResult}
       />
+      
+      {/* Embed Snippet Generator */}
+      <EmbedSnippetGenerator
+        open={showEmbedDialog}
+        onOpenChange={setShowEmbedDialog}
+        shareCode={game?.share_code || id}
+        sport="baseball"
+        gameTitle={`${game?.away_team_name || 'Away'} vs ${game?.home_team_name || 'Home'}`}
+      />
     </div>
   );
 }
