@@ -493,7 +493,7 @@ export default function HomePage() {
               heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <Link to="/contact">
+            <Link to="/pricing">
               <Button size="lg" className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide">
                 Get Started
               </Button>
