@@ -1844,6 +1844,19 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                 </Button>
               )}
               
+              {redoAction && isActive && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleRedo}
+                  className="bg-green-500 border-green-500 text-white hover:bg-green-600"
+                  data-testid="redo-btn"
+                >
+                  <Redo2 className="w-4 h-4 mr-1" />
+                  Redo
+                </Button>
+              )}
+              
               <div className="w-px h-6 bg-white/20 mx-1 hidden sm:block"></div>
               
               <Button 
