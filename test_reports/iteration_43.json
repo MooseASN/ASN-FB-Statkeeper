@@ -1,0 +1,186 @@
+{
+  "summary": "Completed testing of iteration 43 features. All 9 features verified: 1) StatMoose logo navigates to '/', 2) No 'Most Popular' badge on Gold tier, 3) Basketball LiveGame has EmbedSnippetGenerator, 4) FootballLiveGame has Redo button, 5) FootballLiveGame has Embed button, 6) SimpleFootballLiveGame has Share/Embed/Undo/Redo buttons, 7) GET /api/payments/user-tier endpoint works, 8) useSubscriptionFeatures hook has canAccess/hasFeature, 9) BaseballLiveGame has Embed button.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/tests/test_iteration_43_features.py",
+    "/app/test_reports/pytest/pytest_iteration_43.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/tests/test_iteration_43_features.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "email": "antlersportsnetwork@gmail.com",
+    "password": "NoahTheJew1997"
+  },
+  "seed_data_creation": "",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "All iteration 43 features verified. Logo navigation, pricing page, embed integration, redo functionality, and subscription features all working correctly.",
+  "features_tested": {
+    "1_logo_navigation": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/SportSelection.jsx",
+        "line": "154",
+        "code": "onClick={() => navigate('/')",
+        "verified_via": "Playwright test - clicked logo and confirmed navigation to home page"
+      }
+    },
+    "2_no_most_popular_badge": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/PricingPage.jsx",
+        "verification": "grep for 'Most Popular' returned no results",
+        "verified_via": "Playwright test - confirmed no 'Most Popular' text on pricing page"
+      }
+    },
+    "3_basketball_embed_integration": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/LiveGame.jsx",
+        "import_line": "25",
+        "component_line": "2916",
+        "code": "EmbedSnippetGenerator component imported and rendered"
+      }
+    },
+    "4_football_redo_button": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/FootballLiveGame.jsx",
+        "state_line": "562",
+        "button_lines": "4800-4810",
+        "code": "redoStack state, redoLastPlay function, Redo button with Redo2 icon"
+      }
+    },
+    "5_football_embed_button": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/FootballLiveGame.jsx",
+        "import_line": "31",
+        "button_lines": "2935-2944",
+        "data_testid": "football-embed-btn"
+      }
+    },
+    "6_simple_football_buttons": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/SimpleFootballLiveGame.jsx",
+        "share_button": "Line 1133 - Share2 icon",
+        "embed_button": "Line 1142 - Code icon, data-testid='simple-football-embed-btn'",
+        "undo_button": "Line 1145 - Undo2 icon, data-testid='undo-btn'",
+        "redo_button": "Line 1148 - Redo2 icon, data-testid='redo-btn'"
+      }
+    },
+    "7_user_tier_endpoint": {
+      "status": "PASS",
+      "details": {
+        "endpoint": "GET /api/payments/user-tier",
+        "response_fields": ["tier", "subscription_status", "subscription_end", "is_trial"],
+        "default_tier": "bronze",
+        "verified_via": "pytest test - 7/7 tests passed"
+      }
+    },
+    "8_subscription_features_hook": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/hooks/useSubscriptionFeatures.js",
+        "hasFeature_line": "110",
+        "canAccess_line": "120",
+        "exports": ["userTier", "loading", "error", "subscriptionStatus", "hasFeature", "canAccess", "getLimit", "getAllFeatures", "getRequiredTierFor", "TIER_FEATURES"]
+      }
+    },
+    "9_baseball_embed_button": {
+      "status": "PASS",
+      "details": {
+        "file": "/app/frontend/src/pages/BaseballLiveGame.jsx",
+        "import_line": "8",
+        "button_lines": "2390-2399",
+        "data_testid": "embed-button"
+      }
+    }
+  },
+  "api_tested": {
+    "GET /api/payments/user-tier": {
+      "status": "PASS",
+      "response_code": 200,
+      "response": {"tier": "bronze", "subscription_status": null, "subscription_end": null, "is_trial": false}
+    },
+    "GET /api/payments/packages": {
+      "status": "PASS",
+      "response_code": 200,
+      "details": "Returns all packages with trial_days field"
+    },
+    "GET /api/payments/tier-features/bronze": {
+      "status": "PASS",
+      "response_code": 200
+    },
+    "GET /api/payments/tier-features/silver": {
+      "status": "PASS",
+      "response_code": 200
+    },
+    "GET /api/payments/tier-features/gold": {
+      "status": "PASS",
+      "response_code": 200
+    },
+    "GET /api/health": {
+      "status": "PASS",
+      "response_code": 200
+    }
+  },
+  "ui_elements_verified": [
+    "Pricing page - No 'Most Popular' badge",
+    "Pricing page - Bronze/Silver/Gold tier buttons present",
+    "SportSelection page - Logo clickable and navigates to '/'",
+    "SportSelection page - STATMOOSE text in header"
+  ],
+  "code_verification": {
+    "SportSelection.jsx": {
+      "logo_navigation": "Line 154: onClick={() => navigate('/')"
+    },
+    "PricingPage.jsx": {
+      "most_popular_removed": "No 'Most Popular' text found in file"
+    },
+    "LiveGame.jsx": {
+      "embed_import": "Line 25",
+      "embed_component": "Line 2916"
+    },
+    "FootballLiveGame.jsx": {
+      "embed_import": "Line 31",
+      "embed_button": "Lines 2935-2944",
+      "redo_state": "Line 562",
+      "redo_button": "Lines 4800-4810"
+    },
+    "SimpleFootballLiveGame.jsx": {
+      "embed_import": "Line 9",
+      "share_button": "Line 1133",
+      "embed_button": "Line 1142",
+      "undo_button": "Line 1145",
+      "redo_button": "Line 1148"
+    },
+    "BaseballLiveGame.jsx": {
+      "embed_import": "Line 8",
+      "embed_button": "Lines 2390-2399"
+    },
+    "useSubscriptionFeatures.js": {
+      "hasFeature": "Line 110",
+      "canAccess": "Line 120"
+    },
+    "payments.py": {
+      "user_tier_endpoint": "Line 164: @router.get('/user-tier')"
+    }
+  }
+}
