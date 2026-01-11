@@ -267,7 +267,7 @@ export default function SupportPage() {
           </CollapsibleSection>
 
           {/* Baseball Guides */}
-          <CollapsibleSection title="Baseball Stat-Keeping" iconSrc={SPORT_ICONS.baseball}>
+          <CollapsibleSection title="Baseball Stat-Keeping" sportIcon={SPORT_ICONS.baseball}>
             <SubSection title="Setting Up Your Game">
               <Step number="1" title="Create Teams" description="Add your team and the opponent with full rosters" />
               <Step number="2" title="Set Batting Order" description="Drag players into your preferred batting order" />
