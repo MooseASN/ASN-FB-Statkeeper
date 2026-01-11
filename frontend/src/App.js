@@ -52,6 +52,8 @@ import BaseballLiveStats from "@/pages/BaseballLiveStats";
 // Payment pages
 import PricingPage from "@/pages/PricingPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
+// Support page
+import SupportPage from "@/pages/SupportPage";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
