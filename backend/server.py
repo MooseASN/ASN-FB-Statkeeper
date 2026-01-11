@@ -888,9 +888,9 @@ async def delete_user(user_id: str, admin: User = Depends(get_admin_user)):
     if not user_to_delete:
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Prevent deletion of admin user
-    if user_to_delete.get("email") == "antlersportsnetwork@gmail.com":
-        raise HTTPException(status_code=403, detail="Cannot delete the main admin account")
+    # Prevent deletion of primary admin accounts
+    if user_to_delete.get("email", "").lower() in PRIMARY_ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Cannot delete a primary admin account")
     
     # Delete the user
     await db.users.delete_one({"user_id": user_id})
