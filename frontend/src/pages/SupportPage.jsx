@@ -225,7 +225,7 @@ export default function SupportPage() {
           </CollapsibleSection>
 
           {/* Football Guides */}
-          <CollapsibleSection title="Football Stat-Keeping" iconSrc={SPORT_ICONS.football}>
+          <CollapsibleSection title="Football Stat-Keeping" sportIcon={SPORT_ICONS.football}>
             <SubSection title="Simple Mode vs Advanced Mode">
               <p className="mb-3">StatMoose offers two football stat-keeping modes:</p>
               <div className="grid md:grid-cols-2 gap-4">
