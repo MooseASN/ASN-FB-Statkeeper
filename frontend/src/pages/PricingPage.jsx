@@ -24,7 +24,6 @@ const FEATURES = [
   { name: "Public Live Stats Pages", bronze: false, silver: true, gold: true },
   { name: "Embed Widgets", bronze: false, silver: true, gold: true },
   { name: "Sponsor Banners", bronze: false, silver: "5 slots", gold: "Unlimited" },
-  { name: "Season Stats & Leaderboards", bronze: false, silver: true, gold: true },
   { name: "CSV Export", bronze: false, silver: true, gold: true },
   { name: "Shared Access (Invite Staff)", bronze: false, silver: false, gold: true },
   { name: "Custom Branding (Live Stats)", bronze: false, silver: false, gold: true },
