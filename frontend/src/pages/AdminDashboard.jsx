@@ -761,6 +761,162 @@ export default function AdminDashboard({ user, onLogout }) {
           </CardContent>
         </Card>
 
+        {/* Pricing Management - Collapsible */}
+        <Collapsible open={pricingOpen} onOpenChange={setPricingOpen}>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    <DollarSign className="w-5 h-5" />
+                    Pricing Management
+                  </CardTitle>
+                  <ChevronDown className={`w-5 h-5 transition-transform ${pricingOpen ? 'rotate-180' : ''}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    Configure pricing tiers and features for each subscription level.
+                  </p>
+                  {!editingPricing ? (
+                    <Button onClick={handleStartEditPricing} variant="outline" size="sm">
+                      <Edit2 className="w-4 h-4 mr-2" />
+                      Edit Pricing
+                    </Button>
+                  ) : (
+                    <div className="flex gap-2">
+                      <Button onClick={handleCancelEditPricing} variant="outline" size="sm">
+                        Cancel
+                      </Button>
+                      <Button onClick={handleSavePricing} disabled={savingPricing} size="sm">
+                        <Save className="w-4 h-4 mr-2" />
+                        {savingPricing ? "Saving..." : "Save Changes"}
+                      </Button>
+                    </div>
+                  )}
+                </div>
+                
+                {pricingConfig && (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {["bronze", "silver", "gold"].map((tier) => {
+                      const config = editingPricing ? pricingDraft?.[tier] : pricingConfig?.[tier];
+                      if (!config) return null;
+                      
+                      return (
+                        <div 
+                          key={tier} 
+                          className={`p-4 rounded-lg border-2 ${
+                            tier === "gold" 
+                              ? "border-yellow-400 bg-yellow-50" 
+                              : tier === "silver" 
+                                ? "border-gray-300 bg-gray-50" 
+                                : "border-orange-300 bg-orange-50"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2 mb-3">
+                            {tier === "gold" && <span className="text-2xl">🥇</span>}
+                            {tier === "silver" && <span className="text-2xl">🥈</span>}
+                            {tier === "bronze" && <span className="text-2xl">🥉</span>}
+                            {editingPricing ? (
+                              <Input
+                                value={config.name}
+                                onChange={(e) => updatePricingDraft(tier, "name", e.target.value)}
+                                className="font-bold text-lg h-8"
+                              />
+                            ) : (
+                              <h3 className="font-bold text-lg">{config.name}</h3>
+                            )}
+                          </div>
+                          
+                          <div className="space-y-2 mb-4">
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground w-16">Monthly:</span>
+                              {editingPricing ? (
+                                <div className="flex items-center gap-1">
+                                  <span>$</span>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={config.monthly_price}
+                                    onChange={(e) => updatePricingDraft(tier, "monthly_price", parseFloat(e.target.value) || 0)}
+                                    className="w-20 h-7 text-sm"
+                                  />
+                                </div>
+                              ) : (
+                                <span className="font-semibold">
+                                  {config.monthly_price === 0 ? "Free" : `$${config.monthly_price}/mo`}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm text-muted-foreground w-16">Annual:</span>
+                              {editingPricing ? (
+                                <div className="flex items-center gap-1">
+                                  <span>$</span>
+                                  <Input
+                                    type="number"
+                                    step="0.01"
+                                    value={config.annual_price}
+                                    onChange={(e) => updatePricingDraft(tier, "annual_price", parseFloat(e.target.value) || 0)}
+                                    className="w-20 h-7 text-sm"
+                                  />
+                                </div>
+                              ) : (
+                                <span className="font-semibold">
+                                  {config.annual_price === 0 ? "Free" : `$${config.annual_price}/yr`}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-1">
+                            <span className="text-xs font-medium text-muted-foreground uppercase">Features:</span>
+                            {config.features?.map((feature, idx) => (
+                              <div key={idx} className="flex items-center gap-2">
+                                <Check className="w-3 h-3 text-green-600 flex-shrink-0" />
+                                {editingPricing ? (
+                                  <div className="flex-1 flex items-center gap-1">
+                                    <Input
+                                      value={feature}
+                                      onChange={(e) => updatePricingFeature(tier, idx, e.target.value)}
+                                      className="h-6 text-xs flex-1"
+                                    />
+                                    <button
+                                      onClick={() => removePricingFeature(tier, idx)}
+                                      className="text-red-500 hover:text-red-700 p-0.5"
+                                    >
+                                      <X className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <span className="text-xs">{feature}</span>
+                                )}
+                              </div>
+                            ))}
+                            {editingPricing && (
+                              <Button
+                                onClick={() => addPricingFeature(tier)}
+                                variant="ghost"
+                                size="sm"
+                                className="h-6 text-xs mt-1"
+                              >
+                                + Add Feature
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
+
         {/* Schools Viewer - Collapsible */}
         <Collapsible open={schoolsOpen} onOpenChange={setSchoolsOpen}>
           <Card>
