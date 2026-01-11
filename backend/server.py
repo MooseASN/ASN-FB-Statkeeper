@@ -904,6 +904,147 @@ async def delete_user(user_id: str, admin: User = Depends(get_admin_user)):
         "email": user_to_delete.get("email")
     }
 
+# ============ ADMIN ROLE MANAGEMENT ============
+
+class UpdateUserRoleRequest(BaseModel):
+    role: str  # "admin" or "user"
+
+@api_router.put("/admin/users/{user_id}/role")
+async def update_user_role(user_id: str, request: UpdateUserRoleRequest, admin: User = Depends(get_admin_user)):
+    """Grant or revoke admin access for a user (primary admin only)"""
+    # Only primary admins can modify roles
+    if admin.email.lower() not in PRIMARY_ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Only primary admins can modify user roles")
+    
+    # Validate role value
+    if request.role not in ["admin", "user"]:
+        raise HTTPException(status_code=400, detail="Role must be 'admin' or 'user'")
+    
+    # Get the user
+    user_to_update = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    if not user_to_update:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Cannot modify primary admin roles
+    if user_to_update.get("email", "").lower() in PRIMARY_ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Cannot modify primary admin roles")
+    
+    # Update the role
+    await db.users.update_one(
+        {"user_id": user_id},
+        {"$set": {"role": request.role, "role_updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return {
+        "message": f"User role updated to '{request.role}'",
+        "user_id": user_id,
+        "email": user_to_update.get("email"),
+        "role": request.role
+    }
+
+# ============ PRICING MANAGEMENT ============
+
+# Default pricing configuration (stored in DB settings collection)
+DEFAULT_PRICING_CONFIG = {
+    "bronze": {
+        "name": "Bronze",
+        "monthly_price": 0,
+        "annual_price": 0,
+        "features": [
+            "Unlimited teams & games",
+            "Unlimited game history",
+            "PDF box scores",
+            "Simple + Advanced stat tracking",
+            "Play-by-play logging"
+        ]
+    },
+    "silver": {
+        "name": "Silver",
+        "monthly_price": 15.00,
+        "annual_price": 150.00,
+        "features": [
+            "Everything in Bronze",
+            "Public live stats pages",
+            "Embed widgets",
+            "5 sponsor banner slots",
+            "Season stats & leaderboards",
+            "CSV export"
+        ]
+    },
+    "gold": {
+        "name": "Gold",
+        "monthly_price": 20.00,
+        "annual_price": 200.00,
+        "features": [
+            "Everything in Silver",
+            "Shared access (invite staff)",
+            "Custom branding on live stats",
+            "White-label embeds",
+            "Unlimited sponsor banners",
+            "Custom team logos",
+            "Priority support"
+        ]
+    }
+}
+
+class PricingTierUpdate(BaseModel):
+    name: Optional[str] = None
+    monthly_price: Optional[float] = None
+    annual_price: Optional[float] = None
+    features: Optional[List[str]] = None
+
+class PricingConfigUpdate(BaseModel):
+    bronze: Optional[PricingTierUpdate] = None
+    silver: Optional[PricingTierUpdate] = None
+    gold: Optional[PricingTierUpdate] = None
+
+@api_router.get("/admin/pricing")
+async def get_pricing_config(admin: User = Depends(get_admin_user)):
+    """Get current pricing configuration (admin only)"""
+    # Try to get from settings collection
+    pricing = await db.settings.find_one({"key": "pricing_config"}, {"_id": 0})
+    
+    if pricing and pricing.get("config"):
+        return {"pricing": pricing["config"], "source": "custom"}
+    
+    return {"pricing": DEFAULT_PRICING_CONFIG, "source": "default"}
+
+@api_router.put("/admin/pricing")
+async def update_pricing_config(config: PricingConfigUpdate, admin: User = Depends(get_admin_user)):
+    """Update pricing configuration (primary admin only)"""
+    # Only primary admins can modify pricing
+    if admin.email.lower() not in PRIMARY_ADMIN_EMAILS:
+        raise HTTPException(status_code=403, detail="Only primary admins can modify pricing")
+    
+    # Get current config or use defaults
+    existing = await db.settings.find_one({"key": "pricing_config"}, {"_id": 0})
+    current_config = existing.get("config") if existing else DEFAULT_PRICING_CONFIG.copy()
+    
+    # Update each tier if provided
+    update_dict = config.model_dump(exclude_none=True)
+    for tier, updates in update_dict.items():
+        if tier in current_config and updates:
+            for key, value in updates.items():
+                if value is not None:
+                    current_config[tier][key] = value
+    
+    # Save to database
+    await db.settings.update_one(
+        {"key": "pricing_config"},
+        {"$set": {
+            "key": "pricing_config",
+            "config": current_config,
+            "updated_at": datetime.now(timezone.utc).isoformat(),
+            "updated_by": admin.user_id
+        }},
+        upsert=True
+    )
+    
+    return {
+        "message": "Pricing configuration updated",
+        "pricing": current_config
+    }
+
 @api_router.get("/admin/stats")
 async def get_admin_stats(admin: User = Depends(get_admin_user)):
     """Get overall platform stats (admin only)"""
