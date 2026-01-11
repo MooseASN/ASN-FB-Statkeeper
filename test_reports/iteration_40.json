@@ -1,0 +1,143 @@
+{
+  "summary": "Tested Pricing Page at /pricing with 3 tiers (Bronze, Silver, Gold). All backend APIs and frontend UI elements working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/tests/test_pricing_apis.py",
+    "/app/test_reports/pytest/pytest_pricing.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/tests/test_pricing_apis.py"
+  ],
+  "success_rate": {
+    "backend": "100%",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "email": "antlersportsnetwork@gmail.com",
+    "password": "NoahTheJew1997"
+  },
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Pricing page fully tested. All 3 tiers display correctly with proper logos, prices, and feature comparison table.",
+  "features_tested": {
+    "pricing_page_loads": {
+      "status": "PASS",
+      "details": "Page loads at /pricing route"
+    },
+    "three_tier_logos_displayed": {
+      "status": "PASS",
+      "details": "Bronze, Silver, Gold logos from customer-assets URLs displayed correctly"
+    },
+    "bronze_shows_free_price": {
+      "status": "PASS",
+      "details": "Bronze tier shows 'Free' price"
+    },
+    "silver_shows_15_month": {
+      "status": "PASS",
+      "details": "Silver tier shows '$15/month' price"
+    },
+    "gold_shows_20_month": {
+      "status": "PASS",
+      "details": "Gold tier shows '$20/month' price"
+    },
+    "feature_comparison_table_15_features": {
+      "status": "PASS",
+      "details": "All 15 features displayed: Teams & Games, Game History, PDF Box Scores, Stat Tracking Modes, Play-by-Play Logging, Public Live Stats Pages, Embed Widgets, Sponsor Banners, Season Stats & Leaderboards, CSV Export, Shared Access, Custom Branding, White-Label Embeds, Custom Team Logos, Priority Support"
+    },
+    "checkmarks_for_included_features": {
+      "status": "PASS",
+      "details": "19 green checkmarks displayed for included features"
+    },
+    "x_marks_for_excluded_features": {
+      "status": "PASS",
+      "details": "15 X marks displayed for excluded features"
+    },
+    "bronze_get_started_button": {
+      "status": "PASS",
+      "details": "Button visible and clickable, navigates to /login (expected for unauthenticated users)"
+    },
+    "silver_subscribe_button": {
+      "status": "PASS",
+      "details": "Button visible, enabled, and clickable. Attempts Stripe checkout (requires auth)"
+    },
+    "gold_subscribe_button": {
+      "status": "PASS",
+      "details": "Button visible, enabled, and clickable"
+    },
+    "gold_most_popular_badge": {
+      "status": "PASS",
+      "details": "MOST POPULAR badge displayed above Gold column"
+    },
+    "api_payments_packages": {
+      "status": "PASS",
+      "details": "Returns correct tier data with Bronze=$0, Silver=$15, Gold=$20"
+    },
+    "api_payments_tier_features": {
+      "status": "PASS",
+      "details": "Returns correct feature flags for bronze, silver, gold tiers"
+    }
+  },
+  "api_tested": {
+    "GET /api/payments/packages": {
+      "status": "PASS",
+      "response_code": 200,
+      "details": "Returns all subscription packages with correct pricing"
+    },
+    "GET /api/payments/tier-features/bronze": {
+      "status": "PASS",
+      "response_code": 200,
+      "details": "Returns bronze tier features (all disabled except basic)"
+    },
+    "GET /api/payments/tier-features/silver": {
+      "status": "PASS",
+      "response_code": 200,
+      "details": "Returns silver tier features (mid-tier enabled)"
+    },
+    "GET /api/payments/tier-features/gold": {
+      "status": "PASS",
+      "response_code": 200,
+      "details": "Returns gold tier features (all enabled)"
+    },
+    "POST /api/payments/checkout (bronze)": {
+      "status": "PASS",
+      "response_code": 200,
+      "details": "Free tier returns redirect URL without Stripe checkout"
+    },
+    "POST /api/payments/checkout (invalid)": {
+      "status": "PASS",
+      "response_code": 400,
+      "details": "Invalid package returns proper error"
+    }
+  },
+  "ui_elements_verified": [
+    "Back button",
+    "Page title 'Choose Your Plan'",
+    "Bronze tier logo and name",
+    "Silver tier logo and name",
+    "Gold tier logo and name",
+    "Free price for Bronze",
+    "$15/month for Silver",
+    "$20/month for Gold",
+    "MOST POPULAR badge on Gold",
+    "Get Started button (Bronze)",
+    "Subscribe button (Silver)",
+    "Subscribe button (Gold)",
+    "15 feature rows in comparison table",
+    "Green checkmarks for included features",
+    "X marks for excluded features",
+    "Text values (Unlimited, 5 slots, Simple + Advanced)",
+    "Footer text about unlimited teams",
+    "Support email"
+  ]
+}
