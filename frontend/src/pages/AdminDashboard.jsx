@@ -96,6 +96,18 @@ export default function AdminDashboard({ user, onLogout }) {
   const [deletingUser, setDeletingUser] = useState(null);
   const [showDeleteUserDialog, setShowDeleteUserDialog] = useState(false);
   
+  // User role management
+  const [updatingRole, setUpdatingRole] = useState(null);
+  const [showRoleDialog, setShowRoleDialog] = useState(false);
+  const [roleChangeUser, setRoleChangeUser] = useState(null);
+  
+  // Pricing management
+  const [pricingConfig, setPricingConfig] = useState(null);
+  const [editingPricing, setEditingPricing] = useState(false);
+  const [pricingDraft, setPricingDraft] = useState(null);
+  const [savingPricing, setSavingPricing] = useState(false);
+  const [pricingOpen, setPricingOpen] = useState(false);
+  
   // Schools viewer
   const [schools, setSchools] = useState([]);
   const [schoolSearchTerm, setSchoolSearchTerm] = useState("");
@@ -110,16 +122,18 @@ export default function AdminDashboard({ user, onLogout }) {
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes, betaRes, schoolsRes] = await Promise.all([
+      const [usersRes, statsRes, betaRes, schoolsRes, pricingRes] = await Promise.all([
         axios.get(`${API}/admin/users`),
         axios.get(`${API}/admin/stats`),
         axios.get(`${API}/admin/beta-settings`),
-        axios.get(`${API}/admin/schools`)
+        axios.get(`${API}/admin/schools`),
+        axios.get(`${API}/admin/pricing`)
       ]);
       setUsers(usersRes.data.users);
       setStats(statsRes.data);
       setBetaSettings(betaRes.data);
       setSchools(schoolsRes.data.schools || []);
+      setPricingConfig(pricingRes.data.pricing);
       setLastUpdated(new Date());
     } catch (error) {
       if (error.response?.status === 403) {
