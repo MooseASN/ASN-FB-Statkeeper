@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
 import { 
   Dialog,
   DialogContent,
@@ -26,6 +27,7 @@ import {
   Pause,
   RotateCcw,
   Undo2,
+  Redo2,
   Flag,
   Trophy,
   Zap,
@@ -36,7 +38,10 @@ import {
   Check,
   X,
   Plus,
-  Minus
+  Minus,
+  Share2,
+  Code,
+  ExternalLink
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
