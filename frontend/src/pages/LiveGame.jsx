@@ -1218,11 +1218,31 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
         stat_type: lastAction.statType,
         increment: -lastAction.increment
       });
+      // Save action for redo before clearing
+      setRedoAction(lastAction);
       setLastAction(null);
       fetchGame();
       toast.success("Action undone");
     } catch (error) {
       toast.error("Failed to undo");
+    }
+  };
+
+  const handleRedo = async () => {
+    if (!redoAction) return;
+    try {
+      await axios.post(`${API}/games/${id}/stats`, {
+        player_id: redoAction.playerId,
+        stat_type: redoAction.statType,
+        increment: redoAction.increment
+      });
+      // Move redo action back to lastAction
+      setLastAction(redoAction);
+      setRedoAction(null);
+      fetchGame();
+      toast.success("Action redone");
+    } catch (error) {
+      toast.error("Failed to redo");
     }
   };
 
