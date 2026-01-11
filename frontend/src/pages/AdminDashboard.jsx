@@ -184,6 +184,90 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleToggleAdmin = async (targetUser) => {
+    if (!targetUser) return;
+    
+    const newRole = targetUser.effective_role === "admin" ? "user" : "admin";
+    setUpdatingRole(targetUser.user_id);
+    
+    try {
+      await axios.put(`${API}/admin/users/${targetUser.user_id}/role`, { role: newRole });
+      toast.success(`${targetUser.email} is now ${newRole === "admin" ? "an admin" : "a regular user"}`);
+      setShowRoleDialog(false);
+      setRoleChangeUser(null);
+      fetchData(); // Refresh user list
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update user role");
+    } finally {
+      setUpdatingRole(null);
+    }
+  };
+
+  const handleStartEditPricing = () => {
+    setPricingDraft(JSON.parse(JSON.stringify(pricingConfig)));
+    setEditingPricing(true);
+  };
+
+  const handleCancelEditPricing = () => {
+    setPricingDraft(null);
+    setEditingPricing(false);
+  };
+
+  const handleSavePricing = async () => {
+    setSavingPricing(true);
+    try {
+      await axios.put(`${API}/admin/pricing`, pricingDraft);
+      setPricingConfig(pricingDraft);
+      setEditingPricing(false);
+      setPricingDraft(null);
+      toast.success("Pricing configuration saved");
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to save pricing");
+    } finally {
+      setSavingPricing(false);
+    }
+  };
+
+  const updatePricingDraft = (tier, field, value) => {
+    setPricingDraft(prev => ({
+      ...prev,
+      [tier]: {
+        ...prev[tier],
+        [field]: value
+      }
+    }));
+  };
+
+  const updatePricingFeature = (tier, index, value) => {
+    setPricingDraft(prev => ({
+      ...prev,
+      [tier]: {
+        ...prev[tier],
+        features: prev[tier].features.map((f, i) => i === index ? value : f)
+      }
+    }));
+  };
+
+  const addPricingFeature = (tier) => {
+    setPricingDraft(prev => ({
+      ...prev,
+      [tier]: {
+        ...prev[tier],
+        features: [...prev[tier].features, "New feature"]
+      }
+    }));
+  };
+
+  const removePricingFeature = (tier, index) => {
+    setPricingDraft(prev => ({
+      ...prev,
+      [tier]: {
+        ...prev[tier],
+        features: prev[tier].features.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
   const handleExportCSV = async () => {
     try {
       const response = await axios.get(`${API}/admin/users/export`, {
