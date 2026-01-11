@@ -14,6 +14,56 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 11, 2026 - ADMIN DASHBOARD RBAC & USER MANAGEMENT ✅
+
+**New Features: Role-Based Access Control, User Management, and Pricing Management**
+
+#### 1. Role-Based Access Control (RBAC) ✅
+- Replaced hardcoded admin email checks with proper role-based system
+- User roles: `primary_admin`, `admin`, `user`
+- Primary admins (hardcoded emails) always have access
+- Regular admin role can be granted/revoked by primary admins
+- All admin endpoints now check role field in database
+
+#### 2. Admin Dashboard - User Management ✅
+Updated `/app/frontend/src/pages/AdminDashboard.jsx`:
+- **New Columns**: Role, Tier, Subscription status
+- **Role Badges**: Primary Admin (amber/crown), Admin (purple/shield), User (gray)
+- **Tier Badges**: 🥇 Gold, 🥈 Silver, 🥉 Bronze with appropriate colors
+- **Subscription Status**: Shows Active/Free with expiration dates
+- **Grant/Revoke Admin**: UserCog button opens confirmation dialog
+
+#### 3. Admin Dashboard - Pricing Management ✅
+New collapsible "Pricing Management" section:
+- Displays Bronze, Silver, Gold tier cards
+- Shows monthly and annual prices
+- Lists features for each tier
+- "Edit Pricing" button enables edit mode
+- Editable price inputs and feature lists
+- Save/Cancel buttons for changes
+
+#### 4. New API Endpoints:
+- `GET /api/admin/pricing` - Returns pricing configuration
+- `PUT /api/admin/pricing` - Updates pricing (primary admin only)
+- `PUT /api/admin/users/{user_id}/role` - Grant/revoke admin (primary admin only)
+
+#### 5. Updated API Response:
+`GET /api/admin/users` now returns:
+- `effective_role`: 'primary_admin' | 'admin' | 'user'
+- `subscription_tier`: 'bronze' | 'silver' | 'gold'
+- `subscription_status`: 'active' | 'none'
+- `subscription_end`: ISO date string (if active)
+
+**Files Modified:**
+- `/app/backend/server.py` (Lines 712-1010: RBAC functions, pricing endpoints, user role endpoint)
+- `/app/frontend/src/pages/AdminDashboard.jsx` (New sections, updated table)
+
+**Testing:** 21/21 tests passed (100% success rate)
+- Test file: `/app/tests/test_admin_dashboard_features.py`
+- Test report: `/app/test_reports/iteration_41.json`
+
+---
+
 ### January 11, 2026 - PRICING PAGE & SUBSCRIPTION TIERS ✅
 
 **New Feature: Complete pricing page with 3 subscription tiers**
