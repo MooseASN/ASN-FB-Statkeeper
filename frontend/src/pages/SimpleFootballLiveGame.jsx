@@ -694,6 +694,16 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const handleUndo = () => {
     if (undoHistory.length === 0) { toast.error("Nothing to undo"); return; }
     const last = undoHistory[undoHistory.length - 1];
+    
+    // Save current state to redo history
+    setRedoHistory(prev => [...prev, {
+      homeScore, awayScore, possession, quarter, clockTime,
+      homeStats: JSON.parse(JSON.stringify(homeStats)),
+      awayStats: JSON.parse(JSON.stringify(awayStats)),
+      events: [...events], homeTimeouts, awayTimeouts,
+      playerStats: JSON.parse(JSON.stringify(playerStats)), gameStatus
+    }]);
+    
     setHomeScore(last.homeScore);
     setAwayScore(last.awayScore);
     setPossession(last.possession);
@@ -708,6 +718,35 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     setGameStatus(last.gameStatus || 'in_progress');
     setUndoHistory(prev => prev.slice(0, -1));
     toast.success("Undone!");
+  };
+  
+  const handleRedo = () => {
+    if (redoHistory.length === 0) { toast.error("Nothing to redo"); return; }
+    const last = redoHistory[redoHistory.length - 1];
+    
+    // Save current state to undo history
+    setUndoHistory(prev => [...prev, {
+      homeScore, awayScore, possession, quarter, clockTime,
+      homeStats: JSON.parse(JSON.stringify(homeStats)),
+      awayStats: JSON.parse(JSON.stringify(awayStats)),
+      events: [...events], homeTimeouts, awayTimeouts,
+      playerStats: JSON.parse(JSON.stringify(playerStats)), gameStatus
+    }]);
+    
+    setHomeScore(last.homeScore);
+    setAwayScore(last.awayScore);
+    setPossession(last.possession);
+    setQuarter(last.quarter);
+    setClockTime(last.clockTime);
+    setHomeStats(last.homeStats);
+    setAwayStats(last.awayStats);
+    setEvents(last.events);
+    setHomeTimeouts(last.homeTimeouts);
+    setAwayTimeouts(last.awayTimeouts);
+    setPlayerStats(last.playerStats);
+    setGameStatus(last.gameStatus || 'in_progress');
+    setRedoHistory(prev => prev.slice(0, -1));
+    toast.success("Redone!");
   };
   
   const addEvent = (desc) => {
