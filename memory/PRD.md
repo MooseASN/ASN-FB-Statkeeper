@@ -14,6 +14,30 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 11, 2026 - UI UPDATES & EMBED INTEGRATION ✅
+
+**Features Implemented:**
+1. **StatMoose Logo Navigation** - Logo on SportSelection page now navigates to home page '/'
+2. **Pricing Page Update** - Removed "Most Popular" badge from Gold tier
+3. **Redo Button for Football** - Added to FootballLiveGame and SimpleFootballLiveGame
+4. **Embed Integration Complete** - Added EmbedSnippetGenerator to all sports (Basketball, Football, Baseball)
+5. **Feature Gating Hook** - Created `useSubscriptionFeatures` hook for subscription-based feature access
+6. **User Tier Endpoint** - Added `GET /api/payments/user-tier` endpoint
+
+**Files Modified:**
+- `/app/frontend/src/pages/SportSelection.jsx` (logo navigation)
+- `/app/frontend/src/pages/PricingPage.jsx` (removed badge)
+- `/app/frontend/src/pages/LiveGame.jsx` (embed component)
+- `/app/frontend/src/pages/FootballLiveGame.jsx` (redo + embed)
+- `/app/frontend/src/pages/SimpleFootballLiveGame.jsx` (share/embed/redo)
+- `/app/frontend/src/pages/BaseballLiveGame.jsx` (embed)
+- `/app/frontend/src/hooks/useSubscriptionFeatures.js` (NEW)
+- `/app/backend/routers/payments.py` (user-tier endpoint)
+
+**Testing:** 7/7 backend tests passed, 9/9 features verified
+
+---
+
 ### January 11, 2026 - P1/P2/P3 FEATURES COMPLETE ✅
 
 **P1: Trial Periods for Premium Tiers**
