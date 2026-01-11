@@ -370,13 +370,67 @@ async def get_my_subscription(request: Request):
     if not user:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
+    # Get tier from package ID if not directly stored
+    tier = user.get("subscription_tier")
+    if not tier and user.get("subscription_package"):
+        package = SUBSCRIPTION_PACKAGES.get(user.get("subscription_package"), {})
+        tier = package.get("tier", "bronze")
+    
     return {
         "subscription_status": user.get("subscription_status", "none"),
         "subscription_package": user.get("subscription_package"),
+        "subscription_tier": tier or "bronze",  # Default to bronze if none
         "subscription_start": user.get("subscription_start"),
         "subscription_end": user.get("subscription_end"),
         "is_active": user.get("subscription_status") == "active"
     }
+
+@router.get("/tier-features/{tier}")
+async def get_tier_features(tier: str):
+    """Get features available for a specific tier"""
+    tier_features = {
+        "bronze": {
+            "public_live_stats": False,
+            "embed_widgets": False,
+            "sponsor_banners": 0,
+            "season_stats": False,
+            "csv_export": False,
+            "shared_access": False,
+            "custom_branding": False,
+            "white_label_embeds": False,
+            "custom_team_logos": False,
+            "priority_support": False
+        },
+        "silver": {
+            "public_live_stats": True,
+            "embed_widgets": True,
+            "sponsor_banners": 5,
+            "season_stats": True,
+            "csv_export": True,
+            "shared_access": False,
+            "custom_branding": False,
+            "white_label_embeds": False,
+            "custom_team_logos": False,
+            "priority_support": False
+        },
+        "gold": {
+            "public_live_stats": True,
+            "embed_widgets": True,
+            "sponsor_banners": -1,  # Unlimited
+            "season_stats": True,
+            "csv_export": True,
+            "shared_access": True,
+            "custom_branding": True,
+            "white_label_embeds": True,
+            "custom_team_logos": True,
+            "priority_support": True
+        }
+    }
+    
+    if tier not in tier_features:
+        raise HTTPException(status_code=400, detail=f"Invalid tier: {tier}")
+    
+    return {"tier": tier, "features": tier_features[tier]}
 
 @router.get("/history")
 async def get_payment_history(request: Request):
