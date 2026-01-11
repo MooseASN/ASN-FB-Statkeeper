@@ -2391,6 +2391,16 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               variant="ghost" 
               size="sm" 
               className="text-zinc-400 hover:text-white"
+              onClick={() => setShowEmbedDialog(true)}
+              data-testid="embed-button"
+            >
+              <Code className="w-4 h-4 mr-2" />
+              Embed
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              className="text-zinc-400 hover:text-white"
               onClick={() => window.open(`/baseball/${id}/stats`, '_blank')}
               data-testid="live-stats-button"
             >
