@@ -1877,18 +1877,34 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                 {copied ? <Check className="w-4 h-4 mr-1" /> : <Share2 className="w-4 h-4 mr-1" />}
                 Share
               </Button>
-              <Button variant="ghost" size="sm" onClick={openEmbedDialog} className="text-white hover:bg-white/10" data-testid="embed-btn">
-                {embedCopied ? <Check className="w-4 h-4 mr-1" /> : <Code className="w-4 h-4 mr-1" />}
-                Embed
-              </Button>
+              {/* Embed - Silver+ feature */}
+              {(demoMode || canAccess('embed_widgets')) ? (
+                <Button variant="ghost" size="sm" onClick={openEmbedDialog} className="text-white hover:bg-white/10" data-testid="embed-btn">
+                  {embedCopied ? <Check className="w-4 h-4 mr-1" /> : <Code className="w-4 h-4 mr-1" />}
+                  Embed
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => toast.error(`Embed widgets require ${getRequiredTierFor('embed_widgets')} tier`)} className="text-zinc-500 hover:bg-white/5" data-testid="embed-btn-locked">
+                  <Code className="w-4 h-4 mr-1" />
+                  Embed 🔒
+                </Button>
+              )}
               <Button variant="ghost" size="sm" onClick={handleDownloadPDF} className="text-white hover:bg-white/10" data-testid="download-pdf-btn">
                 <FileDown className="w-4 h-4 mr-1" />
                 PDF
               </Button>
-              <Button variant="ghost" size="sm" onClick={copyCSVLink} className="text-white hover:bg-white/10" data-testid="copy-csv-btn">
-                <FileText className="w-4 h-4 mr-1" />
-                CSV Link
-              </Button>
+              {/* CSV Export - Silver+ feature */}
+              {(demoMode || canAccess('csv_export')) ? (
+                <Button variant="ghost" size="sm" onClick={copyCSVLink} className="text-white hover:bg-white/10" data-testid="copy-csv-btn">
+                  <FileText className="w-4 h-4 mr-1" />
+                  CSV Link
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={() => toast.error(`CSV export requires ${getRequiredTierFor('csv_export')} tier`)} className="text-zinc-500 hover:bg-white/5" data-testid="copy-csv-btn-locked">
+                  <FileText className="w-4 h-4 mr-1" />
+                  CSV 🔒
+                </Button>
+              )}
               <Button 
                 variant="ghost" 
                 size="sm" 
