@@ -415,6 +415,11 @@ export default function HomePage() {
             />
           </Link>
           <div className="flex items-center gap-4">
+            <Link to="/pricing">
+              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
+                Pricing
+              </Button>
+            </Link>
             <Link to="/contact">
               <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
                 Contact
@@ -425,7 +430,7 @@ export default function HomePage() {
                 Sign In
               </Button>
             </Link>
-            <Link to="/contact">
+            <Link to="/pricing">
               <Button className="bg-white text-black hover:bg-gray-200 font-semibold">
                 Get Started
               </Button>
