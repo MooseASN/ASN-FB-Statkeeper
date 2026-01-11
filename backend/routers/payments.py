@@ -1,6 +1,6 @@
 """
 Stripe Payment Integration Router
-Handles subscription payments (monthly and annual plans)
+Handles subscription payments (monthly and annual plans) with trial periods
 """
 from fastapi import APIRouter, HTTPException, Request, Depends
 from pydantic import BaseModel, Field
@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import stripe
 
 from emergentintegrations.payments.stripe.checkout import (
     StripeCheckout,
