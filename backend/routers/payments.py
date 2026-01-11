@@ -173,7 +173,35 @@ async def create_checkout_session(
     
     package = SUBSCRIPTION_PACKAGES[checkout_data.package_id]
     
-    # Get Stripe API key
+    # Handle free tier (Bronze) - no Stripe checkout needed
+    if package["amount"] == 0:
+        # Get user info if available
+        user = await get_current_user_from_request(request)
+        user_id = checkout_data.user_id or (user.get("user_id") if user else None)
+        
+        if user_id and db:
+            # Update user to bronze tier immediately
+            await db.users.update_one(
+                {"user_id": user_id},
+                {"$set": {
+                    "subscription_status": "active",
+                    "subscription_package": checkout_data.package_id,
+                    "subscription_tier": package.get("tier", "bronze"),
+                    "subscription_start": datetime.now(timezone.utc).isoformat(),
+                    "subscription_end": None,  # Free tier doesn't expire
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            logger.info(f"Activated free bronze tier for user: {user_id}")
+        
+        # Return a dummy response - frontend will handle this
+        origin = checkout_data.origin_url.rstrip("/")
+        return CheckoutResponse(
+            url=f"{origin}/select-sport",  # Redirect to app
+            session_id="free_tier_no_checkout"
+        )
+    
+    # Get Stripe API key for paid tiers
     stripe_api_key = os.environ.get("STRIPE_API_KEY")
     if not stripe_api_key:
         raise HTTPException(status_code=500, detail="Stripe API key not configured")
@@ -200,6 +228,7 @@ async def create_checkout_session(
         "package_id": checkout_data.package_id,
         "package_name": package["name"],
         "interval": package["interval"],
+        "tier": package.get("tier", "unknown"),
         "source": "web_checkout"
     }
     if user_id:
@@ -228,6 +257,7 @@ async def create_checkout_session(
                 "user_email": user_email,
                 "package_id": checkout_data.package_id,
                 "package_name": package["name"],
+                "tier": package.get("tier", "unknown"),
                 "amount": package["amount"],
                 "currency": package["currency"],
                 "interval": package["interval"],
