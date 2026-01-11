@@ -22,6 +22,7 @@ import { ArrowLeft, Share2, FileDown, UserPlus, Copy, Check, Undo2, Redo2, X, Pl
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import ConnectionStatus from "@/components/ConnectionStatus";
+import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
