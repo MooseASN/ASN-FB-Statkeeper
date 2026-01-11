@@ -591,6 +591,12 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   const [showQuarterDialog, setShowQuarterDialog] = useState(false);
   const [pendingQuarterChange, setPendingQuarterChange] = useState(null);
   
+  // Embed dialog
+  const [showEmbedDialog, setShowEmbedDialog] = useState(false);
+  
+  // Redo stack for undone plays
+  const [redoHistory, setRedoHistory] = useState([]);
+  
   // Demo data
   useEffect(() => {
     if (demoMode) {
