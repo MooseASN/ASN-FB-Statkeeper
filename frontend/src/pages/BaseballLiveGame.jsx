@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
 import { 
   Dialog,
   DialogContent,
@@ -36,7 +37,8 @@ import {
   Radio,
   FileDown,
   Flag,
-  ExternalLink
+  ExternalLink,
+  Code
 } from "lucide-react";
 import { X as XIcon } from "lucide-react";
 
