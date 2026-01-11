@@ -534,26 +534,46 @@ export default function Dashboard({ user, onLogout }) {
               </Link>
             </div>
             <div className="space-y-3">
-              {recentGames.map(game => (
-                <Link key={game.id} to={`/game/${game.id}`}>
-                  <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid={`recent-game-${game.id}`}>
-                    <CardContent className="py-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <span className="font-medium">{game.home_team_name}</span>
-                          <span className="text-2xl font-bold score-display">
-                            {calculateScore(game.quarter_scores, "home")} - {calculateScore(game.quarter_scores, "away")}
+              {recentGames.map(game => {
+                // Determine the correct route based on sport
+                const gameRoute = game.sport === 'football' 
+                  ? `/football/${game.id}` 
+                  : game.sport === 'baseball' 
+                    ? `/baseball/${game.id}` 
+                    : `/game/${game.id}`;
+                
+                // Determine the score based on sport
+                const getScore = (team) => {
+                  if (game.sport === 'football') {
+                    return game.football_state?.[`${team}_score`] || game[`${team}_score`] || 0;
+                  } else if (game.sport === 'baseball') {
+                    return game[`${team}_score`] || 0;
+                  } else {
+                    return calculateScore(game.quarter_scores, team);
+                  }
+                };
+                
+                return (
+                  <Link key={game.id} to={gameRoute}>
+                    <Card className="hover:shadow-md transition-shadow cursor-pointer" data-testid={`recent-game-${game.id}`}>
+                      <CardContent className="py-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-4">
+                            <span className="font-medium">{game.home_team_name}</span>
+                            <span className="text-2xl font-bold score-display">
+                              {getScore("home")} - {getScore("away")}
+                            </span>
+                            <span className="font-medium">{game.away_team_name}</span>
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(game.created_at).toLocaleDateString()}
                           </span>
-                          <span className="font-medium">{game.away_team_name}</span>
                         </div>
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(game.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
+                      </CardContent>
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         )}
