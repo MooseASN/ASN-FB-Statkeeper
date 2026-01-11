@@ -2391,26 +2391,54 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-zinc-400 hover:text-white"
-              onClick={() => setShowEmbedDialog(true)}
-              data-testid="embed-button"
-            >
-              <Code className="w-4 h-4 mr-2" />
-              Embed
-            </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              className="text-zinc-400 hover:text-white"
-              onClick={() => window.open(`/baseball/${id}/stats`, '_blank')}
-              data-testid="live-stats-button"
-            >
-              <ExternalLink className="w-4 h-4 mr-2" />
-              Live Stats
-            </Button>
+            {/* Embed - Silver+ feature */}
+            {(demoMode || canAccess('embed_widgets')) ? (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-zinc-400 hover:text-white"
+                onClick={() => setShowEmbedDialog(true)}
+                data-testid="embed-button"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                Embed
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-zinc-600 cursor-not-allowed"
+                onClick={() => toast.error(`Embed widgets require ${getRequiredTierFor('embed_widgets')} tier. Upgrade at /pricing`)}
+                data-testid="embed-button-locked"
+              >
+                <Code className="w-4 h-4 mr-2" />
+                Embed 🔒
+              </Button>
+            )}
+            {/* Live Stats - Silver+ feature */}
+            {(demoMode || canAccess('public_live_stats')) ? (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-zinc-400 hover:text-white"
+                onClick={() => window.open(`/baseball/${id}/stats`, '_blank')}
+                data-testid="live-stats-button"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Live Stats
+              </Button>
+            ) : (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-zinc-600 cursor-not-allowed"
+                onClick={() => toast.error(`Public live stats require ${getRequiredTierFor('public_live_stats')} tier. Upgrade at /pricing`)}
+                data-testid="live-stats-button-locked"
+              >
+                <ExternalLink className="w-4 h-4 mr-2" />
+                Live Stats 🔒
+              </Button>
+            )}
             <Button 
               variant="ghost" 
               size="sm" 
