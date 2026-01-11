@@ -161,6 +161,53 @@ async def get_current_user_from_request(request: Request):
 
 # ============ PAYMENT ENDPOINTS ============
 
+@router.get("/user-tier")
+async def get_user_tier(request: Request):
+    """Get the current user's subscription tier and status"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        return {
+            "tier": "bronze",
+            "subscription_status": None,
+            "subscription_end": None,
+            "is_trial": False
+        }
+    
+    # Get user's subscription info from database
+    if db:
+        user_doc = await db.users.find_one(
+            {"user_id": user.user_id},
+            {"_id": 0, "subscription_tier": 1, "subscription_status": 1, 
+             "subscription_end": 1, "subscription_package": 1, "tier": 1}
+        )
+        
+        if user_doc:
+            # Determine tier from various fields
+            tier = user_doc.get("subscription_tier") or user_doc.get("tier")
+            if not tier and user_doc.get("subscription_package"):
+                package_id = user_doc.get("subscription_package", "")
+                if "gold" in package_id:
+                    tier = "gold"
+                elif "silver" in package_id:
+                    tier = "silver"
+                else:
+                    tier = "bronze"
+            
+            return {
+                "tier": tier or "bronze",
+                "subscription_status": user_doc.get("subscription_status"),
+                "subscription_end": user_doc.get("subscription_end"),
+                "is_trial": user_doc.get("subscription_status") == "trialing"
+            }
+    
+    return {
+        "tier": "bronze",
+        "subscription_status": None,
+        "subscription_end": None,
+        "is_trial": False
+    }
+
 @router.get("/packages")
 async def get_subscription_packages():
     """Get all available subscription packages"""
