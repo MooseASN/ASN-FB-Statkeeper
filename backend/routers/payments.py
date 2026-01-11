@@ -33,33 +33,83 @@ def set_db(database):
 # ============ SUBSCRIPTION PACKAGES ============
 # Define fixed packages on backend - never accept amounts from frontend
 SUBSCRIPTION_PACKAGES = {
-    "monthly_basic": {
-        "name": "Basic Monthly",
-        "amount": 9.99,
+    # Bronze tier is free - no Stripe checkout needed
+    "monthly_bronze": {
+        "name": "Bronze",
+        "amount": 0,
         "currency": "usd",
         "interval": "month",
-        "features": ["Unlimited teams", "Basic stats tracking", "Game history"]
+        "tier": "bronze",
+        "features": [
+            "Unlimited teams & games",
+            "Unlimited game history",
+            "PDF box scores",
+            "Simple + Advanced stat tracking",
+            "Play-by-play logging"
+        ]
     },
-    "monthly_pro": {
-        "name": "Pro Monthly", 
-        "amount": 19.99,
+    "monthly_silver": {
+        "name": "Silver",
+        "amount": 15.00,
         "currency": "usd",
         "interval": "month",
-        "features": ["Unlimited teams", "Advanced stats", "PDF reports", "Priority support"]
+        "tier": "silver",
+        "features": [
+            "Everything in Bronze",
+            "Public live stats pages",
+            "Embed widgets",
+            "5 sponsor banner slots",
+            "Season stats & leaderboards",
+            "CSV export"
+        ]
     },
-    "annual_basic": {
-        "name": "Basic Annual",
-        "amount": 99.99,  # ~17% discount
+    "monthly_gold": {
+        "name": "Gold", 
+        "amount": 20.00,
+        "currency": "usd",
+        "interval": "month",
+        "tier": "gold",
+        "features": [
+            "Everything in Silver",
+            "Shared access (invite staff)",
+            "Custom branding on live stats",
+            "White-label embeds",
+            "Unlimited sponsor banners",
+            "Custom team logos",
+            "Priority support"
+        ]
+    },
+    # Annual plans (2 months free)
+    "annual_silver": {
+        "name": "Silver Annual",
+        "amount": 150.00,  # $15 x 10 months (2 months free)
         "currency": "usd",
         "interval": "year",
-        "features": ["Unlimited teams", "Basic stats tracking", "Game history"]
+        "tier": "silver",
+        "features": [
+            "Everything in Bronze",
+            "Public live stats pages",
+            "Embed widgets",
+            "5 sponsor banner slots",
+            "Season stats & leaderboards",
+            "CSV export"
+        ]
     },
-    "annual_pro": {
-        "name": "Pro Annual",
-        "amount": 199.99,  # ~17% discount
+    "annual_gold": {
+        "name": "Gold Annual",
+        "amount": 200.00,  # $20 x 10 months (2 months free)
         "currency": "usd",
         "interval": "year",
-        "features": ["Unlimited teams", "Advanced stats", "PDF reports", "Priority support"]
+        "tier": "gold",
+        "features": [
+            "Everything in Silver",
+            "Shared access (invite staff)",
+            "Custom branding on live stats",
+            "White-label embeds",
+            "Unlimited sponsor banners",
+            "Custom team logos",
+            "Priority support"
+        ]
     }
 }
 
