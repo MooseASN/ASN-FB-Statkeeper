@@ -28,6 +28,7 @@ import {
   Code,
 } from "lucide-react";
 import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
+import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
 import { RULESETS } from "@/data/penaltyCatalog";
 import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import ConnectionStatus from "@/components/ConnectionStatus";
