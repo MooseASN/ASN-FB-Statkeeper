@@ -2600,12 +2600,22 @@ async def get_game_public(game_id: str):
     # Get events/play log for this game
     events = await db.events.find({"game_id": game_id}, {"_id": 0}).sort("created_at", -1).to_list(500)
     
-    return {
+    # For baseball, also include batting and pitching stats
+    result = {
         **game,
         "home_player_stats": home_stats,
         "away_player_stats": away_stats,
         "events": events
     }
+    
+    # Baseball-specific: Include batting and pitching stats
+    if game.get("sport") == "baseball":
+        result["home_batting_stats"] = home_stats
+        result["away_batting_stats"] = away_stats
+        result["home_pitching_stats"] = [s for s in home_stats if s.get("pitches_thrown", 0) > 0 or s.get("innings_pitched", 0) > 0]
+        result["away_pitching_stats"] = [s for s in away_stats if s.get("pitches_thrown", 0) > 0 or s.get("innings_pitched", 0) > 0]
+    
+    return result
 
 @api_router.get("/games/{game_id}")
 async def get_game(game_id: str, user: User = Depends(get_current_user)):
