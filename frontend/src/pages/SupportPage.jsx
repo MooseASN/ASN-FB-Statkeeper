@@ -9,9 +9,7 @@ import {
   Lightbulb,
   Play,
   Users,
-  Trophy,
   Clock,
-  Target,
   Undo2,
   Share2,
   FileText,
@@ -23,15 +21,21 @@ import {
   Monitor,
   BarChart3,
   Calendar,
-  Flag,
   Shield
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const MARTY_IMAGE = "https://customer-assets.emergentagent.com/job_sportspro-dash/artifacts/xqkfq63l_Marty.png";
 
-// Collapsible Section Component
-function CollapsibleSection({ title, icon: Icon, children, defaultOpen = false }) {
+// Sport icons
+const SPORT_ICONS = {
+  basketball: "/basketball-icon.png",
+  football: "/football-icon.png", 
+  baseball: "/baseball-icon.png"
+};
+
+// Collapsible Section Component - supports both Lucide icons and image URLs
+function CollapsibleSection({ title, icon: Icon, iconSrc, children, defaultOpen = false }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
   
   return (
@@ -41,7 +45,11 @@ function CollapsibleSection({ title, icon: Icon, children, defaultOpen = false }
         className="w-full px-4 py-3 bg-zinc-900 hover:bg-zinc-800 transition-colors flex items-center justify-between text-left"
       >
         <div className="flex items-center gap-3">
-          <Icon className="w-5 h-5 text-orange-500" />
+          {iconSrc ? (
+            <img src={iconSrc} alt="" className="w-6 h-6 object-contain" />
+          ) : Icon ? (
+            <Icon className="w-5 h-5 text-orange-500" />
+          ) : null}
           <span className="font-medium text-white">{title}</span>
         </div>
         {isOpen ? (
