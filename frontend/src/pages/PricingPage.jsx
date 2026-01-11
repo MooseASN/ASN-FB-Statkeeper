@@ -194,9 +194,6 @@ export default function PricingPage() {
                 
                 {/* Gold */}
                 <th className="p-6 text-center border-l border-zinc-800 bg-amber-500/10">
-                  <div className="absolute -top-0 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-3 py-1 rounded-b-lg">
-                    MOST POPULAR
-                  </div>
                   <div className="flex flex-col items-center">
                     <img src={TIER_LOGOS.gold} alt="Gold" className="w-20 h-20 object-contain mb-3" />
                     <span className="text-xl font-bold text-amber-400">Gold</span>
