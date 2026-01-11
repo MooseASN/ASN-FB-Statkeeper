@@ -14,6 +14,39 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 10, 2026 - BASEBALL LIVE STATS OUTPUT ✅
+
+**New Feature: Public, shareable live stats page for baseball games**
+
+Similar to MLB GameDay, StatBroadcast, PrestoSports, and Sidearm Sports.
+
+#### Route: `/baseball/{id}/stats`
+- Public access (no authentication required)
+- Auto-refreshes every 5 seconds for live updates
+
+#### Features:
+- **Scoreboard**: Team logos, names, colors, and scores
+- **Game Status**: Inning indicator (▲/▼) with LIVE badge for active games
+- **Diamond Visualization**: SVG base runner display
+- **Ball-Strike-Out Count**: Visual indicators below diamond
+- **Linescore**: Inning-by-inning scores with R/H/E totals
+- **Box Score Tab**: Batting stats (AB, R, H, RBI, BB, K) and Pitching stats (IP, H, R, ER, BB, K, NP)
+- **Play-by-Play Tab**: Event log grouped by inning
+
+#### Access Points:
+- Direct URL: `/baseball/{gameId}/stats`
+- From BaseballLiveGame: "Share" button copies URL, "Live Stats" button opens in new tab
+
+**Files Created/Modified:**
+- `/app/frontend/src/pages/BaseballLiveStats.jsx` (NEW)
+- `/app/frontend/src/pages/BaseballLiveGame.jsx` (Updated Share + Live Stats buttons)
+- `/app/frontend/src/App.js` (Route added)
+- `/app/backend/server.py` (Public endpoint enhanced for baseball)
+
+**Testing:** 100% success rate (13/13 features verified)
+
+---
+
 ### January 10, 2026 - SITE-WIDE BETA MODE ✅
 
 **New Feature: Admin can lock down the entire site to authorized users only**
