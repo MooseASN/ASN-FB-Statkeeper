@@ -5083,6 +5083,15 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
           // If result is set, we can optionally auto-advance to next step
         }}
       />
+      
+      {/* Embed Snippet Generator */}
+      <EmbedSnippetGenerator
+        open={showEmbedDialog}
+        onOpenChange={setShowEmbedDialog}
+        shareCode={game?.share_code || id}
+        sport="football"
+        gameTitle={`${game?.away_team_name || 'Away'} vs ${game?.home_team_name || 'Home'}`}
+      />
     </div>
   );
 }
