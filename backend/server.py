@@ -711,19 +711,27 @@ async def update_display_name(data: dict, user: User = Depends(get_current_user)
 
 # ============ ADMIN ENDPOINTS ============
 
-ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
-ADMIN_USERNAMES = ["admin"]
+# Primary admin emails - these users always have admin access
+PRIMARY_ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
 RESERVED_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
 RESERVED_USERNAMES = ["admin"]
 
-def is_admin_user(user: User) -> bool:
-    """Check if user has admin privileges"""
-    return (user.email.lower() in ADMIN_EMAILS or 
-            (user.username and user.username.lower() in ADMIN_USERNAMES))
+async def is_admin_user(user: User) -> bool:
+    """Check if user has admin privileges - checks role field in DB"""
+    # Primary admins always have access
+    if user.email.lower() in PRIMARY_ADMIN_EMAILS:
+        return True
+    
+    # Check role field in database
+    user_doc = await db.users.find_one({"user_id": user.user_id}, {"_id": 0, "role": 1})
+    if user_doc and user_doc.get("role") == "admin":
+        return True
+    
+    return False
 
 async def get_admin_user(user: User = Depends(get_current_user)) -> User:
     """Verify user is an admin"""
-    if not is_admin_user(user):
+    if not await is_admin_user(user):
         raise HTTPException(status_code=403, detail="Admin access required")
     return user
 
