@@ -1,41 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Check, Crown, Zap, ArrowLeft, Loader2 } from 'lucide-react';
+import { Check, X, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { toast } from 'sonner';
 import axios from 'axios';
 
 const API = process.env.REACT_APP_BACKEND_URL;
 
+// Tier logos
+const TIER_LOGOS = {
+  bronze: "https://customer-assets.emergentagent.com/job_31d87846-33e6-4c74-b3e3-570fec34a9a4/artifacts/fkjmxy2o_StatMoose%20Bronze%20Logo.png",
+  silver: "https://customer-assets.emergentagent.com/job_31d87846-33e6-4c74-b3e3-570fec34a9a4/artifacts/th9kex3j_StatMoose%20Silver%20Logo.png",
+  gold: "https://customer-assets.emergentagent.com/job_31d87846-33e6-4c74-b3e3-570fec34a9a4/artifacts/y6akc4wa_StatMoose%20Gold%20Logo.png"
+};
+
+// Feature list with tier availability
+const FEATURES = [
+  { name: "Teams & Games", bronze: "Unlimited", silver: "Unlimited", gold: "Unlimited" },
+  { name: "Game History", bronze: "Unlimited", silver: "Unlimited", gold: "Unlimited" },
+  { name: "PDF Box Scores", bronze: true, silver: true, gold: true },
+  { name: "Stat Tracking Modes", bronze: "Simple + Advanced", silver: "Simple + Advanced", gold: "Simple + Advanced" },
+  { name: "Play-by-Play Logging", bronze: true, silver: true, gold: true },
+  { name: "Public Live Stats Pages", bronze: false, silver: true, gold: true },
+  { name: "Embed Widgets", bronze: false, silver: true, gold: true },
+  { name: "Sponsor Banners", bronze: false, silver: "5 slots", gold: "Unlimited" },
+  { name: "Season Stats & Leaderboards", bronze: false, silver: true, gold: true },
+  { name: "CSV Export", bronze: false, silver: true, gold: true },
+  { name: "Shared Access (Invite Staff)", bronze: false, silver: false, gold: true },
+  { name: "Custom Branding (Live Stats)", bronze: false, silver: false, gold: true },
+  { name: "White-Label Embeds", bronze: false, silver: false, gold: true },
+  { name: "Custom Team Logos", bronze: false, silver: false, gold: true },
+  { name: "Priority Support", bronze: false, silver: false, gold: true },
+];
+
+// Feature cell renderer
+const FeatureCell = ({ value }) => {
+  if (value === true) {
+    return <Check className="w-5 h-5 text-green-500 mx-auto" />;
+  }
+  if (value === false) {
+    return <X className="w-5 h-5 text-zinc-600 mx-auto" />;
+  }
+  return <span className="text-sm text-white">{value}</span>;
+};
+
 export default function PricingPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [packages, setPackages] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [processingPackage, setProcessingPackage] = useState(null);
-  const [billingCycle, setBillingCycle] = useState('monthly');
+  const [loading, setLoading] = useState(false);
+  const [processingTier, setProcessingTier] = useState(null);
   
   // Check for return from Stripe
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
-    fetchPackages();
     if (sessionId) {
       pollPaymentStatus(sessionId);
     }
   }, [sessionId]);
-
-  const fetchPackages = async () => {
-    try {
-      const res = await axios.get(`${API}/api/payments/packages`);
-      setPackages(res.data.packages);
-    } catch (error) {
-      console.error('Failed to fetch packages:', error);
-      toast.error('Failed to load pricing information');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const pollPaymentStatus = async (sessionId, attempts = 0) => {
     const maxAttempts = 5;
@@ -67,12 +89,18 @@ export default function PricingPage() {
     }
   };
 
-  const handleSubscribe = async (packageId) => {
-    setProcessingPackage(packageId);
+  const handleSubscribe = async (tier) => {
+    if (tier === 'bronze') {
+      // Free tier - just go to dashboard
+      navigate('/select-sport');
+      return;
+    }
+    
+    setProcessingTier(tier);
     try {
       const originUrl = window.location.origin;
       const res = await axios.post(`${API}/api/payments/checkout`, {
-        package_id: packageId,
+        package_id: `monthly_${tier}`,
         origin_url: originUrl
       }, { withCredentials: true });
 
@@ -82,39 +110,19 @@ export default function PricingPage() {
       }
     } catch (error) {
       console.error('Failed to create checkout session:', error);
-      toast.error(error.response?.data?.detail || 'Failed to start checkout');
-      setProcessingPackage(null);
+      toast.error(error.response?.data?.detail || 'Failed to start checkout. Please login first.');
+      setProcessingTier(null);
     }
   };
 
-  const getDisplayPackages = () => {
-    const isMonthly = billingCycle === 'monthly';
-    return {
-      basic: isMonthly ? packages.monthly_basic : packages.annual_basic,
-      pro: isMonthly ? packages.monthly_pro : packages.annual_pro,
-      basicId: isMonthly ? 'monthly_basic' : 'annual_basic',
-      proId: isMonthly ? 'monthly_pro' : 'annual_pro'
-    };
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-500" />
-      </div>
-    );
-  }
-
-  const displayPkgs = getDisplayPackages();
-
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-black">
       {/* Header */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
-          className="text-slate-400 hover:text-white mb-8"
+          className="text-zinc-400 hover:text-white mb-8"
           data-testid="back-button"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -125,159 +133,125 @@ export default function PricingPage() {
           <h1 className="text-4xl font-bold text-white mb-4" data-testid="pricing-title">
             Choose Your Plan
           </h1>
-          <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-            Unlock the full power of StatMoose with our premium features
+          <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+            Track stats for any sport. Upgrade anytime to unlock more features.
           </p>
         </div>
 
-        {/* Billing Toggle */}
-        <div className="flex justify-center mb-12">
-          <div className="bg-slate-800 rounded-full p-1 flex items-center gap-1">
-            <button
-              onClick={() => setBillingCycle('monthly')}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all ${
-                billingCycle === 'monthly'
-                  ? 'bg-emerald-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              data-testid="monthly-toggle"
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setBillingCycle('annual')}
-              className={`px-6 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
-                billingCycle === 'annual'
-                  ? 'bg-emerald-500 text-white'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-              data-testid="annual-toggle"
-            >
-              Annual
-              <span className="bg-amber-500 text-amber-900 text-xs px-2 py-0.5 rounded-full">
-                Save 17%
-              </span>
-            </button>
-          </div>
+        {/* Pricing Table */}
+        <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
+          <table className="w-full">
+            {/* Header with Logos and Prices */}
+            <thead>
+              <tr className="border-b border-zinc-800">
+                <th className="p-6 text-left w-1/4">
+                  <span className="text-zinc-500 text-sm font-normal">Compare plans</span>
+                </th>
+                
+                {/* Bronze */}
+                <th className="p-6 text-center border-l border-zinc-800">
+                  <div className="flex flex-col items-center">
+                    <img src={TIER_LOGOS.bronze} alt="Bronze" className="w-20 h-20 object-contain mb-3" />
+                    <span className="text-xl font-bold text-amber-700">Bronze</span>
+                    <div className="mt-2">
+                      <span className="text-3xl font-black text-white">Free</span>
+                    </div>
+                    <Button 
+                      onClick={() => handleSubscribe('bronze')}
+                      variant="outline"
+                      className="mt-4 border-amber-700 text-amber-700 hover:bg-amber-700 hover:text-white"
+                      data-testid="bronze-select"
+                    >
+                      Get Started
+                    </Button>
+                  </div>
+                </th>
+                
+                {/* Silver */}
+                <th className="p-6 text-center border-l border-zinc-800 bg-zinc-800/30">
+                  <div className="flex flex-col items-center">
+                    <img src={TIER_LOGOS.silver} alt="Silver" className="w-20 h-20 object-contain mb-3" />
+                    <span className="text-xl font-bold text-zinc-300">Silver</span>
+                    <div className="mt-2">
+                      <span className="text-3xl font-black text-white">$15</span>
+                      <span className="text-zinc-400 text-sm">/month</span>
+                    </div>
+                    <Button 
+                      onClick={() => handleSubscribe('silver')}
+                      disabled={processingTier === 'silver'}
+                      className="mt-4 bg-zinc-600 hover:bg-zinc-500 text-white"
+                      data-testid="silver-select"
+                    >
+                      {processingTier === 'silver' ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        'Subscribe'
+                      )}
+                    </Button>
+                  </div>
+                </th>
+                
+                {/* Gold */}
+                <th className="p-6 text-center border-l border-zinc-800 bg-amber-500/10">
+                  <div className="absolute -top-0 left-1/2 -translate-x-1/2 bg-amber-500 text-black text-xs font-bold px-3 py-1 rounded-b-lg">
+                    MOST POPULAR
+                  </div>
+                  <div className="flex flex-col items-center">
+                    <img src={TIER_LOGOS.gold} alt="Gold" className="w-20 h-20 object-contain mb-3" />
+                    <span className="text-xl font-bold text-amber-400">Gold</span>
+                    <div className="mt-2">
+                      <span className="text-3xl font-black text-white">$20</span>
+                      <span className="text-zinc-400 text-sm">/month</span>
+                    </div>
+                    <Button 
+                      onClick={() => handleSubscribe('gold')}
+                      disabled={processingTier === 'gold'}
+                      className="mt-4 bg-amber-500 hover:bg-amber-400 text-black font-bold"
+                      data-testid="gold-select"
+                    >
+                      {processingTier === 'gold' ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        'Subscribe'
+                      )}
+                    </Button>
+                  </div>
+                </th>
+              </tr>
+            </thead>
+            
+            {/* Feature Rows */}
+            <tbody>
+              {FEATURES.map((feature, index) => (
+                <tr 
+                  key={feature.name} 
+                  className={`border-b border-zinc-800 ${index % 2 === 0 ? 'bg-zinc-900/50' : ''}`}
+                >
+                  <td className="p-4 text-sm text-zinc-300 font-medium">
+                    {feature.name}
+                  </td>
+                  <td className="p-4 text-center border-l border-zinc-800">
+                    <FeatureCell value={feature.bronze} />
+                  </td>
+                  <td className="p-4 text-center border-l border-zinc-800 bg-zinc-800/20">
+                    <FeatureCell value={feature.silver} />
+                  </td>
+                  <td className="p-4 text-center border-l border-zinc-800 bg-amber-500/5">
+                    <FeatureCell value={feature.gold} />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-          {/* Basic Plan */}
-          {displayPkgs.basic && (
-            <div 
-              className="bg-slate-800/50 border border-slate-700 rounded-2xl p-8 hover:border-slate-600 transition-all"
-              data-testid="basic-plan-card"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-slate-700 flex items-center justify-center">
-                  <Zap className="w-6 h-6 text-slate-300" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">{displayPkgs.basic.name}</h3>
-                  <p className="text-slate-400 text-sm">For casual users</p>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">
-                  ${displayPkgs.basic.amount}
-                </span>
-                <span className="text-slate-400">
-                  /{billingCycle === 'monthly' ? 'mo' : 'yr'}
-                </span>
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                {displayPkgs.basic.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-slate-300">
-                    <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                onClick={() => handleSubscribe(displayPkgs.basicId)}
-                disabled={processingPackage === displayPkgs.basicId}
-                className="w-full bg-slate-700 hover:bg-slate-600 text-white"
-                data-testid="subscribe-basic-btn"
-              >
-                {processingPackage === displayPkgs.basicId ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Get Started'
-                )}
-              </Button>
-            </div>
-          )}
-
-          {/* Pro Plan */}
-          {displayPkgs.pro && (
-            <div 
-              className="bg-gradient-to-b from-emerald-900/30 to-slate-800/50 border-2 border-emerald-500/50 rounded-2xl p-8 relative"
-              data-testid="pro-plan-card"
-            >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="bg-emerald-500 text-white text-xs font-bold px-3 py-1 rounded-full">
-                  MOST POPULAR
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                  <Crown className="w-6 h-6 text-emerald-400" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">{displayPkgs.pro.name}</h3>
-                  <p className="text-emerald-400 text-sm">For serious coaches</p>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">
-                  ${displayPkgs.pro.amount}
-                </span>
-                <span className="text-slate-400">
-                  /{billingCycle === 'monthly' ? 'mo' : 'yr'}
-                </span>
-              </div>
-
-              <ul className="space-y-3 mb-8">
-                {displayPkgs.pro.features.map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-3 text-slate-300">
-                    <Check className="w-5 h-5 text-emerald-500 flex-shrink-0" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Button
-                onClick={() => handleSubscribe(displayPkgs.proId)}
-                disabled={processingPackage === displayPkgs.proId}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white"
-                data-testid="subscribe-pro-btn"
-              >
-                {processingPackage === displayPkgs.proId ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : (
-                  'Get Pro'
-                )}
-              </Button>
-            </div>
-          )}
-        </div>
-
-        {/* FAQ or Features */}
-        <div className="mt-16 text-center">
-          <p className="text-slate-500 text-sm">
-            All plans include a 7-day free trial. Cancel anytime.
+        {/* Bottom CTA */}
+        <div className="text-center mt-12">
+          <p className="text-zinc-500 text-sm">
+            All plans include unlimited teams and games. Cancel anytime.
+          </p>
+          <p className="text-zinc-600 text-xs mt-2">
+            Questions? Contact us at support@statmoose.com
           </p>
         </div>
       </div>
