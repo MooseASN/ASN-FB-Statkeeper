@@ -30,6 +30,7 @@ import {
   Check,
   ArrowLeftRight,
   Undo2,
+  Redo2,
   MoreVertical,
   Trophy,
   Radio,
