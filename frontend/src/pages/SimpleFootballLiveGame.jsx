@@ -1080,9 +1080,35 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
           <Trophy className="w-4 h-4" /><span className="font-bold text-sm">SIMPLE MODE</span>
           <span className="text-xs text-zinc-500 ml-2">(Space/\ = Clock)</span>
         </div>
-        <Button variant="ghost" size="sm" onClick={handleUndo} disabled={undoHistory.length === 0} className={undoHistory.length > 0 ? 'text-amber-500' : 'text-zinc-600'} data-testid="undo-btn">
-          <Undo2 className="w-4 h-4 mr-1" />Undo
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => {
+              const shareUrl = `${window.location.origin}/football/${id}/stats`;
+              navigator.clipboard.writeText(shareUrl);
+              toast.success("Live stat link copied!");
+            }} 
+            className="text-zinc-400 hover:text-white"
+          >
+            <Share2 className="w-4 h-4 mr-1" />Share
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={() => setShowEmbedDialog(true)} 
+            className="text-zinc-400 hover:text-white"
+            data-testid="simple-football-embed-btn"
+          >
+            <Code className="w-4 h-4 mr-1" />Embed
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleUndo} disabled={undoHistory.length === 0} className={undoHistory.length > 0 ? 'text-amber-500' : 'text-zinc-600'} data-testid="undo-btn">
+            <Undo2 className="w-4 h-4 mr-1" />Undo
+          </Button>
+          <Button variant="ghost" size="sm" onClick={handleRedo} disabled={redoHistory.length === 0} className={redoHistory.length > 0 ? 'text-green-500' : 'text-zinc-600'} data-testid="redo-btn">
+            <Redo2 className="w-4 h-4 mr-1" />Redo
+          </Button>
+        </div>
       </div>
       
       {/* Main Content - No Scroll */}
