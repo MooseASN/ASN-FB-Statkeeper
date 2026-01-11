@@ -579,6 +579,9 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   // Help dialog
   const [showHelpDialog, setShowHelpDialog] = useState(false);
   
+  // Embed dialog state
+  const [showEmbedDialog, setShowEmbedDialog] = useState(false);
+  
   // Field View Dialog for yardage calculation
   const [showFieldViewDialog, setShowFieldViewDialog] = useState(false);
   
