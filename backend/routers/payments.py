@@ -149,7 +149,7 @@ async def get_current_user_from_request(request: Request):
         if auth_header and auth_header.startswith("Bearer "):
             session_token = auth_header.split(" ")[1]
     
-    if not session_token or not db:
+    if not session_token or db is None:
         return None
     
     session = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
@@ -175,9 +175,9 @@ async def get_user_tier(request: Request):
         }
     
     # Get user's subscription info from database
-    if db:
+    if db is not None:
         user_doc = await db.users.find_one(
-            {"user_id": user.user_id},
+            {"user_id": user["user_id"]},
             {"_id": 0, "subscription_tier": 1, "subscription_status": 1, 
              "subscription_end": 1, "subscription_package": 1, "tier": 1}
         )
