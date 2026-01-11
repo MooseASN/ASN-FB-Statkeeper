@@ -687,6 +687,9 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
+  // Subscription features for gating
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
+  
   const [game, setGame] = useState(initialDemoData);
   const [loading, setLoading] = useState(!demoMode);
   const [addPlayerOpen, setAddPlayerOpen] = useState(false);
