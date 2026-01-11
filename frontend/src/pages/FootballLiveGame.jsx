@@ -440,6 +440,9 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
+  // Subscription features for gating
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
+  
   // Use custom hooks for game state management
   const driveState = useDriveState();
   const {
