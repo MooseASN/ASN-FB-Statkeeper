@@ -695,6 +695,7 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   const [copied, setCopied] = useState(false);
   const [embedCopied, setEmbedCopied] = useState(false);
   const [lastAction, setLastAction] = useState(null);
+  const [redoAction, setRedoAction] = useState(null);  // Store undone action for redo
   const [showPlayByPlay, setShowPlayByPlay] = useState(false);
   const [viewMode, setViewMode] = useState("condensed"); // "condensed" or "expanded"
   
