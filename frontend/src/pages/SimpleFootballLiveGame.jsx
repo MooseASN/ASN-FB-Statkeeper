@@ -1136,15 +1136,28 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
           >
             <Share2 className="w-4 h-4 mr-1" />Share
           </Button>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={() => setShowEmbedDialog(true)} 
-            className="text-zinc-400 hover:text-white"
-            data-testid="simple-football-embed-btn"
-          >
-            <Code className="w-4 h-4 mr-1" />Embed
-          </Button>
+          {/* Embed - Silver+ feature */}
+          {(demoMode || canAccess('embed_widgets')) ? (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowEmbedDialog(true)} 
+              className="text-zinc-400 hover:text-white"
+              data-testid="simple-football-embed-btn"
+            >
+              <Code className="w-4 h-4 mr-1" />Embed
+            </Button>
+          ) : (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => toast.error(`Embed widgets require ${getRequiredTierFor('embed_widgets')} tier. Upgrade at /pricing`)}
+              className="text-zinc-600 cursor-not-allowed"
+              data-testid="simple-football-embed-btn-locked"
+            >
+              <Code className="w-4 h-4 mr-1" />Embed 🔒
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={handleUndo} disabled={undoHistory.length === 0} className={undoHistory.length > 0 ? 'text-amber-500' : 'text-zinc-600'} data-testid="undo-btn">
             <Undo2 className="w-4 h-4 mr-1" />Undo
           </Button>
