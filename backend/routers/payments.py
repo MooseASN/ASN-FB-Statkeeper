@@ -243,22 +243,53 @@ async def create_checkout_session(
         metadata["user_email"] = user_email
     
     try:
-        # Create checkout session request
-        checkout_request = CheckoutSessionRequest(
-            amount=float(package["amount"]),  # Keep as float for Stripe
-            currency=package["currency"],
-            success_url=success_url,
-            cancel_url=cancel_url,
-            metadata=metadata
-        )
+        # Get trial days from package
+        trial_days = package.get("trial_days", 0)
+        
+        # Use Stripe directly for subscription mode with trial periods
+        stripe.api_key = stripe_api_key
+        
+        # Create a Stripe Product and Price on-the-fly or use price_data
+        session_params = {
+            "payment_method_types": ["card"],
+            "mode": "subscription",
+            "success_url": success_url,
+            "cancel_url": cancel_url,
+            "metadata": metadata,
+            "line_items": [{
+                "price_data": {
+                    "currency": package["currency"],
+                    "product_data": {
+                        "name": f"StatMoose {package['name']} Plan",
+                        "description": f"{'Monthly' if package['interval'] == 'month' else 'Annual'} subscription to StatMoose {package['tier'].capitalize()} tier"
+                    },
+                    "unit_amount": int(package["amount"] * 100),  # Convert to cents
+                    "recurring": {
+                        "interval": package["interval"]
+                    }
+                },
+                "quantity": 1
+            }]
+        }
+        
+        # Add trial period if applicable
+        if trial_days > 0:
+            session_params["subscription_data"] = {
+                "trial_period_days": trial_days
+            }
+            logger.info(f"Adding {trial_days}-day trial to subscription")
+        
+        # Add customer email if available
+        if user_email:
+            session_params["customer_email"] = user_email
         
         # Create the checkout session
-        session: CheckoutSessionResponse = await stripe_checkout.create_checkout_session(checkout_request)
+        session = stripe.checkout.Session.create(**session_params)
         
         # Create payment transaction record BEFORE redirect
         if db:
             transaction_doc = {
-                "session_id": session.session_id,
+                "session_id": session.id,
                 "user_id": user_id,
                 "user_email": user_email,
                 "package_id": checkout_data.package_id,
@@ -267,6 +298,7 @@ async def create_checkout_session(
                 "amount": package["amount"],
                 "currency": package["currency"],
                 "interval": package["interval"],
+                "trial_days": trial_days,
                 "status": "initiated",
                 "payment_status": "pending",
                 "metadata": metadata,
@@ -274,10 +306,13 @@ async def create_checkout_session(
                 "updated_at": datetime.now(timezone.utc).isoformat()
             }
             await db.payment_transactions.insert_one(transaction_doc)
-            logger.info(f"Created payment transaction: {session.session_id}")
+            logger.info(f"Created payment transaction: {session.id}")
         
-        return CheckoutResponse(url=session.url, session_id=session.session_id)
+        return CheckoutResponse(url=session.url, session_id=session.id)
         
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error creating checkout session: {e}")
+        raise HTTPException(status_code=500, detail=f"Payment error: {str(e)}")
     except Exception as e:
         logger.error(f"Failed to create checkout session: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to create checkout session: {str(e)}")
