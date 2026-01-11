@@ -14,6 +14,43 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 11, 2026 - P1/P2/P3 FEATURES COMPLETE ✅
+
+**P1: Trial Periods for Premium Tiers**
+- Added 14-day free trial for Silver and Gold tiers (monthly and annual)
+- Bronze tier remains free with no trial
+- Updated Stripe checkout to use subscription mode with `trial_period_days`
+- Pricing page now shows "14-day free trial" text and "Start Free Trial" buttons
+
+**P1: Embeddable Live Stats Snippet**
+- Created `/app/frontend/src/components/EmbedSnippetGenerator.jsx` component
+- Generates iframe code, responsive embed with auto-resize, and link button
+- Integrated into BaseballLiveGame with "Embed" button in header
+- Supports all sports with configurable size presets
+
+**P2: Season Clone Feature**
+- Added `POST /api/schools/{school_id}/seasons/{season_id}/clone` endpoint
+- Options to clone roster and/or game schedule
+- Returns new season_id and clone statistics
+
+**P3: Redo Button**
+- Enhanced `useGameHistory` hook with redo support (`canRedo`, `redoLastState`)
+- Added Redo button to Basketball LiveGame (green button, appears after undo)
+- Added Redo button to BaseballLiveGame (with count display)
+
+**Files Modified:**
+- `/app/backend/routers/payments.py` (trial_days, subscription mode)
+- `/app/backend/server.py` (SeasonCloneRequest, clone endpoint)
+- `/app/frontend/src/components/EmbedSnippetGenerator.jsx` (NEW)
+- `/app/frontend/src/hooks/useGameHistory.js` (redo support)
+- `/app/frontend/src/pages/LiveGame.jsx` (redo functionality)
+- `/app/frontend/src/pages/BaseballLiveGame.jsx` (redo, embed)
+- `/app/frontend/src/pages/PricingPage.jsx` (trial text)
+
+**Testing:** 11/11 backend tests passed (100%)
+
+---
+
 ### January 11, 2026 - ADMIN DASHBOARD RBAC & USER MANAGEMENT ✅
 
 **New Features: Role-Based Access Control, User Management, and Pricing Management**
