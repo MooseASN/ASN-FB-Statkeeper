@@ -151,7 +151,7 @@ export default function SportSelection({ user, onLogout }) {
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div 
             className="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
-            onClick={() => navigate("/select-sport")}
+            onClick={() => navigate("/")}
           >
             <img src="/logo-white.png" alt="StatMoose" className="h-8 w-8" />
             <span className="text-xl font-black text-white tracking-tight italic">STATMOOSE</span>
