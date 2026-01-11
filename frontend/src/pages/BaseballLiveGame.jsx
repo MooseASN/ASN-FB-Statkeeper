@@ -2361,6 +2361,17 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             <Button 
               variant="ghost" 
               size="sm" 
+              onClick={handleRedo}
+              disabled={!canRedo}
+              className={`${canRedo ? 'text-green-500 hover:text-green-400' : 'text-zinc-600'}`}
+              data-testid="redo-btn"
+            >
+              <Redo2 className="w-4 h-4 mr-2" />
+              Redo {canRedo ? `(${redoLength})` : ''}
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
               className="text-zinc-400 hover:text-white"
               onClick={() => {
                 const liveStatsUrl = `${window.location.origin}/baseball/${id}/stats`;
