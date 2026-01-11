@@ -1363,6 +1363,9 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
   
+  // Subscription features for gating
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
+  
   // Use custom hooks for game history (undo/redo) and play-by-play
   const { saveStateForUndo, popLastState, redoLastState, canUndo, canRedo, historyLength, redoLength } = useGameHistory(20);
   const { playByPlay, addPlay, removeLastPlay, setPlays } = usePlayByPlay([]);
