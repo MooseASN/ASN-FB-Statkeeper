@@ -479,7 +479,6 @@ async def get_tier_features(tier: str):
             "public_live_stats": False,
             "embed_widgets": False,
             "sponsor_banners": 0,
-            "season_stats": False,
             "csv_export": False,
             "shared_access": False,
             "custom_branding": False,
@@ -491,7 +490,6 @@ async def get_tier_features(tier: str):
             "public_live_stats": True,
             "embed_widgets": True,
             "sponsor_banners": 5,
-            "season_stats": True,
             "csv_export": True,
             "shared_access": False,
             "custom_branding": False,
@@ -503,7 +501,6 @@ async def get_tier_features(tier: str):
             "public_live_stats": True,
             "embed_widgets": True,
             "sponsor_banners": -1,  # Unlimited
-            "season_stats": True,
             "csv_export": True,
             "shared_access": True,
             "custom_branding": True,
