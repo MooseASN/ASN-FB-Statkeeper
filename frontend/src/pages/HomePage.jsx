@@ -425,6 +425,11 @@ export default function HomePage() {
                 Contact
               </Button>
             </Link>
+            <Link to="/support">
+              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
+                Support
+              </Button>
+            </Link>
             <Link to="/login">
               <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
                 Sign In
