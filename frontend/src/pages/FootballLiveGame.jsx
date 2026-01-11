@@ -2932,6 +2932,16 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
               <Share2 className="w-4 h-4 mr-2" />
               Share
             </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-zinc-600 text-zinc-300 hover:text-white"
+              onClick={() => setShowEmbedDialog(true)}
+              data-testid="football-embed-btn"
+            >
+              <Code className="w-4 h-4 mr-2" />
+              Embed
+            </Button>
           </div>
         </div>
       </header>
