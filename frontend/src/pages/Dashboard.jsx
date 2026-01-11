@@ -457,37 +457,66 @@ export default function Dashboard({ user, onLogout }) {
               The embed will always show your latest live game and auto-updates every 5 seconds.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {activeGames.map(game => (
-                <Link key={game.id} to={game.sport === 'football' ? `/football/${game.id}` : `/game/${game.id}`}>
+              {activeGames.map(game => {
+              // Determine the correct route based on sport
+              const gameRoute = game.sport === 'football' 
+                ? `/football/${game.id}` 
+                : game.sport === 'baseball' 
+                  ? `/baseball/${game.id}` 
+                  : `/game/${game.id}`;
+              
+              // Determine the score based on sport
+              const getScore = (team) => {
+                if (game.sport === 'football') {
+                  return game.football_state?.[`${team}_score`] || game[`${team}_score`] || 0;
+                } else if (game.sport === 'baseball') {
+                  return game[`${team}_score`] || 0;
+                } else {
+                  return calculateScore(game.quarter_scores, team);
+                }
+              };
+              
+              // Determine the period display based on sport
+              const getPeriodDisplay = () => {
+                if (game.sport === 'baseball') {
+                  const half = game.inning_half === 'top' ? 'Top' : 'Bot';
+                  const inning = game.current_inning || 1;
+                  return `${half} ${inning}`;
+                } else if (game.sport === 'football') {
+                  return `Q${game.football_state?.quarter || 1}`;
+                } else {
+                  return `Q${game.current_quarter || 1}`;
+                }
+              };
+              
+              return (
+                <Link key={game.id} to={gameRoute}>
                   <Card className="hover:shadow-lg transition-shadow cursor-pointer border-2 border-orange-200" data-testid={`active-game-${game.id}`}>
                     <CardContent className="pt-6">
                       <div className="flex items-center justify-between">
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.home_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000]">
-                            {game.sport === 'football' 
-                              ? (game.football_state?.home_score || game.home_score || 0)
-                              : calculateScore(game.quarter_scores, "home")}
+                            {getScore("home")}
                           </p>
                         </div>
                         <div className="px-4">
                           <span className="text-sm bg-orange-100 text-orange-600 px-3 py-1 rounded-full font-medium">
-                            Q{game.sport === 'football' ? (game.football_state?.quarter || 1) : game.current_quarter}
+                            {getPeriodDisplay()}
                           </span>
                         </div>
                         <div className="text-center flex-1">
                           <p className="font-semibold text-lg">{game.away_team_name}</p>
                           <p className="text-4xl font-bold score-display text-[#000000]">
-                            {game.sport === 'football' 
-                              ? (game.football_state?.away_score || game.away_score || 0)
-                              : calculateScore(game.quarter_scores, "away")}
+                            {getScore("away")}
                           </p>
                         </div>
                       </div>
                     </CardContent>
                   </Card>
                 </Link>
-              ))}
+              );
+            })}
             </div>
           </div>
         )}
