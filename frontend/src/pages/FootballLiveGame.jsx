@@ -2521,6 +2521,11 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   // Undo last play
   const undoLastPlay = () => {
     if (playLog.length === 0) return;
+    
+    // Save the play being undone for redo
+    const undonePlay = playLog[0];
+    setRedoStack(prev => [undonePlay, ...prev]);
+    
     const updatedPlays = playLog.slice(1);
     setPlayLog(updatedPlays);
     
@@ -2528,6 +2533,29 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
     recalculateScoresFromPlays(updatedPlays);
     
     toast.success("Last play undone - stats adjusted");
+  };
+  
+  // Redo last undone play
+  const redoLastPlay = () => {
+    if (redoStack.length === 0) return;
+    
+    // Get the play to redo
+    const playToRedo = redoStack[0];
+    setRedoStack(prev => prev.slice(1));
+    
+    // Add it back to the play log
+    const updatedPlays = [playToRedo, ...playLog];
+    setPlayLog(updatedPlays);
+    
+    // Recalculate scores
+    recalculateScoresFromPlays(updatedPlays);
+    
+    toast.success("Play redone");
+  };
+  
+  // Clear redo stack when a new play is added (should be called when adding plays)
+  const clearRedoStack = () => {
+    setRedoStack([]);
   };
 
   if (loading) {
