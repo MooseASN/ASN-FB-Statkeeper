@@ -295,7 +295,7 @@ export default function Teams({ user, onLogout }) {
               <h3 className="text-lg sm:text-xl font-semibold mb-2">No Teams Yet</h3>
               <p className="text-muted-foreground mb-2 text-sm sm:text-base">Create your first team to get started</p>
               <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">
-                Teams hold your player rosters. You'll need at least one team to start tracking games.
+                Teams hold your player rosters. You&apos;ll need at least one team to start tracking games.
               </p>
               <Button onClick={() => setIsDialogOpen(true)} className="bg-[#000000] hover:bg-[#333333]" data-testid="create-first-team-btn">
                 <Plus className="w-4 h-4 mr-2" />

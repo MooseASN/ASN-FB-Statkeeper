@@ -679,7 +679,7 @@ export default function Dashboard({ user, onLogout }) {
                 <Users className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold mb-2">Welcome to StatMoose!</h3>
-              <p className="text-muted-foreground mb-2 text-sm sm:text-base">You don't have any teams yet.</p>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">You don&apos;t have any teams yet.</p>
               <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">Create your first team to start tracking live game stats.</p>
               <Link to="/teams">
                 <Button data-testid="create-first-team-btn" className="bg-orange-500 hover:bg-orange-600">
