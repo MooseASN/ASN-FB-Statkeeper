@@ -133,6 +133,17 @@ export default function NewGame({ user, onLogout }) {
     };
   };
 
+  const getBonusSettings = () => {
+    // Only for basketball
+    if (selectedSport !== "basketball") return {};
+    return {
+      bonus_enabled: bonusEnabled,
+      double_bonus_enabled: doubleBonusEnabled,
+      bonus_fouls: bonusEnabled ? bonusFouls : null,
+      double_bonus_fouls: doubleBonusEnabled ? doubleBonusFouls : null
+    };
+  };
+
   const getPrimetimeSettings = () => {
     if (!primetimeEnabled) return {};
     return {
