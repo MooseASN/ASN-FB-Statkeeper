@@ -113,10 +113,20 @@ export default function PricingPage() {
         }
         
         // For paid tiers, redirect to Stripe checkout
-        // Add a small delay to ensure the loading state is visible
-        setTimeout(() => {
-          window.location.href = res.data.url;
-        }, 100);
+        console.log('Redirecting to Stripe:', res.data.url);
+        
+        // Set a timeout to reset loading state if redirect doesn't work
+        const redirectTimeout = setTimeout(() => {
+          console.error('Redirect timeout - resetting loading state');
+          setProcessingTier(null);
+          toast.error('Redirect to payment page failed. Please try again or disable popup blockers.');
+        }, 5000);
+        
+        // Attempt redirect
+        window.location.href = res.data.url;
+        
+        // Clear timeout if navigation starts (page will unload)
+        window.addEventListener('beforeunload', () => clearTimeout(redirectTimeout));
       } else {
         throw new Error('No checkout URL received');
       }
