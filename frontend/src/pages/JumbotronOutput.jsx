@@ -44,7 +44,7 @@ function TeamPanel({
   teamColor, 
   timeouts, 
   fouls, 
-  inBonus, 
+  bonusStatus,
   players,
   isTop
 }) {
@@ -112,15 +112,18 @@ function TeamPanel({
               <span className="text-white text-3xl font-black">{fouls}</span>
             </div>
             
-            {inBonus && (
+            {bonusStatus && (
               <div 
                 className="px-5 py-2 rounded text-lg font-black uppercase tracking-wider text-white shadow-lg"
                 style={{ 
-                  backgroundColor: '#0ea5e9',
-                  boxShadow: '0 0 20px rgba(14, 165, 233, 0.5)'
+                  backgroundColor: bonusStatus === 'double_bonus' ? '#dc2626' : '#eab308',
+                  color: bonusStatus === 'double_bonus' ? '#ffffff' : '#000000',
+                  boxShadow: bonusStatus === 'double_bonus' 
+                    ? '0 0 20px rgba(220, 38, 38, 0.5)' 
+                    : '0 0 20px rgba(234, 179, 8, 0.5)'
                 }}
               >
-                BONUS
+                {bonusStatus === 'double_bonus' ? '2X BONUS' : 'BONUS'}
               </div>
             )}
           </div>
