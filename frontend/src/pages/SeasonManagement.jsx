@@ -791,9 +791,26 @@ export default function SeasonManagement() {
             )}
             
             {season.games?.length === 0 ? (
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-8 text-center text-slate-300">
-                  No games scheduled yet
+              <Card className="bg-slate-800/50 border-slate-700 border-2 border-dashed">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 mx-auto bg-slate-700/50 rounded-full flex items-center justify-center mb-4">
+                    <Calendar className="w-8 h-8 text-slate-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">No Games Scheduled</h3>
+                  <p className="text-slate-400 text-sm mb-4 max-w-sm mx-auto">
+                    {!season.team_id 
+                      ? "Set up your team roster first, then you can start scheduling games."
+                      : "Add your first game to build out your season schedule."}
+                  </p>
+                  {isAdmin && season.team_id && (
+                    <Button
+                      onClick={() => setShowGameDialog(true)}
+                      className="bg-orange-500 hover:bg-orange-600"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Schedule First Game
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (
@@ -891,9 +908,24 @@ export default function SeasonManagement() {
             </div>
             
             {!season.team ? (
-              <Card className="bg-slate-800/50 border-slate-700">
-                <CardContent className="p-8 text-center text-slate-300">
-                  No roster set up yet
+              <Card className="bg-slate-800/50 border-slate-700 border-2 border-dashed">
+                <CardContent className="p-8 text-center">
+                  <div className="w-16 h-16 mx-auto bg-slate-700/50 rounded-full flex items-center justify-center mb-4">
+                    <Users className="w-8 h-8 text-slate-500" />
+                  </div>
+                  <h3 className="text-lg font-semibold text-white mb-2">No Roster Set Up</h3>
+                  <p className="text-slate-400 text-sm mb-4 max-w-sm mx-auto">
+                    Add your players to get started. You can enter them manually, upload a CSV, or import from a website.
+                  </p>
+                  {isAdmin && (
+                    <Button
+                      onClick={() => setShowRosterDialog(true)}
+                      className="bg-orange-500 hover:bg-orange-600"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Set Up Roster
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ) : (
