@@ -994,6 +994,98 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     closeWorkflow();
   };
   
+  // Kickoff workflow handlers
+  const handleKickoffYardLineSelect = (yardLine) => {
+    setWorkflowData(prev => ({ ...prev, kickoffYardLine: yardLine }));
+    setWorkflowStep(2);
+  };
+  
+  const handleKickoffKickerSelect = (player) => {
+    setWorkflowData(prev => ({ ...prev, kicker: player }));
+    setWorkflowStep(3);
+  };
+  
+  const handleKickoffResult = (result) => {
+    saveState();
+    const { kickoffYardLine, kicker } = workflowData;
+    
+    // Toggle possession (kicking team kicks to receiving team)
+    const kickingTeam = possession;
+    const receivingTeam = possession === 'home' ? 'away' : 'home';
+    const kickingTeamName = possession === 'home' ? game?.home_team_name : game?.away_team_name;
+    const receivingTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    
+    let description = `#${kicker.player_number} ${kicker.player_name} kickoff from ${kickoffYardLine} yd line`;
+    let ballPosition = 25; // Default touchback position
+    
+    if (result === 'touchback') {
+      description += ` - TOUCHBACK. ${receivingTeamName} ball at 25 yd line.`;
+      ballPosition = 25;
+    } else if (result === 'fair_catch') {
+      // For fair catch, ask for the yard line
+      setWorkflowData(prev => ({ ...prev, result: 'fair_catch' }));
+      setWorkflowStep(4); // Go to yard line input step
+      return;
+    } else if (result === 'out_of_bounds') {
+      description += ` - OUT OF BOUNDS! Penalty. ${receivingTeamName} ball at 40 yd line.`;
+      ballPosition = 40;
+    } else if (result === 'return') {
+      // For return, ask for the yard line
+      setWorkflowData(prev => ({ ...prev, result: 'return' }));
+      setWorkflowStep(4); // Go to yard line input step
+      return;
+    } else if (result === 'return_td') {
+      description += ` - KICK RETURN TOUCHDOWN! ${receivingTeamName}!`;
+      // Add 6 points to receiving team
+      if (receivingTeam === 'home') setHomeScore(prev => prev + 6);
+      else setAwayScore(prev => prev + 6);
+    }
+    
+    addPlay({
+      type: 'kickoff',
+      kickoffYardLine: kickoffYardLine,
+      kicker: kicker.player_number,
+      result: result,
+      ballPosition: ballPosition,
+      description: description
+    });
+    
+    // Change possession to receiving team
+    setPossession(receivingTeam);
+    toast.success(`Kickoff recorded! ${receivingTeamName} ball.`);
+    closeWorkflow();
+  };
+  
+  const handleKickoffReturnPosition = (yardLine) => {
+    saveState();
+    const { kickoffYardLine, kicker, result } = workflowData;
+    const kickingTeam = possession;
+    const receivingTeam = possession === 'home' ? 'away' : 'home';
+    const receivingTeamName = possession === 'home' ? game?.away_team_name : game?.home_team_name;
+    
+    let description = `#${kicker.player_number} ${kicker.player_name} kickoff from ${kickoffYardLine} yd line`;
+    
+    if (result === 'fair_catch') {
+      description += ` - FAIR CATCH at ${yardLine} yd line. ${receivingTeamName} ball.`;
+    } else {
+      description += ` - Return to ${yardLine} yd line. ${receivingTeamName} ball.`;
+    }
+    
+    addPlay({
+      type: 'kickoff',
+      kickoffYardLine: kickoffYardLine,
+      kicker: kicker.player_number,
+      result: result,
+      ballPosition: yardLine,
+      description: description
+    });
+    
+    // Change possession to receiving team
+    setPossession(receivingTeam);
+    toast.success(`Kickoff recorded! ${receivingTeamName} ball at ${yardLine}.`);
+    closeWorkflow();
+  };
+  
   // FG workflow handlers
   const handleFGKickerSelect = (player) => {
     setWorkflowData(prev => ({ ...prev, kicker: player }));
