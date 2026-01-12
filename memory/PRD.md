@@ -14,6 +14,37 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - EMBED DIALOG & KICKOFF FIELD VIEW ✅
+
+**Embed Dialog Improvements:**
+- Moved "Live Stats Output Link" to the TOP of the embed dialog for easy access
+- Added prominent orange highlighting with Copy and Open buttons
+- Removed duplicate "Direct Link" section from the bottom
+- Updated `EmbedSnippetGenerator.jsx` component
+
+**All Sports & Modes Now Have Embed:**
+- Added embed functionality to `AdvancedLiveGame.jsx` (basketball advanced mode)
+- All other modes (Classic, Simple, Football, Baseball) already had embed support
+- All modes now have consistent embed button behavior
+
+**Football Kickoff Field View:**
+- Added `KickoffFieldView` component to `KickoffWorkflowDialog.jsx`
+- Visual football field showing:
+  - Kickoff position marker (kicking team color)
+  - Kick trajectory line
+  - Fielded position marker (receiving team color)
+  - Return path visualization
+  - Touchdown/touchback/fair catch status indicators
+- Field view updates dynamically as user selects options
+- Shows on Step 1 (setup) and Step 4 (return details)
+
+**Files Modified:**
+- `/app/frontend/src/components/EmbedSnippetGenerator.jsx` (link at top)
+- `/app/frontend/src/pages/AdvancedLiveGame.jsx` (added embed support)
+- `/app/frontend/src/components/football/KickoffWorkflowDialog.jsx` (added field view)
+
+---
+
 ### January 12, 2026 - ADMIN FEATURE ACCESS FIX & REFACTORING ✅
 
 **Bug Fix: Admin Feature Access**
