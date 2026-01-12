@@ -2354,6 +2354,39 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     toast.success("Game updated");
   };
   
+  // Handle quick end game (from Game Control modal)
+  const handleQuickEndGame = async () => {
+    setGameFinalized(true);
+    
+    // Update game status
+    setGame(prev => ({
+      ...prev,
+      status: 'final',
+    }));
+    
+    // Add finalization to play-by-play
+    addPlay(
+      game?.current_inning || 1,
+      game?.inning_half || 'top',
+      `FINAL: ${game?.away_team_name} ${game?.away_score || 0} - ${game?.home_score || 0} ${game?.home_team_name}`
+    );
+    
+    toast.success("Game ended! Status: FINAL");
+    
+    // Save to backend if not demo mode
+    if (!demoMode && game?.id) {
+      try {
+        await axios.put(`${API}/games/${game.id}`, {
+          ...game,
+          status: 'final',
+        });
+      } catch (error) {
+        console.error("Failed to save ended game:", error);
+        toast.error("Failed to save game status");
+      }
+    }
+  };
+  
   if (loading) {
     return <LoadingScreen message="Loading game..." />;
   }
