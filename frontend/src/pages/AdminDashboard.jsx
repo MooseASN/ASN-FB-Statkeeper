@@ -801,7 +801,9 @@ export default function AdminDashboard({ user, onLogout }) {
               {savingBeta ? "Saving..." : "Save Beta Settings"}
             </Button>
           </CardContent>
+        </CollapsibleContent>
         </Card>
+      </Collapsible>
 
         {/* Pricing Management - Collapsible */}
         <Collapsible open={pricingOpen} onOpenChange={setPricingOpen}>
