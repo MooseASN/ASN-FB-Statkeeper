@@ -46,6 +46,7 @@ import FootballField from "@/components/football/FootballField";
 import KickoffDialog from "@/components/football/KickoffDialog";
 import PlayerSelector from "@/components/football/PlayerSelector";
 import YardLineSelector from "@/components/football/YardLineSelector";
+import KickoffWorkflowDialog from "@/components/football/KickoffWorkflowDialog";
 import { FieldViewDialog } from "@/components/football/FieldViewDialog";
 import { PuntFieldView } from "@/components/football/PuntFieldView";
 import { FieldGoalFieldView } from "@/components/football/FieldGoalFieldView";
