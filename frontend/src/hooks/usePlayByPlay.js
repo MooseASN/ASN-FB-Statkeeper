@@ -2,7 +2,7 @@ import { useState, useCallback, useRef } from 'react';
 
 /**
  * Custom hook for managing play-by-play log
- * Handles adding plays with deduplication to prevent double entries
+ * Handles adding, editing, and deleting plays with deduplication
  * @param {Array} initialPlays - Initial plays array (optional)
  * @returns {Object} - Play-by-play management functions and state
  */
@@ -18,8 +18,9 @@ export function usePlayByPlay(initialPlays = []) {
    * @param {number} inning - Current inning number
    * @param {string} inningHalf - 'top' or 'bottom'
    * @param {string} description - Play description
+   * @param {Object} metadata - Optional metadata for stat tracking (runs, hits, errors, etc.)
    */
-  const addPlay = useCallback((inning, inningHalf, description) => {
+  const addPlay = useCallback((inning, inningHalf, description, metadata = {}) => {
     playCounterRef.current += 1;
     const playId = `play_${Date.now()}_${playCounterRef.current}`;
     
@@ -32,14 +33,38 @@ export function usePlayByPlay(initialPlays = []) {
     setPlayByPlay(plays => [{
       id: playId,
       inning: `${inning}${inningHalf === 'top' ? '▲' : '▼'}`,
+      inningNumber: inning,
+      inningHalf,
       description,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      ...metadata // Include runs, hits, errors, outs, etc.
     }, ...plays]);
     
     // Reset the duplicate check after a short delay
     setTimeout(() => {
       lastPlayIdRef.current = null;
     }, 100);
+  }, []);
+  
+  /**
+   * Update an existing play
+   * @param {string} playId - ID of the play to update
+   * @param {Object} updates - Fields to update (description, metadata, etc.)
+   */
+  const updatePlay = useCallback((playId, updates) => {
+    setPlayByPlay(plays => plays.map(play => 
+      play.id === playId 
+        ? { ...play, ...updates, lastEdited: new Date().toISOString() }
+        : play
+    ));
+  }, []);
+  
+  /**
+   * Delete a play by ID
+   * @param {string} playId - ID of the play to delete
+   */
+  const deletePlay = useCallback((playId) => {
+    setPlayByPlay(plays => plays.filter(play => play.id !== playId));
   }, []);
   
   /**
@@ -69,6 +94,8 @@ export function usePlayByPlay(initialPlays = []) {
   return {
     playByPlay,
     addPlay,
+    updatePlay,
+    deletePlay,
     removeLastPlay,
     clearPlays,
     setPlays
