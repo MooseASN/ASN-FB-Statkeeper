@@ -1127,21 +1127,29 @@ export default function AdminDashboard({ user, onLogout }) {
                                 )}
                               </TableCell>
                               <TableCell>
-                                <Badge 
-                                  variant="outline" 
-                                  className={
-                                    u.subscription_tier === "gold" 
-                                      ? "border-yellow-500 text-yellow-600 bg-yellow-50" 
-                                      : u.subscription_tier === "silver" 
-                                        ? "border-gray-400 text-gray-600 bg-gray-50" 
-                                        : "border-orange-400 text-orange-600 bg-orange-50"
-                                  }
-                                >
-                                  {u.subscription_tier === "gold" && "🥇 "}
-                                  {u.subscription_tier === "silver" && "🥈 "}
-                                  {u.subscription_tier === "bronze" && "🥉 "}
-                                  {(u.subscription_tier || "bronze").charAt(0).toUpperCase() + (u.subscription_tier || "bronze").slice(1)}
-                                </Badge>
+                                <div className="flex items-center gap-1">
+                                  <Badge 
+                                    variant="outline" 
+                                    className={
+                                      u.subscription_tier === "gold" 
+                                        ? "border-yellow-500 text-yellow-600 bg-yellow-50" 
+                                        : u.subscription_tier === "silver" 
+                                          ? "border-gray-400 text-gray-600 bg-gray-50" 
+                                          : "border-orange-400 text-orange-600 bg-orange-50"
+                                    }
+                                  >
+                                    {u.subscription_tier === "gold" && "🥇 "}
+                                    {u.subscription_tier === "silver" && "🥈 "}
+                                    {u.subscription_tier === "bronze" && "🥉 "}
+                                    {(u.subscription_tier || "bronze").charAt(0).toUpperCase() + (u.subscription_tier || "bronze").slice(1)}
+                                  </Badge>
+                                  {u.is_comped && (
+                                    <Badge className="bg-emerald-500 hover:bg-emerald-600 text-xs">
+                                      <Gift className="w-3 h-3 mr-1" />
+                                      Comp
+                                    </Badge>
+                                  )}
+                                </div>
                               </TableCell>
                               <TableCell>
                                 <div className="flex flex-col">
