@@ -83,9 +83,28 @@ export default function Dashboard({ user, onLogout }) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
+    // Check feature access
+    if (!canAccess('sponsor_banners')) {
+      toast.error('Sponsor banners require Silver or Gold tier');
+      return;
+    }
+    
+    // Check banner limit
+    const limit = getLimit('sponsor_banners');
+    if (limit !== -1 && sponsorBanners.length >= limit) {
+      toast.error(`You've reached the limit of ${limit} sponsor banners. Upgrade to Gold for unlimited.`);
+      return;
+    }
+    
     setUploading(true);
     
     for (const file of files) {
+      // Check limit again for each file
+      if (limit !== -1 && sponsorBanners.length + 1 > limit) {
+        toast.error(`Banner limit reached (${limit})`);
+        break;
+      }
+      
       if (!file.type.startsWith('image/')) {
         toast.error(`${file.name} is not an image`);
         continue;
