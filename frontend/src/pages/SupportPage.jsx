@@ -238,7 +238,10 @@ export default function SupportPage() {
             </SubSection>
 
             <SubSection title="Managing Your Subscription">
-              <p>To upgrade or change your subscription, visit the <strong className="text-white">Pricing</strong> page from the main navigation. You can upgrade to a higher tier at any time.</p>
+              <p>To view or manage your subscription:</p>
+              <Step number="1" title="Go to Account Settings" description="Click your profile icon → Account Settings" />
+              <Step number="2" title="Find the Subscription section" description="View your current plan and renewal date" />
+              <Step number="3" title="Change or cancel your plan" description="Use the Cancel or View Plans buttons as needed" />
             </SubSection>
 
             <SubSection title="Free Trial">
