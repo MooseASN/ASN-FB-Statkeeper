@@ -502,19 +502,31 @@ export default function AdminDashboard({ user, onLogout }) {
           </Card>
         )}
         
-        {/* Beta Mode Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              Beta Mode Settings
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Control site access and lock sports behind passwords for beta testing.
-            </p>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {/* SITE-WIDE BETA MODE */}
+        {/* Beta Mode Settings - Collapsible */}
+        <Collapsible open={betaOpen} onOpenChange={setBetaOpen}>
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Lock className="w-5 h-5" />
+                      Beta Mode Settings
+                      {betaSettings.site_beta_enabled && (
+                        <Badge className="bg-amber-500 text-xs">ACTIVE</Badge>
+                      )}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Control site access and lock sports behind passwords for beta testing.
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 transition-transform ${betaOpen ? 'rotate-180' : ''}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-6">
+                {/* SITE-WIDE BETA MODE */}
             <div className={`p-4 rounded-lg space-y-4 ${betaSettings.site_beta_enabled ? 'bg-amber-500/10 border-2 border-amber-500' : 'border border-zinc-200'}`}>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
