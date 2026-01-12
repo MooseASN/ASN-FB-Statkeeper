@@ -37,6 +37,7 @@ import SeasonManagement from "@/pages/SeasonManagement";
 import SeasonStats from "@/pages/SeasonStats";
 import BetaAccessRequired from "@/pages/BetaAccessRequired";
 // Demo pages
+import DemoSportSelection from "@/pages/DemoSportSelection";
 import BasketballDemoSelector from "@/pages/BasketballDemoSelector";
 import DemoLiveGameClassic from "@/pages/DemoLiveGameClassic";
 import DemoLiveGameAdvanced from "@/pages/DemoLiveGameAdvanced";
