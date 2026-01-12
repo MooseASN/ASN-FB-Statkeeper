@@ -1198,6 +1198,7 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
                   <FileDown className="w-6 h-6" />
                   <span>PDF Box Score</span>
                 </Button>
+                {(demoMode || canAccess('csv_export')) ? (
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
@@ -1210,6 +1211,16 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
                   <FileText className="w-6 h-6" />
                   <span>Live CSV Link</span>
                 </Button>
+                ) : (
+                <Button 
+                  className="h-20 flex-col gap-2 opacity-60" 
+                  variant="outline"
+                  onClick={() => toast.error(`CSV export requires ${getRequiredTierFor('csv_export')} tier. Upgrade at /pricing`)}
+                >
+                  <Lock className="w-6 h-6" />
+                  <span>CSV Link 🔒</span>
+                </Button>
+                )}
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
