@@ -1375,7 +1375,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
             ) : (
               events.slice(0, 15).map((e, i) => (
                 <div key={e.id || i} className="text-xs flex gap-2">
-                  <span className="text-orange-500 font-mono w-6">{e.quarter}</span>
+                  <span className="text-orange-500 font-mono w-6">{e.displayQuarter || e.quarter}</span>
                   <span className="text-zinc-300 flex-1">{e.description}</span>
                 </div>
               ))
