@@ -147,6 +147,7 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/support" element={<SupportPage />} />
       
       {/* Demo routes - public, no auth required */}
+      <Route path="/demo" element={<DemoSportSelection />} />
       <Route path="/demo/basketball" element={<BasketballDemoSelector />} />
       <Route path="/demo/basketball/classic" element={<DemoLiveGameClassic />} />
       <Route path="/demo/basketball/advanced" element={<DemoLiveGameAdvanced />} />
