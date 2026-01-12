@@ -14,6 +14,43 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - EDITABLE BASEBALL PLAY-BY-PLAY LOG ✅
+
+**New Feature: Fully Editable Play-by-Play Log**
+
+The baseball play-by-play log is now fully editable:
+
+**Edit Plays:**
+- Hover over any play to reveal edit (pencil) and delete (trash) icons
+- Click edit icon to enter inline edit mode
+- Edit the play description text
+- Press Enter to save or Escape to cancel
+- Edited plays show "(edited)" indicator
+
+**Delete Plays:**
+- Click delete icon to show confirmation dialog
+- Confirm or cancel the deletion
+- Deleted plays are removed from the log
+
+**View All Plays:**
+- By default shows last 10 plays
+- "View All (N)" button expands to show all plays
+- Footer shows total play count
+
+**Technical Updates:**
+- `usePlayByPlay.js` hook enhanced with `updatePlay(playId, updates)` and `deletePlay(playId)` functions
+- Plays now include metadata fields for stat tracking
+- Added `lastEdited` timestamp for edited plays
+- Component tracks `inningNumber` and `inningHalf` separately for potential stat recalculation
+
+**Files Modified:**
+- `/app/frontend/src/hooks/usePlayByPlay.js` (added updatePlay, deletePlay functions)
+- `/app/frontend/src/pages/BaseballLiveGame.jsx` (new editable PlayByPlayLog component)
+
+**Note:** Full stat recalculation on edit/delete would require tracking run/hit/error metadata with each play. Currently shows toast notification that manual stat adjustments may be needed.
+
+---
+
 ### January 12, 2026 - BUG FIXES: LOGO UPLOAD & BASEBALL UI ✅
 
 **Bug Fix: Logo Upload Feature Gating**
