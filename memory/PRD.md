@@ -14,6 +14,35 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - BUG FIXES: LOGO UPLOAD & BASEBALL UI ✅
+
+**Bug Fix: Logo Upload Feature Gating**
+- **Issue:** Users could bypass the Gold tier requirement for custom team logos by uploading during team creation
+- **Fix 1 - Teams.jsx:** Added validation in `handleCreateTeam` to clear `logo_url` if user doesn't have `custom_team_logos` access
+- **Fix 2 - TeamDetail.jsx:** 
+  - Added `useSubscriptionFeatures` hook
+  - Gated logo upload UI - shows locked message with upgrade link for non-Gold users
+  - Added access check in `handleLogoUpload` function to prevent any bypass
+
+**Bug Fix: Baseball Live Stats UI Consistency**
+- **Issue:** Baseball had separate Share and Live Stats buttons, inconsistent with other sports
+- **Fix:** Consolidated to single "Live Stats / Embed" button that opens the embed dialog with Live Stats link at top (matching basketball and football)
+- Removed `Share2` icon import (no longer needed)
+
+**New Feature: Baseball End Game Button**
+- Added "End Game - Mark as Final" button to Game Control modal
+- Button shows confirmation dialog before ending game
+- Sets game status to 'final' regardless of current inning
+- Saves status to backend (if not in demo mode)
+- Adds FINAL entry to play-by-play log
+
+**Files Modified:**
+- `/app/frontend/src/pages/Teams.jsx` (logo validation in create)
+- `/app/frontend/src/pages/TeamDetail.jsx` (feature gating for logo upload)
+- `/app/frontend/src/pages/BaseballLiveGame.jsx` (consolidated buttons, end game feature)
+
+---
+
 ### January 12, 2026 - EMBED DIALOG & KICKOFF FIELD VIEW ✅
 
 **Embed Dialog Improvements:**
