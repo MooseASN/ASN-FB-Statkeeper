@@ -784,10 +784,39 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     toast.success("Redone!");
   };
   
-  const addEvent = (desc) => {
+  // Format time helper for play logs
+  const formatClockTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Add structured play to event log (for box score calculation)
+  const addPlay = (playData) => {
     const qLabels = ['1Q', '2Q', '3Q', '4Q', 'OT'];
     const qLabel = quarter > 4 ? `${quarter - 4}OT` : qLabels[quarter - 1];
-    setEvents(prev => [{ id: `e-${Date.now()}`, quarter: qLabel, description: desc }, ...prev]);
+    const play = {
+      id: `play-${Date.now()}`,
+      quarter: quarter,
+      clock: formatClockTime(clockTime),
+      team: possession,
+      ...playData,
+      // Also include readable description for display
+      displayQuarter: qLabel
+    };
+    setEvents(prev => [play, ...prev]);
+  };
+
+  // Legacy addEvent for simple text events
+  const addEvent = (desc, playData = {}) => {
+    const qLabels = ['1Q', '2Q', '3Q', '4Q', 'OT'];
+    const qLabel = quarter > 4 ? `${quarter - 4}OT` : qLabels[quarter - 1];
+    setEvents(prev => [{ 
+      id: `e-${Date.now()}`, 
+      quarter: qLabel,
+      description: desc,
+      ...playData
+    }, ...prev]);
   };
   
   const updatePlayerStat = (playerNumber, team, statKey, value) => {
