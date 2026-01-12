@@ -7484,6 +7484,11 @@ from routers.support_chat import router as support_chat_router, set_db as set_su
 api_router.include_router(support_chat_router)
 set_support_chat_db(db)
 
+# Import and include error logging router
+from routers.error_logging import router as error_logging_router, set_db as set_error_logging_db
+api_router.include_router(error_logging_router)
+set_error_logging_db(db)
+
 # Include router after all routes are defined
 app.include_router(api_router)
 
