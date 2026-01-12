@@ -893,7 +893,16 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     setStats(prev => ({ ...prev, rushYards: prev.rushYards + yards, totalYards: prev.totalYards + yards }));
     updatePlayerStat(rusher.player_number, possession, 'rushYards', yards);
     if (tackler) updatePlayerStat(tackler.player_number, defenseTeam, 'tackles', 1);
-    addEvent(`#${rusher.player_number} ${rusher.player_name} rush for ${yards} yds${tackler ? ` (tackled by #${tackler.player_number})` : ''}`);
+    
+    // Add structured play data for box score
+    addPlay({
+      type: 'run',
+      carrier: rusher.player_number,
+      yards: yards,
+      tackler: tackler?.player_number || null,
+      result: yards > 0 ? 'gain' : yards < 0 ? 'loss' : 'no_gain',
+      description: `#${rusher.player_number} ${rusher.player_name} rush for ${yards} yds${tackler ? ` (tackled by #${tackler.player_number})` : ''}`
+    });
     closeWorkflow();
   };
   
