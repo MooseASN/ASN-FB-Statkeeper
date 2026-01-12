@@ -1419,6 +1419,30 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
         </DialogContent>
       </Dialog>
       
+      {/* Sack Workflow Dialog */}
+      <Dialog open={activeWorkflow === 'sack'} onOpenChange={() => closeWorkflow()}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader><DialogTitle>Sack</DialogTitle></DialogHeader>
+          {workflowStep === 1 && (
+            <PlayerNumberInput 
+              roster={defenseRoster || []} 
+              onSelect={handleSackDefenderSelect} 
+              onCancel={closeWorkflow} 
+              title={`Select Defender (${defenseTeamName})`}
+              onAddPlayer={addToDefenseRoster} 
+              teamName={defenseTeamName} 
+            />
+          )}
+          {workflowStep === 2 && (
+            <YardsInput 
+              onSubmit={handleSackYards} 
+              onCancel={closeWorkflow} 
+              title={`Yards Lost on Sack by #${workflowData.defender?.player_number}`} 
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      
       {/* FG Workflow Dialog */}
       <Dialog open={activeWorkflow === 'fg'} onOpenChange={() => closeWorkflow()}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
