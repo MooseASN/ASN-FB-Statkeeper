@@ -63,7 +63,7 @@ export default function GameHistory({ user, onLogout }) {
       const sport = game.sport || selectedSport || 'basketball';
       
       if (sport === 'baseball') {
-        pdfEndpoint = `${API}/games/${game.id}/boxscore/pdf`;
+        pdfEndpoint = `${API}/games/${game.id}/baseball-boxscore/pdf`;
       } else if (sport === 'football') {
         pdfEndpoint = `${API}/games/${game.id}/football-boxscore/pdf`;
       } else {
