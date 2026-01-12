@@ -41,7 +41,7 @@ class ErrorLogResponse(BaseModel):
 async def log_error(request: Request, error: ErrorLogRequest):
     """Log an error from frontend or backend"""
     
-    if not db:
+    if db is None:
         return {"success": False, "message": "Database not available"}
     
     # Get user info if available
@@ -99,7 +99,7 @@ async def get_error_logs(
     except:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    if not db:
+    if db is None:
         return {"errors": [], "total": 0}
     
     # Build query
@@ -136,7 +136,7 @@ async def get_error_stats(request: Request):
     except:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    if not db:
+    if db is None:
         return {"total": 0, "unresolved": 0, "by_type": {}}
     
     # Get counts
@@ -177,7 +177,7 @@ async def resolve_error(error_id: str, request: Request):
     except:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     
     body = await request.json()
@@ -209,7 +209,7 @@ async def delete_error(error_id: str, request: Request):
     except:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     
     result = await db.error_logs.delete_one({"error_id": error_id})
@@ -230,7 +230,7 @@ async def clear_resolved_errors(request: Request):
     except:
         raise HTTPException(status_code=403, detail="Admin access required")
     
-    if not db:
+    if db is None:
         raise HTTPException(status_code=500, detail="Database not available")
     
     result = await db.error_logs.delete_many({"resolved": True})
