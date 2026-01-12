@@ -616,13 +616,15 @@ export default function Dashboard({ user, onLogout }) {
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Image className="w-5 h-5 text-purple-500" />
               Sponsor Banners
-              {!canAccess('sponsor_banners') && (
+              {!subscriptionLoading && !canAccess('sponsor_banners') && (
                 <span className="text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Lock className="w-3 h-3" /> Silver+
                 </span>
               )}
             </h2>
-            {canAccess('sponsor_banners') ? (
+            {subscriptionLoading ? (
+              <span className="text-sm text-muted-foreground">Loading...</span>
+            ) : canAccess('sponsor_banners') ? (
               <Button
                 variant="outline"
                 size="sm"
@@ -645,7 +647,11 @@ export default function Dashboard({ user, onLogout }) {
           </div>
           <Card className="dark:bg-neutral-900">
             <CardContent className="py-4">
-              {!canAccess('sponsor_banners') ? (
+              {subscriptionLoading ? (
+                <div className="text-center py-4 text-muted-foreground">
+                  Checking subscription...
+                </div>
+              ) : !canAccess('sponsor_banners') ? (
                 <div className="text-center text-muted-foreground py-4">
                   <Lock className="w-10 h-10 mx-auto mb-2 text-amber-500/50" />
                   <p className="text-amber-500">Sponsor banners require Silver or Gold tier</p>
