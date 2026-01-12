@@ -65,10 +65,23 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
   const [newShareEmail, setNewShareEmail] = useState("");
   const [sharingAccess, setSharingAccess] = useState(false);
   const [loadingSharedAccess, setLoadingSharedAccess] = useState(false);
+  
+  // Subscription state
+  const [subscription, setSubscription] = useState(null);
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
+  const [cancelingSubscription, setCancelingSubscription] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
+  
+  // Payment Methods state
+  const [paymentMethods, setPaymentMethods] = useState([]);
+  const [loadingPaymentMethods, setLoadingPaymentMethods] = useState(false);
+  const [openingBillingPortal, setOpeningBillingPortal] = useState(false);
 
   useEffect(() => {
     fetchProfile();
     fetchSharedAccess();
+    fetchSubscription();
+    fetchPaymentMethods();
   }, []);
 
   const fetchProfile = async () => {
@@ -83,6 +96,93 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
       navigate("/dashboard");
     } finally {
       setLoading(false);
+    }
+  };
+  
+  const fetchSubscription = async () => {
+    setLoadingSubscription(true);
+    try {
+      const res = await axios.get(`${API}/payments/subscription-details`);
+      setSubscription(res.data);
+    } catch (error) {
+      console.error("Failed to load subscription:", error);
+    } finally {
+      setLoadingSubscription(false);
+    }
+  };
+  
+  const fetchPaymentMethods = async () => {
+    setLoadingPaymentMethods(true);
+    try {
+      const res = await axios.get(`${API}/payments/payment-methods`);
+      setPaymentMethods(res.data.payment_methods || []);
+    } catch (error) {
+      console.error("Failed to load payment methods:", error);
+    } finally {
+      setLoadingPaymentMethods(false);
+    }
+  };
+  
+  const handleCancelSubscription = async () => {
+    setCancelingSubscription(true);
+    try {
+      const res = await axios.post(`${API}/payments/cancel-subscription`);
+      toast.success(res.data.message);
+      setShowCancelDialog(false);
+      fetchSubscription();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to cancel subscription");
+    } finally {
+      setCancelingSubscription(false);
+    }
+  };
+  
+  const handleReactivateSubscription = async () => {
+    try {
+      const res = await axios.post(`${API}/payments/reactivate-subscription`);
+      toast.success(res.data.message);
+      fetchSubscription();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to reactivate subscription");
+    }
+  };
+  
+  const handleOpenBillingPortal = async () => {
+    setOpeningBillingPortal(true);
+    try {
+      const res = await axios.post(`${API}/payments/create-billing-portal`, {
+        return_url: window.location.href
+      });
+      if (res.data.url) {
+        window.location.href = res.data.url;
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to open billing portal");
+      setOpeningBillingPortal(false);
+    }
+  };
+  
+  const handleDeletePaymentMethod = async (paymentMethodId) => {
+    if (!confirm("Are you sure you want to remove this payment method?")) return;
+    
+    try {
+      await axios.delete(`${API}/payments/payment-method/${paymentMethodId}`);
+      toast.success("Payment method removed");
+      fetchPaymentMethods();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to remove payment method");
+    }
+  };
+  
+  const handleSetDefaultPaymentMethod = async (paymentMethodId) => {
+    try {
+      await axios.post(`${API}/payments/set-default-payment-method`, {
+        payment_method_id: paymentMethodId
+      });
+      toast.success("Default payment method updated");
+      fetchPaymentMethods();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update default payment method");
     }
   };
 
