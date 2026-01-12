@@ -2666,7 +2666,16 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         <div className="grid grid-cols-12 gap-3 mt-3">
           {/* Left Column - Play by Play & Batting Order */}
           <div className="col-span-3 space-y-2">
-            <PlayByPlayLog plays={playByPlay} />
+            <PlayByPlayLog 
+              plays={playByPlay} 
+              onUpdatePlay={updatePlay}
+              onDeletePlay={deletePlay}
+              onRecalculateStats={() => {
+                // Note: Full stat recalculation would require tracking metadata with each play
+                // For now, just show a toast that the play was edited
+                toast.info("Play updated. Manual stat adjustments may be needed.");
+              }}
+            />
             <BattingOrder 
               players={battingRoster}
               currentBatterIndex={activeBatterIndex}
