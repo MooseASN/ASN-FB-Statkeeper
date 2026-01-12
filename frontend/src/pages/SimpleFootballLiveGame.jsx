@@ -280,6 +280,7 @@ const YardsInput = ({ onSubmit, onCancel, title, showNoTackle = false, onNoTackl
             variant="outline"
             onClick={() => addYards(y)}
             className="border-zinc-700 text-green-400 hover:bg-green-900/30 text-lg font-bold h-12"
+            data-testid={`yards-plus-${y}`}
           >
             +{y}
           </Button>
@@ -294,6 +295,7 @@ const YardsInput = ({ onSubmit, onCancel, title, showNoTackle = false, onNoTackl
             variant="outline"
             onClick={() => addYards(-y)}
             className="border-zinc-700 text-red-400 hover:bg-red-900/30 text-lg font-bold h-12"
+            data-testid={`yards-minus-${y}`}
           >
             -{y}
           </Button>
