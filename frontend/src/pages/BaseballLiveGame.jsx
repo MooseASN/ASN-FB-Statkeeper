@@ -810,34 +810,28 @@ const GameControlModal = ({
 
 // Game Control Modal - For changing inning and score
 const InningScoreControlModal = ({ isOpen, onClose, game, onUpdate, onEndGame }) => {
-  // Initialize state from game data
-  const [inning, setInning] = useState(game?.current_inning || 1);
-  const [inningHalf, setInningHalf] = useState(game?.inning_half || 'top');
-  const [homeScore, setHomeScore] = useState(game?.home_score || 0);
-  const [awayScore, setAwayScore] = useState(game?.away_score || 0);
+  // Use refs to track pending values, initialized on mount
+  const [inning, setInning] = useState(1);
+  const [inningHalf, setInningHalf] = useState('top');
+  const [homeScore, setHomeScore] = useState(0);
+  const [awayScore, setAwayScore] = useState(0);
   const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
+  const [initialized, setInitialized] = useState(false);
   
-  // Reset confirmation state when modal opens
-  useEffect(() => {
-    if (isOpen) {
-      setShowEndGameConfirm(false);
-    }
-  }, [isOpen]);
+  // Initialize values when game data is available
+  if (!initialized && game && isOpen) {
+    setInning(game.current_inning || 1);
+    setInningHalf(game.inning_half || 'top');
+    setHomeScore(game.home_score || 0);
+    setAwayScore(game.away_score || 0);
+    setShowEndGameConfirm(false);
+    setInitialized(true);
+  }
   
-  // Update local state when modal opens (re-sync with game state)
-  const currentInning = game?.current_inning || 1;
-  const currentHalf = game?.inning_half || 'top';
-  const currentHomeScore = game?.home_score || 0;
-  const currentAwayScore = game?.away_score || 0;
-  
-  useEffect(() => {
-    if (isOpen) {
-      setInning(currentInning);
-      setInningHalf(currentHalf);
-      setHomeScore(currentHomeScore);
-      setAwayScore(currentAwayScore);
-    }
-  }, [isOpen, currentInning, currentHalf, currentHomeScore, currentAwayScore]);
+  // Reset initialized when modal closes
+  if (!isOpen && initialized) {
+    setInitialized(false);
+  }
   
   if (!isOpen) return null;
   
