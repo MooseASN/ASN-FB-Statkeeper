@@ -432,6 +432,34 @@ export default function SeasonManagement() {
     }
   };
 
+  const handleCloneSeason = async () => {
+    if (!cloneSeasonName.trim()) {
+      toast.error("Please enter a name for the cloned season");
+      return;
+    }
+    
+    setCloning(true);
+    try {
+      const token = sessionStorage.getItem("session_token") || localStorage.getItem("session_token");
+      const res = await axios.post(
+        `${API}/seasons/${seasonId}/clone`,
+        { new_name: cloneSeasonName.trim() },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      toast.success("Season cloned successfully!");
+      setShowCloneSeasonDialog(false);
+      setCloneSeasonName("");
+      
+      // Navigate to the new cloned season
+      navigate(`/season/${res.data.new_season_id}`);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to clone season");
+    } finally {
+      setCloning(false);
+    }
+  };
+
   // Roster duplication handlers
   const handleOpenDuplicateRoster = async () => {
     setShowDuplicateRosterDialog(true);
