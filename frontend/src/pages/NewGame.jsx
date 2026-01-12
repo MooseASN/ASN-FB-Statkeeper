@@ -850,7 +850,7 @@ export default function NewGame({ user, onLogout }) {
                   <Label className="text-base font-semibold">Bonus Rules</Label>
                 </div>
                 <p className="text-sm text-muted-foreground">
-                  Configure when teams enter the bonus based on opponent's team fouls.
+                  Configure when teams enter the bonus based on opponent&apos;s team fouls.
                 </p>
                 
                 <div className="space-y-4">
