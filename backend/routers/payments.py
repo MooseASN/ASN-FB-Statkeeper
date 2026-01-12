@@ -381,14 +381,14 @@ async def get_payment_status(session_id: str, request: Request):
         
         # Find transaction in our database
         transaction = None
-        if db:
+        if db is not None:
             transaction = await db.payment_transactions.find_one(
                 {"session_id": session_id},
                 {"_id": 0}
             )
         
         # Update transaction status if payment is complete and not already processed
-        if db and transaction and checkout_status.payment_status == "paid":
+        if db is not None and transaction and checkout_status.payment_status == "paid":
             if transaction.get("payment_status") != "paid":
                 # Update the transaction
                 await db.payment_transactions.update_one(
