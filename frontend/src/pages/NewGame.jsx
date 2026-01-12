@@ -239,6 +239,7 @@ export default function NewGame({ user, onLogout }) {
         sport: selectedSport,
         ...getClockSettings(),
         ...getTimeoutSettings(),
+        ...getBonusSettings(),
         ...getPrimetimeSettings(),
         ...(selectedSport === "baseball" ? { total_innings: totalInnings } : {})
       };
