@@ -125,6 +125,7 @@ export default function AdminDashboard({ user, onLogout }) {
   // Collapsible sections
   const [schoolsOpen, setSchoolsOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
+  const [betaOpen, setBetaOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
