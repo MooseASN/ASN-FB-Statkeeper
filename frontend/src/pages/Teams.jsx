@@ -248,14 +248,32 @@ export default function Teams({ user, onLogout }) {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="logo">Logo URL (optional)</Label>
-                  <Input
-                    id="logo"
-                    placeholder="https://example.com/logo.png"
-                    value={newTeam.logo_url}
-                    onChange={(e) => setNewTeam({ ...newTeam, logo_url: e.target.value })}
-                    data-testid="team-logo-input"
-                  />
+                  <Label htmlFor="logo" className="flex items-center gap-2">
+                    Logo URL 
+                    {!canAccess('custom_team_logos') && (
+                      <span className="text-xs text-amber-600 flex items-center gap-1">
+                        <Crown className="w-3 h-3" />
+                        Gold
+                      </span>
+                    )}
+                  </Label>
+                  {canAccess('custom_team_logos') ? (
+                    <Input
+                      id="logo"
+                      placeholder="https://example.com/logo.png"
+                      value={newTeam.logo_url}
+                      onChange={(e) => setNewTeam({ ...newTeam, logo_url: e.target.value })}
+                      data-testid="team-logo-input"
+                    />
+                  ) : (
+                    <div 
+                      className="flex items-center gap-2 p-2 bg-slate-100 rounded-md border border-dashed border-slate-300 cursor-pointer hover:bg-slate-200"
+                      onClick={() => toast.error(`Custom team logos require ${getRequiredTierFor('custom_team_logos')} tier. Upgrade at /pricing`)}
+                    >
+                      <Lock className="w-4 h-4 text-slate-400" />
+                      <span className="text-sm text-slate-500">Upgrade to Gold to add custom logos</span>
+                    </div>
+                  )}
                 </div>
                 <Button onClick={handleCreateTeam} className="w-full" data-testid="create-team-submit">
                   Create Team
