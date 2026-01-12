@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
+import SupportChatbot from "@/components/SupportChatbot";
 import axios from "axios";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
