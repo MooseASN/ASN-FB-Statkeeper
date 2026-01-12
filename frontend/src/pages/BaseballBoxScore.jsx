@@ -147,30 +147,30 @@ const BattingStatsTable = ({ teamName, teamColor, teamLogo, players, stats }) =>
           <tbody>
             {playerStats.map((player, idx) => (
               <tr key={player.player_number || idx} className={idx % 2 === 0 ? 'bg-zinc-900' : 'bg-zinc-800/50'}>
-                <td className="text-left px-3 py-2 text-white border border-zinc-700">
-                  #{player.player_number} {player.player_name}
+                <td className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-white border border-zinc-700 whitespace-nowrap">
+                  <span className="text-zinc-400">#{player.player_number}</span> {player.player_name}
                 </td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.position || '-'}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.ab}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.r}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.h}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.rbi}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.bb}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.so}</td>
-                <td className="text-center px-2 py-2 text-zinc-300 border border-zinc-700">{player.lob}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.position || '-'}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.ab}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.r}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.h}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.rbi}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.bb}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.so}</td>
+                <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-zinc-300 border border-zinc-700">{player.lob}</td>
               </tr>
             ))}
             {/* Totals Row */}
             <tr className="bg-zinc-700 font-bold">
-              <td className="text-left px-3 py-2 text-white border border-zinc-600">Totals</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600"></td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.ab}</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.r}</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.h}</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.rbi}</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.bb}</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.so}</td>
-              <td className="text-center px-2 py-2 text-white border border-zinc-600">{totals.lob}</td>
+              <td className="text-left px-2 sm:px-3 py-1.5 sm:py-2 text-white border border-zinc-600">Totals</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600"></td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.ab}</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.r}</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.h}</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.rbi}</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.bb}</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.so}</td>
+              <td className="text-center px-1 sm:px-2 py-1.5 sm:py-2 text-white border border-zinc-600">{totals.lob}</td>
             </tr>
           </tbody>
         </table>
