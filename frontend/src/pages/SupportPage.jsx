@@ -162,8 +162,16 @@ export default function SupportPage() {
           {/* Category Navigation Buttons */}
           <div className="flex flex-wrap justify-center gap-4">
             <Button
-              onClick={() => scrollToSection('guides')}
+              onClick={() => scrollToSection('general-help')}
               className="bg-orange-500 hover:bg-orange-400 text-black font-bold px-6 py-3"
+              data-testid="nav-general-help"
+            >
+              <HelpCircle className="w-5 h-5 mr-2" />
+              General Help
+            </Button>
+            <Button
+              onClick={() => scrollToSection('guides')}
+              className="bg-zinc-700 hover:bg-zinc-600 text-white font-bold px-6 py-3"
               data-testid="nav-guides"
             >
               <BookOpen className="w-5 h-5 mr-2" />
