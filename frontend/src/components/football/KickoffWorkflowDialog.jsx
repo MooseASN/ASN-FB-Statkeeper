@@ -11,6 +11,128 @@ import PlayerSelector from "./PlayerSelector";
 import YardLineSelector from "./YardLineSelector";
 
 /**
+ * KickoffFieldView - Mini football field visualization for kickoff
+ */
+function KickoffFieldView({ 
+  kickoffYardLine, 
+  fieldedAt, 
+  returnedTo, 
+  direction,
+  kickingTeamColor,
+  receivingTeamColor,
+  specialResult
+}) {
+  // Convert positions to percentage (0-100 field representation)
+  // Kickoff typically happens from kicking team's side
+  const kickoffPos = direction === 'left' ? (100 - kickoffYardLine) : kickoffYardLine;
+  const fieldedPos = direction === 'left' ? (100 - (fieldedAt || 5)) : (fieldedAt || 5);
+  const returnedPos = specialResult === 'touchback' ? (direction === 'left' ? 25 : 75) :
+                      specialResult === 'touchdown' ? (direction === 'left' ? 0 : 100) :
+                      direction === 'left' ? (100 - (returnedTo || 25)) : (returnedTo || 25);
+
+  return (
+    <div className="bg-green-800 rounded-lg p-3 relative overflow-hidden" style={{ height: '120px' }}>
+      {/* Field lines */}
+      <div className="absolute inset-0 flex">
+        {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((line) => (
+          <div 
+            key={line} 
+            className="flex-1 border-r border-white/30 relative"
+            style={{ borderRightWidth: line === 50 ? '2px' : '1px' }}
+          >
+            {line > 0 && line < 100 && (
+              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-white/60 font-mono">
+                {line <= 50 ? line : 100 - line}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      
+      {/* End zones */}
+      <div className="absolute left-0 top-0 bottom-0 w-[5%] bg-blue-900/50 flex items-center justify-center">
+        <span className="text-[8px] text-white/80 rotate-90 whitespace-nowrap">END ZONE</span>
+      </div>
+      <div className="absolute right-0 top-0 bottom-0 w-[5%] bg-red-900/50 flex items-center justify-center">
+        <span className="text-[8px] text-white/80 -rotate-90 whitespace-nowrap">END ZONE</span>
+      </div>
+      
+      {/* Kickoff position marker */}
+      <div 
+        className="absolute top-4 w-4 h-4 rounded-full border-2 border-white shadow-lg z-10"
+        style={{ 
+          left: `calc(${kickoffPos}% - 8px)`,
+          backgroundColor: kickingTeamColor || '#f59e0b'
+        }}
+        title={`Kickoff from ${kickoffYardLine}`}
+      />
+      
+      {/* Kick trajectory line */}
+      {fieldedAt && (
+        <div 
+          className="absolute top-6 h-0.5 bg-yellow-400/50"
+          style={{ 
+            left: `${Math.min(kickoffPos, fieldedPos)}%`,
+            width: `${Math.abs(fieldedPos - kickoffPos)}%`
+          }}
+        />
+      )}
+      
+      {/* Fielded at marker */}
+      {fieldedAt && (
+        <div 
+          className="absolute top-4 w-3 h-3 rounded-full border-2 border-white shadow-lg z-10"
+          style={{ 
+            left: `calc(${fieldedPos}% - 6px)`,
+            backgroundColor: receivingTeamColor || '#3b82f6'
+          }}
+          title={`Fielded at ${fieldedAt}`}
+        />
+      )}
+      
+      {/* Return trajectory line */}
+      {returnedTo && !specialResult && (
+        <div 
+          className="absolute top-6 h-1 bg-green-400"
+          style={{ 
+            left: `${Math.min(fieldedPos, returnedPos)}%`,
+            width: `${Math.abs(returnedPos - fieldedPos)}%`
+          }}
+        />
+      )}
+      
+      {/* Ball position (returned to) */}
+      {returnedTo && (
+        <div 
+          className="absolute top-3 w-5 h-5 rounded-full border-2 border-yellow-400 shadow-lg z-20 flex items-center justify-center"
+          style={{ 
+            left: `calc(${returnedPos}% - 10px)`,
+            backgroundColor: specialResult === 'touchdown' ? '#22c55e' : 
+                            specialResult === 'touchback' ? '#3b82f6' : 
+                            receivingTeamColor || '#3b82f6'
+          }}
+          title={specialResult || `Returned to ${returnedTo}`}
+        >
+          <span className="text-[8px] font-bold text-white">🏈</span>
+        </div>
+      )}
+      
+      {/* Legend */}
+      <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-3 text-[8px] text-white/80">
+        <span className="flex items-center gap-1">
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: kickingTeamColor || '#f59e0b' }}></div>
+          Kick
+        </span>
+        <span className="flex items-center gap-1">
+          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: receivingTeamColor || '#3b82f6' }}></div>
+          Return
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/**
  * KickoffWorkflowDialog - Multi-step dialog for recording kickoff plays
  * Extracted from FootballLiveGame.jsx for better maintainability
  */
