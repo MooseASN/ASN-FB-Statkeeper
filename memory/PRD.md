@@ -14,6 +14,56 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - HIGH/MEDIUM PRIORITY ITEMS COMPLETED ✅
+
+**1. Error Monitoring/Logging System**
+- Created `/app/backend/routers/error_logging.py` with API endpoints for logging and viewing errors
+- Created `/app/frontend/src/utils/errorLogger.js` utility for frontend error logging
+- Created `/app/frontend/src/components/ErrorBoundary.jsx` for catching React errors
+- Added axios interceptor to log API errors (excluding auth errors)
+- Added global error handlers for unhandled promise rejections
+- Admin dashboard now has "Error Logs" collapsible section with:
+  - Total errors count & last 24h count
+  - Unresolved errors badge
+  - List with resolve/delete actions
+  - Stack trace viewer
+  - Clear resolved errors button
+
+**2. Season Clone UI**
+- Added "Clone Season" button in Season Management edit dialog
+- Clone dialog shows what will be copied (teams, rosters, opponents)
+- Backend endpoint already existed at `POST /api/seasons/{season_id}/clone`
+- Files modified: `/app/frontend/src/pages/SeasonManagement.jsx`
+
+**3. Mobile Responsiveness Improvements**
+- Baseball Box Score page (`BaseballBoxScore.jsx`):
+  - Responsive scoreboard with smaller logos/text on mobile
+  - Horizontal scrollable batting stats tables
+  - Smaller padding and font sizes on mobile
+- Live View page already had good responsive styles
+
+**4. Empty States Enhancement**
+- Dashboard empty state improved with:
+  - Welcoming message "Welcome to StatMoose!"
+  - Larger icon with orange background
+  - Link to Demo Mode for new users
+  - Dashed border styling
+
+**Files Created:**
+- `/app/backend/routers/error_logging.py`
+- `/app/frontend/src/utils/errorLogger.js`
+- `/app/frontend/src/components/ErrorBoundary.jsx`
+
+**Files Modified:**
+- `/app/backend/server.py` (registered error logging router)
+- `/app/frontend/src/App.js` (added error handlers and axios interceptor)
+- `/app/frontend/src/pages/AdminDashboard.jsx` (added Error Logs section)
+- `/app/frontend/src/pages/SeasonManagement.jsx` (added Clone Season)
+- `/app/frontend/src/pages/BaseballBoxScore.jsx` (mobile improvements)
+- `/app/frontend/src/pages/Dashboard.jsx` (enhanced empty state)
+
+---
+
 ### January 12, 2026 - ADMIN "GRANT ALL PERKS" FEATURE ✅
 
 **New Feature: Complimentary Gold Access for Users**
