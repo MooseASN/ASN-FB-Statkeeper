@@ -736,6 +736,213 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
           </CardContent>
         </Card>
 
+        {/* Subscription */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Crown className="w-5 h-5" />
+              Subscription
+            </CardTitle>
+            <CardDescription>Manage your StatMoose subscription</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loadingSubscription ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            ) : subscription ? (
+              <>
+                {/* Current Plan */}
+                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg border">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-3">
+                      <span className="font-medium">Current Plan</span>
+                      <TierBadge tier={subscription.tier} />
+                    </div>
+                    {subscription.is_trial && (
+                      <p className="text-sm text-emerald-600 font-medium">
+                        Free trial active
+                        {subscription.trial_end && (
+                          <span> · Ends {new Date(subscription.trial_end).toLocaleDateString()}</span>
+                        )}
+                      </p>
+                    )}
+                    {subscription.status === "canceling" && (
+                      <p className="text-sm text-amber-600 font-medium">
+                        Cancels on {subscription.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString() : "end of period"}
+                      </p>
+                    )}
+                    {subscription.is_active && !subscription.is_trial && subscription.status !== "canceling" && (
+                      <p className="text-sm text-muted-foreground">
+                        Renews {subscription.current_period_end ? new Date(subscription.current_period_end).toLocaleDateString() : "automatically"}
+                      </p>
+                    )}
+                  </div>
+                  {subscription.tier !== "bronze" && (
+                    <div className="flex gap-2">
+                      {subscription.status === "canceling" || subscription.cancel_at_period_end ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          onClick={handleReactivateSubscription}
+                        >
+                          <RefreshCw className="w-4 h-4 mr-2" />
+                          Reactivate
+                        </Button>
+                      ) : subscription.can_cancel ? (
+                        <Button 
+                          variant="outline" 
+                          size="sm"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => setShowCancelDialog(true)}
+                        >
+                          <XCircle className="w-4 h-4 mr-2" />
+                          Cancel
+                        </Button>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+
+                {/* Upgrade/Change Plan */}
+                <div className="flex items-center justify-between pt-2">
+                  <div>
+                    <p className="font-medium">Want to change your plan?</p>
+                    <p className="text-sm text-muted-foreground">
+                      {subscription.tier === "bronze" 
+                        ? "Upgrade to unlock more features" 
+                        : subscription.tier === "silver" 
+                          ? "Upgrade to Gold for unlimited features"
+                          : "You're on our best plan!"}
+                    </p>
+                  </div>
+                  <Button onClick={() => navigate("/pricing")} variant="outline">
+                    View Plans
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-muted-foreground mb-4">No active subscription</p>
+                <Button onClick={() => navigate("/pricing")}>
+                  View Subscription Plans
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Payment Methods */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="w-5 h-5" />
+              Payment Methods
+            </CardTitle>
+            <CardDescription>Manage your saved payment methods</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {loadingPaymentMethods ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            ) : paymentMethods.length > 0 ? (
+              <>
+                <div className="space-y-3">
+                  {paymentMethods.map((pm) => (
+                    <div 
+                      key={pm.id} 
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-7 bg-slate-200 rounded flex items-center justify-center">
+                          <CreditCard className="w-5 h-5 text-slate-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium capitalize">
+                            {pm.brand} •••• {pm.last4}
+                            {pm.is_default && (
+                              <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
+                                Default
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            Expires {pm.exp_month}/{pm.exp_year}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {!pm.is_default && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSetDefaultPaymentMethod(pm.id)}
+                            title="Set as default"
+                          >
+                            <Star className="w-4 h-4" />
+                          </Button>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeletePaymentMethod(pm.id)}
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                          title="Remove"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Stripe Billing Portal */}
+                <div className="pt-2 border-t">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleOpenBillingPortal}
+                    disabled={openingBillingPortal}
+                    className="w-full"
+                  >
+                    {openingBillingPortal ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2"></div>
+                        Opening...
+                      </>
+                    ) : (
+                      <>
+                        <ExternalLink className="w-4 h-4 mr-2" />
+                        Manage in Stripe Billing Portal
+                      </>
+                    )}
+                  </Button>
+                  <p className="text-xs text-muted-foreground text-center mt-2">
+                    Add new payment methods, view invoices, and update billing info
+                  </p>
+                </div>
+              </>
+            ) : (
+              <div className="text-center py-4">
+                <p className="text-muted-foreground mb-4">No payment methods saved</p>
+                {subscription?.tier !== "bronze" ? (
+                  <Button 
+                    variant="outline" 
+                    onClick={handleOpenBillingPortal}
+                    disabled={openingBillingPortal}
+                  >
+                    {openingBillingPortal ? "Opening..." : "Add Payment Method"}
+                  </Button>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    Payment methods are saved when you subscribe to a paid plan
+                  </p>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Account Info */}
         <Card>
           <CardHeader>
