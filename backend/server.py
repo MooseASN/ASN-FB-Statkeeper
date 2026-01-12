@@ -1627,6 +1627,11 @@ class GameCreate(BaseModel):
     sport: str = "basketball"  # "basketball", "football", or "baseball"
     # Baseball-specific fields
     total_innings: int = 9  # Number of innings (default 9, can be 7 for high school/doubleheaders)
+    # Bonus rule settings (basketball)
+    bonus_enabled: bool = True  # Enable automatic bonus tracking
+    double_bonus_enabled: bool = True  # Enable automatic double bonus tracking
+    bonus_fouls: Optional[int] = 7  # Team fouls needed for bonus
+    double_bonus_fouls: Optional[int] = 10  # Team fouls needed for double bonus
 
 class QuarterScores(BaseModel):
     home: List[int] = [0, 0, 0, 0]
