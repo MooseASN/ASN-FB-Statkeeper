@@ -200,6 +200,145 @@ export default function SupportPage() {
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-4 py-12">
         
+        {/* ========== GENERAL HELP SECTION ========== */}
+        <section id="general-help" className="mb-16 scroll-mt-8">
+          <div className="flex items-center gap-3 mb-6">
+            <HelpCircle className="w-8 h-8 text-orange-500" />
+            <h2 className="text-2xl font-bold">General Help</h2>
+          </div>
+          <p className="text-zinc-400 mb-6">
+            Common questions, troubleshooting tips, and solutions to help you get started.
+          </p>
+
+          {/* Account & Subscription */}
+          <CollapsibleSection title="Account & Subscription" icon={CreditCard} defaultOpen={true}>
+            <SubSection title="Creating an Account">
+              <Step number="1" title="Click 'Get Started'" description="Find this button on the homepage or navigation bar" />
+              <Step number="2" title="Enter your information" description="Provide your email, name, and create a password" />
+              <Step number="3" title="Verify your email" description="Check your inbox for a verification link" />
+              <Step number="4" title="Start your free trial" description="All paid tiers include a 14-day free trial!" />
+            </SubSection>
+
+            <SubSection title="Subscription Tiers">
+              <p className="mb-3">StatMoose offers three subscription levels:</p>
+              <div className="space-y-3">
+                <div className="p-3 bg-zinc-900 rounded-lg border border-amber-700/50">
+                  <h5 className="font-bold text-amber-600 mb-1">Bronze (Free)</h5>
+                  <p className="text-sm text-zinc-400">Basic stat tracking, PDF box scores, and share links. Perfect for trying out StatMoose.</p>
+                </div>
+                <div className="p-3 bg-zinc-900 rounded-lg border border-gray-400/50">
+                  <h5 className="font-bold text-gray-300 mb-1">Silver ($9.99/month)</h5>
+                  <p className="text-sm text-zinc-400">Everything in Bronze plus embeddable widgets, sponsor banners (5 slots), and priority support.</p>
+                </div>
+                <div className="p-3 bg-zinc-900 rounded-lg border border-yellow-500/50">
+                  <h5 className="font-bold text-yellow-500 mb-1">Gold ($19.99/month)</h5>
+                  <p className="text-sm text-zinc-400">Everything in Silver plus custom team logos, unlimited sponsors, and multi-user access.</p>
+                </div>
+              </div>
+            </SubSection>
+
+            <SubSection title="Managing Your Subscription">
+              <p>To view or change your subscription:</p>
+              <Step number="1" title="Go to your Dashboard" />
+              <Step number="2" title="Click 'Account Settings'" />
+              <Step number="3" title="Select 'Subscription'" description="Here you can upgrade, downgrade, or cancel" />
+            </SubSection>
+
+            <SubSection title="Free Trial">
+              <p>All paid tiers (Silver & Gold) include a <strong className="text-white">14-day free trial</strong>. You won't be charged until the trial ends, and you can cancel anytime during the trial period.</p>
+            </SubSection>
+          </CollapsibleSection>
+
+          {/* Payment & Billing Issues */}
+          <CollapsibleSection title="Payment & Billing Issues" icon={AlertTriangle}>
+            <SubSection title="Payment Failed">
+              <p className="mb-3">If your payment failed, here are common causes and solutions:</p>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li><strong className="text-white">Insufficient funds</strong> - Check your account balance</li>
+                <li><strong className="text-white">Card expired</strong> - Update your payment method in Account Settings</li>
+                <li><strong className="text-white">Bank blocked the charge</strong> - Contact your bank to authorize StatMoose payments</li>
+                <li><strong className="text-white">Incorrect card details</strong> - Re-enter your card information</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Updating Payment Method">
+              <Step number="1" title="Go to Dashboard → Account Settings" />
+              <Step number="2" title="Click 'Payment Methods'" />
+              <Step number="3" title="Add a new card or update existing one" />
+              <Step number="4" title="Set as default payment method" />
+            </SubSection>
+
+            <SubSection title="Refund Policy">
+              <p>If you're not satisfied with StatMoose, contact us within 7 days of your first payment for a full refund. Use the Contact Us page or email us directly.</p>
+            </SubSection>
+          </CollapsibleSection>
+
+          {/* Technical Troubleshooting */}
+          <CollapsibleSection title="Technical Troubleshooting" icon={RefreshCw}>
+            <SubSection title="Page Not Loading">
+              <p className="mb-3">If StatMoose isn't loading properly:</p>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li><strong className="text-white">Clear your browser cache</strong> - Press Ctrl+Shift+Delete (Windows) or Cmd+Shift+Delete (Mac)</li>
+                <li><strong className="text-white">Try a different browser</strong> - Chrome, Firefox, Safari, and Edge are all supported</li>
+                <li><strong className="text-white">Disable browser extensions</strong> - Ad blockers can sometimes interfere</li>
+                <li><strong className="text-white">Check your internet connection</strong> - Try refreshing the page</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Stats Not Saving">
+              <p className="mb-3">If your stats aren't being saved:</p>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li><strong className="text-white">Check your connection</strong> - Look for the connection indicator in the top corner</li>
+                <li><strong className="text-white">Don't close the browser</strong> - Stats sync when you have an active connection</li>
+                <li><strong className="text-white">Wait a moment</strong> - There may be a brief delay in syncing</li>
+              </ul>
+              <p className="mt-3 text-orange-400">Pro tip: StatMoose auto-saves every action, so you rarely lose data even if you close the browser accidentally!</p>
+            </SubSection>
+
+            <SubSection title="Offline Mode">
+              <p>StatMoose requires an internet connection for full functionality. If you're at a venue with poor connectivity:</p>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400 mt-2">
+                <li>Use your phone's mobile hotspot</li>
+                <li>Position yourself closer to the venue's WiFi router</li>
+                <li>Consider downloading game data beforehand while on good WiFi</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Browser Compatibility">
+              <p>StatMoose works best on:</p>
+              <ul className="list-disc list-inside space-y-1 text-zinc-400 mt-2">
+                <li><strong className="text-white">Chrome</strong> (recommended) - Version 90+</li>
+                <li><strong className="text-white">Safari</strong> - Version 14+ (great for iPad users)</li>
+                <li><strong className="text-white">Firefox</strong> - Version 88+</li>
+                <li><strong className="text-white">Edge</strong> - Version 90+</li>
+              </ul>
+              <p className="mt-3 text-zinc-500 italic">Internet Explorer is not supported.</p>
+            </SubSection>
+          </CollapsibleSection>
+
+          {/* Getting Started Quick Tips */}
+          <CollapsibleSection title="Getting Started Checklist" icon={Zap}>
+            <SubSection title="Before Your First Game">
+              <div className="space-y-3">
+                <Step number="1" title="Create your account" description="Sign up and choose your subscription tier" />
+                <Step number="2" title="Set up your team" description="Add team name, colors, and logo (optional)" />
+                <Step number="3" title="Add your roster" description="Enter all player names, numbers, and positions" />
+                <Step number="4" title="Try a practice game" description="Use Demo Mode to get comfortable with the interface" />
+                <Step number="5" title="Prepare your device" description="Charge your tablet/phone and test your WiFi connection at the venue" />
+              </div>
+            </SubSection>
+
+            <SubSection title="Game Day Essentials">
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li><strong className="text-white">Fully charged device</strong> - Bring a portable charger just in case</li>
+                <li><strong className="text-white">Stable internet</strong> - Mobile hotspot as backup</li>
+                <li><strong className="text-white">Printed roster</strong> - Physical backup with jersey numbers</li>
+                <li><strong className="text-white">Share link ready</strong> - Send to parents/fans before the game starts</li>
+              </ul>
+            </SubSection>
+          </CollapsibleSection>
+        </section>
+
         {/* ========== GUIDES SECTION ========== */}
         <section id="guides" className="mb-16 scroll-mt-8">
           <div className="flex items-center gap-3 mb-6">
