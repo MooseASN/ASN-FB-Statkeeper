@@ -115,6 +115,38 @@ export default function EmbedSnippetGenerator({
         </DialogHeader>
         
         <div className="space-y-6 py-4">
+          {/* Live Stats Link - At the TOP for easy access */}
+          <div className="p-4 bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-sm font-semibold text-orange-800">Live Stats Output Link</Label>
+                <p className="text-xs text-orange-600 mt-1 font-mono break-all">{liveStatsUrl}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-orange-300 text-orange-700 hover:bg-orange-100"
+                  onClick={() => {
+                    navigator.clipboard.writeText(liveStatsUrl);
+                    toast.success('Live stats link copied!');
+                  }}
+                >
+                  <Copy className="w-4 h-4 mr-1" />
+                  Copy
+                </Button>
+                <Button
+                  size="sm"
+                  className="bg-orange-500 hover:bg-orange-600 text-white"
+                  onClick={() => window.open(liveStatsUrl, '_blank')}
+                >
+                  <ExternalLink className="w-4 h-4 mr-1" />
+                  Open
+                </Button>
+              </div>
+            </div>
+          </div>
+
           {/* Size Controls */}
           <div className="space-y-3">
             <Label className="text-sm font-medium">Widget Size</Label>
