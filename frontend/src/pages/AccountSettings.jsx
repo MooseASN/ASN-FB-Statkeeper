@@ -1052,10 +1052,10 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
                 <strong>What happens when you cancel:</strong>
               </p>
               <ul className="text-sm text-amber-700 mt-2 space-y-1 list-disc list-inside">
-                <li>You'll keep access until the end of your current billing period</li>
+                <li>You&apos;ll keep access until the end of your current billing period</li>
                 <li>Your teams, games, and data will be preserved</li>
                 <li>You can reactivate anytime before the period ends</li>
-                <li>After cancellation, you'll be downgraded to Bronze (free) tier</li>
+                <li>After cancellation, you&apos;ll be downgraded to Bronze (free) tier</li>
               </ul>
             </div>
           </div>
