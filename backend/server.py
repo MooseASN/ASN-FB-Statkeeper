@@ -807,7 +807,8 @@ async def get_all_users(admin: User = Depends(get_admin_user)):
             "effective_role": effective_role,
             "subscription_tier": tier,
             "subscription_status": user.get("subscription_status", "none"),
-            "subscription_end": user.get("subscription_end")
+            "subscription_end": user.get("subscription_end"),
+            "is_comped": user.get("is_comped", False)
         })
     
     return {
