@@ -20,6 +20,9 @@ from emergentintegrations.payments.stripe.checkout import (
 
 logger = logging.getLogger(__name__)
 
+# Primary admin emails - these get full access
+PRIMARY_ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
+
 # Create router
 router = APIRouter(prefix="/payments", tags=["payments"])
 
