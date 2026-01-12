@@ -930,7 +930,17 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     updatePlayerStat(qb.player_number, possession, 'passYards', yards);
     updatePlayerStat(receiver.player_number, possession, 'recYards', yards);
     if (tackler) updatePlayerStat(tackler.player_number, defenseTeam, 'tackles', 1);
-    addEvent(`#${qb.player_number} pass to #${receiver.player_number} for ${yards} yds${tackler ? ` (tackled by #${tackler.player_number})` : ''}`);
+    
+    // Add structured play data for box score
+    addPlay({
+      type: 'pass',
+      qb: qb.player_number,
+      receiver: receiver.player_number,
+      yards: yards,
+      tackler: tackler?.player_number || null,
+      result: 'complete',
+      description: `#${qb.player_number} pass to #${receiver.player_number} for ${yards} yds${tackler ? ` (tackled by #${tackler.player_number})` : ''}`
+    });
     closeWorkflow();
   };
   
