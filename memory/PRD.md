@@ -14,6 +14,49 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - MARTY THE STATMOOSE SUPPORT CHATBOT ✅
+
+**New Feature: AI-Powered Support Chatbot**
+
+Added "Marty the StatMoose" - an AI-powered support chatbot that helps users with questions about StatMoose.
+
+**Features:**
+1. **Floating Badge:**
+   - Marty's head appears in the bottom-right corner when users are logged in
+   - Small X button to dismiss the badge (persists for session)
+   - Green pulse indicator shows Marty is available
+
+2. **Chat Interface:**
+   - Clean, modern chat window with orange theme
+   - Marty's head and name in header
+   - Message history with user (orange) and assistant (white) bubbles
+   - Typing indicator while waiting for response
+   - "Need more help? Contact Support" link to /contact page
+
+3. **AI Knowledge:**
+   - Powered by OpenAI GPT-4o-mini via Emergent Integrations
+   - Comprehensive knowledge about StatMoose features, pricing, and troubleshooting
+   - Maintains conversation history for context
+   - Friendly "Marty the StatMoose" personality
+
+**Backend:**
+- `POST /api/support-chat/message` - Send message and get AI response
+- `DELETE /api/support-chat/history/{session_id}` - Clear chat history
+- Chat history stored in MongoDB for conversation continuity
+
+**Files Created:**
+- `/app/backend/routers/support_chat.py` (new router for chatbot API)
+- `/app/frontend/src/components/SupportChatbot.jsx` (chatbot UI component)
+
+**Files Modified:**
+- `/app/backend/server.py` (registered new router)
+- `/app/frontend/src/components/Layout.jsx` (added chatbot to layout)
+
+**Image Used:**
+- Marty Head: https://customer-assets.emergentagent.com/job_stat-tracker-14/artifacts/im9bk6ab_Marty%20Head.png
+
+---
+
 ### January 12, 2026 - SUBSCRIPTION & PAYMENT METHODS MANAGEMENT ✅
 
 **New Feature: Account Settings Subscription & Payment Management**
