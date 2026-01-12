@@ -557,34 +557,110 @@ export default function SupportPage() {
               <Step number="3" title="Assign Defensive Positions" description="Place players on the diamond" />
             </SubSection>
 
-            <SubSection title="Recording At-Bats">
-              <p className="mb-3">When a batter comes up, you can record:</p>
+            <SubSection title="Understanding the Interface">
+              <p className="mb-3">The baseball stat-keeping screen shows:</p>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li><strong className="text-white">Scoreboard</strong> - Inning-by-inning score, runs, hits, errors</li>
+                <li><strong className="text-white">Diamond View</strong> - Visual display of base runners</li>
+                <li><strong className="text-white">Current Batter</strong> - Active batter and their count</li>
+                <li><strong className="text-white">Outs Counter</strong> - Current number of outs</li>
+                <li><strong className="text-white">Lineup Card</strong> - Batting order with quick stats</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Recording At-Bats - Step by Step">
+              <p className="mb-3">When a batter comes up:</p>
+              <Step number="1" title="Batter appears automatically" description="Based on your batting order" />
+              <Step number="2" title="Wait for the at-bat result" description="Watch the play unfold" />
+              <Step number="3" title="Tap the appropriate outcome" description="Choose from hits, outs, or walks" />
+              <Step number="4" title="Select specific type" description="e.g., Single, Double, Groundout, etc." />
+              <Step number="5" title="Advance runners if needed" description="Tap runners on the diamond" />
+            </SubSection>
+
+            <SubSection title="Hit Types">
               <ul className="list-disc list-inside space-y-1 text-zinc-400">
-                <li><strong className="text-white">Hits</strong> - Single, Double, Triple, Home Run</li>
-                <li><strong className="text-white">Outs</strong> - Strikeout, Groundout, Flyout, Lineout</li>
-                <li><strong className="text-white">Walks</strong> - BB (Base on Balls), HBP (Hit by Pitch)</li>
-                <li><strong className="text-white">Sacrifices</strong> - Sac Fly, Sac Bunt</li>
-                <li><strong className="text-white">Errors</strong> - Reached on Error</li>
+                <li><strong className="text-white">Single (1B)</strong> - Batter reaches first base on a hit</li>
+                <li><strong className="text-white">Double (2B)</strong> - Batter reaches second base on a hit</li>
+                <li><strong className="text-white">Triple (3B)</strong> - Batter reaches third base on a hit</li>
+                <li><strong className="text-white">Home Run (HR)</strong> - Batter scores on a hit</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Out Types">
+              <ul className="list-disc list-inside space-y-1 text-zinc-400">
+                <li><strong className="text-white">Strikeout (K)</strong> - Three strikes</li>
+                <li><strong className="text-white">Groundout</strong> - Ball hit on ground, batter thrown out</li>
+                <li><strong className="text-white">Flyout</strong> - Ball caught in the air (outfield)</li>
+                <li><strong className="text-white">Lineout</strong> - Line drive caught</li>
+                <li><strong className="text-white">Pop Out</strong> - Pop fly caught (infield)</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Walks & Other">
+              <ul className="list-disc list-inside space-y-1 text-zinc-400">
+                <li><strong className="text-white">Walk (BB)</strong> - Four balls, batter takes first</li>
+                <li><strong className="text-white">Hit By Pitch (HBP)</strong> - Batter hit by pitch, takes first</li>
+                <li><strong className="text-white">Sacrifice Fly</strong> - Out that scores a runner</li>
+                <li><strong className="text-white">Sacrifice Bunt</strong> - Bunt that advances a runner</li>
+                <li><strong className="text-white">Fielder's Choice</strong> - Out recorded elsewhere</li>
+                <li><strong className="text-white">Error</strong> - Reached base due to defensive error</li>
               </ul>
             </SubSection>
 
             <SubSection title="Base Running">
-              <p>Tap runners on the diamond to advance them. The system tracks:</p>
+              <p>Tap runners on the diamond to manage base movement:</p>
               <ul className="list-disc list-inside mt-2 space-y-1 text-zinc-400">
-                <li>Stolen bases and caught stealing</li>
-                <li>Runs scored and RBIs</li>
-                <li>Runner advancement on hits</li>
+                <li><strong className="text-white">Advance</strong> - Tap a runner, then tap the next base</li>
+                <li><strong className="text-white">Stolen Base</strong> - Mark as steal attempt</li>
+                <li><strong className="text-white">Caught Stealing</strong> - Runner tagged out</li>
+                <li><strong className="text-white">Score</strong> - Tap home plate to score the runner</li>
+                <li><strong className="text-white">Picked Off</strong> - Runner tagged out on pickoff</li>
               </ul>
             </SubSection>
 
-            <SubSection title="Pitching Stats">
-              <p>Pitching stats are auto-calculated:</p>
+            <SubSection title="RBI Tracking">
+              <p>Runs Batted In are automatically calculated when:</p>
               <ul className="list-disc list-inside mt-2 space-y-1 text-zinc-400">
-                <li><strong className="text-white">IP</strong> - Innings Pitched</li>
+                <li>A hit scores a runner</li>
+                <li>A sacrifice fly scores a runner</li>
+                <li>A walk with bases loaded</li>
+              </ul>
+              <p className="mt-2 text-zinc-500 italic">Note: Errors and wild pitches don't count as RBIs</p>
+            </SubSection>
+
+            <SubSection title="Pitching Stats">
+              <p>Pitching stats are automatically tracked:</p>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-zinc-400">
+                <li><strong className="text-white">IP</strong> - Innings Pitched (tracks outs)</li>
                 <li><strong className="text-white">K</strong> - Strikeouts</li>
                 <li><strong className="text-white">BB</strong> - Walks allowed</li>
                 <li><strong className="text-white">H</strong> - Hits allowed</li>
-                <li><strong className="text-white">ER</strong> - Earned Runs</li>
+                <li><strong className="text-white">R</strong> - Runs allowed</li>
+                <li><strong className="text-white">ER</strong> - Earned Runs (excludes errors)</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Changing Pitchers">
+              <Step number="1" title="Tap 'Change Pitcher'" description="In the pitching controls area" />
+              <Step number="2" title="Select the new pitcher" description="From your roster" />
+              <Step number="3" title="Previous pitcher's stats are saved" description="IP, K, BB, etc. are preserved" />
+            </SubSection>
+
+            <SubSection title="Inning Management">
+              <ul className="list-disc list-inside space-y-1 text-zinc-400">
+                <li><strong className="text-white">Half-inning ends</strong> - After 3 outs, automatically advances</li>
+                <li><strong className="text-white">Top/Bottom</strong> - Visitors bat top, home bats bottom</li>
+                <li><strong className="text-white">Extra Innings</strong> - Game continues past 9 if tied</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Box Score & Stats">
+              <p>At any time, you can view:</p>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-zinc-400">
+                <li>Full batting statistics for each player</li>
+                <li>Pitching lines for all pitchers used</li>
+                <li>Inning-by-inning score breakdown</li>
+                <li>Team totals (R, H, E, LOB)</li>
               </ul>
             </SubSection>
           </CollapsibleSection>
