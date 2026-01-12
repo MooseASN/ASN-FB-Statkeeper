@@ -7424,6 +7424,11 @@ from routers.payments import router as payments_router, set_db as set_payments_d
 api_router.include_router(payments_router)
 set_payments_db(db)
 
+# Import and include support chat router
+from routers.support_chat import router as support_chat_router, set_db as set_support_chat_db
+api_router.include_router(support_chat_router)
+set_support_chat_db(db)
+
 # Include router after all routes are defined
 app.include_router(api_router)
 
