@@ -599,6 +599,36 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   // Embed dialog
   const [showEmbedDialog, setShowEmbedDialog] = useState(false);
   
+  // PDF generation
+  const [generatingPdf, setGeneratingPdf] = useState(false);
+  
+  const handleDownloadPdf = async () => {
+    if (demoMode) {
+      toast.info("PDF download not available in demo mode");
+      return;
+    }
+    setGeneratingPdf(true);
+    try {
+      const response = await axios.get(`${API}/games/${id}/football-boxscore/pdf`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `football_boxscore_${game?.home_team_name}_vs_${game?.away_team_name}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      toast.success('PDF downloaded successfully');
+    } catch (error) {
+      console.error('PDF download error:', error);
+      toast.error('Failed to generate PDF');
+    } finally {
+      setGeneratingPdf(false);
+    }
+  };
+  
   // Redo stack for undone plays
   const [redoHistory, setRedoHistory] = useState([]);
   
