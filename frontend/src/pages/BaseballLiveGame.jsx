@@ -971,6 +971,43 @@ const InningScoreControlModal = ({ isOpen, onClose, game, onUpdate, onEndGame })
         <Button onClick={onClose} variant="outline" className="w-full mt-2 text-zinc-400">
           Cancel
         </Button>
+        
+        {/* End Game Section */}
+        <div className="mt-6 pt-4 border-t border-zinc-700">
+          {!showEndGameConfirm ? (
+            <Button 
+              onClick={() => setShowEndGameConfirm(true)}
+              variant="outline"
+              className="w-full text-red-400 border-red-400/50 hover:bg-red-500/10 hover:text-red-300"
+            >
+              End Game - Mark as Final
+            </Button>
+          ) : (
+            <div className="space-y-3 bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+              <p className="text-red-300 text-sm text-center">
+                Are you sure you want to end this game? This will set the status to <strong>FINAL</strong>.
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  onClick={() => setShowEndGameConfirm(false)}
+                  variant="outline"
+                  className="flex-1 text-zinc-400"
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={() => {
+                    onEndGame();
+                    onClose();
+                  }}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+                >
+                  End Game
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
