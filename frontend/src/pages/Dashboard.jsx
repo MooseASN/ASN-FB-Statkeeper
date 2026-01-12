@@ -671,17 +671,23 @@ export default function Dashboard({ user, onLogout }) {
 
         {/* Empty State */}
         {!loading && teams.length === 0 && (
-          <Card className="text-center py-12">
+          <Card className="text-center py-12 border-2 border-dashed border-slate-200">
             <CardContent>
-              <Users className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Teams Yet</h3>
-              <p className="text-muted-foreground mb-4">Create your first team to start tracking games</p>
+              <div className="w-20 h-20 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                <Users className="w-10 h-10 text-orange-500" />
+              </div>
+              <h3 className="text-xl font-semibold mb-2">Welcome to StatMoose!</h3>
+              <p className="text-muted-foreground mb-2">You don't have any teams yet.</p>
+              <p className="text-muted-foreground text-sm mb-6">Create your first team to start tracking live game stats.</p>
               <Link to="/teams">
-                <Button data-testid="create-first-team-btn">
+                <Button data-testid="create-first-team-btn" className="bg-orange-500 hover:bg-orange-600">
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Team
+                  Create Your First Team
                 </Button>
               </Link>
+              <p className="text-xs text-muted-foreground mt-4">
+                Or try <Link to="/demo" className="text-orange-500 hover:underline">Demo Mode</Link> to see how it works
+              </p>
             </CardContent>
           </Card>
         )}
