@@ -1150,24 +1150,167 @@ const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitut
 );
 
 // Play by Play Log Component - Compact version
-const PlayByPlayLog = ({ plays }) => (
-  <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
-    <div className="bg-zinc-800 px-3 py-1.5 border-b border-zinc-700">
-      <h3 className="text-xs font-bold text-white uppercase tracking-wider">Play by Play</h3>
-    </div>
-    <div className="max-h-32 overflow-y-auto p-2">
-      {plays?.length > 0 ? (
-        plays.slice(0, 10).map((play) => (
-          <div key={play.id} className="text-xs text-zinc-300 mb-1 pb-1 border-b border-zinc-800/50">
-            <span className="text-zinc-500">{play.inning}</span> {play.description}
-          </div>
-        ))
-      ) : (
-        <div className="text-zinc-500 text-center py-2 text-xs">No plays yet</div>
+// Editable Play-by-Play Log Component
+const PlayByPlayLog = ({ plays, onUpdatePlay, onDeletePlay, onRecalculateStats }) => {
+  const [editingPlayId, setEditingPlayId] = useState(null);
+  const [editText, setEditText] = useState("");
+  const [showAllPlays, setShowAllPlays] = useState(false);
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  
+  const handleStartEdit = (play) => {
+    setEditingPlayId(play.id);
+    setEditText(play.description);
+  };
+  
+  const handleSaveEdit = (play) => {
+    if (editText.trim() !== play.description) {
+      onUpdatePlay(play.id, { description: editText.trim() });
+      // Trigger stats recalculation if the edit affects scoring
+      if (onRecalculateStats) {
+        onRecalculateStats();
+      }
+    }
+    setEditingPlayId(null);
+    setEditText("");
+  };
+  
+  const handleCancelEdit = () => {
+    setEditingPlayId(null);
+    setEditText("");
+  };
+  
+  const handleDelete = (playId) => {
+    onDeletePlay(playId);
+    setConfirmDeleteId(null);
+    // Trigger stats recalculation after deletion
+    if (onRecalculateStats) {
+      onRecalculateStats();
+    }
+  };
+  
+  const displayPlays = showAllPlays ? plays : plays?.slice(0, 10);
+  
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-lg overflow-hidden">
+      <div className="bg-zinc-800 px-3 py-1.5 border-b border-zinc-700 flex items-center justify-between">
+        <h3 className="text-xs font-bold text-white uppercase tracking-wider">Play by Play</h3>
+        {plays?.length > 10 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-5 text-[10px] text-zinc-400 hover:text-white px-2"
+            onClick={() => setShowAllPlays(!showAllPlays)}
+          >
+            {showAllPlays ? `Show Less` : `View All (${plays.length})`}
+          </Button>
+        )}
+      </div>
+      <div className={`overflow-y-auto p-2 ${showAllPlays ? 'max-h-64' : 'max-h-32'}`}>
+        {plays?.length > 0 ? (
+          displayPlays.map((play) => (
+            <div 
+              key={play.id} 
+              className="text-xs text-zinc-300 mb-1 pb-1 border-b border-zinc-800/50 group relative"
+            >
+              {editingPlayId === play.id ? (
+                // Edit mode
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <span className="text-zinc-500 flex-shrink-0">{play.inning}</span>
+                    <input
+                      type="text"
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="flex-1 bg-zinc-800 border border-zinc-600 rounded px-2 py-1 text-xs text-white"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveEdit(play);
+                        if (e.key === 'Escape') handleCancelEdit();
+                      }}
+                    />
+                  </div>
+                  <div className="flex gap-1 justify-end">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 text-[10px] px-2 text-zinc-400"
+                      onClick={handleCancelEdit}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="h-5 text-[10px] px-2 bg-green-600 hover:bg-green-700"
+                      onClick={() => handleSaveEdit(play)}
+                    >
+                      Save
+                    </Button>
+                  </div>
+                </div>
+              ) : confirmDeleteId === play.id ? (
+                // Delete confirmation mode
+                <div className="bg-red-900/30 rounded p-2 space-y-1">
+                  <p className="text-red-300 text-[10px]">Delete this play?</p>
+                  <div className="flex gap-1 justify-end">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-5 text-[10px] px-2 text-zinc-400"
+                      onClick={() => setConfirmDeleteId(null)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="h-5 text-[10px] px-2 bg-red-600 hover:bg-red-700"
+                      onClick={() => handleDelete(play.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                // Display mode
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1">
+                    <span className="text-zinc-500">{play.inning}</span> {play.description}
+                    {play.lastEdited && (
+                      <span className="text-zinc-600 text-[9px] ml-1">(edited)</span>
+                    )}
+                  </div>
+                  {/* Edit/Delete buttons - show on hover */}
+                  <div className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                    <button
+                      onClick={() => handleStartEdit(play)}
+                      className="text-zinc-500 hover:text-blue-400 p-0.5"
+                      title="Edit play"
+                    >
+                      <Edit className="w-3 h-3" />
+                    </button>
+                    <button
+                      onClick={() => setConfirmDeleteId(play.id)}
+                      className="text-zinc-500 hover:text-red-400 p-0.5"
+                      title="Delete play"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-zinc-500 text-center py-2 text-xs">No plays yet</div>
+        )}
+      </div>
+      {plays?.length > 0 && (
+        <div className="bg-zinc-800/50 px-3 py-1 border-t border-zinc-700 text-[10px] text-zinc-500">
+          {plays.length} plays • Hover to edit or delete
+        </div>
       )}
     </div>
-  </div>
-);
+  );
+};
 
 // Pitch Result Buttons Component - Compact version
 const PitchResultButtons = ({ onPitchResult, disabled }) => {
