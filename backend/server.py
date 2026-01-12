@@ -4358,14 +4358,54 @@ async def record_stat(game_id: str, stat: StatUpdate, user: User = Depends(get_c
                 play_by_play.pop(i)
                 break
     
+    # Calculate team fouls and update bonus status for basketball games
+    update_data = {
+        "quarter_scores": quarter_scores,
+        "play_by_play": play_by_play,
+        "game_stats": game_stats,
+        "updated_at": datetime.now(timezone.utc).isoformat()
+    }
+    
+    # Auto-update team fouls and bonus when a foul is recorded (basketball only)
+    if stat.stat_type == "foul" and game.get("sport") == "basketball":
+        # Calculate team fouls from all player stats
+        home_fouls = 0
+        away_fouls = 0
+        
+        async for ps in db.player_stats.find({"game_id": game_id}, {"_id": 0, "fouls": 1, "team_id": 1}):
+            if ps.get("team_id") == game.get("home_team_id"):
+                home_fouls += ps.get("fouls", 0)
+            else:
+                away_fouls += ps.get("fouls", 0)
+        
+        update_data["home_team_fouls"] = home_fouls
+        update_data["away_team_fouls"] = away_fouls
+        
+        # Auto-calculate bonus status based on game settings
+        bonus_enabled = game.get("bonus_enabled", True)
+        double_bonus_enabled = game.get("double_bonus_enabled", True)
+        bonus_fouls = game.get("bonus_fouls", 7)
+        double_bonus_fouls = game.get("double_bonus_fouls", 10)
+        
+        # Home team bonus is based on AWAY team fouls (opponent fouls trigger your bonus)
+        if double_bonus_enabled and away_fouls >= double_bonus_fouls:
+            update_data["home_bonus"] = "double_bonus"
+        elif bonus_enabled and away_fouls >= bonus_fouls:
+            update_data["home_bonus"] = "bonus"
+        else:
+            update_data["home_bonus"] = None
+        
+        # Away team bonus is based on HOME team fouls
+        if double_bonus_enabled and home_fouls >= double_bonus_fouls:
+            update_data["away_bonus"] = "double_bonus"
+        elif bonus_enabled and home_fouls >= bonus_fouls:
+            update_data["away_bonus"] = "bonus"
+        else:
+            update_data["away_bonus"] = None
+    
     await db.games.update_one(
         {"id": game_id},
-        {"$set": {
-            "quarter_scores": quarter_scores,
-            "play_by_play": play_by_play,
-            "game_stats": game_stats,
-            "updated_at": datetime.now(timezone.utc).isoformat()
-        }}
+        {"$set": update_data}
     )
     
     updated_stat = await db.player_stats.find_one({"id": stat.player_id}, {"_id": 0})
