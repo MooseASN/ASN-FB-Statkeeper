@@ -14,6 +14,33 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - ADMIN FEATURE ACCESS FIX & REFACTORING ✅
+
+**Bug Fix: Admin Feature Access**
+- Fixed issue where admin users weren't immediately seeing Gold-tier features (e.g., unlimited banners)
+- Added `subscriptionLoading` state to Dashboard.jsx to prevent UI flash showing Bronze features
+- UI now shows "Loading..." or "Checking subscription..." until the subscription data is fetched
+- Backend already correctly returns `tier: "gold"` and `is_admin: true` for admin users
+
+**Refactoring Progress:**
+
+**FootballLiveGame.jsx (5115 → 4741 lines, -374 lines)**
+- Extracted `KickoffWorkflowDialog` component to `/app/frontend/src/components/football/KickoffWorkflowDialog.jsx`
+- Component handles the 5-step kickoff workflow (yard line, direction, kicker, returner, return result, tackler)
+
+**server.py Decomposition Status:**
+- Currently integrated routers: `payments.py`, `support_chat.py`, `error_logging.py`
+- Existing but unintegrated: `auth.py`, `admin.py`, `schools.py`
+- Remaining in server.py (~7500 lines): Teams, Games, Events, Sponsor Banners, Clock controls, Stats recording
+- **Risk Assessment:** Full decomposition is high-risk and should be done incrementally with thorough testing
+
+**Files Modified:**
+- `/app/frontend/src/pages/Dashboard.jsx` (admin feature loading fix)
+- `/app/frontend/src/pages/FootballLiveGame.jsx` (component extraction)
+- `/app/frontend/src/components/football/KickoffWorkflowDialog.jsx` (new file)
+
+---
+
 ### January 12, 2026 - BASKETBALL BONUS RULES FEATURE ✅
 
 **New Feature: Configurable Bonus Rules for Basketball Games**
