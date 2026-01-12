@@ -52,6 +52,7 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
   const params = useParams();
   const id = demoMode ? 'demo' : params.id;
   const navigate = useNavigate();
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
   
   // Core state
   const [game, setGame] = useState(initialDemoData);
