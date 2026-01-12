@@ -83,6 +83,12 @@ export default function Dashboard({ user, onLogout }) {
     const files = e.target.files;
     if (!files || files.length === 0) return;
     
+    // Wait for subscription data to load
+    if (subscriptionLoading) {
+      toast.error('Please wait, loading subscription data...');
+      return;
+    }
+    
     // Check feature access
     if (!canAccess('sponsor_banners')) {
       toast.error('Sponsor banners require Silver or Gold tier');
