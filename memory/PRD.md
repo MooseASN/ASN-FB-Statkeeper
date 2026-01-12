@@ -14,6 +14,57 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - MOBILE RESPONSIVENESS & EMPTY STATES AUDIT ✅
+
+**Mobile Responsiveness Improvements:**
+- **Dashboard.jsx:** Scheduled game cards now stack buttons vertically on mobile, use shorter labels ("Start" vs "Start Now"), and handle text overflow gracefully
+- **GameHistory.jsx:** Game cards now display in a mobile-friendly stacked layout with a dropdown menu for actions instead of inline buttons
+- **Teams.jsx:** Empty state cards are mobile-responsive with appropriate padding and text sizes
+- **Events.jsx:** Empty state improvements with better visual hierarchy on mobile
+- **SeasonManagement.jsx:** Mobile-friendly empty states for schedule, roster, and opponents tabs
+- **TeamDetail.jsx:** Improved empty state for roster table
+
+**Empty States Audit - Improved UX for New Users:**
+- **Dashboard:** 
+  - "No teams" empty state with icon, helpful message, CTA button, and demo link
+  - NEW: "Has teams but no games" empty state encouraging users to start their first game
+- **Teams Page:** Improved empty state explaining that teams hold rosters and are needed for games
+- **Game History:** Enhanced empty state with icon and helpful guidance about what will appear there
+- **Events Page:** Better empty state explaining what events/tournaments are for
+- **Season Management:**
+  - Schedule tab: Contextual empty state (different message if roster not set up vs just no games)
+  - Roster tab: Empty state with guidance about import options
+  - Opponents tab: Empty state with quick-action buttons to find schools or add manually
+
+**Bug Fix:**
+- Fixed `error_logging.py` router - PyMongo Database objects don't support truth testing (`if not db:`), changed to `if db is None:`
+
+**Files Modified:**
+- `/app/frontend/src/pages/Dashboard.jsx` (mobile responsive, dual empty states)
+- `/app/frontend/src/pages/GameHistory.jsx` (mobile dropdown menu, better empty states)
+- `/app/frontend/src/pages/Teams.jsx` (improved empty state)
+- `/app/frontend/src/pages/Events.jsx` (improved empty state)
+- `/app/frontend/src/pages/SeasonManagement.jsx` (multiple empty state improvements)
+- `/app/frontend/src/pages/TeamDetail.jsx` (improved roster empty state)
+- `/app/backend/routers/error_logging.py` (bug fix for db truth testing)
+
+---
+
+### January 12, 2026 - DEMO SPORT SELECTION PAGE ✅
+
+**New Feature:**
+- Created `/demo` route with a 3-sport selection page matching the home page design
+- Basketball, Football, and Baseball cards with "View Demo" buttons
+- Routes correctly to `/demo/basketball`, `/demo/football`, `/demo/baseball`
+
+**Files Created:**
+- `/app/frontend/src/pages/DemoSportSelection.jsx`
+
+**Files Modified:**
+- `/app/frontend/src/App.js` (added route)
+
+---
+
 ### January 12, 2026 - BOX SCORE PDF FIX & ADMIN FEATURE ACCESS ✅
 
 **Bug Fix: Wrong Sport Box Score PDF**
