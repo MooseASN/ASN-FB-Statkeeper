@@ -2109,14 +2109,23 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                   )}
                   {/* Bonus Button */}
                   {isActive && (
-                    <Button
-                      size="sm"
-                      variant={game?.home_bonus ? "default" : "outline"}
-                      className={`mt-2 ml-1 text-xs h-7 ${game?.home_bonus === "double_bonus" ? "bg-red-500 hover:bg-red-600" : game?.home_bonus === "bonus" ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}`}
-                      onClick={() => handleBonusToggle("home")}
-                    >
-                      {game?.home_bonus === "double_bonus" ? "2x Bonus" : game?.home_bonus === "bonus" ? "Bonus" : "Bonus"}
-                    </Button>
+                    <div className="flex flex-col items-center mt-2">
+                      <Button
+                        size="sm"
+                        variant={game?.home_bonus ? "default" : "outline"}
+                        className={`text-xs h-7 ${game?.home_bonus === "double_bonus" ? "bg-red-500 hover:bg-red-600" : game?.home_bonus === "bonus" ? "bg-yellow-500 hover:bg-yellow-600 text-black" : ""}`}
+                        onClick={() => handleBonusToggle("home")}
+                        data-testid="home-bonus-btn"
+                      >
+                        {game?.home_bonus === "double_bonus" ? "2x Bonus" : game?.home_bonus === "bonus" ? "Bonus" : "Bonus"}
+                      </Button>
+                      {/* Team fouls indicator - shows opponent fouls that affect this team's bonus */}
+                      {game?.bonus_enabled && (
+                        <span className="text-[10px] text-slate-500 mt-1">
+                          Opp Fouls: {game?.away_team_fouls || 0}/{game?.bonus_fouls || 7}
+                        </span>
+                      )}
+                    </div>
                   )}
                 </div>
                 <div className="px-4 text-2xl text-slate-300">-</div>
