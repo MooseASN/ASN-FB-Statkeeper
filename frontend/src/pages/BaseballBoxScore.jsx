@@ -577,22 +577,22 @@ export default function BaseballBoxScore() {
                   <img 
                     src={game.away_team_logo} 
                     alt={`${game.away_team_name} logo`}
-                    className="w-20 h-20 mx-auto mb-2 object-contain"
+                    className="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-1 sm:mb-2 object-contain"
                     data-testid="away-team-logo"
                   />
                 ) : (
                   <div 
-                    className="w-16 h-16 mx-auto mb-2 rounded-full"
+                    className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-1 sm:mb-2 rounded-full"
                     style={{ backgroundColor: game.away_team_color || '#3b82f6' }}
                   />
                 )}
-                <div className="text-xl font-bold">{game.away_team_name}</div>
-                <div className="text-4xl font-bold mt-2">{game.away_score || 0}</div>
+                <div className="text-base sm:text-xl font-bold">{game.away_team_name}</div>
+                <div className="text-3xl sm:text-4xl font-bold mt-1 sm:mt-2">{game.away_score || 0}</div>
               </div>
               
               {/* VS / Final */}
               <div className="text-center">
-                <div className={`text-lg font-bold px-4 py-2 rounded ${
+                <div className={`text-sm sm:text-lg font-bold px-3 sm:px-4 py-1.5 sm:py-2 rounded ${
                   game.status === 'final' ? 'bg-green-600' : 'bg-amber-600'
                 }`}>
                   {game.status === 'final' ? 'FINAL' : `${game.inning_half === 'top' ? '▲' : '▼'} ${game.current_inning}`}
@@ -605,23 +605,23 @@ export default function BaseballBoxScore() {
                   <img 
                     src={game.home_team_logo} 
                     alt={`${game.home_team_name} logo`}
-                    className="w-20 h-20 mx-auto mb-2 object-contain"
+                    className="w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-1 sm:mb-2 object-contain"
                     data-testid="home-team-logo"
                   />
                 ) : (
                   <div 
-                    className="w-16 h-16 mx-auto mb-2 rounded-full"
+                    className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-1 sm:mb-2 rounded-full"
                     style={{ backgroundColor: game.home_team_color || '#dc2626' }}
                   />
                 )}
-                <div className="text-xl font-bold">{game.home_team_name}</div>
-                <div className="text-4xl font-bold mt-2">{game.home_score || 0}</div>
+                <div className="text-base sm:text-xl font-bold">{game.home_team_name}</div>
+                <div className="text-3xl sm:text-4xl font-bold mt-1 sm:mt-2">{game.home_score || 0}</div>
               </div>
             </div>
             
             {/* Win/Loss Info */}
             {game.status === 'final' && (game.winning_pitcher || game.losing_pitcher) && (
-              <div className="text-sm text-zinc-400">
+              <div className="text-xs sm:text-sm text-zinc-400">
                 {game.winning_pitcher && <span className="text-green-400">W: #{game.winning_pitcher}</span>}
                 {game.winning_pitcher && game.losing_pitcher && <span className="mx-2">|</span>}
                 {game.losing_pitcher && <span className="text-red-400">L: #{game.losing_pitcher}</span>}
