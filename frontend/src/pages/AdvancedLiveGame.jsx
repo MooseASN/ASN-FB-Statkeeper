@@ -13,10 +13,11 @@ import { LoadingScreen } from "@/components/LoadingScreen";
 import { 
   ArrowLeft, Play, Pause, Settings, HelpCircle, FileDown, Users, 
   RotateCcw, ChevronRight, AlertCircle, X, Plus, Link as LinkIcon, 
-  UserPlus, Trash2, Loader2, Mail, Edit, FileText, Monitor
+  UserPlus, Trash2, Loader2, Mail, Edit, FileText, Monitor, Lock
 } from "lucide-react";
 import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import ConnectionStatus from "@/components/ConnectionStatus";
+import { useSubscriptionFeatures } from "@/hooks/useSubscriptionFeatures";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
