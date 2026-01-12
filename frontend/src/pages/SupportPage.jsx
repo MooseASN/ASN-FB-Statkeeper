@@ -227,21 +227,18 @@ export default function SupportPage() {
                   <p className="text-sm text-zinc-400">Basic stat tracking, PDF box scores, and share links. Perfect for trying out StatMoose.</p>
                 </div>
                 <div className="p-3 bg-zinc-900 rounded-lg border border-gray-400/50">
-                  <h5 className="font-bold text-gray-300 mb-1">Silver ($9.99/month)</h5>
-                  <p className="text-sm text-zinc-400">Everything in Bronze plus embeddable widgets, sponsor banners (5 slots), and priority support.</p>
+                  <h5 className="font-bold text-gray-300 mb-1">Silver ($15/month)</h5>
+                  <p className="text-sm text-zinc-400">Everything in Bronze plus embeddable widgets, sponsor banners (5 slots), and CSV export.</p>
                 </div>
                 <div className="p-3 bg-zinc-900 rounded-lg border border-yellow-500/50">
-                  <h5 className="font-bold text-yellow-500 mb-1">Gold ($19.99/month)</h5>
-                  <p className="text-sm text-zinc-400">Everything in Silver plus custom team logos, unlimited sponsors, and multi-user access.</p>
+                  <h5 className="font-bold text-yellow-500 mb-1">Gold ($20/month)</h5>
+                  <p className="text-sm text-zinc-400">Everything in Silver plus custom team logos, unlimited sponsors, shared access, and priority support.</p>
                 </div>
               </div>
             </SubSection>
 
             <SubSection title="Managing Your Subscription">
-              <p>To view or change your subscription:</p>
-              <Step number="1" title="Go to your Dashboard" />
-              <Step number="2" title="Click 'Account Settings'" />
-              <Step number="3" title="Select 'Subscription'" description="Here you can upgrade, downgrade, or cancel" />
+              <p>To upgrade or change your subscription, visit the <strong className="text-white">Pricing</strong> page from the main navigation. You can upgrade to a higher tier at any time.</p>
             </SubSection>
 
             <SubSection title="Free Trial">
