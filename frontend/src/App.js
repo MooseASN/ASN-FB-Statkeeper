@@ -55,6 +55,13 @@ import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 // Support page
 import SupportPage from "@/pages/SupportPage";
 
+// Error handling
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { setupGlobalErrorHandlers, logApiError } from "@/utils/errorLogger";
+
+// Set up global error handlers on app load
+setupGlobalErrorHandlers();
+
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
 // Helper to get token from either storage
