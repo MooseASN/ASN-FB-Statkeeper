@@ -2607,6 +2607,15 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Embed Snippet Generator */}
+      <EmbedSnippetGenerator
+        open={showEmbedDialog}
+        onOpenChange={setShowEmbedDialog}
+        shareCode={game?.share_code || id}
+        sport="basketball"
+        gameTitle={`${game?.away_team_name || 'Away'} vs ${game?.home_team_name || 'Home'}`}
+      />
     </div>
   );
 }
