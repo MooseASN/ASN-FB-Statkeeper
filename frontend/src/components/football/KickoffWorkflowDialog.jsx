@@ -22,13 +22,48 @@ function KickoffFieldView({
   receivingTeamColor,
   specialResult
 }) {
-  // Convert positions to percentage (0-100 field representation)
-  // Kickoff typically happens from kicking team's side
-  const kickoffPos = direction === 'left' ? (100 - kickoffYardLine) : kickoffYardLine;
-  const fieldedPos = direction === 'left' ? (100 - (fieldedAt || 5)) : (fieldedAt || 5);
-  const returnedPos = specialResult === 'touchback' ? (direction === 'left' ? 25 : 75) :
-                      specialResult === 'touchdown' ? (direction === 'left' ? 0 : 100) :
-                      direction === 'left' ? (100 - (returnedTo || 25)) : (returnedTo || 25);
+  // Field representation: 0% = left end zone, 100% = right end zone
+  // The 50 yard line is at 50%
+  // 
+  // For kickoffs:
+  // - Kickoff from 35 means kicker is on their OWN 35 (35% or 65% from their end zone)
+  // - Fielded at 5 means returner catches at THEIR OWN 5 (near their end zone)
+  // - The kick travels from kicker's side to returner's side
+  //
+  // If kicking LEFT: Kicker is on RIGHT side (100 - 35 = 65%), ball goes to LEFT end zone area
+  // If kicking RIGHT: Kicker is on LEFT side (35%), ball goes to RIGHT end zone area
+  
+  let kickoffPos, fieldedPos, returnedPos;
+  
+  if (direction === 'left') {
+    // Kicking towards left end zone (0%)
+    // Kicker starts on the right side of the field
+    kickoffPos = 100 - kickoffYardLine; // e.g., 35 yard line = 65% from left
+    // Returner catches near left end zone (their territory)
+    fieldedPos = fieldedAt || 5; // e.g., 5 yard line = 5% from left
+    // Return moves back towards the middle
+    if (specialResult === 'touchback') {
+      returnedPos = 25; // Touchback at 25 yard line
+    } else if (specialResult === 'touchdown') {
+      returnedPos = 0; // Left end zone
+    } else {
+      returnedPos = returnedTo || 25;
+    }
+  } else {
+    // Kicking towards right end zone (100%)
+    // Kicker starts on the left side of the field
+    kickoffPos = kickoffYardLine; // e.g., 35 yard line = 35% from left
+    // Returner catches near right end zone (their territory)
+    fieldedPos = 100 - (fieldedAt || 5); // e.g., 5 yard line = 95% from left
+    // Return moves back towards the middle
+    if (specialResult === 'touchback') {
+      returnedPos = 75; // Touchback at 25 yard line (from right side)
+    } else if (specialResult === 'touchdown') {
+      returnedPos = 100; // Right end zone
+    } else {
+      returnedPos = 100 - (returnedTo || 25);
+    }
+  }
 
   return (
     <div className="bg-green-800 rounded-lg p-3 relative overflow-hidden" style={{ height: '120px' }}>
