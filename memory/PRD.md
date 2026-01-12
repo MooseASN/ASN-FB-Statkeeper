@@ -19,8 +19,8 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 **P0: Expanded Support Page Content**
 
 1. **New General Help Section** - Added comprehensive troubleshooting and FAQ content:
-   - Account & Subscription guide (creating account, subscription tiers, free trial info)
-   - Payment & Billing Issues (failed payments, updating payment method, refund policy)
+   - Account & Subscription guide (creating account, subscription tiers with correct prices, free trial info)
+   - Payment & Billing Issues (failed payments, updating payment info, refund policy)
    - Technical Troubleshooting (page not loading, stats not saving, offline mode, browser compatibility)
    - Getting Started Checklist (pre-game setup, game day essentials)
 
@@ -30,7 +30,9 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
    - **🏈 Football Advanced Mode:** Full play-by-play tracking, run plays, pass plays, penalties, special teams
    - **⚾ Baseball:** Interface overview, step-by-step at-bats, hit types, out types, walks, base running, RBI tracking, pitching stats, changing pitchers, inning management
 
-3. **Removed Non-Existent Features:**
+3. **Content Accuracy Fixes:**
+   - Corrected tier prices: Bronze (Free), Silver ($15/month), Gold ($20/month)
+   - Removed references to non-existent "Payment Methods" and "Subscription" pages in Account Settings
    - Removed QR Codes subsection from "Live Stats Sharing" (feature not implemented)
 
 4. **Contact Form Updates (`/contact`):**
@@ -39,7 +41,7 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
    - Updated placeholder to "Your organization or school name"
 
 **Files Modified:**
-- `/app/frontend/src/pages/SupportPage.jsx` (major content expansion)
+- `/app/frontend/src/pages/SupportPage.jsx` (major content expansion + accuracy fixes)
 - `/app/frontend/src/pages/ContactPage.jsx` (text and label updates)
 
 ---
