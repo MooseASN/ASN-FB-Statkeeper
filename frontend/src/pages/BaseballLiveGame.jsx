@@ -2606,6 +2606,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         onClose={() => setShowInningScoreModal(false)}
         game={game}
         onUpdate={handleInningScoreUpdate}
+        onEndGame={handleQuickEndGame}
       />
       
       {/* Wrap-Up Modal (was Game Control Modal) */}
