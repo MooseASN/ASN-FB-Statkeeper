@@ -151,11 +151,15 @@ export default function Teams({ user, onLogout }) {
     // Debug: Log the sport being used
     console.log("Creating team with sport:", selectedSport, "and data:", newTeam);
 
+    // Clear logo_url if user doesn't have access to custom logos (prevent bypass)
+    const teamData = {
+      ...newTeam,
+      sport: selectedSport,
+      logo_url: canAccess('custom_team_logos') ? newTeam.logo_url : ""
+    };
+
     try {
-      const res = await axios.post(`${API}/teams`, {
-        ...newTeam,
-        sport: selectedSport
-      });
+      const res = await axios.post(`${API}/teams`, teamData);
       
       console.log("Team created successfully:", res.data);
       
