@@ -117,31 +117,31 @@ const BattingStatsTable = ({ teamName, teamColor, teamLogo, players, stats }) =>
   return (
     <div className="mb-6">
       <div 
-        className="flex items-center gap-3 px-4 py-2 rounded-t-lg"
+        className="flex items-center gap-3 px-3 sm:px-4 py-2 rounded-t-lg"
         style={{ backgroundColor: teamColor || '#374151' }}
       >
         {teamLogo && (
           <img 
             src={teamLogo} 
             alt={`${teamName} logo`}
-            className="w-8 h-8 object-contain"
+            className="w-6 h-6 sm:w-8 sm:h-8 object-contain"
           />
         )}
-        <h3 className="text-white font-bold text-lg">{teamName}</h3>
+        <h3 className="text-white font-bold text-base sm:text-lg">{teamName}</h3>
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm border-collapse" data-testid={`batting-table-${teamName?.toLowerCase().replace(/\s+/g, '-')}`}>
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <table className="w-full text-xs sm:text-sm border-collapse min-w-[500px]" data-testid={`batting-table-${teamName?.toLowerCase().replace(/\s+/g, '-')}`}>
           <thead>
             <tr className="bg-zinc-800 text-white">
-              <th className="text-left px-3 py-2 font-semibold border border-zinc-700 min-w-[180px]">Player</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-12">Pos</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">AB</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">R</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">H</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">RBI</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">BB</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">SO</th>
-              <th className="text-center px-2 py-2 font-semibold border border-zinc-700 w-10">LOB</th>
+              <th className="text-left px-2 sm:px-3 py-1.5 sm:py-2 font-semibold border border-zinc-700 min-w-[120px] sm:min-w-[180px]">Player</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-12">Pos</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">AB</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">R</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">H</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">RBI</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">BB</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">SO</th>
+              <th className="text-center px-1 sm:px-2 py-1.5 sm:py-2 font-semibold border border-zinc-700 w-8 sm:w-10">LOB</th>
             </tr>
           </thead>
           <tbody>
