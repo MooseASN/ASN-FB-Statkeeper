@@ -21,7 +21,14 @@ import {
   Monitor,
   BarChart3,
   Calendar,
-  Shield
+  Shield,
+  HelpCircle,
+  CreditCard,
+  Lock,
+  AlertTriangle,
+  RefreshCw,
+  Wifi,
+  WifiOff
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
