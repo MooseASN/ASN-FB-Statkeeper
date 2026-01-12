@@ -48,12 +48,14 @@ export default function PricingPage() {
   const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [processingTier, setProcessingTier] = useState(null);
+  const [verifyingPayment, setVerifyingPayment] = useState(false);
   
   // Check for return from Stripe
   const sessionId = searchParams.get('session_id');
 
   useEffect(() => {
     if (sessionId) {
+      setVerifyingPayment(true);
       pollPaymentStatus(sessionId);
     }
   }, [sessionId]);
@@ -63,7 +65,9 @@ export default function PricingPage() {
     const pollInterval = 2000;
 
     if (attempts >= maxAttempts) {
+      setVerifyingPayment(false);
       toast.info('Payment status check timed out. Please check your email for confirmation.');
+      navigate('/dashboard');
       return;
     }
 
@@ -72,9 +76,13 @@ export default function PricingPage() {
       
       if (res.data.payment_status === 'paid') {
         toast.success('Payment successful! Thank you for subscribing.');
-        setTimeout(() => navigate('/dashboard'), 2000);
+        setTimeout(() => {
+          setVerifyingPayment(false);
+          navigate('/dashboard');
+        }, 1500);
         return;
       } else if (res.data.status === 'expired') {
+        setVerifyingPayment(false);
         toast.error('Payment session expired. Please try again.');
         return;
       }
@@ -84,6 +92,7 @@ export default function PricingPage() {
       setTimeout(() => pollPaymentStatus(sessionId, attempts + 1), pollInterval);
     } catch (error) {
       console.error('Error checking payment status:', error);
+      setVerifyingPayment(false);
       toast.error('Error checking payment status');
     }
   };
