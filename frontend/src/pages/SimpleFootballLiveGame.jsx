@@ -1560,6 +1560,150 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
         </DialogContent>
       </Dialog>
       
+      {/* Kickoff Workflow Dialog */}
+      <Dialog open={activeWorkflow === 'kickoff'} onOpenChange={() => closeWorkflow()}>
+        <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
+          <DialogHeader>
+            <DialogTitle>Kickoff</DialogTitle>
+            <p className="text-sm text-zinc-400">{offenseTeamName} kicking to {defenseTeamName}</p>
+          </DialogHeader>
+          
+          {/* Step 1: Select Kickoff Yard Line */}
+          {workflowStep === 1 && (
+            <div className="space-y-4">
+              <div className="text-center text-lg font-semibold text-white mb-2">Kickoff From</div>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => handleKickoffYardLineSelect(35)}
+                  className="h-16 text-xl font-bold bg-cyan-600 hover:bg-cyan-700"
+                >
+                  35 Yard Line
+                </Button>
+                <Button
+                  onClick={() => handleKickoffYardLineSelect(40)}
+                  className="h-16 text-xl font-bold bg-zinc-700 hover:bg-zinc-600"
+                >
+                  40 Yard Line
+                </Button>
+                <Button
+                  onClick={() => handleKickoffYardLineSelect(30)}
+                  className="h-14 text-lg font-bold bg-zinc-700 hover:bg-zinc-600"
+                >
+                  30 (After Penalty)
+                </Button>
+                <Button
+                  onClick={() => handleKickoffYardLineSelect(20)}
+                  className="h-14 text-lg font-bold bg-zinc-700 hover:bg-zinc-600"
+                >
+                  20 (Safety Kick)
+                </Button>
+              </div>
+              <Button variant="outline" onClick={closeWorkflow} className="w-full border-zinc-700">
+                Cancel
+              </Button>
+            </div>
+          )}
+          
+          {/* Step 2: Select Kicker */}
+          {workflowStep === 2 && (
+            <PlayerNumberInput 
+              roster={offenseRoster || []} 
+              onSelect={handleKickoffKickerSelect} 
+              onCancel={closeWorkflow} 
+              title={`Select Kicker (${offenseTeamName})`}
+              onAddPlayer={addToOffenseRoster} 
+              teamName={offenseTeamName} 
+            />
+          )}
+          
+          {/* Step 3: Select Kickoff Result */}
+          {workflowStep === 3 && (
+            <div className="space-y-4">
+              <div className="text-center text-lg font-semibold text-white mb-2">
+                Kickoff Result
+              </div>
+              <p className="text-sm text-zinc-400 text-center">
+                #{workflowData.kicker?.player_number} kicking from {workflowData.kickoffYardLine} yd line
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                <Button
+                  onClick={() => handleKickoffResult('touchback')}
+                  className="h-16 text-lg font-bold bg-blue-600 hover:bg-blue-700"
+                >
+                  Touchback<br/><span className="text-xs font-normal">Ball at 25</span>
+                </Button>
+                <Button
+                  onClick={() => handleKickoffResult('return')}
+                  className="h-16 text-lg font-bold bg-green-600 hover:bg-green-700"
+                >
+                  Return<br/><span className="text-xs font-normal">Enter yard line</span>
+                </Button>
+                <Button
+                  onClick={() => handleKickoffResult('fair_catch')}
+                  className="h-16 text-lg font-bold bg-yellow-600 hover:bg-yellow-700"
+                >
+                  Fair Catch<br/><span className="text-xs font-normal">Enter yard line</span>
+                </Button>
+                <Button
+                  onClick={() => handleKickoffResult('out_of_bounds')}
+                  className="h-16 text-lg font-bold bg-purple-600 hover:bg-purple-700"
+                >
+                  Out of Bounds<br/><span className="text-xs font-normal">Penalty - Ball at 40</span>
+                </Button>
+                <Button
+                  onClick={() => handleKickoffResult('return_td')}
+                  className="h-16 text-lg font-bold bg-orange-600 hover:bg-orange-700 col-span-2"
+                >
+                  KICK RETURN TD! 🏈
+                </Button>
+              </div>
+              <Button variant="outline" onClick={() => setWorkflowStep(2)} className="w-full border-zinc-700">
+                ← Back
+              </Button>
+            </div>
+          )}
+          
+          {/* Step 4: Enter Return/Fair Catch Yard Line */}
+          {workflowStep === 4 && (
+            <div className="space-y-4">
+              <div className="text-center text-lg font-semibold text-white mb-2">
+                {workflowData.result === 'fair_catch' ? 'Fair Catch At' : 'Returned To'}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {[15, 20, 25, 30, 35, 40, 45, 50].map(yd => (
+                  <Button
+                    key={yd}
+                    onClick={() => handleKickoffReturnPosition(yd)}
+                    className="h-12 text-lg font-bold bg-zinc-700 hover:bg-zinc-600"
+                  >
+                    {yd}
+                  </Button>
+                ))}
+              </div>
+              <div className="flex gap-2 items-center justify-center">
+                <span className="text-zinc-400">Custom:</span>
+                <input
+                  type="number"
+                  min="1"
+                  max="99"
+                  placeholder="Yard"
+                  className="w-20 bg-zinc-800 border border-zinc-600 rounded px-3 py-2 text-white text-center"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const val = parseInt(e.target.value);
+                      if (val > 0 && val < 100) handleKickoffReturnPosition(val);
+                    }
+                  }}
+                />
+              </div>
+              <Button variant="outline" onClick={() => setWorkflowStep(3)} className="w-full border-zinc-700">
+                ← Back
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+      
       {/* FG Workflow Dialog */}
       <Dialog open={activeWorkflow === 'fg'} onOpenChange={() => closeWorkflow()}>
         <DialogContent className="bg-zinc-900 border-zinc-700 text-white max-w-md">
