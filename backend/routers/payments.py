@@ -400,11 +400,32 @@ async def get_payment_status(session_id: str, request: Request):
                     }}
                 )
                 
+                # Get full session details from Stripe to get subscription and customer IDs
+                stripe.api_key = stripe_api_key
+                try:
+                    stripe_session = stripe.checkout.Session.retrieve(session_id)
+                    stripe_customer_id = stripe_session.customer
+                    stripe_subscription_id = stripe_session.subscription
+                except Exception as e:
+                    logger.warning(f"Could not retrieve Stripe session details: {e}")
+                    stripe_customer_id = None
+                    stripe_subscription_id = None
+                
                 # Activate subscription for user
                 user_id = transaction.get("user_id")
                 if user_id:
                     subscription_end = datetime.now(timezone.utc)
                     interval = transaction.get("interval", "month")
+                    trial_days = transaction.get("trial_days", 0)
+                    
+                    # If trial, extend the end date by trial period
+                    if trial_days > 0:
+                        from datetime import timedelta
+                        subscription_end = subscription_end + timedelta(days=trial_days)
+                        subscription_status = "trialing"
+                    else:
+                        subscription_status = "active"
+                    
                     if interval == "year":
                         from datetime import timedelta
                         subscription_end = subscription_end + timedelta(days=365)
@@ -412,15 +433,24 @@ async def get_payment_status(session_id: str, request: Request):
                         from datetime import timedelta
                         subscription_end = subscription_end + timedelta(days=30)
                     
+                    update_data = {
+                        "subscription_status": subscription_status,
+                        "subscription_package": transaction.get("package_id"),
+                        "subscription_tier": transaction.get("tier"),
+                        "subscription_start": datetime.now(timezone.utc).isoformat(),
+                        "subscription_end": subscription_end.isoformat(),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }
+                    
+                    # Add Stripe IDs if available
+                    if stripe_customer_id:
+                        update_data["stripe_customer_id"] = stripe_customer_id
+                    if stripe_subscription_id:
+                        update_data["stripe_subscription_id"] = stripe_subscription_id
+                    
                     await db.users.update_one(
                         {"user_id": user_id},
-                        {"$set": {
-                            "subscription_status": "active",
-                            "subscription_package": transaction.get("package_id"),
-                            "subscription_start": datetime.now(timezone.utc).isoformat(),
-                            "subscription_end": subscription_end.isoformat(),
-                            "updated_at": datetime.now(timezone.utc).isoformat()
-                        }}
+                        {"$set": update_data}
                     )
                     logger.info(f"Activated subscription for user: {user_id}")
         
