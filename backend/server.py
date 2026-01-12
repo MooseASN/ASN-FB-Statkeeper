@@ -1694,6 +1694,14 @@ class Game(BaseModel):
     # Bonus status
     home_bonus: Optional[str] = None  # null, "bonus", or "double_bonus"
     away_bonus: Optional[str] = None  # null, "bonus", or "double_bonus"
+    # Bonus rule settings (basketball)
+    bonus_enabled: bool = True  # Enable automatic bonus tracking
+    double_bonus_enabled: bool = True  # Enable automatic double bonus tracking
+    bonus_fouls: Optional[int] = 7  # Team fouls needed for bonus
+    double_bonus_fouls: Optional[int] = 10  # Team fouls needed for double bonus
+    # Team fouls per period (for bonus calculation)
+    home_team_fouls: int = 0
+    away_team_fouls: int = 0
     # Simple mode - only track makes, rebounds, assists, fouls
     simple_mode: bool = False
     # Advanced mode - PrestoSports-style interface
