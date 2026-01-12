@@ -176,6 +176,10 @@ async def get_user_tier(request: Request):
             "is_admin": False
         }
     
+    # Check if user is a primary admin by email
+    user_email = user.get("email", "").lower()
+    is_primary_admin = user_email in [e.lower() for e in PRIMARY_ADMIN_EMAILS]
+    
     # Get user's subscription info from database
     if db is not None:
         user_doc = await db.users.find_one(
@@ -186,8 +190,8 @@ async def get_user_tier(request: Request):
         )
         
         if user_doc:
-            # Check if user is an admin
-            is_admin = user_doc.get("role") == "admin"
+            # Check if user is an admin (by role or primary admin list)
+            is_admin = user_doc.get("role") == "admin" or is_primary_admin
             is_comped = user_doc.get("is_comped", False)
             
             # Determine tier from various fields
@@ -215,6 +219,18 @@ async def get_user_tier(request: Request):
                 "is_admin": is_admin,
                 "is_comped": is_comped
             }
+    
+    # If no user doc but is primary admin, still grant gold
+    if is_primary_admin:
+        return {
+            "tier": "gold",
+            "actual_tier": "bronze",
+            "subscription_status": None,
+            "subscription_end": None,
+            "is_trial": False,
+            "is_admin": True,
+            "is_comped": False
+        }
     
     return {
         "tier": "bronze",
