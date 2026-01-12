@@ -1310,6 +1310,149 @@ export default function AdminDashboard({ user, onLogout }) {
             </CollapsibleContent>
           </Card>
         </Collapsible>
+
+        {/* Error Logs - Collapsible */}
+        <Collapsible 
+          open={errorsOpen} 
+          onOpenChange={(open) => {
+            setErrorsOpen(open);
+            if (open && errorLogs.length === 0) {
+              fetchErrorLogs();
+            }
+          }}
+        >
+          <Card>
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Bug className="w-5 h-5" />
+                      Error Logs
+                      {errorStats?.unresolved > 0 && (
+                        <Badge variant="destructive" className="text-xs">
+                          {errorStats.unresolved} unresolved
+                        </Badge>
+                      )}
+                    </CardTitle>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {errorStats?.total || 0} total errors • {errorStats?.recent_24h || 0} in last 24h
+                    </p>
+                  </div>
+                  <ChevronDown className={`w-5 h-5 transition-transform ${errorsOpen ? 'rotate-180' : ''}`} />
+                </div>
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <CardContent className="space-y-4">
+                {/* Actions Bar */}
+                <div className="flex items-center justify-between">
+                  <Button variant="outline" size="sm" onClick={fetchErrorLogs} disabled={loadingErrors}>
+                    <RefreshCw className={`w-4 h-4 mr-2 ${loadingErrors ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                  {errorLogs.some(e => e.resolved) && (
+                    <Button variant="outline" size="sm" onClick={handleClearResolvedErrors} className="text-red-500">
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Clear Resolved
+                    </Button>
+                  )}
+                </div>
+
+                {/* Error List */}
+                {loadingErrors ? (
+                  <div className="flex items-center justify-center py-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                  </div>
+                ) : errorLogs.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-30" />
+                    <p>No errors logged yet</p>
+                    <p className="text-sm">Errors from the frontend and API will appear here</p>
+                  </div>
+                ) : (
+                  <ScrollArea className="h-[400px]">
+                    <div className="space-y-3">
+                      {errorLogs.map((err) => (
+                        <div 
+                          key={err.error_id} 
+                          className={`p-3 rounded-lg border ${
+                            err.resolved 
+                              ? 'bg-green-50 border-green-200' 
+                              : 'bg-red-50 border-red-200'
+                          }`}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <Badge variant={err.error_type === 'api' ? 'default' : 'secondary'} className="text-xs">
+                                  {err.error_type}
+                                </Badge>
+                                {err.resolved && (
+                                  <Badge variant="outline" className="text-xs text-green-600 border-green-300">
+                                    Resolved
+                                  </Badge>
+                                )}
+                                <span className="text-xs text-muted-foreground">
+                                  {new Date(err.timestamp).toLocaleString()}
+                                </span>
+                              </div>
+                              <p className="text-sm font-medium text-gray-800 truncate">
+                                {err.message}
+                              </p>
+                              {err.url && (
+                                <p className="text-xs text-muted-foreground truncate mt-1">
+                                  URL: {err.url}
+                                </p>
+                              )}
+                              {err.user_email && (
+                                <p className="text-xs text-muted-foreground">
+                                  User: {err.user_email}
+                                </p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                              {!err.resolved && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleResolveError(err.error_id)}
+                                  className="text-green-600 hover:text-green-700 hover:bg-green-100"
+                                  title="Mark as resolved"
+                                >
+                                  <Check className="w-4 h-4" />
+                                </Button>
+                              )}
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleDeleteError(err.error_id)}
+                                className="text-red-500 hover:text-red-700 hover:bg-red-100"
+                                title="Delete"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                          </div>
+                          {err.stack_trace && (
+                            <details className="mt-2">
+                              <summary className="text-xs text-muted-foreground cursor-pointer hover:text-gray-700">
+                                Stack trace
+                              </summary>
+                              <pre className="mt-1 p-2 bg-gray-100 rounded text-xs overflow-x-auto max-h-32">
+                                {err.stack_trace}
+                              </pre>
+                            </details>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                )}
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
       </div>
 
       {/* School Details Dialog */}
