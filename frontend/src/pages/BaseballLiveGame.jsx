@@ -23,7 +23,6 @@ import {
 import { 
   ChevronUp, 
   ChevronDown, 
-  Share2, 
   FileText,
   RotateCcw,
   Settings,
