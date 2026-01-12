@@ -476,7 +476,7 @@ export default function BaseballBoxScore() {
     
     setGenerating(true);
     try {
-      const response = await axios.get(`${API}/games/${id}/boxscore/pdf`, {
+      const response = await axios.get(`${API}/games/${id}/baseball-boxscore/pdf`, {
         responseType: 'blob'
       });
       
@@ -484,7 +484,7 @@ export default function BaseballBoxScore() {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `boxscore_${game?.away_team_name}_vs_${game?.home_team_name}.pdf`);
+      link.setAttribute('download', `baseball_boxscore_${game?.away_team_name}_vs_${game?.home_team_name}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
