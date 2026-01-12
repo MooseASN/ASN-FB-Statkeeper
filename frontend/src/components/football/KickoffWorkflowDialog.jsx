@@ -168,6 +168,14 @@ export default function KickoffWorkflowDialog({
           </DialogHeader>
           
           <div className="space-y-6 mt-4">
+            {/* Field Preview */}
+            <KickoffFieldView
+              kickoffYardLine={kickoffData.kickoffYardLine || 35}
+              direction={kickoffData.direction}
+              kickingTeamColor={kickingTeamColor}
+              receivingTeamColor={receivingTeamColor}
+            />
+            
             {/* Kickoff Yard Line */}
             <div>
               <label className="text-sm text-zinc-400 uppercase tracking-wide mb-3 block">
