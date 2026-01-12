@@ -1727,6 +1727,71 @@ export default function SeasonManagement() {
         </DialogContent>
       </Dialog>
 
+      {/* Clone Season Dialog */}
+      <Dialog open={showCloneSeasonDialog} onOpenChange={setShowCloneSeasonDialog}>
+        <DialogContent className="bg-slate-800 border-slate-700 text-white">
+          <DialogHeader>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Copy className="w-5 h-5 text-orange-500" />
+              Clone Season
+            </DialogTitle>
+            <DialogDescription className="text-slate-400">
+              Create a copy of this season with all teams, rosters, and opponents
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label className="text-white">New Season Name</Label>
+              <Input
+                value={cloneSeasonName}
+                onChange={(e) => setCloneSeasonName(e.target.value)}
+                placeholder="Enter name for the cloned season"
+                className="bg-slate-900 border-slate-600 text-white mt-1"
+                data-testid="clone-season-name-input"
+              />
+            </div>
+            
+            <div className="bg-slate-900/50 p-3 rounded-lg text-sm text-slate-300">
+              <p className="font-medium mb-2">What will be copied:</p>
+              <ul className="list-disc list-inside space-y-1 text-slate-400">
+                <li>All teams and their rosters</li>
+                <li>All opponent teams</li>
+                <li>Season settings (sport, gender, level)</li>
+              </ul>
+              <p className="mt-2 text-slate-500">Games will not be copied.</p>
+            </div>
+            
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setShowCloneSeasonDialog(false)}
+                className="flex-1 border-slate-600"
+              >
+                Cancel
+              </Button>
+              <Button
+                onClick={handleCloneSeason}
+                disabled={cloning || !cloneSeasonName.trim()}
+                className="flex-1 bg-orange-500 hover:bg-orange-600"
+                data-testid="confirm-clone-season-btn"
+              >
+                {cloning ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2" />
+                    Cloning...
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-2" />
+                    Clone Season
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* School Search Dialog */}
       <Dialog open={showSchoolSearchDialog} onOpenChange={setShowSchoolSearchDialog}>
         <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
