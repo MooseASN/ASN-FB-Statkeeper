@@ -247,7 +247,7 @@ export default function EmbedSnippetGenerator({
 
           {/* Link Button Code */}
           <div className="space-y-2">
-            <Label className="text-sm font-medium">Link Button</Label>
+            <Label className="text-sm font-medium">Link Button (for websites)</Label>
             <div className="relative">
               <pre className="bg-zinc-900 text-zinc-100 p-3 rounded-lg text-xs overflow-x-auto whitespace-pre-wrap">
                 {linkCode}
@@ -262,22 +262,6 @@ export default function EmbedSnippetGenerator({
               </Button>
             </div>
             <div className="mt-2" dangerouslySetInnerHTML={{ __html: linkCode }} />
-          </div>
-
-          {/* Direct Link */}
-          <div className="flex items-center justify-between p-3 bg-zinc-100 rounded-lg">
-            <div>
-              <Label className="text-sm font-medium">Direct Link</Label>
-              <p className="text-xs text-muted-foreground mt-1 font-mono">{liveStatsUrl}</p>
-            </div>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => window.open(liveStatsUrl, '_blank')}
-            >
-              <ExternalLink className="w-4 h-4 mr-1" />
-              Open
-            </Button>
           </div>
         </div>
       </DialogContent>
