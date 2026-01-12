@@ -324,25 +324,26 @@ export default function GameHistory({ user, onLogout }) {
               return (
                 <Link key={game.id} to={`/game/${game.id}`}>
                   <Card className={`hover:shadow-md transition-shadow cursor-pointer ${isScheduled ? 'border-2 border-blue-200' : ''}`} data-testid={`game-card-${game.id}`}>
-                    <CardContent className="py-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-4">
-                            <div className={`flex-1 ${!isScheduled && isHomeWinner ? 'font-bold' : ''}`}>
-                              <span className="text-[#000000]">{game.home_team_name}</span>
+                    <CardContent className="py-3 sm:py-4">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex-1 min-w-0">
+                          {/* Mobile: Stacked layout, Desktop: Inline */}
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                            <div className={`flex items-center gap-2 ${!isScheduled && isHomeWinner ? 'font-bold' : ''}`}>
+                              <span className="text-[#000000] truncate text-sm sm:text-base">{game.home_team_name}</span>
                               {!isScheduled && (
-                                <span className="ml-2 text-2xl score-display">{homeScore}</span>
+                                <span className="text-lg sm:text-2xl score-display flex-shrink-0">{homeScore}</span>
                               )}
                             </div>
-                            <div className="text-slate-300">{isScheduled ? 'VS' : '-'}</div>
-                            <div className={`flex-1 text-right ${!isScheduled && isAwayWinner ? 'font-bold' : ''}`}>
+                            <div className="text-slate-300 hidden sm:block">{isScheduled ? 'VS' : '-'}</div>
+                            <div className={`flex items-center gap-2 sm:flex-row-reverse ${!isScheduled && isAwayWinner ? 'font-bold' : ''}`}>
+                              <span className="text-orange-500 truncate text-sm sm:text-base">{game.away_team_name}</span>
                               {!isScheduled && (
-                                <span className="text-2xl score-display">{awayScore}</span>
+                                <span className="text-lg sm:text-2xl score-display flex-shrink-0">{awayScore}</span>
                               )}
-                              <span className={`${isScheduled ? '' : 'ml-2'} text-orange-500`}>{game.away_team_name}</span>
                             </div>
                           </div>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                          <div className="flex items-center gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-muted-foreground flex-wrap">
                             {isScheduled && scheduledInfo ? (
                               <span className="flex items-center gap-1 text-blue-600 font-medium">
                                 <Clock className="w-3 h-3" />
@@ -356,7 +357,8 @@ export default function GameHistory({ user, onLogout }) {
                             </span>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
+                        {/* Desktop actions */}
+                        <div className="hidden sm:flex items-center gap-2 ml-4 flex-shrink-0">
                           {game.status === "completed" && (
                             <Button
                               variant="outline"
@@ -394,6 +396,56 @@ export default function GameHistory({ user, onLogout }) {
                             <Trash2 className="w-4 h-4" />
                           </Button>
                           <ChevronRight className="w-5 h-5 text-slate-400" />
+                        </div>
+                        {/* Mobile: Dropdown menu */}
+                        <div className="sm:hidden flex-shrink-0">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 w-8 p-0"
+                                onClick={(e) => e.preventDefault()}
+                              >
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              {game.status === "completed" && (
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleContinueGame(game.id, e);
+                                  }}
+                                  className="text-green-600"
+                                >
+                                  <PlayCircle className="w-4 h-4 mr-2" />
+                                  Continue Game
+                                </DropdownMenuItem>
+                              )}
+                              {!isScheduled && (
+                                <DropdownMenuItem
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handleDownloadPDF(game, e);
+                                  }}
+                                >
+                                  <FileDown className="w-4 h-4 mr-2" />
+                                  Download PDF
+                                </DropdownMenuItem>
+                              )}
+                              <DropdownMenuItem
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setDeleteGameId(game.id);
+                                }}
+                                className="text-red-600"
+                              >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Delete Game
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </div>
                       </div>
                     </CardContent>
