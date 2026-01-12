@@ -1412,7 +1412,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
   
   // Use custom hooks for game history (undo/redo) and play-by-play
   const { saveStateForUndo, popLastState, redoLastState, canUndo, canRedo, historyLength, redoLength } = useGameHistory(20);
-  const { playByPlay, addPlay, removeLastPlay, setPlays } = usePlayByPlay([]);
+  const { playByPlay, addPlay, updatePlay, deletePlay, removeLastPlay, setPlays } = usePlayByPlay([]);
   
   // Game state
   const [game, setGame] = useState(initialDemoData);
