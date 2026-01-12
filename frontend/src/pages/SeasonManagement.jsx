@@ -50,6 +50,9 @@ export default function SeasonManagement() {
   const [showDeleteSeasonDialog, setShowDeleteSeasonDialog] = useState(false);
   const [showSchoolSearchDialog, setShowSchoolSearchDialog] = useState(false);
   const [showDuplicateRosterDialog, setShowDuplicateRosterDialog] = useState(false);
+  const [showCloneSeasonDialog, setShowCloneSeasonDialog] = useState(false);
+  const [cloning, setCloning] = useState(false);
+  const [cloneSeasonName, setCloneSeasonName] = useState("");
   
   // Roster duplication
   const [previousRosters, setPreviousRosters] = useState([]);
