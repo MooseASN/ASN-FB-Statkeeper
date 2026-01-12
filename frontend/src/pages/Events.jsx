@@ -159,12 +159,17 @@ export default function Events({ user, onLogout }) {
             <p className="text-muted-foreground">Loading events...</p>
           </div>
         ) : events.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-8 sm:py-12 border-2 border-dashed border-slate-200">
             <CardContent>
-              <Calendar className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Events Yet</h3>
-              <p className="text-muted-foreground mb-4">Create your first event or tournament to get started</p>
-              <Button onClick={() => setCreateDialogOpen(true)} data-testid="create-first-event-btn">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                <Calendar className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">No Events Yet</h3>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">Create your first event or tournament</p>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">
+                Events help you organize multiple games together, like tournaments or showcases. Great for managing brackets and schedules.
+              </p>
+              <Button onClick={() => setCreateDialogOpen(true)} data-testid="create-first-event-btn" className="bg-orange-500 hover:bg-orange-600">
                 <Plus className="w-4 h-4 mr-2" />
                 Create Event
               </Button>
