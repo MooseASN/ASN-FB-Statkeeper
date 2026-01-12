@@ -1174,6 +1174,26 @@ export default function AdminDashboard({ user, onLogout }) {
                               </TableCell>
                               <TableCell>
                                 <div className="flex items-center justify-center gap-1">
+                                  {/* Grant/Revoke All Perks button */}
+                                  {u.effective_role !== "primary_admin" && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        setCompedUser(u);
+                                        setShowCompedDialog(true);
+                                      }}
+                                      disabled={updatingComped === u.user_id}
+                                      className={u.is_comped 
+                                        ? "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" 
+                                        : "text-amber-500 hover:text-amber-700 hover:bg-amber-50"
+                                      }
+                                      data-testid={`toggle-comped-${u.user_id}`}
+                                      title={u.is_comped ? "Revoke All Perks" : "Grant All Perks"}
+                                    >
+                                      <Gift className="w-4 h-4" />
+                                    </Button>
+                                  )}
                                   {/* Grant/Revoke Admin button - only show for non-primary admins */}
                                   {u.effective_role !== "primary_admin" && (
                                     <Button
