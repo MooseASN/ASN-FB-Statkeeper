@@ -93,6 +93,7 @@ export default function Teams({ user, onLogout }) {
   const location = useLocation();
   const { selectedSport } = useSport();
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
