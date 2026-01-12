@@ -1445,6 +1445,11 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
               <span className="text-3xl font-black">+2</span><span className="text-sm font-semibold">Safety</span>
             </button>
             
+            {/* Kickoff Button */}
+            <button onClick={startKickoffWorkflow} className="bg-cyan-700 hover:bg-cyan-600 border border-cyan-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="kickoff-btn">
+              <Zap className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Kickoff</span>
+            </button>
+            
             {/* Stats - Color coded */}
             <button onClick={startRushWorkflow} className="bg-emerald-700 hover:bg-emerald-600 border border-emerald-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="rush-btn">
               <Zap className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Rush Yds</span>
