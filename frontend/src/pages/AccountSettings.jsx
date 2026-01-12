@@ -1008,6 +1008,48 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Cancel Subscription Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <XCircle className="w-5 h-5 text-red-500" />
+              Cancel Subscription
+            </DialogTitle>
+            <DialogDescription>
+              Are you sure you want to cancel your subscription?
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+              <p className="text-sm text-amber-800">
+                <strong>What happens when you cancel:</strong>
+              </p>
+              <ul className="text-sm text-amber-700 mt-2 space-y-1 list-disc list-inside">
+                <li>You'll keep access until the end of your current billing period</li>
+                <li>Your teams, games, and data will be preserved</li>
+                <li>You can reactivate anytime before the period ends</li>
+                <li>After cancellation, you'll be downgraded to Bronze (free) tier</li>
+              </ul>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)}>
+              Keep Subscription
+            </Button>
+            <Button 
+              variant="destructive"
+              onClick={handleCancelSubscription}
+              disabled={cancelingSubscription}
+            >
+              {cancelingSubscription ? "Canceling..." : "Yes, Cancel"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
