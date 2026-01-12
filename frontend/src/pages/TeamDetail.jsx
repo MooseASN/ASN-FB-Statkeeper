@@ -597,8 +597,14 @@ export default function TeamDetail({ user, onLogout }) {
                 </TableBody>
               </Table>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                No players added yet. Add players manually or upload a CSV file.
+              <div className="text-center py-8 sm:py-12 border-2 border-dashed border-slate-200 rounded-lg">
+                <div className="w-16 h-16 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                  <Users className="w-8 h-8 text-slate-400" />
+                </div>
+                <h3 className="font-semibold mb-2 text-slate-600">No Players Added Yet</h3>
+                <p className="text-muted-foreground text-sm mb-4 max-w-md mx-auto">
+                  Add players manually, upload a CSV file, or import from a roster website.
+                </p>
               </div>
             )}
 
