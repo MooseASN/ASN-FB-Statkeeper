@@ -146,6 +146,19 @@ export default function PricingPage() {
     }
   };
 
+  // Show loading screen when verifying payment after Stripe redirect
+  if (verifyingPayment) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-black flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-orange-500 mx-auto mb-6"></div>
+          <h2 className="text-2xl font-bold text-white mb-2">Verifying Payment...</h2>
+          <p className="text-zinc-400">Please wait while we confirm your subscription.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-zinc-900 to-black">
       {/* Header */}
