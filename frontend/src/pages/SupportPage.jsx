@@ -378,9 +378,6 @@ export default function SupportPage() {
               <Step number="4" title="Paste into your website" />
             </SubSection>
 
-            <SubSection title="QR Codes">
-              <p>Generate a QR code for your live stats page - perfect for displaying at the game venue!</p>
-            </SubSection>
           </CollapsibleSection>
 
           {/* PDF Box Scores */}

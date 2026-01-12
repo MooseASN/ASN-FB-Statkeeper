@@ -127,7 +127,7 @@ export default function ContactPage() {
               Contact Us
             </h1>
             <p className="text-gray-400 text-lg">
-              Interested in StatMoose for your school? Fill out the form below and we'll be in touch.
+              Interested in StatMoose for your school? Having issues with the site? Fill out the form below, and we'll be in touch!
             </p>
           </div>
 
@@ -167,17 +167,17 @@ export default function ContactPage() {
                 />
               </div>
 
-              {/* School */}
+              {/* Organization/School */}
               <div>
                 <Label htmlFor="school" className="text-white mb-2 block font-medium">
-                  School <span className="text-gray-500">*</span>
+                  Organization/School Name <span className="text-gray-500">*</span>
                 </Label>
                 <Input
                   id="school"
                   name="school"
                   value={formData.school}
                   onChange={handleChange}
-                  placeholder="School or University name"
+                  placeholder="Your organization or school name"
                   className="bg-black border-gray-700 text-white placeholder:text-gray-600 focus:border-white focus:ring-white"
                   required
                 />
