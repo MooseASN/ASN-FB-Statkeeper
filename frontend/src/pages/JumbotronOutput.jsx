@@ -277,13 +277,32 @@ export default function JumbotronOutput() {
     ? awayStats.filter(p => awayOnFloor.includes(p.id))
     : [...awayStats].sort((a, b) => calculatePoints(b) - calculatePoints(a)).slice(0, 5);
 
-  // Calculate team fouls
-  const homeTeamFouls = homeStats.reduce((sum, p) => sum + calculatePF(p), 0);
-  const awayTeamFouls = awayStats.reduce((sum, p) => sum + calculatePF(p), 0);
+  // Calculate team fouls from game data or player stats
+  const homeTeamFouls = game.home_team_fouls ?? homeStats.reduce((sum, p) => sum + calculatePF(p), 0);
+  const awayTeamFouls = game.away_team_fouls ?? awayStats.reduce((sum, p) => sum + calculatePF(p), 0);
 
-  // Check bonus status (7+ fouls = bonus in college, opponent fouls determine your bonus)
-  const homeInBonus = awayTeamFouls >= 7;
-  const awayInBonus = homeTeamFouls >= 7;
+  // Get bonus status from game (auto-calculated) or calculate from settings
+  const getBonusStatus = (opponentFouls, gameBonus) => {
+    // If game has explicit bonus status, use it
+    if (gameBonus) return gameBonus;
+    
+    // Otherwise calculate from settings
+    const bonusEnabled = game.bonus_enabled ?? true;
+    const doubleBonusEnabled = game.double_bonus_enabled ?? true;
+    const bonusFouls = game.bonus_fouls ?? 7;
+    const doubleBonusFouls = game.double_bonus_fouls ?? 10;
+    
+    if (doubleBonusEnabled && opponentFouls >= doubleBonusFouls) {
+      return "double_bonus";
+    } else if (bonusEnabled && opponentFouls >= bonusFouls) {
+      return "bonus";
+    }
+    return null;
+  };
+
+  // Home team bonus is based on AWAY team fouls
+  const homeBonusStatus = getBonusStatus(awayTeamFouls, game.home_bonus);
+  const awayBonusStatus = getBonusStatus(homeTeamFouls, game.away_bonus);
 
   // Get timeouts (default 5 for college, 7 for NBA)
   const homeTimeouts = game.home_timeouts ?? 5;
