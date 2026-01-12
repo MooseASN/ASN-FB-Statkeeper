@@ -5,11 +5,12 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload, ExternalLink, Copy, Pencil, Building2 } from "lucide-react";
+import { Plus, Users, History, PlayCircle, Code, Check, Calendar, Clock, Link2, Image, Trash2, Upload, ExternalLink, Copy, Pencil, Building2, Lock } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Layout from "@/components/Layout";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
+import { useSubscriptionFeatures } from "@/hooks/useSubscriptionFeatures";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -17,6 +18,10 @@ export default function Dashboard({ user, onLogout }) {
   const navigate = useNavigate();
   const { selectedSport } = useSport();
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
+  
+  // Subscription features for gating
+  const { canAccess, getLimit, userTier, getRequiredTierFor } = useSubscriptionFeatures();
+  
   const [activeGames, setActiveGames] = useState([]);
   const [scheduledGames, setScheduledGames] = useState([]);
   const [recentGames, setRecentGames] = useState([]);
