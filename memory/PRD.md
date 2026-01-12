@@ -14,6 +14,46 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - SUBSCRIPTION & PAYMENT METHODS MANAGEMENT ✅
+
+**New Feature: Account Settings Subscription & Payment Management**
+
+Added comprehensive subscription and payment method management directly in Account Settings:
+
+1. **Subscription Section:**
+   - View current plan with tier badge (Bronze/Silver/Gold)
+   - See trial status and expiration date if on trial
+   - Cancel subscription (at end of billing period)
+   - Reactivate canceled subscription before period ends
+   - Quick link to view/change plans
+
+2. **Payment Methods Section:**
+   - View all saved payment cards (brand, last 4 digits, expiry)
+   - Set default payment method
+   - Remove payment methods
+   - Link to Stripe Billing Portal for full management (add cards, invoices, etc.)
+
+3. **Backend Endpoints Added:**
+   - `GET /api/payments/subscription-details` - Get detailed subscription info
+   - `POST /api/payments/cancel-subscription` - Cancel at end of period
+   - `POST /api/payments/reactivate-subscription` - Undo cancellation
+   - `GET /api/payments/payment-methods` - List saved cards
+   - `POST /api/payments/create-setup-intent` - For adding new cards
+   - `POST /api/payments/set-default-payment-method` - Update default
+   - `DELETE /api/payments/payment-method/{id}` - Remove a card
+   - `POST /api/payments/create-billing-portal` - Open Stripe portal
+
+4. **Support Page Updated:**
+   - Updated "Managing Your Subscription" with step-by-step instructions
+   - Updated "Managing Payment Methods" with new workflow
+
+**Files Modified:**
+- `/app/backend/routers/payments.py` (major additions - subscription management endpoints)
+- `/app/frontend/src/pages/AccountSettings.jsx` (new Subscription & Payment Methods cards)
+- `/app/frontend/src/pages/SupportPage.jsx` (updated help content)
+
+---
+
 ### January 12, 2026 - SUPPORT PAGE EXPANSION & CONTACT FORM UPDATE ✅
 
 **P0: Expanded Support Page Content**
