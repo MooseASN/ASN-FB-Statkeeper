@@ -628,12 +628,32 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
             <CardTitle className="flex items-center gap-2">
               <Share2 className="w-5 h-5" />
               Shared Access
+              {!canAccess('shared_access') && (
+                <span className="ml-2 px-2 py-0.5 bg-yellow-100 text-yellow-700 text-xs rounded-full flex items-center gap-1">
+                  <Crown className="w-3 h-3" />
+                  Gold
+                </span>
+              )}
             </CardTitle>
             <CardDescription>
               Share your teams, games, and events with other StatMoose users
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {!canAccess('shared_access') ? (
+              <div className="text-center py-6 bg-slate-50 rounded-lg border-2 border-dashed">
+                <Lock className="w-10 h-10 mx-auto text-slate-400 mb-3" />
+                <h4 className="font-medium mb-1">Shared Access is a Gold Feature</h4>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Upgrade to Gold to invite staff members and share access to your teams and games.
+                </p>
+                <Button onClick={() => navigate('/pricing')} className="bg-yellow-500 hover:bg-yellow-600 text-black">
+                  <Crown className="w-4 h-4 mr-2" />
+                  Upgrade to Gold
+                </Button>
+              </div>
+            ) : (
+              <>
             {/* Grant Access Section */}
             <div className="space-y-3">
               <Label className="text-sm font-medium">Grant Access to Another User</Label>
