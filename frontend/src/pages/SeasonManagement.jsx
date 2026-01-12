@@ -1634,6 +1634,20 @@ export default function SeasonManagement() {
               Save Changes
             </Button>
             
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setCloneSeasonName(`${season?.name || 'Season'} (Copy)`);
+                setShowEditSeasonDialog(false);
+                setShowCloneSeasonDialog(true);
+              }}
+              className="w-full border-slate-600 text-white hover:bg-slate-700"
+              data-testid="clone-season-btn"
+            >
+              <Copy className="w-4 h-4 mr-2" />
+              Clone Season
+            </Button>
+            
             <div className="border-t border-slate-700 pt-4">
               <Button 
                 variant="destructive"
