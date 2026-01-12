@@ -15,7 +15,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { History, ChevronRight, FileDown, Trash2, Search, Filter, Calendar, Clock, PlayCircle } from "lucide-react";
+import { History, ChevronRight, FileDown, Trash2, Search, Filter, Calendar, Clock, PlayCircle, MoreVertical } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import Layout from "@/components/Layout";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
 
@@ -266,22 +272,32 @@ export default function GameHistory({ user, onLogout }) {
         {loading ? (
           <div className="text-center py-12 text-muted-foreground">Loading games...</div>
         ) : games.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-8 sm:py-12 border-2 border-dashed border-slate-200">
             <CardContent>
-              <History className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Games Yet</h3>
-              <p className="text-muted-foreground mb-4">Start a new game to see it here</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                <History className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">No Games Yet</h3>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">Your game history will appear here</p>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">
+                Start a new game to track live statistics. Completed games will show here with full box scores.
+              </p>
               <Link to="/new-game">
-                <Button>Start New Game</Button>
+                <Button className="bg-orange-500 hover:bg-orange-600" data-testid="start-first-game-btn">
+                  <PlayCircle className="w-4 h-4 mr-2" />
+                  Start New Game
+                </Button>
               </Link>
             </CardContent>
           </Card>
         ) : filteredGames.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-8 sm:py-12">
             <CardContent>
-              <Search className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Matching Games</h3>
-              <p className="text-muted-foreground mb-4">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                <Search className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">No Matching Games</h3>
+              <p className="text-muted-foreground mb-4 text-sm sm:text-base">
                 Try adjusting your search or filter criteria
               </p>
               <Button variant="outline" onClick={() => { setSearchQuery(""); setStatusFilter("all"); }}>

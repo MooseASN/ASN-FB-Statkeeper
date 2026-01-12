@@ -383,41 +383,42 @@ export default function Dashboard({ user, onLogout }) {
                 <Card key={game.id} className="border-2 border-blue-200" data-testid={`scheduled-game-${game.id}`}>
                   <CardContent className="pt-6">
                     <div className="flex items-center justify-between mb-4">
-                      <div className="text-center flex-1">
-                        <p className="font-semibold text-lg">{game.home_team_name}</p>
-                        <p className="text-sm text-muted-foreground">Home</p>
+                      <div className="text-center flex-1 min-w-0">
+                        <p className="font-semibold text-base sm:text-lg truncate">{game.home_team_name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Home</p>
                       </div>
-                      <div className="px-4">
-                        <span className="text-lg font-bold text-slate-400">VS</span>
+                      <div className="px-2 sm:px-4 flex-shrink-0">
+                        <span className="text-base sm:text-lg font-bold text-slate-400">VS</span>
                       </div>
-                      <div className="text-center flex-1">
-                        <p className="font-semibold text-lg">{game.away_team_name}</p>
-                        <p className="text-sm text-muted-foreground">Away</p>
+                      <div className="text-center flex-1 min-w-0">
+                        <p className="font-semibold text-base sm:text-lg truncate">{game.away_team_name}</p>
+                        <p className="text-xs sm:text-sm text-muted-foreground">Away</p>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-4 border-t">
                       <div className="flex items-center gap-2 text-blue-600">
-                        <Clock className="w-4 h-4" />
-                        <span className="text-sm font-medium">
+                        <Clock className="w-4 h-4 flex-shrink-0" />
+                        <span className="text-xs sm:text-sm font-medium">
                           {formatScheduledDate(game.scheduled_date, game.scheduled_time)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1 sm:gap-2 flex-wrap w-full sm:w-auto">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => copyGameLink(game)}
+                          className="flex-1 sm:flex-initial text-xs sm:text-sm"
                           data-testid={`copy-link-${game.id}`}
                         >
                           {copiedLinkId === game.id ? (
                             <>
-                              <Check className="w-4 h-4 mr-1 text-green-500" />
-                              Copied!
+                              <Check className="w-3 h-3 sm:w-4 sm:h-4 mr-1 text-green-500" />
+                              <span className="hidden sm:inline">Copied!</span>
                             </>
                           ) : (
                             <>
-                              <Link2 className="w-4 h-4 mr-1" />
-                              Copy Link
+                              <Link2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                              <span className="hidden sm:inline">Copy Link</span>
                             </>
                           )}
                         </Button>
@@ -425,20 +426,21 @@ export default function Dashboard({ user, onLogout }) {
                           size="sm"
                           variant="outline"
                           onClick={() => navigate(`/edit-game/${game.id}`)}
+                          className="flex-1 sm:flex-initial text-xs sm:text-sm"
                           data-testid={`edit-scheduled-${game.id}`}
                         >
-                          <Pencil className="w-4 h-4 mr-1" />
-                          Edit
+                          <Pencil className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
+                          <span className="hidden sm:inline">Edit</span>
                         </Button>
                         <Button
                           size="sm"
-                          className="bg-green-600 hover:bg-green-700"
+                          className="bg-green-600 hover:bg-green-700 flex-1 sm:flex-initial text-xs sm:text-sm"
                           onClick={(e) => handleStartScheduledGame(game.id, e)}
                           disabled={startingGameId === game.id}
                           data-testid={`start-scheduled-${game.id}`}
                         >
-                          <PlayCircle className="w-4 h-4 mr-1" />
-                          {startingGameId === game.id ? "Starting..." : "Start Now"}
+                          <PlayCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />
+                          {startingGameId === game.id ? "..." : "Start"}
                         </Button>
                       </div>
                     </div>
@@ -669,16 +671,16 @@ export default function Dashboard({ user, onLogout }) {
           </Card>
         </div>
 
-        {/* Empty State */}
+        {/* Empty State - No teams */}
         {!loading && teams.length === 0 && (
-          <Card className="text-center py-12 border-2 border-dashed border-slate-200">
+          <Card className="text-center py-8 sm:py-12 border-2 border-dashed border-slate-200">
             <CardContent>
-              <div className="w-20 h-20 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
-                <Users className="w-10 h-10 text-orange-500" />
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-orange-100 rounded-full flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 sm:w-10 sm:h-10 text-orange-500" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">Welcome to StatMoose!</h3>
-              <p className="text-muted-foreground mb-2">You don't have any teams yet.</p>
-              <p className="text-muted-foreground text-sm mb-6">Create your first team to start tracking live game stats.</p>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">Welcome to StatMoose!</h3>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">You don't have any teams yet.</p>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">Create your first team to start tracking live game stats.</p>
               <Link to="/teams">
                 <Button data-testid="create-first-team-btn" className="bg-orange-500 hover:bg-orange-600">
                   <Plus className="w-4 h-4 mr-2" />
@@ -688,6 +690,26 @@ export default function Dashboard({ user, onLogout }) {
               <p className="text-xs text-muted-foreground mt-4">
                 Or try <Link to="/demo" className="text-orange-500 hover:underline">Demo Mode</Link> to see how it works
               </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Empty State - Has teams but no games */}
+        {!loading && teams.length > 0 && activeGames.length === 0 && scheduledGames.length === 0 && recentGames.length === 0 && (
+          <Card className="text-center py-8 sm:py-12 border-2 border-dashed border-slate-200">
+            <CardContent>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <PlayCircle className="w-8 h-8 sm:w-10 sm:h-10 text-blue-500" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">No Games Yet</h3>
+              <p className="text-muted-foreground text-sm sm:text-base mb-2">You have {teams.length} team{teams.length !== 1 ? 's' : ''} set up.</p>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">Start a new game to begin tracking stats in real-time.</p>
+              <Link to="/new-game">
+                <Button data-testid="start-first-game-btn" className="bg-orange-500 hover:bg-orange-600">
+                  <PlayCircle className="w-4 h-4 mr-2" />
+                  Start Your First Game
+                </Button>
+              </Link>
             </CardContent>
           </Card>
         )}

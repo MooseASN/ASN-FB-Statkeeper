@@ -287,11 +287,20 @@ export default function Teams({ user, onLogout }) {
         {loading ? (
           <div className="text-center py-12 text-muted-foreground">Loading teams...</div>
         ) : teams.length === 0 ? (
-          <Card className="text-center py-12">
+          <Card className="text-center py-8 sm:py-12 border-2 border-dashed border-slate-200">
             <CardContent>
-              <Users className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No Teams Yet</h3>
-              <p className="text-muted-foreground mb-4">Create your first team to get started</p>
+              <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto bg-slate-100 rounded-full flex items-center justify-center mb-4">
+                <Users className="w-8 h-8 sm:w-10 sm:h-10 text-slate-400" />
+              </div>
+              <h3 className="text-lg sm:text-xl font-semibold mb-2">No Teams Yet</h3>
+              <p className="text-muted-foreground mb-2 text-sm sm:text-base">Create your first team to get started</p>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 max-w-md mx-auto">
+                Teams hold your player rosters. You'll need at least one team to start tracking games.
+              </p>
+              <Button onClick={() => setIsDialogOpen(true)} className="bg-[#000000] hover:bg-[#333333]" data-testid="create-first-team-btn">
+                <Plus className="w-4 h-4 mr-2" />
+                Create Your First Team
+              </Button>
             </CardContent>
           </Card>
         ) : (
