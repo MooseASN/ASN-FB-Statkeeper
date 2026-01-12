@@ -14,6 +14,50 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - FOOTBALL DEMO SELECTOR & SACK BUTTON ✅
+
+**New Feature: Football Demo Mode Selector**
+- Created `/demo/football` page that shows Simple Mode and Advanced Mode options
+- Mirrors the basketball demo selector UI pattern
+- Shows demo team info: Central Wolves vs Riverside Panthers
+- Each mode card displays features list and "Try" button
+
+**New Feature: Sack Button in Simple Football Mode**
+- Added purple "Sack" button with Shield icon to action buttons grid
+- Sack workflow shows defensive team players for defender selection
+- Records sack with defender name and yards lost (as negative rushing yards)
+- Adds structured play data to game log for box score calculation
+
+**Bug Fix: Defensive Player Selection**
+- Confirmed tackler selection in Rush workflow shows defensive players
+- Confirmed tackler selection in Pass workflow shows defensive players
+- Sack workflow correctly shows defensive team players
+
+**Technical Updates:**
+- Created `FootballDemoSelector.jsx` page component
+- Updated `App.js` routes:
+  - `/demo/football` → FootballDemoSelector
+  - `/demo/football/advanced` → DemoFootballLiveGame (advanced mode)
+  - `/demo/football/simple` → SimpleFootballLiveGame demoMode (simple mode)
+- Enhanced `SimpleFootballLiveGame.jsx`:
+  - Added `addPlay()` function for structured play data
+  - Added `startSackWorkflow()` and sack handlers
+  - Added Sack workflow dialog with defensive roster
+  - Updated rush/pass handlers to include structured play data for box score
+
+**Files Created:**
+- `/app/frontend/src/pages/FootballDemoSelector.jsx`
+
+**Files Modified:**
+- `/app/frontend/src/App.js` (new routes)
+- `/app/frontend/src/pages/SimpleFootballLiveGame.jsx` (sack feature, structured play data)
+
+**Testing:**
+- All 10 frontend tests passed (100% success rate)
+- Test report: `/app/test_reports/iteration_45.json`
+
+---
+
 ### January 12, 2026 - EDITABLE BASEBALL PLAY-BY-PLAY LOG ✅
 
 **New Feature: Fully Editable Play-by-Play Log**
