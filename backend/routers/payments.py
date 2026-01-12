@@ -169,7 +169,8 @@ async def get_user_tier(request: Request):
             "tier": "bronze",
             "subscription_status": None,
             "subscription_end": None,
-            "is_trial": False
+            "is_trial": False,
+            "is_admin": False
         }
     
     # Get user's subscription info from database
@@ -177,10 +178,15 @@ async def get_user_tier(request: Request):
         user_doc = await db.users.find_one(
             {"user_id": user["user_id"]},
             {"_id": 0, "subscription_tier": 1, "subscription_status": 1, 
-             "subscription_end": 1, "subscription_package": 1, "tier": 1}
+             "subscription_end": 1, "subscription_package": 1, "tier": 1, "role": 1,
+             "is_comped": 1}
         )
         
         if user_doc:
+            # Check if user is an admin
+            is_admin = user_doc.get("role") == "admin"
+            is_comped = user_doc.get("is_comped", False)
+            
             # Determine tier from various fields
             tier = user_doc.get("subscription_tier") or user_doc.get("tier")
             if not tier and user_doc.get("subscription_package"):
@@ -192,11 +198,19 @@ async def get_user_tier(request: Request):
                 else:
                     tier = "bronze"
             
+            # Admins and comped users get Gold tier features
+            effective_tier = tier or "bronze"
+            if is_admin or is_comped:
+                effective_tier = "gold"
+            
             return {
-                "tier": tier or "bronze",
+                "tier": effective_tier,
+                "actual_tier": tier or "bronze",  # The user's real subscription tier
                 "subscription_status": user_doc.get("subscription_status"),
                 "subscription_end": user_doc.get("subscription_end"),
-                "is_trial": user_doc.get("subscription_status") == "trialing"
+                "is_trial": user_doc.get("subscription_status") == "trialing",
+                "is_admin": is_admin,
+                "is_comped": is_comped
             }
     
     return {
