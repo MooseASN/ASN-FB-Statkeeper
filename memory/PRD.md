@@ -14,6 +14,36 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - SUPPORT PAGE EXPANSION & CONTACT FORM UPDATE ✅
+
+**P0: Expanded Support Page Content**
+
+1. **New General Help Section** - Added comprehensive troubleshooting and FAQ content:
+   - Account & Subscription guide (creating account, subscription tiers, free trial info)
+   - Payment & Billing Issues (failed payments, updating payment method, refund policy)
+   - Technical Troubleshooting (page not loading, stats not saving, offline mode, browser compatibility)
+   - Getting Started Checklist (pre-game setup, game day essentials)
+
+2. **Expanded Sport Guides** - Detailed step-by-step tutorials for each sport:
+   - **🏀 Basketball:** Understanding the interface, recording stats, step-by-step 3-pointer recording, rebounds, quarter management, substitutions, ending games
+   - **🏈 Football Simple Mode:** Complete guide with interface overview, recording touchdowns, field goals, safeties, game clock usage
+   - **🏈 Football Advanced Mode:** Full play-by-play tracking, run plays, pass plays, penalties, special teams
+   - **⚾ Baseball:** Interface overview, step-by-step at-bats, hit types, out types, walks, base running, RBI tracking, pitching stats, changing pitchers, inning management
+
+3. **Removed Non-Existent Features:**
+   - Removed QR Codes subsection from "Live Stats Sharing" (feature not implemented)
+
+4. **Contact Form Updates (`/contact`):**
+   - Changed intro text to: "Interested in StatMoose for your school? Having issues with the site? Fill out the form below, and we'll be in touch!"
+   - Changed "School" field label to "Organization/School Name"
+   - Updated placeholder to "Your organization or school name"
+
+**Files Modified:**
+- `/app/frontend/src/pages/SupportPage.jsx` (major content expansion)
+- `/app/frontend/src/pages/ContactPage.jsx` (text and label updates)
+
+---
+
 ### January 11, 2026 - SUPPORT PAGE WITH MARTY THE STATMOOSE ✅
 
 **New Feature: Comprehensive Support Page**
