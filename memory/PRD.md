@@ -14,6 +14,42 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - FEATURE GATING AUDIT COMPLETE ✅
+
+**Premium Feature Gating Audit Results:**
+
+| Feature | Tier Required | Status | File |
+|---------|---------------|--------|------|
+| Embed Widgets | Silver | ✅ Already Gated | LiveGame, FootballLiveGame, BaseballLiveGame |
+| Sponsor Banners | Silver (5 limit) / Gold (unlimited) | ✅ Already Gated | Dashboard.jsx |
+| CSV Export | Silver | ✅ Already Gated | LiveGame.jsx |
+| Custom Team Logos | Gold | ✅ **NOW GATED** | Teams.jsx |
+| Shared Access | Gold | ✅ **NOW GATED** | AccountSettings.jsx |
+| CSV Export (Advanced) | Silver | ✅ **NOW GATED** | AdvancedLiveGame.jsx |
+
+**Gating Added This Session:**
+
+1. **Custom Team Logos (Teams.jsx)**
+   - Logo URL input now locked for non-Gold users
+   - Shows "🏆 Gold" badge and "Upgrade to Gold to add custom logos" message
+   - Clicking shows toast error with upgrade link
+
+2. **Shared Access (AccountSettings.jsx)**
+   - Entire Shared Access section locked for non-Gold users
+   - Shows lock icon, feature description, and "Upgrade to Gold" button
+   - Gold badge in section header
+
+3. **CSV Export in Advanced Mode (AdvancedLiveGame.jsx)**
+   - "Live CSV Link" button locked for non-Silver users
+   - Shows lock icon and "CSV Link 🔒" text
+
+**Files Modified:**
+- `/app/frontend/src/pages/Teams.jsx` (added useSubscriptionFeatures, gated logo input)
+- `/app/frontend/src/pages/AccountSettings.jsx` (added useSubscriptionFeatures, gated shared access section)
+- `/app/frontend/src/pages/AdvancedLiveGame.jsx` (added useSubscriptionFeatures, gated CSV export)
+
+---
+
 ### January 12, 2026 - HIGH/MEDIUM PRIORITY ITEMS COMPLETED ✅
 
 **1. Error Monitoring/Logging System**
