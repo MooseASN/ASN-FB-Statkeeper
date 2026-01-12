@@ -119,6 +119,7 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
   const [showBulkAddDialog, setShowBulkAddDialog] = useState(false);
   const [showSingleAddDialog, setShowSingleAddDialog] = useState(false);
   const [showLinkImportDialog, setShowLinkImportDialog] = useState(false);
+  const [showEmbedDialog, setShowEmbedDialog] = useState(false);
   const [importTeam, setImportTeam] = useState("home");
   const [importUrl, setImportUrl] = useState("");
   const [importLoading, setImportLoading] = useState(false);
