@@ -357,6 +357,16 @@ export default function SupportPage() {
               <Step number="3" title="Start a Game" description="Click 'New Game', select opponent, and you're ready!" />
             </SubSection>
             
+            <SubSection title="Understanding the Interface">
+              <p className="mb-3">The basketball stat-keeping screen has several key areas:</p>
+              <ul className="list-disc list-inside space-y-2 text-zinc-400">
+                <li><strong className="text-white">Scoreboard (Top)</strong> - Shows team names, scores, and current quarter</li>
+                <li><strong className="text-white">Player Grid (Center)</strong> - Each row is a player, each column is a stat</li>
+                <li><strong className="text-white">Quick Actions (Bottom)</strong> - Undo, Redo, Share, and End Game buttons</li>
+                <li><strong className="text-white">Play Log (Side)</strong> - Running list of all recorded plays</li>
+              </ul>
+            </SubSection>
+
             <SubSection title="Recording Stats During a Game">
               <p>Tap a player's row to record stats. Each column represents a different stat:</p>
               <ul className="list-disc list-inside mt-2 space-y-1 text-zinc-400">
@@ -373,8 +383,40 @@ export default function SupportPage() {
               </ul>
             </SubSection>
 
+            <SubSection title="Step-by-Step: Recording a Made 3-Pointer">
+              <Step number="1" title="Find the player" description="Locate their row in the player grid" />
+              <Step number="2" title="Tap the 3PT column" description="A popup appears with Make/Miss options" />
+              <Step number="3" title="Select 'Make'" description="The stat is recorded and score updates automatically" />
+              <Step number="4" title="Verify in play log" description="Check the sidebar to confirm the play was recorded" />
+            </SubSection>
+
+            <SubSection title="Recording Rebounds">
+              <p className="mb-3">When recording a rebound:</p>
+              <Step number="1" title="Tap the REB column for the player" />
+              <Step number="2" title="Select rebound type" description="Choose Offensive (O-REB) or Defensive (D-REB)" />
+              <Step number="3" title="Confirm" description="Total rebounds auto-calculate" />
+            </SubSection>
+
             <SubSection title="Quarter Management">
               <p>Use the quarter selector at the top to track which period you're in. Stats are saved per-quarter for detailed box scores.</p>
+              <ul className="list-disc list-inside mt-2 space-y-1 text-zinc-400">
+                <li><strong className="text-white">Advance Quarter</strong> - Tap the quarter indicator or use the Next Period button</li>
+                <li><strong className="text-white">Go Back</strong> - You can return to previous quarters if needed</li>
+                <li><strong className="text-white">Overtime</strong> - Additional periods are added automatically</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Substitutions">
+              <p>Track which players are on the court:</p>
+              <Step number="1" title="Tap a player's name" description="This toggles their active/bench status" />
+              <Step number="2" title="Active players are highlighted" description="Makes it easy to see who's in the game" />
+              <Step number="3" title="Stats are tracked for all players" description="Even benched players' previous stats are preserved" />
+            </SubSection>
+
+            <SubSection title="Ending the Game">
+              <Step number="1" title="Tap 'End Game' when finished" />
+              <Step number="2" title="Review the final stats" description="Make any last-minute corrections" />
+              <Step number="3" title="Generate PDF box score" description="Download or share the official game summary" />
             </SubSection>
           </CollapsibleSection>
 
