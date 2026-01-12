@@ -1235,6 +1235,27 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
                   <ChevronRight className="w-6 h-6" />
                   <span>Live Stats Link</span>
                 </Button>
+                {(demoMode || canAccess('embed_widgets')) ? (
+                <Button 
+                  className="h-20 flex-col gap-2" 
+                  variant="outline"
+                  onClick={() => setShowEmbedDialog(true)}
+                  data-testid="embed-btn"
+                >
+                  <Code className="w-6 h-6" />
+                  <span>Embed Stats</span>
+                </Button>
+                ) : (
+                <Button 
+                  className="h-20 flex-col gap-2 opacity-60" 
+                  variant="outline"
+                  onClick={() => toast.error(`Embed widgets require ${getRequiredTierFor('embed_widgets')} tier. Upgrade at /pricing`)}
+                  data-testid="embed-btn-locked"
+                >
+                  <Lock className="w-6 h-6" />
+                  <span>Embed 🔒</span>
+                </Button>
+                )}
                 <Button 
                   className="h-20 flex-col gap-2" 
                   variant="outline"
