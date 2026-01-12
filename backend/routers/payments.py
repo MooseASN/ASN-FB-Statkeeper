@@ -532,3 +532,376 @@ async def get_payment_history(request: Request):
     ).sort("created_at", -1).to_list(100)
     
     return {"transactions": transactions}
+
+@router.get("/subscription-details")
+async def get_subscription_details(request: Request):
+    """Get detailed subscription info including Stripe subscription ID"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    
+    # Get user's subscription data from database
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "subscription_tier": 1, "subscription_status": 1, 
+         "subscription_end": 1, "subscription_start": 1, "subscription_package": 1,
+         "stripe_customer_id": 1, "stripe_subscription_id": 1, "email": 1, "tier": 1}
+    )
+    
+    if not user_doc:
+        return {
+            "tier": "bronze",
+            "status": "none",
+            "is_active": False,
+            "can_cancel": False
+        }
+    
+    tier = user_doc.get("subscription_tier") or user_doc.get("tier") or "bronze"
+    status = user_doc.get("subscription_status", "none")
+    stripe_subscription_id = user_doc.get("stripe_subscription_id")
+    
+    # Try to get subscription details from Stripe if we have a subscription ID
+    stripe_subscription = None
+    if stripe_api_key and stripe_subscription_id:
+        try:
+            stripe.api_key = stripe_api_key
+            stripe_subscription = stripe.Subscription.retrieve(stripe_subscription_id)
+        except Exception as e:
+            logger.warning(f"Could not retrieve Stripe subscription: {e}")
+    
+    # Build response
+    response = {
+        "tier": tier,
+        "status": status,
+        "package": user_doc.get("subscription_package"),
+        "start_date": user_doc.get("subscription_start"),
+        "end_date": user_doc.get("subscription_end"),
+        "is_active": status in ["active", "trialing"],
+        "is_trial": status == "trialing",
+        "can_cancel": stripe_subscription_id is not None and status in ["active", "trialing"],
+        "stripe_subscription_id": stripe_subscription_id
+    }
+    
+    # Add Stripe-specific details if available
+    if stripe_subscription:
+        response["current_period_end"] = datetime.fromtimestamp(
+            stripe_subscription.current_period_end, tz=timezone.utc
+        ).isoformat()
+        response["cancel_at_period_end"] = stripe_subscription.cancel_at_period_end
+        if stripe_subscription.trial_end:
+            response["trial_end"] = datetime.fromtimestamp(
+                stripe_subscription.trial_end, tz=timezone.utc
+            ).isoformat()
+    
+    return response
+
+@router.post("/cancel-subscription")
+async def cancel_subscription(request: Request):
+    """Cancel user's subscription at end of billing period"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    # Get user's Stripe subscription ID
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_subscription_id": 1}
+    )
+    
+    if not user_doc or not user_doc.get("stripe_subscription_id"):
+        raise HTTPException(status_code=400, detail="No active subscription found")
+    
+    try:
+        stripe.api_key = stripe_api_key
+        # Cancel at end of period (not immediately)
+        subscription = stripe.Subscription.modify(
+            user_doc["stripe_subscription_id"],
+            cancel_at_period_end=True
+        )
+        
+        # Update user record
+        await db.users.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {
+                "subscription_status": "canceling",
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        logger.info(f"Subscription cancellation scheduled for user: {user['user_id']}")
+        
+        return {
+            "success": True,
+            "message": "Your subscription will be canceled at the end of the current billing period",
+            "cancel_at": datetime.fromtimestamp(
+                subscription.current_period_end, tz=timezone.utc
+            ).isoformat()
+        }
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error canceling subscription: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to cancel subscription: {str(e)}")
+
+@router.post("/reactivate-subscription")
+async def reactivate_subscription(request: Request):
+    """Reactivate a subscription that was set to cancel"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_subscription_id": 1}
+    )
+    
+    if not user_doc or not user_doc.get("stripe_subscription_id"):
+        raise HTTPException(status_code=400, detail="No subscription found")
+    
+    try:
+        stripe.api_key = stripe_api_key
+        subscription = stripe.Subscription.modify(
+            user_doc["stripe_subscription_id"],
+            cancel_at_period_end=False
+        )
+        
+        # Update user record
+        await db.users.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {
+                "subscription_status": "active",
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        logger.info(f"Subscription reactivated for user: {user['user_id']}")
+        
+        return {
+            "success": True,
+            "message": "Your subscription has been reactivated"
+        }
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error reactivating subscription: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to reactivate subscription: {str(e)}")
+
+@router.get("/payment-methods")
+async def get_payment_methods(request: Request):
+    """Get user's saved payment methods from Stripe"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_customer_id": 1}
+    )
+    
+    if not user_doc or not user_doc.get("stripe_customer_id"):
+        return {"payment_methods": [], "default_payment_method": None}
+    
+    try:
+        stripe.api_key = stripe_api_key
+        
+        # Get customer's payment methods
+        payment_methods = stripe.PaymentMethod.list(
+            customer=user_doc["stripe_customer_id"],
+            type="card"
+        )
+        
+        # Get customer to find default payment method
+        customer = stripe.Customer.retrieve(user_doc["stripe_customer_id"])
+        default_pm = customer.invoice_settings.default_payment_method if customer.invoice_settings else None
+        
+        methods = []
+        for pm in payment_methods.data:
+            methods.append({
+                "id": pm.id,
+                "brand": pm.card.brand,
+                "last4": pm.card.last4,
+                "exp_month": pm.card.exp_month,
+                "exp_year": pm.card.exp_year,
+                "is_default": pm.id == default_pm
+            })
+        
+        return {
+            "payment_methods": methods,
+            "default_payment_method": default_pm
+        }
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error getting payment methods: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to get payment methods: {str(e)}")
+
+@router.post("/create-setup-intent")
+async def create_setup_intent(request: Request):
+    """Create a Stripe SetupIntent for adding a new payment method"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    try:
+        stripe.api_key = stripe_api_key
+        
+        # Get or create Stripe customer
+        user_doc = await db.users.find_one(
+            {"user_id": user["user_id"]},
+            {"_id": 0, "stripe_customer_id": 1, "email": 1}
+        )
+        
+        customer_id = user_doc.get("stripe_customer_id") if user_doc else None
+        
+        if not customer_id:
+            # Create a new Stripe customer
+            customer = stripe.Customer.create(
+                email=user.get("email"),
+                metadata={"user_id": user["user_id"]}
+            )
+            customer_id = customer.id
+            
+            # Save customer ID to user record
+            await db.users.update_one(
+                {"user_id": user["user_id"]},
+                {"$set": {
+                    "stripe_customer_id": customer_id,
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+        
+        # Create SetupIntent
+        setup_intent = stripe.SetupIntent.create(
+            customer=customer_id,
+            payment_method_types=["card"]
+        )
+        
+        return {
+            "client_secret": setup_intent.client_secret
+        }
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error creating setup intent: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create setup intent: {str(e)}")
+
+@router.post("/set-default-payment-method")
+async def set_default_payment_method(request: Request):
+    """Set a payment method as the default"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    body = await request.json()
+    payment_method_id = body.get("payment_method_id")
+    
+    if not payment_method_id:
+        raise HTTPException(status_code=400, detail="Payment method ID required")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_customer_id": 1}
+    )
+    
+    if not user_doc or not user_doc.get("stripe_customer_id"):
+        raise HTTPException(status_code=400, detail="No Stripe customer found")
+    
+    try:
+        stripe.api_key = stripe_api_key
+        
+        # Update customer's default payment method
+        stripe.Customer.modify(
+            user_doc["stripe_customer_id"],
+            invoice_settings={"default_payment_method": payment_method_id}
+        )
+        
+        return {"success": True, "message": "Default payment method updated"}
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error setting default payment method: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to update payment method: {str(e)}")
+
+@router.delete("/payment-method/{payment_method_id}")
+async def delete_payment_method(payment_method_id: str, request: Request):
+    """Delete a payment method"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    try:
+        stripe.api_key = stripe_api_key
+        stripe.PaymentMethod.detach(payment_method_id)
+        
+        return {"success": True, "message": "Payment method removed"}
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error deleting payment method: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to remove payment method: {str(e)}")
+
+@router.post("/create-billing-portal")
+async def create_billing_portal(request: Request):
+    """Create a Stripe Billing Portal session for self-service management"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_customer_id": 1}
+    )
+    
+    if not user_doc or not user_doc.get("stripe_customer_id"):
+        raise HTTPException(status_code=400, detail="No Stripe customer found. Please subscribe first.")
+    
+    try:
+        stripe.api_key = stripe_api_key
+        
+        body = await request.json()
+        return_url = body.get("return_url", "")
+        
+        # Create billing portal session
+        session = stripe.billing_portal.Session.create(
+            customer=user_doc["stripe_customer_id"],
+            return_url=return_url
+        )
+        
+        return {"url": session.url}
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error creating billing portal: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to create billing portal: {str(e)}")
+
