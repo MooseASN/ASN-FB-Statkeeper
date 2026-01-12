@@ -14,6 +14,45 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - FOOTBALL KICKOFF WORKFLOW & YARDS INPUT FIX ✅
+
+**New Feature: Kickoff Workflow in Simple Football Mode**
+- Added cyan "Kickoff" button to the action buttons grid
+- Complete 4-step kickoff workflow:
+  1. **Yard Line Selection:** 35 (default), 40, 30 (after penalty), 20 (safety kick)
+  2. **Kicker Selection:** Select from offensive roster
+  3. **Result Selection:** Touchback, Return, Fair Catch, Out of Bounds, Kick Return TD
+  4. **Custom Yard Line:** For Return and Fair Catch results
+
+**Kickoff Rules Implemented (per NFL/College standards):**
+- **Touchback:** Ball at 25 yard line
+- **Out of Bounds:** Penalty - Ball at 40 yard line
+- **Fair Catch:** Ball at the yard line where caught
+- **Return:** Ball at the yard line where tackled
+- **Kick Return TD:** 6 points to receiving team
+
+**Bug Fix: Yards Input Buttons**
+- Changed from "quick set" to "add/subtract" functionality
+- Simplified to +1, +5, +10 (green) and -1, -5, -10 (red) buttons
+- Added "Reset to 0" button for quick clearing
+- Buttons now correctly add/subtract from current value
+- Supports negative yards for plays behind the line of scrimmage
+
+**Technical Updates:**
+- Added `startKickoffWorkflow()` and kickoff handlers to SimpleFootballLiveGame.jsx
+- Added Kickoff workflow dialog with 4 steps
+- Updated `YardsInput` component with `addYards()` function
+- Added data-testid attributes for testing
+
+**Files Modified:**
+- `/app/frontend/src/pages/SimpleFootballLiveGame.jsx` (kickoff workflow, yards fix)
+
+**Testing:**
+- All 11 kickoff tests passed (100% success rate)
+- Test report: `/app/test_reports/iteration_46.json`
+
+---
+
 ### January 12, 2026 - FOOTBALL DEMO SELECTOR & SACK BUTTON ✅
 
 **New Feature: Football Demo Mode Selector**
