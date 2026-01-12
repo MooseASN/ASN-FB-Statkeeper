@@ -204,6 +204,13 @@ export default function TeamDetail({ user, onLogout }) {
 
   // Handle logo file upload
   const handleLogoUpload = async (e) => {
+    // Check if user has access to custom logos
+    if (!canAccess('custom_team_logos')) {
+      toast.error(`Custom team logos require ${getRequiredTierFor('custom_team_logos')} tier. Upgrade at /pricing`);
+      e.target.value = '';
+      return;
+    }
+    
     const file = e.target.files?.[0];
     if (!file) return;
     
