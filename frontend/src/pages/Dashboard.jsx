@@ -583,25 +583,55 @@ export default function Dashboard({ user, onLogout }) {
           </div>
         )}
 
-        {/* Sponsor Banners */}
+        {/* Sponsor Banners - Silver+ feature */}
         <div>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Image className="w-5 h-5 text-purple-500" />
               Sponsor Banners
+              {!canAccess('sponsor_banners') && (
+                <span className="text-xs bg-amber-500/20 text-amber-500 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Lock className="w-3 h-3" /> Silver+
+                </span>
+              )}
             </h2>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSponsorDialogOpen(true)}
-              data-testid="manage-sponsors-btn"
-            >
-              Manage Banners
-            </Button>
+            {canAccess('sponsor_banners') ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSponsorDialogOpen(true)}
+                data-testid="manage-sponsors-btn"
+              >
+                Manage Banners ({sponsorBanners.length}/{getLimit('sponsor_banners') === -1 ? '∞' : getLimit('sponsor_banners')})
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/pricing')}
+                className="text-amber-500 border-amber-500/50"
+                data-testid="upgrade-sponsors-btn"
+              >
+                <Lock className="w-3 h-3 mr-1" /> Upgrade to Silver
+              </Button>
+            )}
           </div>
           <Card className="dark:bg-neutral-900">
             <CardContent className="py-4">
-              {sponsorBanners.length === 0 ? (
+              {!canAccess('sponsor_banners') ? (
+                <div className="text-center text-muted-foreground py-4">
+                  <Lock className="w-10 h-10 mx-auto mb-2 text-amber-500/50" />
+                  <p className="text-amber-500">Sponsor banners require Silver or Gold tier</p>
+                  <p className="text-sm mt-1">Display sponsor logos on your live stats page</p>
+                  <Button 
+                    variant="link" 
+                    className="text-amber-500 mt-2"
+                    onClick={() => navigate('/pricing')}
+                  >
+                    View pricing →
+                  </Button>
+                </div>
+              ) : sponsorBanners.length === 0 ? (
                 <div className="text-center text-muted-foreground py-4">
                   <Image className="w-10 h-10 mx-auto mb-2 opacity-50" />
                   <p>No sponsor banners uploaded yet</p>
