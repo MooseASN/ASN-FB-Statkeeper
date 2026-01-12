@@ -1031,7 +1031,7 @@ export default function NewGame({ user, onLogout }) {
                     <Label className="text-base font-semibold text-orange-900">Add to School Season (Optional)</Label>
                   </div>
                   <p className="text-sm text-orange-700">
-                    Link this game to one of your school's seasons to track it in the school dashboard.
+                    Link this game to one of your school&apos;s seasons to track it in the school dashboard.
                   </p>
                   <Select
                     value={selectedSeasonId || "none"}
@@ -1041,7 +1041,7 @@ export default function NewGame({ user, onLogout }) {
                       <SelectValue placeholder="Select a season (optional)" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="none">None - Don't link to a season</SelectItem>
+                      <SelectItem value="none">None - Don&apos;t link to a season</SelectItem>
                       {seasons.map(season => (
                         <SelectItem key={season.season_id} value={season.season_id}>
                           {season.name}
