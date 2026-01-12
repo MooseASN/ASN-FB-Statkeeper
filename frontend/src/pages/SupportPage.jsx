@@ -446,19 +446,106 @@ export default function SupportPage() {
               </div>
             </SubSection>
 
-            <SubSection title="Simple Mode Guide">
-              <Step number="1" title="Select the scoring team" description="Tap Home or Away at the top" />
-              <Step number="2" title="Choose the score type" description="Touchdown (6), Field Goal (3), Safety (2), etc." />
-              <Step number="3" title="Add player details (optional)" description="Enter who scored for detailed stats" />
-              <Step number="4" title="Manage the clock" description="Press SPACE or \ to start/stop the game clock" />
+            <SubSection title="Simple Mode - Complete Guide">
+              <p className="mb-3 text-orange-400 font-medium">Best for: Youth leagues, casual games, or when you just need score tracking</p>
+              
+              <h5 className="text-white font-semibold mt-4 mb-2">Interface Overview</h5>
+              <ul className="list-disc list-inside space-y-1 text-zinc-400 mb-4">
+                <li><strong className="text-white">Scoreboard</strong> - Home and Away scores with team colors</li>
+                <li><strong className="text-white">Game Clock</strong> - Optional, can be toggled on/off</li>
+                <li><strong className="text-white">Quarter Indicator</strong> - Current period of play</li>
+                <li><strong className="text-white">Scoring Buttons</strong> - Quick-tap scoring options</li>
+                <li><strong className="text-white">Play Log</strong> - Record of all scoring plays</li>
+              </ul>
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Recording a Touchdown</h5>
+              <Step number="1" title="Select the scoring team" description="Tap 'Home' or 'Away' at the top" />
+              <Step number="2" title="Tap 'Touchdown'" description="6 points are added automatically" />
+              <Step number="3" title="Enter player number (optional)" description="Type the jersey number of who scored" />
+              <Step number="4" title="Record the extra point" description="Choose PAT (1pt) or 2-point conversion" />
+              <Step number="5" title="Verify in play log" description="The scoring play appears in the log" />
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Other Scoring Options</h5>
+              <ul className="list-disc list-inside space-y-1 text-zinc-400">
+                <li><strong className="text-white">Field Goal (3 pts)</strong> - Tap FG, optionally enter kicker number</li>
+                <li><strong className="text-white">Safety (2 pts)</strong> - Awarded to the defensive team</li>
+                <li><strong className="text-white">PAT (1 pt)</strong> - Extra point after touchdown</li>
+                <li><strong className="text-white">2-Point Conversion (2 pts)</strong> - Alternative to PAT</li>
+              </ul>
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Using the Game Clock</h5>
+              <Step number="1" title="Toggle clock on/off" description="Click the clock icon in the header" />
+              <Step number="2" title="Start/Stop" description="Press SPACE or \\ (backslash) key" />
+              <Step number="3" title="Adjust time manually" description="Click on the time display to edit" />
+              <Step number="4" title="Change quarters" description="Use the quarter buttons to advance" />
             </SubSection>
 
-            <SubSection title="Advanced Mode Guide">
-              <Step number="1" title="Set initial possession" description="Choose which team starts with the ball" />
-              <Step number="2" title="Track each play" description="Select play type: Run, Pass, Punt, Kick, etc." />
-              <Step number="3" title="Enter yardage" description="Use the field view to mark ball position" />
-              <Step number="4" title="Record player involvement" description="Who carried, threw, caught, or tackled" />
-              <Step number="5" title="Handle penalties" description="Use the penalty workflow for detailed tracking" />
+            <SubSection title="Advanced Mode - Complete Guide">
+              <p className="mb-3 text-orange-400 font-medium">Best for: High school, college, or any game needing detailed play-by-play stats</p>
+              
+              <h5 className="text-white font-semibold mt-4 mb-2">Interface Overview</h5>
+              <ul className="list-disc list-inside space-y-1 text-zinc-400 mb-4">
+                <li><strong className="text-white">Field Visualization</strong> - Shows ball position and yard line</li>
+                <li><strong className="text-white">Down & Distance</strong> - Current down and yards to go</li>
+                <li><strong className="text-white">Possession Indicator</strong> - Which team has the ball</li>
+                <li><strong className="text-white">Play Type Selector</strong> - Run, Pass, Punt, Kick, etc.</li>
+                <li><strong className="text-white">Player Stats Panel</strong> - Individual player statistics</li>
+              </ul>
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Starting a New Drive</h5>
+              <Step number="1" title="Set possession" description="Select which team has the ball" />
+              <Step number="2" title="Set starting position" description="Tap the field or enter yard line" />
+              <Step number="3" title="Down resets to 1st & 10" description="Automatic when possession changes" />
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Recording a Run Play</h5>
+              <Step number="1" title="Select 'Run'" description="From the play type menu" />
+              <Step number="2" title="Choose the ball carrier" description="Select from your roster" />
+              <Step number="3" title="Enter yards gained/lost" description="Positive for gain, negative for loss" />
+              <Step number="4" title="Mark result" description="First down, tackle, fumble, or touchdown" />
+              <Step number="5" title="Down & distance updates" description="Automatically calculated" />
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Recording a Pass Play</h5>
+              <Step number="1" title="Select 'Pass'" description="From the play type menu" />
+              <Step number="2" title="Choose the quarterback" description="Who threw the ball" />
+              <Step number="3" title="Select result" description="Complete, Incomplete, or Interception" />
+              <Step number="4" title="If complete: Choose receiver" description="Who caught the pass" />
+              <Step number="5" title="Enter yards gained" description="From line of scrimmage" />
+              <Step number="6" title="Mark additional outcome" description="Tackle, TD, fumble, etc." />
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Recording Penalties</h5>
+              <Step number="1" title="Tap 'Penalty'" description="Opens the penalty workflow" />
+              <Step number="2" title="Select team" description="Offense or Defense" />
+              <Step number="3" title="Choose penalty type" description="Holding, False Start, PI, etc." />
+              <Step number="4" title="Enter yards" description="5, 10, 15, or spot foul" />
+              <Step number="5" title="Accept/Decline" description="Apply or decline the penalty" />
+
+              <h5 className="text-white font-semibold mt-4 mb-2">Special Teams</h5>
+              <ul className="list-disc list-inside space-y-1 text-zinc-400">
+                <li><strong className="text-white">Punt</strong> - Select punter, enter distance, mark return yards</li>
+                <li><strong className="text-white">Kickoff</strong> - Track kicker, distance, and return</li>
+                <li><strong className="text-white">Field Goal Attempt</strong> - Select kicker, mark good/no good</li>
+              </ul>
+            </SubSection>
+
+            <SubSection title="Keyboard Shortcuts (Both Modes)">
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                <div className="bg-zinc-900 p-2 rounded text-center">
+                  <span className="text-orange-400 font-mono">SPACE</span>
+                  <p className="text-xs text-zinc-400">Start/Stop Clock</p>
+                </div>
+                <div className="bg-zinc-900 p-2 rounded text-center">
+                  <span className="text-orange-400 font-mono">\\</span>
+                  <p className="text-xs text-zinc-400">Start/Stop Clock</p>
+                </div>
+                <div className="bg-zinc-900 p-2 rounded text-center">
+                  <span className="text-orange-400 font-mono">Ctrl+Z</span>
+                  <p className="text-xs text-zinc-400">Undo Last Action</p>
+                </div>
+                <div className="bg-zinc-900 p-2 rounded text-center">
+                  <span className="text-orange-400 font-mono">Ctrl+Y</span>
+                  <p className="text-xs text-zinc-400">Redo Action</p>
+                </div>
+              </div>
             </SubSection>
           </CollapsibleSection>
 
