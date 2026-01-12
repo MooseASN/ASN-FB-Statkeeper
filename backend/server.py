@@ -3144,7 +3144,7 @@ async def reset_game_stats(game_id: str, user: User = Depends(get_current_user))
     return {"message": "All stats reset successfully"}
 
 # Baseball Box Score PDF Generation
-@api_router.get("/games/{game_id}/boxscore/pdf")
+@api_router.get("/games/{game_id}/baseball-boxscore/pdf")
 async def generate_baseball_boxscore_pdf(game_id: str, user: User = Depends(get_current_user)):
     """Generate a PDF box score for a baseball game"""
     game = await db.games.find_one({"id": game_id}, {"_id": 0})
