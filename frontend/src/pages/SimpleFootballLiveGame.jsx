@@ -249,8 +249,14 @@ const YardsInput = ({ onSubmit, onCancel, title, showNoTackle = false, onNoTackl
     onSubmit(yardValue);
   };
   
-  const quickYards = [5, 10, 15, 20, 25, 30, 40, 50];
-  const lossYards = [-1, -2, -3, -5, -10];
+  // Add/subtract buttons - these modify the current value
+  const addYards = (amount) => {
+    const current = parseInt(yards) || 0;
+    setYards((current + amount).toString());
+  };
+  
+  const plusButtons = [1, 5, 10];
+  const minusButtons = [1, 5, 10];
   
   return (
     <div className="space-y-4">
@@ -261,36 +267,47 @@ const YardsInput = ({ onSubmit, onCancel, title, showNoTackle = false, onNoTackl
           type="number"
           value={yards}
           onChange={(e) => setYards(e.target.value)}
-          placeholder="Enter yards"
+          placeholder="Enter yards (negative for loss)"
           className="bg-zinc-800 border-zinc-700 text-white text-3xl text-center h-16"
         />
       </form>
       
-      <div className="grid grid-cols-4 gap-2">
-        {quickYards.map(y => (
+      {/* Add yards buttons */}
+      <div className="grid grid-cols-3 gap-2">
+        {plusButtons.map(y => (
           <Button
-            key={y}
+            key={`plus-${y}`}
             variant="outline"
-            onClick={() => setYards(y.toString())}
-            className="border-zinc-700 text-green-400"
+            onClick={() => addYards(y)}
+            className="border-zinc-700 text-green-400 hover:bg-green-900/30 text-lg font-bold h-12"
           >
             +{y}
           </Button>
         ))}
       </div>
       
-      <div className="grid grid-cols-5 gap-2">
-        {lossYards.map(y => (
+      {/* Subtract yards buttons */}
+      <div className="grid grid-cols-3 gap-2">
+        {minusButtons.map(y => (
           <Button
-            key={y}
+            key={`minus-${y}`}
             variant="outline"
-            onClick={() => setYards(y.toString())}
-            className="border-zinc-700 text-red-400"
+            onClick={() => addYards(-y)}
+            className="border-zinc-700 text-red-400 hover:bg-red-900/30 text-lg font-bold h-12"
           >
-            {y}
+            -{y}
           </Button>
         ))}
       </div>
+      
+      {/* Quick set to zero */}
+      <Button 
+        variant="outline" 
+        onClick={() => setYards('0')} 
+        className="w-full border-zinc-700 text-zinc-400 hover:bg-zinc-800"
+      >
+        Reset to 0
+      </Button>
       
       <div className="flex gap-2 pt-2">
         <Button variant="outline" onClick={onCancel} className="flex-1 border-zinc-700">
