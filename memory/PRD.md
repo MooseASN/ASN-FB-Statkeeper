@@ -14,6 +14,31 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - ADMIN "GRANT ALL PERKS" FEATURE ✅
+
+**New Feature: Complimentary Gold Access for Users**
+
+Admins can now grant full Gold-tier benefits to any user without giving them admin access.
+
+**Features:**
+1. **New Gift Button** in user table - amber color for non-comped users, green for comped users
+2. **Confirmation Dialog** showing:
+   - User's email and current tier
+   - List of Gold perks they'll receive (embeds, sponsors, logos, shared access, priority support)
+3. **"Comp" Badge** - Green badge displayed next to Gold tier for comped users
+4. **Revoke Capability** - Click the green gift icon on a comped user to revoke access
+
+**Backend:**
+- `PUT /api/admin/users/{user_id}/comped` - Grant/revoke comped status
+- Stores `is_comped`, `comped_at`, `comped_by` fields on user document
+- Revoke downgrades user to Bronze tier
+
+**Files Modified:**
+- `/app/backend/server.py` (new comped endpoint)
+- `/app/frontend/src/pages/AdminDashboard.jsx` (Gift button, Comp badge, dialog)
+
+---
+
 ### January 12, 2026 - MARTY THE STATMOOSE SUPPORT CHATBOT ✅
 
 **New Feature: AI-Powered Support Chatbot**
