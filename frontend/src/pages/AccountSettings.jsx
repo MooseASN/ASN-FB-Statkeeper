@@ -30,6 +30,7 @@ const TierBadge = ({ tier }) => {
 
 export default function AccountSettings({ user, onLogout, onUserUpdate }) {
   const navigate = useNavigate();
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState(null);
   
