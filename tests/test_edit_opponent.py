@@ -6,7 +6,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://sportspro-dash.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://stat-tracker-14.preview.emergentagent.com')
 
 class TestEditOpponentAPI:
     """Tests for Edit Opponent feature backend API"""
