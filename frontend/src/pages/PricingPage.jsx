@@ -103,9 +103,22 @@ export default function PricingPage() {
         origin_url: originUrl
       }, { withCredentials: true });
 
-      // Redirect to Stripe checkout
+      // Redirect to Stripe checkout or internal page
       if (res.data.url) {
-        window.location.href = res.data.url;
+        // For free tier, use navigate instead of full page redirect
+        if (res.data.session_id === 'free_tier_no_checkout') {
+          setProcessingTier(null);
+          navigate('/select-sport');
+          return;
+        }
+        
+        // For paid tiers, redirect to Stripe checkout
+        // Add a small delay to ensure the loading state is visible
+        setTimeout(() => {
+          window.location.href = res.data.url;
+        }, 100);
+      } else {
+        throw new Error('No checkout URL received');
       }
     } catch (error) {
       console.error('Failed to create checkout session:', error);
