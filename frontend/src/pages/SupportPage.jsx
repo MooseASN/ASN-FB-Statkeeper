@@ -255,14 +255,17 @@ export default function SupportPage() {
               <p className="mb-3">If your payment failed, here are common causes and solutions:</p>
               <ul className="list-disc list-inside space-y-2 text-zinc-400">
                 <li><strong className="text-white">Insufficient funds</strong> - Check your account balance</li>
-                <li><strong className="text-white">Card expired</strong> - Try again with an updated card</li>
+                <li><strong className="text-white">Card expired</strong> - Update your payment method in Account Settings</li>
                 <li><strong className="text-white">Bank blocked the charge</strong> - Contact your bank to authorize StatMoose payments</li>
                 <li><strong className="text-white">Incorrect card details</strong> - Re-enter your card information carefully</li>
               </ul>
             </SubSection>
 
-            <SubSection title="Updating Payment Information">
-              <p>To update your payment method, you'll need to cancel your current subscription and re-subscribe with your new payment details. Your access will continue until the end of your billing period.</p>
+            <SubSection title="Managing Payment Methods">
+              <p>To view or update your payment methods:</p>
+              <Step number="1" title="Go to Account Settings" description="Click your profile icon → Account Settings" />
+              <Step number="2" title="Find the Payment Methods section" description="View your saved cards" />
+              <Step number="3" title="Use the Stripe Billing Portal" description="Click 'Manage in Stripe Billing Portal' to add cards, view invoices, or update billing info" />
             </SubSection>
 
             <SubSection title="Refund Policy">
