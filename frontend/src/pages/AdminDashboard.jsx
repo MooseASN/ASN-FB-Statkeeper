@@ -208,6 +208,29 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const handleToggleComped = async (targetUser) => {
+    if (!targetUser) return;
+    
+    const newCompedStatus = !targetUser.is_comped;
+    setUpdatingComped(targetUser.user_id);
+    
+    try {
+      await axios.put(`${API}/admin/users/${targetUser.user_id}/comped`, { is_comped: newCompedStatus });
+      toast.success(
+        newCompedStatus 
+          ? `${targetUser.email} now has complimentary Gold access!` 
+          : `${targetUser.email}'s complimentary access has been revoked`
+      );
+      setShowCompedDialog(false);
+      setCompedUser(null);
+      fetchData(); // Refresh user list
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to update user perks");
+    } finally {
+      setUpdatingComped(null);
+    }
+  };
+
   const handleStartEditPricing = () => {
     setPricingDraft(JSON.parse(JSON.stringify(pricingConfig)));
     setEditingPricing(true);
