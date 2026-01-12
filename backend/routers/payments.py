@@ -332,7 +332,7 @@ async def create_checkout_session(
         session = stripe.checkout.Session.create(**session_params)
         
         # Create payment transaction record BEFORE redirect
-        if db:
+        if db is not None:
             transaction_doc = {
                 "session_id": session.id,
                 "user_id": user_id,
