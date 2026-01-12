@@ -20,7 +20,7 @@ export default function Dashboard({ user, onLogout }) {
   const sportConfig = SPORT_CONFIG[selectedSport] || SPORT_CONFIG.basketball;
   
   // Subscription features for gating
-  const { canAccess, getLimit, userTier, getRequiredTierFor } = useSubscriptionFeatures();
+  const { canAccess, getLimit, userTier, getRequiredTierFor, loading: subscriptionLoading } = useSubscriptionFeatures();
   
   const [activeGames, setActiveGames] = useState([]);
   const [scheduledGames, setScheduledGames] = useState([]);
