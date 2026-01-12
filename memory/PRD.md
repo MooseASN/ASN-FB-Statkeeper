@@ -14,6 +14,55 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - BASKETBALL BONUS RULES FEATURE ✅
+
+**New Feature: Configurable Bonus Rules for Basketball Games**
+
+Users can now configure when teams enter the bonus and double bonus during basketball game creation:
+
+**Game Creation Settings (NewGame.jsx):**
+- **Bonus (1-and-1) Checkbox:** Enable/disable bonus tracking
+- **Double Bonus Checkbox:** Enable/disable double bonus tracking
+- **Foul Thresholds:** Configurable team fouls needed for each bonus level
+- **Preset Buttons:**
+  - College (7/10) - Default
+  - NBA (5 fouls, no 1-and-1)
+  - High School (7/10)
+
+**Live Game Display (LiveGame.jsx):**
+- Bonus button shows current status (Bonus / 2x Bonus)
+- Yellow button color for Bonus
+- Red button color for Double Bonus
+- Opponent foul count indicator shows "Opp Fouls: X/Y"
+- Manual override still available via button click
+
+**Jumbotron Output (JumbotronOutput.jsx):**
+- Automatically displays "BONUS" (yellow) or "2X BONUS" (red)
+- Calculates from opponent team fouls based on game settings
+
+**Backend Changes (server.py):**
+- New fields in GameCreate and Game models:
+  - `bonus_enabled: bool`
+  - `double_bonus_enabled: bool`
+  - `bonus_fouls: int` (default 7)
+  - `double_bonus_fouls: int` (default 10)
+  - `home_team_fouls: int`
+  - `away_team_fouls: int`
+- Auto-calculation of bonus status when fouls are recorded
+- Bonus is based on opponent fouls (if home team commits 7 fouls, AWAY team enters bonus)
+
+**Files Modified:**
+- `/app/frontend/src/pages/NewGame.jsx` (bonus settings UI)
+- `/app/frontend/src/pages/LiveGame.jsx` (bonus display with foul indicator)
+- `/app/frontend/src/pages/JumbotronOutput.jsx` (bonus status display)
+- `/app/backend/server.py` (bonus fields and auto-calculation)
+
+**Testing:**
+- All 9 backend tests passed (100% success rate)
+- Test file: `/app/tests/test_basketball_bonus_rules.py`
+
+---
+
 ### January 12, 2026 - MOBILE RESPONSIVENESS & EMPTY STATES AUDIT ✅
 
 **Mobile Responsiveness Improvements:**
