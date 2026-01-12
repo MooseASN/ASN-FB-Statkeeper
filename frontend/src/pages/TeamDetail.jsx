@@ -94,6 +94,9 @@ export default function TeamDetail({ user, onLogout }) {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
   
+  // Subscription features for logo upload gating
+  const { canAccess, getRequiredTierFor } = useSubscriptionFeatures();
+  
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
