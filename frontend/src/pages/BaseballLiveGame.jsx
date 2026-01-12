@@ -809,11 +809,12 @@ const GameControlModal = ({
 };
 
 // Game Control Modal - For changing inning and score
-const InningScoreControlModal = ({ isOpen, onClose, game, onUpdate }) => {
+const InningScoreControlModal = ({ isOpen, onClose, game, onUpdate, onEndGame }) => {
   const [inning, setInning] = useState(game?.current_inning || 1);
   const [inningHalf, setInningHalf] = useState(game?.inning_half || 'top');
   const [homeScore, setHomeScore] = useState(game?.home_score || 0);
   const [awayScore, setAwayScore] = useState(game?.away_score || 0);
+  const [showEndGameConfirm, setShowEndGameConfirm] = useState(false);
   
   // Update local state when game changes
   useEffect(() => {
