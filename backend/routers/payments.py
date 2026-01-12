@@ -217,7 +217,9 @@ async def get_user_tier(request: Request):
         "tier": "bronze",
         "subscription_status": None,
         "subscription_end": None,
-        "is_trial": False
+        "is_trial": False,
+        "is_admin": False,
+        "is_comped": False
     }
 
 @router.get("/packages")
