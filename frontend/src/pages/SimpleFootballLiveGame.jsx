@@ -1167,6 +1167,17 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
           >
             <Share2 className="w-4 h-4 mr-1" />Share
           </Button>
+          {/* PDF Download */}
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={handleDownloadPdf}
+            disabled={generatingPdf}
+            className="text-zinc-400 hover:text-white"
+            data-testid="simple-football-pdf-btn"
+          >
+            <FileDown className="w-4 h-4 mr-1" />{generatingPdf ? 'Generating...' : 'PDF'}
+          </Button>
           {/* Embed - Silver+ feature */}
           {(demoMode || canAccess('embed_widgets')) ? (
             <Button 
