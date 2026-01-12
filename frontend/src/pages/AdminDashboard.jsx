@@ -1493,6 +1493,91 @@ export default function AdminDashboard({ user, onLogout }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Comped (All Perks) Dialog */}
+      <Dialog open={showCompedDialog} onOpenChange={setShowCompedDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Gift className={compedUser?.is_comped ? "w-5 h-5 text-red-500" : "w-5 h-5 text-emerald-500"} />
+              {compedUser?.is_comped ? "Revoke All Perks" : "Grant All Perks"}
+            </DialogTitle>
+            <DialogDescription>
+              {compedUser?.is_comped 
+                ? "This will remove complimentary Gold access from this user."
+                : "This will give the user complimentary Gold-tier access (all premium features) without requiring payment."}
+            </DialogDescription>
+          </DialogHeader>
+          
+          {compedUser && (
+            <div className="py-4">
+              <div className={`p-4 rounded-lg ${compedUser.is_comped ? "bg-red-50" : "bg-emerald-50"}`}>
+                <p className={`font-medium ${compedUser.is_comped ? "text-red-800" : "text-emerald-800"}`}>
+                  {compedUser.email}
+                </p>
+                <p className={`text-sm ${compedUser.is_comped ? "text-red-600" : "text-emerald-600"}`}>
+                  Current tier: <span className="font-medium capitalize">{compedUser.subscription_tier || "bronze"}</span>
+                  {compedUser.is_comped && " (Comped)"}
+                </p>
+              </div>
+              
+              <div className="mt-4 space-y-2">
+                <p className="text-sm font-medium">
+                  {compedUser.is_comped ? "After revoking:" : "User will receive:"}
+                </p>
+                {compedUser.is_comped ? (
+                  <ul className="text-sm text-muted-foreground list-disc list-inside">
+                    <li>Downgraded to Bronze (free) tier</li>
+                    <li>Premium features will be locked</li>
+                    <li>Teams and data remain intact</li>
+                  </ul>
+                ) : (
+                  <ul className="text-sm text-muted-foreground list-disc list-inside">
+                    <li>Full Gold tier access</li>
+                    <li>Embeddable stats widgets</li>
+                    <li>Unlimited sponsor banners</li>
+                    <li>Custom team logos</li>
+                    <li>Shared access for staff</li>
+                    <li>Priority support</li>
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowCompedDialog(false);
+                setCompedUser(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => handleToggleComped(compedUser)}
+              disabled={updatingComped === compedUser?.user_id}
+              className={compedUser?.is_comped 
+                ? "bg-red-600 hover:bg-red-700" 
+                : "bg-emerald-600 hover:bg-emerald-700"}
+              data-testid="confirm-comped-change-btn"
+            >
+              {compedUser?.is_comped ? (
+                <>
+                  <X className="w-4 h-4 mr-2" />
+                  Revoke All Perks
+                </>
+              ) : (
+                <>
+                  <Gift className="w-4 h-4 mr-2" />
+                  Grant All Perks
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
