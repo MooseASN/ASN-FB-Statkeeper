@@ -1394,6 +1394,11 @@ Baseball diamond now displays all positions: LF, CF, RF, SS, 2B, 3B, P, 1B, C
 
 ## What's Been Implemented
 
+### January 2026 Updates
+- **Demo Sport Selection Page:** Created `/demo` route with 3-sport selection UI (Basketball, Football, Baseball) matching the home page design. Routes correctly to each sport's demo page.
+
+### Previous Updates
+
 ### January 2025
 - ✅ Beta Mode feature (backend APIs + frontend UI)
 - ✅ End Game functionality for both sports
