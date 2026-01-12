@@ -1340,12 +1340,17 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
             <button onClick={startPassWorkflow} className="bg-blue-700 hover:bg-blue-600 border border-blue-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="pass-btn">
               <Zap className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Pass Yds</span>
             </button>
+            <button onClick={startSackWorkflow} className="bg-purple-700 hover:bg-purple-600 border border-purple-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="sack-btn">
+              <Shield className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Sack</span>
+            </button>
             <button onClick={handleFirstDown} className="bg-amber-700 hover:bg-amber-600 border border-amber-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="first-down-btn">
               <Flag className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">1st Down</span>
             </button>
             <button onClick={startTurnoverWorkflow} className="bg-red-700 hover:bg-red-600 border border-red-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="turnover-btn">
               <AlertTriangle className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Turnover</span>
             </button>
+            
+            {/* Penalties and Timeouts Row */}
             <button onClick={startFlagWorkflow} className="bg-orange-700 hover:bg-orange-600 border border-orange-500 rounded-xl p-2 flex flex-col items-center justify-center" data-testid="penalty-btn">
               <Flag className="w-6 h-6 text-white mb-1" /><span className="text-sm font-semibold">Penalty</span>
             </button>
