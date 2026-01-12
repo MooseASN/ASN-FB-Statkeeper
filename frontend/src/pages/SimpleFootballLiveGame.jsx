@@ -49,6 +49,87 @@ import {
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
+// Simple Kickoff Field View for Simple Mode
+const SimpleKickoffFieldView = ({ kickoffYardLine, result, returnYardLine }) => {
+  // Field representation: left side = kicking team, right side = receiving team
+  // Kicker kicks from their 35 towards the receiving team's end zone
+  const kickPos = kickoffYardLine; // e.g., 35 = 35% from left
+  
+  // Ball position based on result
+  let ballPos = 25; // default touchback
+  if (result === 'touchback') {
+    ballPos = 25;
+  } else if (result === 'out_of_bounds') {
+    ballPos = 40;
+  } else if (result === 'return' || result === 'fair_catch') {
+    ballPos = returnYardLine || 25;
+  } else if (result === 'return_td') {
+    ballPos = 0; // Touchdown
+  }
+  
+  // Convert to visual position (receiving team's yard line from their end zone)
+  // Ball at 25 = 25% from receiving team's end zone = 75% from left on field view
+  const ballVisualPos = 100 - ballPos;
+  
+  return (
+    <div className="bg-green-800 rounded-lg p-2 relative overflow-hidden mb-4" style={{ height: '80px' }}>
+      {/* Field lines */}
+      <div className="absolute inset-0 flex">
+        {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((line) => (
+          <div 
+            key={line} 
+            className="flex-1 border-r border-white/20 relative"
+            style={{ borderRightWidth: line === 50 ? '2px' : '1px' }}
+          >
+            {line > 0 && line < 100 && line % 20 === 0 && (
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 text-[7px] text-white/50 font-mono">
+                {line <= 50 ? line : 100 - line}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      
+      {/* End zones */}
+      <div className="absolute left-0 top-0 bottom-0 w-[4%] bg-orange-600/40" />
+      <div className="absolute right-0 top-0 bottom-0 w-[4%] bg-blue-600/40" />
+      
+      {/* Kickoff position marker */}
+      <div 
+        className="absolute top-3 w-3 h-3 rounded-full bg-orange-500 border border-white shadow-lg z-10"
+        style={{ left: `calc(${kickPos}% - 6px)` }}
+        title={`Kick from ${kickoffYardLine}`}
+      />
+      
+      {/* Kick trajectory line */}
+      <div 
+        className="absolute top-4 h-0.5 bg-yellow-400/60"
+        style={{ 
+          left: `${kickPos}%`,
+          width: `${ballVisualPos - kickPos}%`
+        }}
+      />
+      
+      {/* Ball position */}
+      {result && (
+        <div 
+          className={`absolute top-2 w-4 h-4 rounded-full border-2 border-yellow-400 shadow-lg z-20 flex items-center justify-center ${
+            result === 'return_td' ? 'bg-green-500' : 
+            result === 'out_of_bounds' ? 'bg-purple-500' : 'bg-blue-500'
+          }`}
+          style={{ left: `calc(${ballVisualPos}% - 8px)` }}
+        >
+          <span className="text-[6px]">🏈</span>
+        </div>
+      )}
+      
+      {/* Labels */}
+      <div className="absolute bottom-1 left-2 text-[8px] text-orange-300">KICK</div>
+      <div className="absolute bottom-1 right-2 text-[8px] text-blue-300">RECEIVE</div>
+    </div>
+  );
+};
+
 // Common penalties for football with type-to-search
 const PENALTIES = [
   { name: "Holding", defaultYards: 10 },
