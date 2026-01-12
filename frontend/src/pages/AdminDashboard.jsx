@@ -56,7 +56,9 @@ import {
   Check,
   Edit2,
   Save,
-  Gift
+  Gift,
+  AlertCircle,
+  Bug
 } from "lucide-react";
 import Layout from "@/components/Layout";
 
