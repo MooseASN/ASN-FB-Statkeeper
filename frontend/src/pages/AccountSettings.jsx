@@ -750,10 +750,12 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
               </div>
             )}
             
-            {sharedAccessList.length === 0 && receivedAccessList.length === 0 && !loadingSharedAccess && (
+            {sharedAccessList.length === 0 && receivedAccessList.length === 0 && !loadingSharedAccess && canAccess('shared_access') && (
               <p className="text-sm text-muted-foreground text-center py-4">
                 No shared access configured. Grant access to another user above, or ask another user to share their account with you.
               </p>
+            )}
+              </>
             )}
           </CardContent>
         </Card>
