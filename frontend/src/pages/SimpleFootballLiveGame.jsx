@@ -944,6 +944,35 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     closeWorkflow();
   };
   
+  // Sack workflow handlers
+  const handleSackDefenderSelect = (defender) => {
+    setWorkflowData(prev => ({ ...prev, defender: defender }));
+    setWorkflowStep(2);
+  };
+  
+  const handleSackYards = (yards) => {
+    saveState();
+    const { defender } = workflowData;
+    const sackYards = Math.abs(yards) * -1; // Sacks are always negative yards
+    const setStats = possession === 'home' ? setHomeStats : setAwayStats;
+    // Sacks count against rushing yards in some systems, or separate
+    setStats(prev => ({ ...prev, rushYards: prev.rushYards + sackYards, totalYards: prev.totalYards + sackYards }));
+    updatePlayerStat(defender.player_number, defenseTeam, 'sacks', 1);
+    updatePlayerStat(defender.player_number, defenseTeam, 'tackles', 1);
+    
+    // Add structured play data for box score
+    addPlay({
+      type: 'pass',
+      yards: sackYards,
+      tackler: defender.player_number,
+      defender: defender.player_number,
+      result: 'sacked',
+      description: `SACK by #${defender.player_number} ${defender.player_name} for ${Math.abs(sackYards)} yard loss`
+    });
+    toast.success(`Sack recorded!`);
+    closeWorkflow();
+  };
+  
   // FG workflow handlers
   const handleFGKickerSelect = (player) => {
     setWorkflowData(prev => ({ ...prev, kicker: player }));
