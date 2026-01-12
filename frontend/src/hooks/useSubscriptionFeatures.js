@@ -167,6 +167,8 @@ export function useSubscriptionFeatures() {
     getAllFeatures,
     getRequiredTierFor,
     TIER_FEATURES,
+    isAdmin,
+    isComped,
   };
 }
 
