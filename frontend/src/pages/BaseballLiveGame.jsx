@@ -38,7 +38,9 @@ import {
   FileDown,
   Flag,
   ExternalLink,
-  Code
+  Code,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { X as XIcon } from "lucide-react";
 
