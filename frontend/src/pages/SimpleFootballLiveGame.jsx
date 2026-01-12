@@ -1700,6 +1700,12 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
           {/* Step 3: Select Kickoff Result */}
           {workflowStep === 3 && (
             <div className="space-y-4">
+              {/* Field View */}
+              <SimpleKickoffFieldView 
+                kickoffYardLine={workflowData.kickoffYardLine} 
+                result={null}
+                returnYardLine={null}
+              />
               <div className="text-center text-lg font-semibold text-white mb-2">
                 Kickoff Result
               </div>
