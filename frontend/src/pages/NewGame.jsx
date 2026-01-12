@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ArrowLeft, PlayCircle, Users, Calendar, Clock, Timer, FileText, Building2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import { useSport, SPORT_CONFIG } from "@/contexts/SportContext";
