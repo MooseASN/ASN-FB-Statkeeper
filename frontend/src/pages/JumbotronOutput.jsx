@@ -320,7 +320,7 @@ export default function JumbotronOutput() {
         teamColor={homeColor}
         timeouts={homeTimeouts}
         fouls={homeTeamFouls}
-        inBonus={homeInBonus}
+        bonusStatus={homeBonusStatus}
         players={homeFloorPlayers}
         isTop={true}
       />
@@ -335,7 +335,7 @@ export default function JumbotronOutput() {
         teamColor={awayColor}
         timeouts={awayTimeouts}
         fouls={awayTeamFouls}
-        inBonus={awayInBonus}
+        bonusStatus={awayBonusStatus}
         players={awayFloorPlayers}
         isTop={false}
       />
