@@ -187,6 +187,52 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   };
 
+  const fetchErrorLogs = async () => {
+    setLoadingErrors(true);
+    try {
+      const res = await axios.get(`${API}/errors/admin/list?limit=50`);
+      setErrorLogs(res.data.errors || []);
+    } catch (error) {
+      console.error("Failed to fetch error logs:", error);
+    } finally {
+      setLoadingErrors(false);
+    }
+  };
+
+  const handleResolveError = async (errorId) => {
+    try {
+      await axios.put(`${API}/errors/admin/${errorId}/resolve`, { notes: "Resolved from admin dashboard" });
+      toast.success("Error marked as resolved");
+      fetchErrorLogs();
+      fetchData(); // Refresh stats
+    } catch (error) {
+      toast.error("Failed to resolve error");
+    }
+  };
+
+  const handleDeleteError = async (errorId) => {
+    try {
+      await axios.delete(`${API}/errors/admin/${errorId}`);
+      toast.success("Error deleted");
+      fetchErrorLogs();
+      fetchData();
+    } catch (error) {
+      toast.error("Failed to delete error");
+    }
+  };
+
+  const handleClearResolvedErrors = async () => {
+    if (!confirm("Are you sure you want to delete all resolved errors?")) return;
+    try {
+      const res = await axios.delete(`${API}/errors/admin/clear-resolved`);
+      toast.success(`Cleared ${res.data.deleted_count} resolved errors`);
+      fetchErrorLogs();
+      fetchData();
+    } catch (error) {
+      toast.error("Failed to clear errors");
+    }
+  };
+
   const handleDeleteUser = async () => {
     if (!deletingUser) return;
     
