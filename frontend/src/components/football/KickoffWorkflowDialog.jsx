@@ -382,6 +382,17 @@ export default function KickoffWorkflowDialog({
           </DialogHeader>
           
           <div className="space-y-6 mt-4">
+            {/* Field Preview - shows the return progress */}
+            <KickoffFieldView
+              kickoffYardLine={kickoffData.kickoffYardLine || 35}
+              fieldedAt={kickoffData.fieldedAt}
+              returnedTo={kickoffData.returnedTo}
+              direction={kickoffData.direction}
+              kickingTeamColor={kickingTeamColor}
+              receivingTeamColor={receivingTeamColor}
+              specialResult={kickoffData.specialResult}
+            />
+            
             {/* Fielded At - FIRST */}
             <YardLineSelector
               label="Fielded At (Yard Line)"
