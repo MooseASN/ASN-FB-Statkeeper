@@ -126,21 +126,29 @@ export default function AdminDashboard({ user, onLogout }) {
   const [schoolsOpen, setSchoolsOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false);
   const [betaOpen, setBetaOpen] = useState(false);
+  const [errorsOpen, setErrorsOpen] = useState(false);
+  
+  // Error logs
+  const [errorLogs, setErrorLogs] = useState([]);
+  const [errorStats, setErrorStats] = useState(null);
+  const [loadingErrors, setLoadingErrors] = useState(false);
 
   const fetchData = useCallback(async () => {
     try {
-      const [usersRes, statsRes, betaRes, schoolsRes, pricingRes] = await Promise.all([
+      const [usersRes, statsRes, betaRes, schoolsRes, pricingRes, errorStatsRes] = await Promise.all([
         axios.get(`${API}/admin/users`),
         axios.get(`${API}/admin/stats`),
         axios.get(`${API}/admin/beta-settings`),
         axios.get(`${API}/admin/schools`),
-        axios.get(`${API}/admin/pricing`)
+        axios.get(`${API}/admin/pricing`),
+        axios.get(`${API}/errors/admin/stats`).catch(() => ({ data: { total: 0, unresolved: 0, recent_24h: 0 } }))
       ]);
       setUsers(usersRes.data.users);
       setStats(statsRes.data);
       setBetaSettings(betaRes.data);
       setSchools(schoolsRes.data.schools || []);
       setPricingConfig(pricingRes.data.pricing);
+      setErrorStats(errorStatsRes.data);
       setLastUpdated(new Date());
     } catch (error) {
       if (error.response?.status === 403) {
