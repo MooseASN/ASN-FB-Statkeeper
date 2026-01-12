@@ -35,24 +35,34 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[db_name]
 
 # Password hashing - use bcrypt directly for better compatibility
+# Suppress passlib bcrypt version warning
+import warnings
+warnings.filterwarnings("ignore", message=".*error reading bcrypt version.*")
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# Helper function to verify password - use passlib for robust compatibility
+# Helper function to verify password - use bcrypt directly for reliability
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     try:
-        # Use passlib's verify which handles multiple bcrypt variations
-        return pwd_context.verify(plain_password, hashed_password)
+        # Use bcrypt directly for better compatibility with bcrypt 4.x
+        return bcrypt_lib.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
     except Exception as e:
         logging.error(f"Password verification exception: {e}")
-        # Fallback to direct bcrypt check
+        # Fallback to passlib
         try:
-            return bcrypt_lib.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
+            return pwd_context.verify(plain_password, hashed_password)
         except Exception:
             return False
 
-# Helper function to hash password - use passlib for consistency
+# Helper function to hash password - use bcrypt directly
 def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
+    try:
+        # Use bcrypt directly for better compatibility
+        salt = bcrypt_lib.gensalt()
+        return bcrypt_lib.hashpw(password.encode('utf-8'), salt).decode('utf-8')
+    except Exception:
+        # Fallback to passlib
+        return pwd_context.hash(password)
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
