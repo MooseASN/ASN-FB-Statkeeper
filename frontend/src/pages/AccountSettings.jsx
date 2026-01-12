@@ -7,10 +7,25 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { ArrowLeft, User, Mail, Lock, Shield, Eye, EyeOff, Check, AlertCircle, Users, UserPlus, UserMinus, Share2 } from "lucide-react";
+import { ArrowLeft, User, Mail, Lock, Shield, Eye, EyeOff, Check, AlertCircle, Users, UserPlus, UserMinus, Share2, CreditCard, Crown, ExternalLink, Trash2, Star, RefreshCw, XCircle } from "lucide-react";
 import Layout from "@/components/Layout";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
+
+// Tier badge component
+const TierBadge = ({ tier }) => {
+  const tierConfig = {
+    bronze: { bg: "bg-amber-900/30", text: "text-amber-600", label: "Bronze" },
+    silver: { bg: "bg-gray-500/30", text: "text-gray-300", label: "Silver" },
+    gold: { bg: "bg-yellow-500/30", text: "text-yellow-500", label: "Gold" }
+  };
+  const config = tierConfig[tier] || tierConfig.bronze;
+  return (
+    <span className={`px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}>
+      {config.label}
+    </span>
+  );
+};
 
 export default function AccountSettings({ user, onLogout, onUserUpdate }) {
   const navigate = useNavigate();
