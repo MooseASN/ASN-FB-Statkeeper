@@ -841,6 +841,135 @@ export default function NewGame({ user, onLogout }) {
               </div>
               )}
 
+              {/* Bonus Rules - Basketball Only */}
+              {selectedSport === "basketball" && (
+              <div className="border rounded-lg p-4 space-y-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">🏀</span>
+                  <Label className="text-base font-semibold">Bonus Rules</Label>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  Configure when teams enter the bonus based on opponent's team fouls.
+                </p>
+                
+                <div className="space-y-4">
+                  {/* Bonus Setting */}
+                  <div className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        id="bonus-enabled"
+                        checked={bonusEnabled}
+                        onCheckedChange={setBonusEnabled}
+                        data-testid="bonus-checkbox"
+                      />
+                      <div>
+                        <Label htmlFor="bonus-enabled" className="font-semibold text-yellow-800 cursor-pointer">
+                          Bonus (1-and-1)
+                        </Label>
+                        <p className="text-xs text-yellow-700">Shooter must make first free throw to get second</p>
+                      </div>
+                    </div>
+                    {bonusEnabled && (
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm text-yellow-800">Fouls:</Label>
+                        <Input
+                          type="number"
+                          min="1"
+                          max="20"
+                          value={bonusFouls}
+                          onChange={(e) => setBonusFouls(Math.max(1, Math.min(20, parseInt(e.target.value) || 7)))}
+                          className="w-16 h-8 text-center"
+                          data-testid="bonus-fouls-input"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Double Bonus Setting */}
+                  <div className="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Checkbox
+                        id="double-bonus-enabled"
+                        checked={doubleBonusEnabled}
+                        onCheckedChange={setDoubleBonusEnabled}
+                        data-testid="double-bonus-checkbox"
+                      />
+                      <div>
+                        <Label htmlFor="double-bonus-enabled" className="font-semibold text-red-800 cursor-pointer">
+                          Double Bonus
+                        </Label>
+                        <p className="text-xs text-red-700">Automatic two free throws on every foul</p>
+                      </div>
+                    </div>
+                    {doubleBonusEnabled && (
+                      <div className="flex items-center gap-2">
+                        <Label className="text-sm text-red-800">Fouls:</Label>
+                        <Input
+                          type="number"
+                          min={bonusEnabled ? bonusFouls + 1 : 1}
+                          max="20"
+                          value={doubleBonusFouls}
+                          onChange={(e) => setDoubleBonusFouls(Math.max(bonusEnabled ? bonusFouls + 1 : 1, Math.min(20, parseInt(e.target.value) || 10)))}
+                          className="w-16 h-8 text-center"
+                          data-testid="double-bonus-fouls-input"
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Presets */}
+                  <div className="flex gap-2 flex-wrap">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setBonusEnabled(true); setDoubleBonusEnabled(true); setBonusFouls(7); setDoubleBonusFouls(10); }}
+                      className="text-xs"
+                      data-testid="preset-college"
+                    >
+                      College (7/10)
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setBonusEnabled(false); setDoubleBonusEnabled(true); setBonusFouls(5); setDoubleBonusFouls(5); }}
+                      className="text-xs"
+                      data-testid="preset-nba"
+                    >
+                      NBA (5 fouls)
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => { setBonusEnabled(true); setDoubleBonusEnabled(true); setBonusFouls(7); setDoubleBonusFouls(10); }}
+                      className="text-xs"
+                      data-testid="preset-hs"
+                    >
+                      High School (7/10)
+                    </Button>
+                  </div>
+                  
+                  {/* Summary */}
+                  <div className="p-3 bg-slate-50 rounded-lg text-sm">
+                    <p className="font-medium text-slate-800 mb-1">Summary:</p>
+                    <ul className="text-slate-600 space-y-1">
+                      {bonusEnabled && (
+                        <li>• Bonus at <strong>{bonusFouls}</strong> opponent team fouls</li>
+                      )}
+                      {doubleBonusEnabled && (
+                        <li>• Double Bonus at <strong>{doubleBonusFouls}</strong> opponent team fouls</li>
+                      )}
+                      {!bonusEnabled && !doubleBonusEnabled && (
+                        <li className="text-amber-600">• No automatic bonus tracking (can still toggle manually)</li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              )}
+
               {/* Primetime Mode */}
               <div className="border rounded-lg p-4 space-y-4">
                 <div className="flex items-center justify-between">
