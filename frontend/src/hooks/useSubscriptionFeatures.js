@@ -76,6 +76,8 @@ export function useSubscriptionFeatures() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isComped, setIsComped] = useState(false);
 
   // Fetch user's tier from backend
   useEffect(() => {
@@ -83,8 +85,11 @@ export function useSubscriptionFeatures() {
       try {
         const response = await axios.get(`${API}/payments/user-tier`);
         const tierData = response.data;
+        // Backend now returns effective tier (Gold for admins/comped users)
         setUserTier(tierData.tier || 'bronze');
         setSubscriptionStatus(tierData.subscription_status);
+        setIsAdmin(tierData.is_admin || false);
+        setIsComped(tierData.is_comped || false);
         setError(null);
       } catch (err) {
         // Default to bronze on error
