@@ -2662,6 +2662,13 @@ async def create_game(game_data: GameCreate, user: User = Depends(get_current_us
         possession="home",  # Default possession to home team
         note=game_data.note,  # Game note/description
         sport=game_data.sport,  # Pass the sport from the request!
+        # Bonus rule settings (basketball)
+        bonus_enabled=game_data.bonus_enabled if game_data.sport == "basketball" else False,
+        double_bonus_enabled=game_data.double_bonus_enabled if game_data.sport == "basketball" else False,
+        bonus_fouls=game_data.bonus_fouls if game_data.sport == "basketball" else None,
+        double_bonus_fouls=game_data.double_bonus_fouls if game_data.sport == "basketball" else None,
+        home_team_fouls=0,
+        away_team_fouls=0,
         # Baseball-specific initialization - use defaults if not baseball
         total_innings=game_data.total_innings if game_data.sport == "baseball" else 9,
         current_inning=1,
