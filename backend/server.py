@@ -942,6 +942,60 @@ async def update_user_role(user_id: str, request: UpdateUserRoleRequest, admin: 
         "role": request.role
     }
 
+# ============ COMPED ACCOUNT MANAGEMENT ============
+
+class UpdateCompedStatusRequest(BaseModel):
+    is_comped: bool
+
+@api_router.put("/admin/users/{user_id}/comped")
+async def update_comped_status(user_id: str, request: UpdateCompedStatusRequest, admin: User = Depends(get_admin_user)):
+    """Grant or revoke complimentary Gold-tier access for a user (admin only)"""
+    
+    # Get the user
+    user_to_update = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    if not user_to_update:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    if request.is_comped:
+        # Grant all perks (Gold tier without Stripe subscription)
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "is_comped": True,
+                "subscription_tier": "gold",
+                "subscription_status": "active",
+                "comped_at": datetime.now(timezone.utc).isoformat(),
+                "comped_by": admin.email,
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        message = "User granted complimentary Gold access"
+    else:
+        # Revoke comped status - revert to bronze
+        await db.users.update_one(
+            {"user_id": user_id},
+            {"$set": {
+                "is_comped": False,
+                "subscription_tier": "bronze",
+                "subscription_status": "none",
+                "comped_revoked_at": datetime.now(timezone.utc).isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            "$unset": {
+                "comped_at": "",
+                "comped_by": ""
+            }}
+        )
+        message = "User's complimentary access revoked (now Bronze tier)"
+    
+    return {
+        "message": message,
+        "user_id": user_id,
+        "email": user_to_update.get("email"),
+        "is_comped": request.is_comped,
+        "tier": "gold" if request.is_comped else "bronze"
+    }
+
 # ============ PRICING MANAGEMENT ============
 
 # Default pricing configuration (stored in DB settings collection)
