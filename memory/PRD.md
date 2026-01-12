@@ -14,6 +14,35 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 12, 2026 - BOX SCORE PDF FIX & ADMIN FEATURE ACCESS ✅
+
+**Bug Fix: Wrong Sport Box Score PDF**
+- Problem: Downloading a basketball game's box score from History page returned a baseball PDF
+- Root Cause: Two endpoints shared the same path `/games/{game_id}/boxscore/pdf` - FastAPI used the first (baseball)
+- Fix: 
+  - Renamed baseball endpoint to `/games/{game_id}/baseball-boxscore/pdf`
+  - Updated `GameHistory.jsx` to select correct endpoint based on game sport:
+    - Baseball: `/baseball-boxscore/pdf`
+    - Football: `/football-boxscore/pdf`  
+    - Basketball: `/boxscore/pdf`
+
+**Enhancement: Admin Users Get All Features**
+- Admins (by role or PRIMARY_ADMIN_EMAILS list) now automatically get Gold-tier access to all features
+- Backend `/api/payments/user-tier` endpoint now returns:
+  - `tier`: effective tier (gold for admins)
+  - `actual_tier`: real subscription tier
+  - `is_admin`: boolean
+  - `is_comped`: boolean
+- Feature gating (custom logos, shared access, CSV export) now works for admins
+
+**Files Modified:**
+- `/app/backend/server.py` (renamed baseball PDF endpoint)
+- `/app/backend/routers/payments.py` (added PRIMARY_ADMIN_EMAILS check, return admin status)
+- `/app/frontend/src/pages/GameHistory.jsx` (sport-aware PDF download)
+- `/app/frontend/src/hooks/useSubscriptionFeatures.js` (added isAdmin, isComped tracking)
+
+---
+
 ### January 12, 2026 - FEATURE GATING AUDIT COMPLETE ✅
 
 **Premium Feature Gating Audit Results:**
