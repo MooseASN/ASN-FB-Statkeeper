@@ -39,6 +39,12 @@ export default function NewGame({ user, onLogout }) {
   const [timeoutPreset, setTimeoutPreset] = useState("college"); // "high_school", "college", "custom"
   const [customTimeouts, setCustomTimeouts] = useState(4);
 
+  // Bonus rule options (basketball only)
+  const [bonusEnabled, setBonusEnabled] = useState(true);
+  const [doubleBonusEnabled, setDoubleBonusEnabled] = useState(true);
+  const [bonusFouls, setBonusFouls] = useState(7); // Team fouls needed for bonus
+  const [doubleBonusFouls, setDoubleBonusFouls] = useState(10); // Team fouls needed for double bonus
+
   // Primetime options
   const [primetimeEnabled, setPrimetimeEnabled] = useState(false);
   const [videoUrl, setVideoUrl] = useState("");
