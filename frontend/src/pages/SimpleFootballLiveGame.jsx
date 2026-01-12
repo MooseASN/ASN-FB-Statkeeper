@@ -868,6 +868,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
   // Start workflows
   const startRushWorkflow = () => { setActiveWorkflow('rush'); setWorkflowStep(1); setWorkflowData({}); };
   const startPassWorkflow = () => { setActiveWorkflow('pass'); setWorkflowStep(1); setWorkflowData({}); };
+  const startSackWorkflow = () => { setActiveWorkflow('sack'); setWorkflowStep(1); setWorkflowData({}); };
   const startFGWorkflow = () => { setActiveWorkflow('fg'); setWorkflowStep(1); setWorkflowData({}); };
   const startFlagWorkflow = () => { setActiveWorkflow('flag'); setWorkflowStep(1); setWorkflowData({}); };
   const startTurnoverWorkflow = () => { setActiveWorkflow('turnover'); setWorkflowStep(1); setWorkflowData({}); };
