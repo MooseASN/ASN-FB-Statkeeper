@@ -94,6 +94,19 @@ axios.interceptors.request.use((config) => {
   return config;
 });
 
+// Log API errors (but not auth errors - those are expected)
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // Don't log 401/403 errors (auth issues) or user input errors (400)
+    const status = error.response?.status;
+    if (status && ![400, 401, 403].includes(status)) {
+      logApiError(error, error.config?.url);
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Protected route wrapper - requires auth
 function ProtectedRoute({ children, user }) {
   if (!user) {
