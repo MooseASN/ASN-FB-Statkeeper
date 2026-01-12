@@ -101,6 +101,11 @@ export default function AdminDashboard({ user, onLogout }) {
   const [showRoleDialog, setShowRoleDialog] = useState(false);
   const [roleChangeUser, setRoleChangeUser] = useState(null);
   
+  // Comped (all perks) management
+  const [updatingComped, setUpdatingComped] = useState(null);
+  const [showCompedDialog, setShowCompedDialog] = useState(false);
+  const [compedUser, setCompedUser] = useState(null);
+  
   // Pricing management
   const [pricingConfig, setPricingConfig] = useState(null);
   const [editingPricing, setEditingPricing] = useState(false);
