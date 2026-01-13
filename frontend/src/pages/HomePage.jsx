@@ -492,11 +492,11 @@ export default function HomePage() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-700">
                   <DropdownMenuItem 
-                    onClick={handleGoToDashboard}
+                    onClick={() => navigate("/my-account")}
                     className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
                   >
                     <LayoutDashboard className="w-4 h-4 mr-2" />
-                    {selectedSport ? 'Dashboard' : 'Select Sport & Dashboard'}
+                    My Dashboard
                   </DropdownMenuItem>
                   {user?.is_admin && (
                     <DropdownMenuItem 
@@ -512,7 +512,7 @@ export default function HomePage() {
                     className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
                   >
                     <Trophy className="w-4 h-4 mr-2" />
-                    Change Sport
+                    Track a Game
                   </DropdownMenuItem>
                   <DropdownMenuItem 
                     onClick={() => navigate("/settings")}
