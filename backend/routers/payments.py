@@ -932,6 +932,295 @@ async def delete_payment_method(payment_method_id: str, request: Request):
         logger.error(f"Stripe error deleting payment method: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to remove payment method: {str(e)}")
 
+# ============ SUBSCRIPTION UPGRADE/DOWNGRADE ============
+
+class ChangeTierRequest(BaseModel):
+    new_tier: str = Field(..., description="The tier to change to: bronze, silver, or gold")
+    billing_interval: str = Field(default="month", description="Billing interval: month or year")
+
+@router.post("/change-tier")
+async def change_subscription_tier(request: Request, tier_data: ChangeTierRequest):
+    """
+    Change user's subscription tier.
+    - Changes take effect at the end of the current billing period (no proration)
+    - Upgrade: New price starts next billing cycle
+    - Downgrade: Current tier remains until cycle ends, then switches
+    """
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    new_tier = tier_data.new_tier.lower()
+    billing_interval = tier_data.billing_interval.lower()
+    
+    # Validate tier
+    if new_tier not in ["bronze", "silver", "gold"]:
+        raise HTTPException(status_code=400, detail="Invalid tier. Must be bronze, silver, or gold")
+    
+    # Validate billing interval
+    if billing_interval not in ["month", "year"]:
+        raise HTTPException(status_code=400, detail="Invalid billing interval. Must be month or year")
+    
+    # Get package details
+    package_key = f"{'annual' if billing_interval == 'year' else 'monthly'}_{new_tier}"
+    if package_key not in SUBSCRIPTION_PACKAGES:
+        raise HTTPException(status_code=400, detail=f"Package not found: {package_key}")
+    
+    new_package = SUBSCRIPTION_PACKAGES[package_key]
+    
+    # Get user's current subscription info
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_subscription_id": 1, "stripe_customer_id": 1, 
+         "subscription_tier": 1, "subscription_status": 1, "email": 1}
+    )
+    
+    if not user_doc:
+        raise HTTPException(status_code=400, detail="User not found")
+    
+    current_tier = user_doc.get("subscription_tier", "bronze")
+    stripe_subscription_id = user_doc.get("stripe_subscription_id")
+    stripe_customer_id = user_doc.get("stripe_customer_id")
+    
+    # Handle downgrade to free Bronze tier
+    if new_tier == "bronze":
+        if stripe_subscription_id:
+            try:
+                stripe.api_key = stripe_api_key
+                # Cancel subscription at end of period
+                subscription = stripe.Subscription.modify(
+                    stripe_subscription_id,
+                    cancel_at_period_end=True
+                )
+                
+                # Schedule the tier change for when the subscription ends
+                await db.users.update_one(
+                    {"user_id": user["user_id"]},
+                    {"$set": {
+                        "subscription_status": "canceling",
+                        "pending_tier_change": "bronze",
+                        "tier_change_date": datetime.fromtimestamp(
+                            subscription.current_period_end, tz=timezone.utc
+                        ).isoformat(),
+                        "updated_at": datetime.now(timezone.utc).isoformat()
+                    }}
+                )
+                
+                return {
+                    "success": True,
+                    "message": f"Your subscription will be changed to Bronze (Free) at the end of your current billing period",
+                    "effective_date": datetime.fromtimestamp(
+                        subscription.current_period_end, tz=timezone.utc
+                    ).isoformat(),
+                    "current_tier": current_tier,
+                    "new_tier": new_tier
+                }
+                
+            except stripe.error.StripeError as e:
+                logger.error(f"Stripe error downgrading to bronze: {e}")
+                raise HTTPException(status_code=500, detail=f"Failed to change tier: {str(e)}")
+        else:
+            # No active subscription, just set to bronze
+            await db.users.update_one(
+                {"user_id": user["user_id"]},
+                {"$set": {
+                    "subscription_tier": "bronze",
+                    "subscription_status": "active",
+                    "updated_at": datetime.now(timezone.utc).isoformat()
+                }}
+            )
+            return {
+                "success": True,
+                "message": "You are now on the Bronze (Free) tier",
+                "current_tier": "bronze",
+                "new_tier": "bronze"
+            }
+    
+    # For paid tier changes (Silver <-> Gold, or upgrading from Bronze)
+    stripe.api_key = stripe_api_key
+    
+    # If user has no subscription, redirect them to checkout
+    if not stripe_subscription_id:
+        return {
+            "success": False,
+            "requires_checkout": True,
+            "message": "No active subscription found. Please subscribe through checkout.",
+            "checkout_package": package_key
+        }
+    
+    try:
+        # Get current subscription
+        subscription = stripe.Subscription.retrieve(stripe_subscription_id)
+        
+        if subscription.status not in ["active", "trialing"]:
+            return {
+                "success": False,
+                "requires_checkout": True,
+                "message": "Your subscription is not active. Please subscribe through checkout.",
+                "checkout_package": package_key
+            }
+        
+        # Get the current subscription item
+        current_item = subscription["items"]["data"][0]
+        
+        # Create new price for the new tier
+        # Note: In production, you might want to use pre-created Price IDs instead
+        new_price = stripe.Price.create(
+            currency=new_package["currency"],
+            unit_amount=int(new_package["amount"] * 100),
+            recurring={"interval": new_package["interval"]},
+            product_data={
+                "name": f"StatMoose {new_package['name']} Plan",
+            }
+        )
+        
+        # Update subscription with NO proration (change at end of billing period)
+        # proration_behavior='none' means the customer keeps their current plan 
+        # until the end of the billing cycle, then switches to the new plan
+        updated_subscription = stripe.Subscription.modify(
+            stripe_subscription_id,
+            items=[{
+                "id": current_item.id,
+                "price": new_price.id
+            }],
+            proration_behavior="none",  # No immediate charge, change at next billing cycle
+            metadata={
+                "tier": new_tier,
+                "package_id": package_key
+            }
+        )
+        
+        # Calculate when the change takes effect
+        effective_date = datetime.fromtimestamp(
+            updated_subscription.current_period_end, tz=timezone.utc
+        )
+        
+        # Update user record with pending tier change
+        await db.users.update_one(
+            {"user_id": user["user_id"]},
+            {"$set": {
+                "pending_tier_change": new_tier,
+                "pending_package": package_key,
+                "tier_change_date": effective_date.isoformat(),
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            }}
+        )
+        
+        # Log the tier change
+        logger.info(f"User {user['user_id']} scheduled tier change from {current_tier} to {new_tier}, effective {effective_date}")
+        
+        # Determine if upgrade or downgrade
+        tier_order = {"bronze": 0, "silver": 1, "gold": 2}
+        is_upgrade = tier_order.get(new_tier, 0) > tier_order.get(current_tier, 0)
+        
+        return {
+            "success": True,
+            "message": f"Your subscription will be {'upgraded' if is_upgrade else 'changed'} to {new_tier.capitalize()} at the end of your current billing period",
+            "effective_date": effective_date.isoformat(),
+            "current_tier": current_tier,
+            "new_tier": new_tier,
+            "new_amount": new_package["amount"],
+            "billing_interval": new_package["interval"],
+            "is_upgrade": is_upgrade
+        }
+        
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error changing tier: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to change subscription: {str(e)}")
+
+@router.get("/pending-changes")
+async def get_pending_tier_changes(request: Request):
+    """Get any pending subscription tier changes for the current user"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "subscription_tier": 1, "pending_tier_change": 1, 
+         "tier_change_date": 1, "pending_package": 1, "subscription_status": 1}
+    )
+    
+    if not user_doc:
+        return {"has_pending_change": False}
+    
+    pending_tier = user_doc.get("pending_tier_change")
+    
+    if pending_tier:
+        return {
+            "has_pending_change": True,
+            "current_tier": user_doc.get("subscription_tier", "bronze"),
+            "pending_tier": pending_tier,
+            "effective_date": user_doc.get("tier_change_date"),
+            "pending_package": user_doc.get("pending_package"),
+            "subscription_status": user_doc.get("subscription_status")
+        }
+    
+    return {"has_pending_change": False}
+
+@router.post("/cancel-pending-change")
+async def cancel_pending_tier_change(request: Request):
+    """Cancel a pending tier change and keep the current subscription"""
+    user = await get_current_user_from_request(request)
+    
+    if not user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    
+    stripe_api_key = os.environ.get("STRIPE_API_KEY")
+    if not stripe_api_key:
+        raise HTTPException(status_code=500, detail="Stripe API key not configured")
+    
+    user_doc = await db.users.find_one(
+        {"user_id": user["user_id"]},
+        {"_id": 0, "stripe_subscription_id": 1, "subscription_tier": 1, 
+         "pending_tier_change": 1, "subscription_status": 1}
+    )
+    
+    if not user_doc or not user_doc.get("pending_tier_change"):
+        raise HTTPException(status_code=400, detail="No pending tier change to cancel")
+    
+    stripe_subscription_id = user_doc.get("stripe_subscription_id")
+    
+    # If user was canceling to bronze, reactivate the subscription
+    if user_doc.get("subscription_status") == "canceling" and stripe_subscription_id:
+        try:
+            stripe.api_key = stripe_api_key
+            stripe.Subscription.modify(
+                stripe_subscription_id,
+                cancel_at_period_end=False
+            )
+        except stripe.error.StripeError as e:
+            logger.error(f"Stripe error reactivating subscription: {e}")
+            raise HTTPException(status_code=500, detail=f"Failed to cancel pending change: {str(e)}")
+    
+    # Clear the pending change from user record
+    await db.users.update_one(
+        {"user_id": user["user_id"]},
+        {
+            "$set": {
+                "subscription_status": "active",
+                "updated_at": datetime.now(timezone.utc).isoformat()
+            },
+            "$unset": {
+                "pending_tier_change": "",
+                "tier_change_date": "",
+                "pending_package": ""
+            }
+        }
+    )
+    
+    return {
+        "success": True,
+        "message": "Pending tier change has been canceled. You will keep your current subscription.",
+        "current_tier": user_doc.get("subscription_tier", "bronze")
+    }
+
 @router.post("/create-billing-portal")
 async def create_billing_portal(request: Request):
     """Create a Stripe Billing Portal session for self-service management"""
