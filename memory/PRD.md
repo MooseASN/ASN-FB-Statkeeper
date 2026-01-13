@@ -14,6 +14,33 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 13, 2026 - ADMIN DASHBOARD FLOW FIX ✅
+
+**Bug Fix: Admin is_admin Flag Not Being Returned**
+- **Root Cause:** The login and `/auth/me` endpoints were only checking the `is_admin` database field, not the `PRIMARY_ADMIN_EMAILS` list
+- **Fix:** Updated both endpoints to check `PRIMARY_ADMIN_EMAILS` (antlersportsnetwork@gmail.com, jared@antlersn.com) OR the database `role`/`is_admin` fields
+- Admin users now correctly receive `is_admin: true` from both `/api/auth/login` and `/api/auth/me`
+
+**Verified Admin Dashboard Flow:**
+- ✅ Admin login returns `is_admin=true`
+- ✅ Admin `/auth/me` returns `is_admin=true`
+- ✅ Admin can access `/admin` dashboard with full features
+- ✅ Admin dashboard shows User Management (16 users), Beta Settings, Pricing Management, Error Logs
+- ✅ Homepage "Go to Dashboard" navigates admin to `/admin`
+- ✅ Admin dropdown shows "Admin Dashboard" option
+- ✅ Non-admin dropdown shows "My Dashboard" option
+- ✅ Non-admin "Go to Dashboard" navigates to `/my-account`
+- ✅ Non-admin cannot access `/admin` (redirected)
+
+**Files Modified:**
+- `/app/backend/server.py` (login endpoint, /auth/me endpoint, moved PRIMARY_ADMIN_EMAILS to top)
+
+**Testing:**
+- All 11 tests passed (100% backend + frontend success rate)
+- Test report: `/app/test_reports/iteration_48.json`
+
+---
+
 ### January 13, 2026 - BASKETBALL PLAYER SUBSTITUTION & HOME PAGE AUTH ✅
 
 **Bug Fix: Basketball Player Substitution**
