@@ -508,7 +508,7 @@ export default function HomePage() {
                       onClick={() => navigate("/admin")}
                       className="text-yellow-400 hover:text-yellow-300 hover:bg-gray-800 cursor-pointer"
                     >
-                      <Settings className="w-4 h-4 mr-2" />
+                      <Shield className="w-4 h-4 mr-2" />
                       Admin Dashboard
                     </DropdownMenuItem>
                   )}
