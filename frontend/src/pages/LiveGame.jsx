@@ -300,15 +300,14 @@ const CondensedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onE
           >
             {player.player_number}
           </div>
-          {clockEnabled && (
-            <Checkbox
-              checked={isOnFloor}
-              onCheckedChange={() => onToggleFloor(player.id)}
-              disabled={!isOnFloor && !canCheckIn}
-              className="w-4 h-4 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-              title={isOnFloor ? "On floor" : (canCheckIn ? "Check in" : "5 players max")}
-            />
-          )}
+          {/* Always show checkbox for player selection */}
+          <Checkbox
+            checked={isOnFloor}
+            onCheckedChange={() => onToggleFloor(player.id)}
+            disabled={!isOnFloor && !canCheckIn}
+            className="w-4 h-4 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+            title={isOnFloor ? "On floor (click to sub out)" : (canCheckIn ? "Click to sub in" : "5 players max on floor")}
+          />
         </div>
         
         {simpleMode ? (
