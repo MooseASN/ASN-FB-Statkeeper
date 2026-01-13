@@ -164,10 +164,10 @@ function AppRoutes({ user, onLogin, onLogout }) {
       <Route path="/payment/success" element={<PaymentSuccessPage />} />
       
       {/* Public routes */}
-      <Route path="/login" element={user ? <Navigate to="/select-sport" replace /> : <Login onLogin={onLogin} />} />
-      <Route path="/register" element={user ? <Navigate to="/select-sport" replace /> : <Register onLogin={onLogin} />} />
-      <Route path="/forgot-password" element={user ? <Navigate to="/select-sport" replace /> : <ForgotPassword />} />
-      <Route path="/reset-password" element={user ? <Navigate to="/select-sport" replace /> : <ResetPassword />} />
+      <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login onLogin={onLogin} />} />
+      <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register onLogin={onLogin} />} />
+      <Route path="/forgot-password" element={user ? <Navigate to="/" replace /> : <ForgotPassword />} />
+      <Route path="/reset-password" element={user ? <Navigate to="/" replace /> : <ResetPassword />} />
       
       {/* Sport selection - requires auth but not sport */}
       <Route path="/select-sport" element={
