@@ -52,13 +52,24 @@ export default function AccountDashboard({ user, onLogout }) {
   const [sharedAccess, setSharedAccess] = useState([]);
   
   const { 
-    tier, 
-    features, 
+    tier = 'free', 
+    features = {}, 
     loading: subscriptionLoading,
-    isAdmin,
-    isTrial,
+    isAdmin = false,
+    isTrial = false,
     trialEnd
-  } = useSubscriptionFeatures();
+  } = useSubscriptionFeatures() || {};
+
+  // Default features if not loaded
+  const safeFeatures = {
+    maxTeams: features?.maxTeams ?? 2,
+    liveStats: features?.liveStats ?? false,
+    pdfExport: features?.pdfExport ?? false,
+    embedWidgets: features?.embedWidgets ?? false,
+    advancedStats: features?.advancedStats ?? false,
+    seasonStats: features?.seasonStats ?? false,
+    ...features
+  };
 
   useEffect(() => {
     const fetchData = async () => {
