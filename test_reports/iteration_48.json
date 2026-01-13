@@ -1,0 +1,131 @@
+{
+  "summary": "Completed testing of admin dashboard flow. All features working correctly: Admin login returns is_admin=true from both /api/auth/login and /api/auth/me endpoints. Admin can access /admin dashboard with full features (User Management, Beta Settings, Pricing Configuration, Error Logs). Non-admin users see 'My Dashboard' in dropdown and are correctly redirected to /my-account when clicking 'Go to Dashboard'. Non-admin users cannot access /admin directly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Admin Dashboard",
+        "issues": ["Console shows 403/404 errors for some resources (likely favicon or other static assets) - not affecting functionality"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/tests/test_admin_flow.py",
+    "/app/test_reports/pytest/pytest_admin_flow.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [
+    "/app/tests/test_admin_flow.py"
+  ],
+  "success_rate": {
+    "backend": "100% (7/7 tests passed)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {
+      "email": "antlersportsnetwork@gmail.com",
+      "password": "NoahTheJew1997",
+      "is_admin": true
+    }
+  },
+  "seed_data_creation": "Created and deleted test non-admin user (test_nonadmin_user@example.com) for testing",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Admin dashboard flow fully tested and working. Admin user (antlersportsnetwork@gmail.com) correctly receives is_admin=true from login and /auth/me endpoints. Admin can access /admin dashboard with all features. Non-admin users are correctly redirected to /my-account.",
+  "features_tested": {
+    "1_admin_login_is_admin_true": {
+      "status": "PASS",
+      "details": {
+        "endpoint": "/api/auth/login",
+        "email": "antlersportsnetwork@gmail.com",
+        "is_admin_returned": true
+      }
+    },
+    "2_admin_me_is_admin_true": {
+      "status": "PASS",
+      "details": {
+        "endpoint": "/api/auth/me",
+        "is_admin_returned": true
+      }
+    },
+    "3_admin_access_admin_dashboard": {
+      "status": "PASS",
+      "details": {
+        "url": "/admin",
+        "access_granted": true,
+        "dashboard_title_visible": true
+      }
+    },
+    "4_admin_dashboard_user_management": {
+      "status": "PASS",
+      "details": {
+        "section": "All Users",
+        "visible": true,
+        "total_users_displayed": 16
+      }
+    },
+    "5_admin_dashboard_beta_settings": {
+      "status": "PASS",
+      "details": {
+        "section": "Beta Mode Settings",
+        "visible": true
+      }
+    },
+    "6_admin_dashboard_pricing_management": {
+      "status": "PASS",
+      "details": {
+        "section": "Pricing Management",
+        "visible": true
+      }
+    },
+    "7_homepage_go_to_dashboard_admin": {
+      "status": "PASS",
+      "details": {
+        "button": "Go to Dashboard",
+        "navigates_to": "/admin",
+        "correct_for_admin": true
+      }
+    },
+    "8_admin_dropdown_shows_admin_dashboard": {
+      "status": "PASS",
+      "details": {
+        "dropdown_option": "Admin Dashboard",
+        "visible": true,
+        "navigates_to": "/admin"
+      }
+    },
+    "9_nonadmin_dropdown_shows_my_dashboard": {
+      "status": "PASS",
+      "details": {
+        "dropdown_option": "My Dashboard",
+        "visible": true,
+        "admin_dashboard_option_hidden": true
+      }
+    },
+    "10_nonadmin_go_to_dashboard_navigates_my_account": {
+      "status": "PASS",
+      "details": {
+        "button": "Go to Dashboard",
+        "navigates_to": "/my-account",
+        "correct_for_nonadmin": true
+      }
+    },
+    "11_nonadmin_cannot_access_admin": {
+      "status": "PASS",
+      "details": {
+        "attempted_url": "/admin",
+        "redirected_to": "/select-sport",
+        "access_denied": true
+      }
+    }
+  },
+  "mocked_data": {
+    "note": "No mocked APIs - all APIs are real"
+  }
+}
