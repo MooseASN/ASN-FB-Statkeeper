@@ -503,6 +503,15 @@ export default function HomePage() {
                     <LayoutDashboard className="w-4 h-4 mr-2" />
                     {selectedSport ? 'Dashboard' : 'Select Sport & Dashboard'}
                   </DropdownMenuItem>
+                  {user?.is_admin && (
+                    <DropdownMenuItem 
+                      onClick={() => navigate("/admin")}
+                      className="text-yellow-400 hover:text-yellow-300 hover:bg-gray-800 cursor-pointer"
+                    >
+                      <Settings className="w-4 h-4 mr-2" />
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem 
                     onClick={() => navigate("/select-sport")}
                     className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
