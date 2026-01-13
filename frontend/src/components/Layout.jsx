@@ -158,13 +158,16 @@ export default function Layout({ children, user, onLogout }) {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      Dashboard
+                    </DropdownMenuItem>
                     {isAdminUser(user) && (
                       <>
                         <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer text-amber-600">
                           <Shield className="w-4 h-4 mr-2" />
                           Admin Dashboard
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                       </>
                     )}
                     {schoolInfo && (
@@ -173,10 +176,10 @@ export default function Layout({ children, user, onLogout }) {
                           <Building2 className="w-4 h-4 mr-2" />
                           {schoolInfo.name}
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                       </>
                     )}
-                    <DropdownMenuItem onClick={() => navigate("/account")} className="cursor-pointer">
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={() => navigate("/settings")} className="cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" />
                       Account Settings
                     </DropdownMenuItem>
