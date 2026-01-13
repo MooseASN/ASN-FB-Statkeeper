@@ -14,6 +14,37 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 13, 2026 - SUBSCRIPTION TIER CHANGE & LOADING SCREEN ✅
+
+**Feature: Subscription Tier Upgrade/Downgrade**
+- New endpoints for changing subscription tier without immediate proration
+- Upgrades/downgrades take effect at the end of the current billing cycle
+- New API endpoints:
+  - `POST /api/payments/change-tier` - Change to different tier
+  - `GET /api/payments/pending-changes` - Check pending tier changes
+  - `POST /api/payments/cancel-pending-change` - Cancel a pending change
+- Stripe webhook handlers updated to process:
+  - `customer.subscription.updated` - Apply pending tier changes
+  - `customer.subscription.deleted` - Downgrade to bronze on cancellation
+  - `invoice.paid` - Update subscription period
+
+**Feature: Initial Loading Screen**
+- Added StatMoose logo with spinning circle to `index.html`
+- Shows immediately when users first visit the domain (before React loads)
+- Dark gradient background matching app theme
+- Smooth fade-out animation when React app is ready
+
+**Files Modified:**
+- `/app/backend/routers/payments.py` (new tier change endpoints)
+- `/app/backend/server.py` (enhanced webhook handlers)
+- `/app/frontend/public/index.html` (initial loading screen)
+
+**Testing:**
+- All 17 tests passed (100% success rate)
+- Test report: `/app/test_reports/iteration_49.json`
+
+---
+
 ### January 13, 2026 - ADMIN DASHBOARD FLOW FIX ✅
 
 **Bug Fix: Admin is_admin Flag Not Being Returned**
