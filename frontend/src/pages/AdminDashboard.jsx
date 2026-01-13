@@ -93,27 +93,6 @@ export default function AdminDashboard({ user, onLogout }) {
     }
   }, [user, navigate]);
   
-  // Show unauthorized message before redirect
-  if (unauthorized || (user && !user.is_admin)) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-800 flex flex-col items-center justify-center text-white">
-        <div className="text-center">
-          <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-red-500" />
-          </div>
-          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
-          <p className="text-zinc-400 mb-4">You don't have permission to access the admin dashboard.</p>
-          <p className="text-zinc-500 text-sm">Redirecting to your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Show loading if user not yet loaded
-  if (!user) {
-    return <LoadingScreen message="Checking permissions..." />;
-  }
-  
   // Beta mode settings
   const [betaSettings, setBetaSettings] = useState({
     site_beta_enabled: false,
