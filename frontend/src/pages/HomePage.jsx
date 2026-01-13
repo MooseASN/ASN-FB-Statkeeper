@@ -590,10 +590,10 @@ export default function HomePage() {
             }`}
           >
             {isLoggedIn ? (
-              /* Logged in - Go to sport selection */
+              /* Logged in - Go to dashboard */
               <Button 
                 size="lg" 
-                onClick={() => navigate("/select-sport")}
+                onClick={() => navigate("/dashboard")}
                 className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide"
               >
                 Go to Dashboard
