@@ -51,10 +51,114 @@
                 document.head.appendChild(tailwindScript);
             }
         </script>
+        <style>
+            /* Initial loading screen styles */
+            #initial-loader {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(135deg, #18181b 0%, #000000 50%, #27272a 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 9999;
+                transition: opacity 0.3s ease-out;
+            }
+            #initial-loader.fade-out {
+                opacity: 0;
+                pointer-events: none;
+            }
+            .loader-container {
+                position: relative;
+                width: 96px;
+                height: 96px;
+                margin-bottom: 32px;
+            }
+            .loader-logo {
+                width: 96px;
+                height: 96px;
+                object-fit: contain;
+            }
+            .loader-spinner {
+                position: absolute;
+                top: -24px;
+                left: -24px;
+                width: 144px;
+                height: 144px;
+                animation: spin 2s linear infinite;
+            }
+            .loader-spinner circle.track {
+                stroke: rgba(255, 255, 255, 0.1);
+            }
+            .loader-spinner circle.progress {
+                stroke: white;
+                stroke-dasharray: 100 314;
+                stroke-linecap: round;
+            }
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        </style>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
+        
+        <!-- Initial loading screen with logo and spinner -->
+        <div id="initial-loader">
+            <div class="loader-container">
+                <!-- StatMoose Logo -->
+                <img 
+                    src="%PUBLIC_URL%/logo-white.png" 
+                    alt="StatMoose" 
+                    class="loader-logo"
+                    onerror="this.style.display='none'"
+                />
+                <!-- Spinning circle around logo -->
+                <svg class="loader-spinner" viewBox="0 0 144 144">
+                    <circle
+                        class="track"
+                        cx="72"
+                        cy="72"
+                        r="68"
+                        stroke-width="2"
+                        fill="none"
+                    />
+                    <circle
+                        class="progress"
+                        cx="72"
+                        cy="72"
+                        r="68"
+                        stroke-width="2"
+                        fill="none"
+                    />
+                </svg>
+            </div>
+        </div>
+        
         <div id="root"></div>
+        
+        <script>
+            // Hide loader once React app is ready
+            window.addEventListener('load', function() {
+                // Wait a brief moment for React to render
+                setTimeout(function() {
+                    var loader = document.getElementById('initial-loader');
+                    if (loader) {
+                        loader.classList.add('fade-out');
+                        // Remove from DOM after fade animation
+                        setTimeout(function() {
+                            if (loader.parentNode) {
+                                loader.parentNode.removeChild(loader);
+                            }
+                        }, 300);
+                    }
+                }, 100);
+            });
+        </script>
         <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
