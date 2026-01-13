@@ -64,6 +64,9 @@ def hash_password(password: str) -> str:
         # Fallback to passlib
         return pwd_context.hash(password)
 
+# Primary admin emails - these users always have admin access (defined early for login endpoint)
+PRIMARY_ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
+
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
