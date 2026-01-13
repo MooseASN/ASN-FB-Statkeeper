@@ -338,6 +338,7 @@ export default function HomePage() {
   const [heroRef, heroInView] = useInView();
   const [showSweep, setShowSweep] = useState(false);
   const navigate = useNavigate();
+  const { selectedSport } = useSport();
   
   // Check if user is logged in - initialize from storage
   const getInitialAuthState = () => {
@@ -373,9 +374,19 @@ export default function HomePage() {
     navigate("/");
   };
 
+  const handleGoToDashboard = () => {
+    // If sport is selected, go directly to dashboard
+    // Otherwise, go to sport selection first
+    if (selectedSport) {
+      navigate("/dashboard");
+    } else {
+      navigate("/select-sport");
+    }
+  };
+
   const handleGetStarted = () => {
     if (isLoggedIn) {
-      navigate("/select-sport");
+      handleGoToDashboard();
     } else {
       navigate("/login");
     }
