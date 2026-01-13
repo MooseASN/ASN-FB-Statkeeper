@@ -14,6 +14,47 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 13, 2026 - SUBSCRIPTION MANAGEMENT UI, PWA & REFACTORING ✅
+
+**Feature: Subscription Management UI**
+- New `SubscriptionManager` component in Account Dashboard (`/my-account`)
+- Shows current tier with upgrade/downgrade options for Bronze, Silver, Gold
+- Confirmation dialogs for tier changes with feature lists
+- Pending change alerts with ability to cancel
+- Payment/billing portal access for existing subscribers
+- Fully tested with 19 passing tests
+
+**Feature: PWA (Progressive Web App) Setup**
+- `manifest.json` with app name, icons, theme color
+- `service-worker.js` for offline capability and caching
+- `offline.html` fallback page when offline
+- PWA icons: `logo-192.png`, `logo-512.png`
+- Apple meta tags for iOS "Add to Home Screen"
+- Service worker registers on page load
+
+**Refactoring: Server.py Decomposition Plan**
+- Documented comprehensive decomposition plan in `/app/backend/routers/__init__.py`
+- Currently active routers: payments.py, support_chat.py, error_logging.py
+- Planned routers: teams.py, games.py, admin.py, schools.py, exports.py, public.py, events.py
+- Migration strategy outlined for incremental refactoring
+
+**Files Created/Modified:**
+- `/app/frontend/src/components/SubscriptionManager.jsx` (NEW)
+- `/app/frontend/src/pages/AccountDashboard.jsx` (updated to use SubscriptionManager)
+- `/app/frontend/public/manifest.json` (NEW)
+- `/app/frontend/public/service-worker.js` (NEW)
+- `/app/frontend/public/offline.html` (NEW)
+- `/app/frontend/public/logo-192.png` (NEW)
+- `/app/frontend/public/logo-512.png` (NEW)
+- `/app/frontend/public/index.html` (PWA meta tags, service worker registration)
+- `/app/backend/routers/__init__.py` (decomposition documentation)
+
+**Testing:**
+- All 19 tests passed (100% success rate)
+- Test report: `/app/test_reports/iteration_50.json`
+
+---
+
 ### January 13, 2026 - SUBSCRIPTION TIER CHANGE & LOADING SCREEN ✅
 
 **Feature: Subscription Tier Upgrade/Downgrade**
