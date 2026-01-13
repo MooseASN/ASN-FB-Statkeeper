@@ -27,6 +27,7 @@ import Register from "@/pages/Register";
 import ForgotPassword from "@/pages/ForgotPassword";
 import ResetPassword from "@/pages/ResetPassword";
 import AccountSettings from "@/pages/AccountSettings";
+import AccountDashboard from "@/pages/AccountDashboard";
 import AdminDashboard from "@/pages/AdminDashboard";
 import FootballStatsView from "@/pages/FootballStatsView";
 import Jumbotron from "@/pages/Jumbotron";
