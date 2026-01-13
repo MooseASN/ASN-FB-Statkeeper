@@ -328,12 +328,17 @@ async def login(credentials: UserLogin, response: Response):
 @api_router.get("/auth/me")
 async def get_me(user: User = Depends(get_current_user)):
     """Get current authenticated user"""
+    # Check if user is admin
+    user_doc = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
+    is_admin = user_doc.get("is_admin", False) if user_doc else False
+    
     return {
         "user_id": user.user_id,
         "email": user.email,
         "username": user.username,
         "name": user.name,
-        "picture": user.picture
+        "picture": user.picture,
+        "is_admin": is_admin
     }
 
 @api_router.post("/auth/logout")
