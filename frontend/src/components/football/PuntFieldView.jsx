@@ -76,46 +76,48 @@ export function PuntFieldView({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Football Field Visualization */}
+          {/* Football Field Visualization - Accurate 120-yard field */}
           <div className="relative">
-            <div className="relative h-40 bg-green-800 rounded-lg overflow-hidden border-4 border-white">
-              {/* End zones */}
+            <div className="relative h-40 bg-green-900 rounded-lg overflow-hidden border-4 border-white/50">
+              {/* End zones - 10 yards each out of 120 = 8.33% */}
               <div 
-                className="absolute left-0 top-0 bottom-0 w-[10%] flex items-center justify-center"
-                style={{ backgroundColor: homeTeamColor }}
+                className="absolute left-0 top-0 bottom-0 flex items-center justify-center"
+                style={{ width: '8.33%', backgroundColor: homeTeamColor }}
               >
-                <span className="text-white text-xs font-bold rotate-[-90deg] whitespace-nowrap">
+                <span className="text-white/90 text-xs font-bold rotate-[-90deg] whitespace-nowrap">
                   {homeTeamName?.substring(0, 4).toUpperCase()}
                 </span>
               </div>
               <div 
-                className="absolute right-0 top-0 bottom-0 w-[10%] flex items-center justify-center"
-                style={{ backgroundColor: awayTeamColor }}
+                className="absolute right-0 top-0 bottom-0 flex items-center justify-center"
+                style={{ width: '8.33%', backgroundColor: awayTeamColor }}
               >
-                <span className="text-white text-xs font-bold rotate-90 whitespace-nowrap">
+                <span className="text-white/90 text-xs font-bold rotate-90 whitespace-nowrap">
                   {awayTeamName?.substring(0, 4).toUpperCase()}
                 </span>
               </div>
+              
+              {/* Goal lines */}
+              <div className="absolute top-0 bottom-0 w-1 bg-white" style={{ left: '8.33%' }} />
+              <div className="absolute top-0 bottom-0 w-1 bg-white" style={{ right: '8.33%' }} />
 
-              {/* Field lines */}
-              <div className="absolute left-[10%] right-[10%] top-0 bottom-0">
-                {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((yard) => (
-                  <div
-                    key={yard}
-                    className="absolute top-0 bottom-0 w-px bg-white/50"
-                    style={{ left: `${(yard - 10) * 1.25}%` }}
-                  />
-                ))}
-                
-                {/* 50 yard line */}
-                <div 
-                  className="absolute top-0 bottom-0 w-1 bg-white"
-                  style={{ left: '50%', transform: 'translateX(-50%)' }}
-                />
+              {/* Playing field area */}
+              <div className="absolute top-0 bottom-0" style={{ left: '8.33%', right: '8.33%' }}>
+                {/* Yard lines */}
+                {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((yard) => {
+                  const displayYard = yard <= 50 ? yard : 100 - yard;
+                  return (
+                    <div
+                      key={yard}
+                      className={`absolute top-0 bottom-0 ${yard === 50 ? 'w-1 bg-white/80' : 'w-px bg-white/40'}`}
+                      style={{ left: `${yard}%` }}
+                    />
+                  );
+                })}
                 
                 {/* Yard numbers */}
-                <div className="absolute bottom-1 left-0 right-0 flex justify-between text-[10px] text-white/70 px-2">
-                  <span>10</span>
+                <div className="absolute bottom-1 left-0 right-0 flex justify-between text-[10px] text-white/70 px-1">
+                  <span style={{ marginLeft: '8%' }}>10</span>
                   <span>20</span>
                   <span>30</span>
                   <span>40</span>
@@ -123,80 +125,80 @@ export function PuntFieldView({
                   <span>40</span>
                   <span>30</span>
                   <span>20</span>
-                  <span>10</span>
+                  <span style={{ marginRight: '8%' }}>10</span>
                 </div>
-              </div>
 
-              {/* Ball Position (Line of Scrimmage) */}
-              <div
-                className="absolute top-0 bottom-0 w-1 bg-yellow-400 z-10"
-                style={{ left: `${10 + (ballPosition * 0.8)}%` }}
-              />
-              <div
-                className="absolute top-1 w-3 h-3 rounded-full bg-yellow-400 border-2 border-yellow-600 z-20"
-                style={{ 
-                  left: `${10 + (ballPosition * 0.8)}%`,
-                  transform: 'translateX(-50%)'
-                }}
-                title="Line of Scrimmage"
-              />
-
-              {/* Punt Trajectory Arc */}
-              <svg 
-                className="absolute left-[10%] right-[10%] top-0 bottom-0 w-[80%] h-full pointer-events-none"
-                viewBox="0 0 100 100"
-                preserveAspectRatio="none"
-              >
-                <path
-                  d={`M ${ballPosition * 0.8} 50 Q ${(ballPosition + puntLandingPosition) * 0.4} 5 ${puntLandingPosition * 0.8} 50`}
-                  fill="none"
-                  stroke="#a855f7"
-                  strokeWidth="2"
-                  strokeDasharray="4 2"
-                  opacity="0.8"
+                {/* Ball Position (Line of Scrimmage) */}
+                <div
+                  className="absolute top-0 bottom-0 w-1 bg-yellow-400 z-10"
+                  style={{ left: `${ballPosition}%` }}
                 />
-              </svg>
+                <div
+                  className="absolute top-1 w-3 h-3 rounded-full bg-yellow-400 border-2 border-yellow-600 z-20"
+                  style={{ 
+                    left: `${ballPosition}%`,
+                    transform: 'translateX(-50%)'
+                  }}
+                  title="Line of Scrimmage"
+                />
 
-              {/* Punt Landing Spot */}
-              <div
-                className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-4 z-20 shadow-lg ${
-                  isTouchback ? 'bg-blue-400 border-blue-600' : 'bg-purple-400 border-purple-600'
-                }`}
-                style={{ 
-                  left: `${10 + (puntLandingPosition * 0.8)}%`,
-                  transform: 'translate(-50%, -50%)'
-                }}
-                title="Punt lands"
-              />
-
-              {/* Return Path (if showing return) */}
-              {mode === "return" && returnStartYardLine !== undefined && (
-                <>
-                  {/* Return trajectory line */}
-                  {Math.abs(returnEndPosition - returnStartYardLine) > 0 && (
-                    <div
-                      className="absolute top-1/2 h-2 -translate-y-1/2 rounded z-15"
-                      style={{
-                        left: `${10 + Math.min(returnStartYardLine, returnEndPosition) * 0.8}%`,
-                        width: `${Math.abs(returnEndPosition - returnStartYardLine) * 0.8}%`,
-                        backgroundColor: returnYards > 0 ? 'rgba(34, 197, 94, 0.6)' : 'rgba(239, 68, 68, 0.6)'
-                      }}
-                    />
-                  )}
-                  
-                  {/* Return End Position */}
-                  <div
-                    className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-4 z-25 shadow-lg ${
-                      returnYards > 0 ? 'bg-green-400 border-green-600' : 'bg-orange-400 border-orange-600'
-                    }`}
-                    style={{ 
-                      left: `${10 + (returnEndPosition * 0.8)}%`,
-                      transform: 'translate(-50%, -50%)'
-                    }}
-                    title="Return ends"
+                {/* Punt Trajectory Arc */}
+                <svg 
+                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                >
+                  <path
+                    d={`M ${ballPosition} 50 Q ${(ballPosition + Math.min(100, Math.max(0, puntLandingPosition))) / 2} 5 ${Math.min(100, Math.max(0, puntLandingPosition))} 50`}
+                    fill="none"
+                    stroke="#a855f7"
+                    strokeWidth="2"
+                    strokeDasharray="4 2"
+                    opacity="0.8"
                   />
-                </>
-              )}
+                </svg>
+
+                {/* Punt Landing Spot */}
+                <div
+                  className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-4 z-20 shadow-lg ${
+                    isTouchback ? 'bg-blue-400 border-blue-600' : 'bg-purple-400 border-purple-600'
+                  }`}
+                  style={{ 
+                    left: `${Math.min(100, Math.max(0, puntLandingPosition))}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                  title="Punt lands"
+                />
+
+                {/* Return Path (if showing return) */}
+                {mode === "return" && returnStartYardLine !== undefined && (
+                  <>
+                    {/* Return trajectory line */}
+                    {Math.abs(returnEndPosition - returnStartYardLine) > 0 && (
+                      <div
+                        className="absolute top-1/2 h-2 -translate-y-1/2 rounded z-15"
+                        style={{
+                          left: `${Math.min(returnStartYardLine, Math.max(0, Math.min(100, returnEndPosition)))}%`,
+                          width: `${Math.abs(Math.max(0, Math.min(100, returnEndPosition)) - returnStartYardLine)}%`,
+                          backgroundColor: returnYards > 0 ? 'rgba(34, 197, 94, 0.6)' : 'rgba(239, 68, 68, 0.6)'
+                        }}
+                      />
+                    )}
+                    
+                    {/* Return End Position */}
+                    <div
+                      className={`absolute top-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-4 z-25 shadow-lg ${
+                        returnYards > 0 ? 'bg-green-400 border-green-600' : 'bg-orange-400 border-orange-600'
+                      }`}
+                      style={{ 
+                        left: `${Math.max(0, Math.min(100, returnEndPosition))}%`,
+                        transform: 'translate(-50%, -50%)'
+                      }}
+                      title="Return ends"
+                    />
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
