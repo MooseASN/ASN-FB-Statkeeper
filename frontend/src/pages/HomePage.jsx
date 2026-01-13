@@ -375,13 +375,8 @@ export default function HomePage() {
   };
 
   const handleGoToDashboard = () => {
-    // If sport is selected, go directly to dashboard
-    // Otherwise, go to sport selection first
-    if (selectedSport) {
-      navigate("/dashboard");
-    } else {
-      navigate("/select-sport");
-    }
+    // Go to the account dashboard (doesn't require sport selection)
+    navigate("/my-account");
   };
 
   const handleGetStarted = () => {
