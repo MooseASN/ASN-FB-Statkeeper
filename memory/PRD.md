@@ -14,6 +14,37 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 13, 2026 - BASKETBALL PLAYER SUBSTITUTION & HOME PAGE AUTH ✅
+
+**Bug Fix: Basketball Player Substitution**
+- **Demo Mode:** Fixed player check-in/check-out by updating local state directly instead of making API calls with invalid game ID 'demo'
+- **Always Show Checkboxes:** Player selection checkboxes are now always visible (not just when clock is enabled)
+- **5-Player Limit:** Checkboxes are properly disabled when team already has 5 players on floor
+
+**Enhancement: Home Page Authentication Flow**
+- **Not Logged In:** "Get Started" button now redirects to `/login` instead of `/pricing`
+- **After Login:** User is redirected to home page `/` instead of `/select-sport`
+- **Logged In State:** Navigation shows account dropdown instead of "Sign In" and "Get Started" buttons
+- **Account Dropdown:** Contains Dashboard, Select Sport, Account Settings, and Sign Out options
+- **Hero Section:** Shows "Go to Dashboard" button when logged in
+
+**Admin Access Verified**
+- Admin users automatically get Gold tier (all features unlocked)
+- Verified via `/api/payments/user-tier` endpoint returning `tier: "gold"` for admins
+
+**Files Modified:**
+- `/app/frontend/src/pages/LiveGame.jsx` (demo mode check-in/out, always show checkboxes)
+- `/app/frontend/src/pages/HomePage.jsx` (auth state, account dropdown)
+- `/app/frontend/src/pages/Login.jsx` (redirect to /)
+- `/app/frontend/src/pages/Register.jsx` (redirect to /)
+- `/app/frontend/src/App.js` (route redirects)
+
+**Testing:**
+- All 11 tests passed (100% success rate)
+- Test report: `/app/test_reports/iteration_47.json`
+
+---
+
 ### January 12, 2026 - FOOTBALL KICKOFF WORKFLOW & YARDS INPUT FIX ✅
 
 **New Feature: Kickoff Workflow in Simple Football Mode**
