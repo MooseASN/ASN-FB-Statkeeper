@@ -422,13 +422,7 @@ export default function AdminDashboard({ user, onLogout }) {
   };
 
   if (loading) {
-    return (
-      <Layout user={user} onLogout={onLogout}>
-        <div className="flex items-center justify-center min-h-[400px]">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
-    );
+    return <LoadingScreen message="Loading admin dashboard..." />;
   }
 
   return (
