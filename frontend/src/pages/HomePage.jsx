@@ -397,8 +397,12 @@ export default function HomePage() {
   };
 
   const handleGoToDashboard = () => {
-    // Go to the account dashboard (doesn't require sport selection)
-    navigate("/my-account");
+    // Admins go to admin dashboard, non-admins go to account dashboard
+    if (user?.is_admin) {
+      navigate("/admin");
+    } else {
+      navigate("/my-account");
+    }
   };
 
   const handleGetStarted = () => {
