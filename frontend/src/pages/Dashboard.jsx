@@ -294,6 +294,11 @@ export default function Dashboard({ user, onLogout }) {
     return dateText;
   };
 
+  // Show loading screen while data is being fetched
+  if (loading && subscriptionLoading) {
+    return <LoadingScreen message="Loading your dashboard..." />;
+  }
+
   return (
     <Layout user={user} onLogout={onLogout}>
       <div className="space-y-8" data-testid="dashboard">
