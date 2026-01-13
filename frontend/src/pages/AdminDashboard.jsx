@@ -61,6 +61,7 @@ import {
   Bug
 } from "lucide-react";
 import Layout from "@/components/Layout";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
