@@ -517,20 +517,23 @@ export default function HomePage() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-700">
-                  <DropdownMenuItem 
-                    onClick={() => navigate("/my-account")}
-                    className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
-                  >
-                    <LayoutDashboard className="w-4 h-4 mr-2" />
-                    My Dashboard
-                  </DropdownMenuItem>
-                  {user?.is_admin && (
+                  {user?.is_admin ? (
+                    /* Admin users - show Admin Dashboard as primary */
                     <DropdownMenuItem 
                       onClick={() => navigate("/admin")}
                       className="text-yellow-400 hover:text-yellow-300 hover:bg-gray-800 cursor-pointer"
                     >
                       <Shield className="w-4 h-4 mr-2" />
                       Admin Dashboard
+                    </DropdownMenuItem>
+                  ) : (
+                    /* Non-admin users - show My Dashboard */
+                    <DropdownMenuItem 
+                      onClick={() => navigate("/my-account")}
+                      className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                    >
+                      <LayoutDashboard className="w-4 h-4 mr-2" />
+                      My Dashboard
                     </DropdownMenuItem>
                   )}
                   <DropdownMenuItem 
