@@ -77,46 +77,48 @@ export function FieldGoalFieldView({
         </DialogHeader>
 
         <div className="space-y-6 py-4">
-          {/* Field Goal Visualization */}
+          {/* Field Goal Visualization - Accurate 120-yard field */}
           <div className="relative">
-            <div className="relative h-48 bg-green-800 rounded-lg overflow-hidden border-4 border-white">
-              {/* End zones */}
+            <div className="relative h-48 bg-green-900 rounded-lg overflow-hidden border-4 border-white/50">
+              {/* End zones - 10 yards each out of 120 = 8.33% */}
               <div 
-                className="absolute left-0 top-0 bottom-0 w-[10%] flex items-center justify-center"
-                style={{ backgroundColor: homeTeamColor }}
+                className="absolute left-0 top-0 bottom-0 flex items-center justify-center"
+                style={{ width: '8.33%', backgroundColor: homeTeamColor }}
               >
-                <span className="text-white text-xs font-bold rotate-[-90deg] whitespace-nowrap">
+                <span className="text-white/90 text-xs font-bold rotate-[-90deg] whitespace-nowrap">
                   {homeTeamName?.substring(0, 4).toUpperCase()}
                 </span>
               </div>
               <div 
-                className="absolute right-0 top-0 bottom-0 w-[10%] flex items-center justify-center"
-                style={{ backgroundColor: awayTeamColor }}
+                className="absolute right-0 top-0 bottom-0 flex items-center justify-center"
+                style={{ width: '8.33%', backgroundColor: awayTeamColor }}
               >
-                <span className="text-white text-xs font-bold rotate-90 whitespace-nowrap">
+                <span className="text-white/90 text-xs font-bold rotate-90 whitespace-nowrap">
                   {awayTeamName?.substring(0, 4).toUpperCase()}
                 </span>
               </div>
+              
+              {/* Goal lines */}
+              <div className="absolute top-0 bottom-0 w-1 bg-white" style={{ left: '8.33%' }} />
+              <div className="absolute top-0 bottom-0 w-1 bg-white" style={{ right: '8.33%' }} />
 
-              {/* Field lines */}
-              <div className="absolute left-[10%] right-[10%] top-0 bottom-0">
-                {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((yard) => (
-                  <div
-                    key={yard}
-                    className="absolute top-0 bottom-0 w-px bg-white/50"
-                    style={{ left: `${(yard - 10) * 1.25}%` }}
-                  />
-                ))}
-                
-                {/* 50 yard line */}
-                <div 
-                  className="absolute top-0 bottom-0 w-1 bg-white"
-                  style={{ left: '50%', transform: 'translateX(-50%)' }}
-                />
+              {/* Playing field area */}
+              <div className="absolute top-0 bottom-0" style={{ left: '8.33%', right: '8.33%' }}>
+                {/* Yard lines */}
+                {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((yard) => {
+                  const displayYard = yard <= 50 ? yard : 100 - yard;
+                  return (
+                    <div
+                      key={yard}
+                      className={`absolute top-0 bottom-0 ${yard === 50 ? 'w-1 bg-white/80' : 'w-px bg-white/40'}`}
+                      style={{ left: `${yard}%` }}
+                    />
+                  );
+                })}
 
                 {/* Yard numbers */}
-                <div className="absolute bottom-1 left-0 right-0 flex justify-between text-[10px] text-white/70 px-2">
-                  <span>10</span>
+                <div className="absolute bottom-1 left-0 right-0 flex justify-between text-[10px] text-white/70 px-1">
+                  <span style={{ marginLeft: '8%' }}>10</span>
                   <span>20</span>
                   <span>30</span>
                   <span>40</span>
@@ -124,82 +126,82 @@ export function FieldGoalFieldView({
                   <span>40</span>
                   <span>30</span>
                   <span>20</span>
-                  <span>10</span>
+                  <span style={{ marginRight: '8%' }}>10</span>
                 </div>
-              </div>
 
-              {/* Goal Posts */}
-              <div 
-                className={`absolute top-[20%] bottom-[20%] w-2 ${possession === 'home' ? 'right-[8%]' : 'left-[8%]'}`}
-              >
-                {/* Crossbar */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-1 bg-yellow-400 rounded" />
-                {/* Left upright */}
-                <div className="absolute top-0 left-0 w-1 h-full bg-yellow-400 rounded" />
-                {/* Right upright */}
-                <div className="absolute top-0 right-0 w-1 h-full bg-yellow-400 rounded" />
-              </div>
-
-              {/* Ball Position (Line of Scrimmage) */}
-              <div
-                className="absolute top-0 bottom-0 w-1 bg-yellow-400 z-10"
-                style={{ left: `${10 + (scrimmageYardLine * 0.8)}%` }}
-              />
-              <div
-                className="absolute top-8 w-3 h-3 rounded-full bg-yellow-400 border-2 border-yellow-600 z-20"
-                style={{ 
-                  left: `${10 + (scrimmageYardLine * 0.8)}%`,
-                  transform: 'translateX(-50%)'
-                }}
-                title="Ball Position"
-              />
-
-              {/* Kick Trajectory */}
-              {result && (
-                <svg 
-                  className="absolute left-[10%] right-[10%] top-0 bottom-0 w-[80%] h-full pointer-events-none"
-                  viewBox="0 0 100 100"
-                  preserveAspectRatio="none"
-                >
-                  {result === 'blocked' ? (
-                    // Short blocked trajectory
-                    <path
-                      d={`M ${scrimmageYardLine * 0.8} 45 L ${(scrimmageYardLine + (possession === 'home' ? 5 : -5)) * 0.8} 60`}
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="3"
-                      strokeDasharray="5 3"
-                    />
-                  ) : (
-                    // Full kick arc
-                    <path
-                      d={`M ${scrimmageYardLine * 0.8} 45 Q ${((scrimmageYardLine + kickEndPos) / 2) * 0.8} ${result === 'good' ? 5 : 15} ${kickEndPos * 0.8} ${result === 'good' ? 50 : 45}`}
-                      fill="none"
-                      stroke={result === 'good' ? '#22c55e' : '#ef4444'}
-                      strokeWidth="3"
-                      strokeDasharray="5 3"
-                    />
-                  )}
-                </svg>
-              )}
-
-              {/* Result indicator at goal posts */}
-              {result && result !== 'blocked' && (
+                {/* Goal Posts - positioned at the goal line */}
                 <div 
-                  className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-30 ${
-                    result === 'good' ? 'bg-green-500' : 'bg-red-500'
-                  }`}
-                  style={{ 
-                    [possession === 'home' ? 'right' : 'left']: '6%'
-                  }}
+                  className={`absolute top-[20%] bottom-[20%] w-2 ${possession === 'home' ? 'right-0' : 'left-0'}`}
                 >
-                  {result === 'good' ? (
-                    <Check className="w-5 h-5 text-white" />
-                  ) : (
-                    <X className="w-5 h-5 text-white" />
-                  )}
+                  {/* Crossbar */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-1 bg-yellow-400 rounded" />
+                  {/* Left upright */}
+                  <div className="absolute top-0 left-0 w-1 h-full bg-yellow-400 rounded" />
+                  {/* Right upright */}
+                  <div className="absolute top-0 right-0 w-1 h-full bg-yellow-400 rounded" />
                 </div>
-              )}
+
+                {/* Ball Position (Line of Scrimmage) */}
+                <div
+                  className="absolute top-0 bottom-0 w-1 bg-yellow-400 z-10"
+                  style={{ left: `${Math.max(0, Math.min(100, scrimmageYardLine))}%` }}
+                />
+                <div
+                  className="absolute top-8 w-3 h-3 rounded-full bg-yellow-400 border-2 border-yellow-600 z-20"
+                  style={{ 
+                    left: `${Math.max(0, Math.min(100, scrimmageYardLine))}%`,
+                    transform: 'translateX(-50%)'
+                  }}
+                  title="Ball Position"
+                />
+
+                {/* Kick Trajectory */}
+                {result && (
+                  <svg 
+                    className="absolute inset-0 w-full h-full pointer-events-none"
+                    viewBox="0 0 100 100"
+                    preserveAspectRatio="none"
+                  >
+                    {result === 'blocked' ? (
+                      // Short blocked trajectory
+                      <path
+                        d={`M ${scrimmageYardLine} 45 L ${scrimmageYardLine + (possession === 'home' ? 5 : -5)} 60`}
+                        fill="none"
+                        stroke="#ef4444"
+                        strokeWidth="3"
+                        strokeDasharray="5 3"
+                      />
+                    ) : (
+                      // Full kick arc
+                      <path
+                        d={`M ${scrimmageYardLine} 45 Q ${(scrimmageYardLine + (possession === 'home' ? 100 : 0)) / 2} ${result === 'good' ? 5 : 15} ${possession === 'home' ? 100 : 0} ${result === 'good' ? 50 : 45}`}
+                        fill="none"
+                        stroke={result === 'good' ? '#22c55e' : '#ef4444'}
+                        strokeWidth="3"
+                        strokeDasharray="5 3"
+                      />
+                    )}
+                  </svg>
+                )}
+
+                {/* Result indicator at goal posts */}
+                {result && result !== 'blocked' && (
+                  <div 
+                    className={`absolute top-1/2 -translate-y-1/2 w-8 h-8 rounded-full flex items-center justify-center z-30 ${
+                      result === 'good' ? 'bg-green-500' : 'bg-red-500'
+                    }`}
+                    style={{ 
+                      [possession === 'home' ? 'right' : 'left']: '0%'
+                    }}
+                  >
+                    {result === 'good' ? (
+                      <Check className="w-5 h-5 text-white" />
+                    ) : (
+                      <X className="w-5 h-5 text-white" />
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
