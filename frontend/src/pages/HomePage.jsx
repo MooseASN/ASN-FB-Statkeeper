@@ -336,6 +336,24 @@ const CTASection = () => {
 export default function HomePage() {
   const [heroRef, heroInView] = useInView();
   const [showSweep, setShowSweep] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem("session_token") || sessionStorage.getItem("session_token");
+    const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
+    
+    if (token && userData) {
+      setIsLoggedIn(true);
+      try {
+        setUser(JSON.parse(userData));
+      } catch (e) {
+        console.error("Error parsing user data", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     // Trigger sweep animation after initial fade-in
@@ -344,6 +362,24 @@ export default function HomePage() {
     }, 800);
     return () => clearTimeout(timer);
   }, []);
+
+  const handleSignOut = () => {
+    localStorage.removeItem("session_token");
+    localStorage.removeItem("user");
+    sessionStorage.removeItem("session_token");
+    sessionStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUser(null);
+    navigate("/");
+  };
+
+  const handleGetStarted = () => {
+    if (isLoggedIn) {
+      navigate("/select-sport");
+    } else {
+      navigate("/login");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-black">
