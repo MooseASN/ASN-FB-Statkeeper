@@ -184,6 +184,13 @@ function AppRoutes({ user, onLogin, onLogout }) {
         </ProtectedRoute>
       } />
       
+      {/* Account dashboard - requires auth but not sport (for all users) */}
+      <Route path="/my-account" element={
+        <ProtectedRoute user={user}>
+          <AccountDashboard user={user} onLogout={handleLogout} />
+        </ProtectedRoute>
+      } />
+      
       {/* Admin dashboard - requires auth but not sport */}
       <Route path="/admin" element={
         <ProtectedRoute user={user}>
