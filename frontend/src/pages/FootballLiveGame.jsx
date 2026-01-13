@@ -1955,7 +1955,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
       // Use the new comprehensive addPlayToDrive function
       addPlayToDrive(play);
     } else {
-      // Legacy fallback - just update counts
+      // Legacy fallback - yardsGained is already signed correctly (positive = gain)
+      // No direction adjustment needed here since the caller passes the actual gain
       setCurrentDrive(prev => ({
         ...prev,
         playCount: prev.playCount + 1,
