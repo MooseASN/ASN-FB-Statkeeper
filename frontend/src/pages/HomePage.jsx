@@ -336,24 +336,24 @@ const CTASection = () => {
 export default function HomePage() {
   const [heroRef, heroInView] = useInView();
   const [showSweep, setShowSweep] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Check if user is logged in
+  
+  // Check if user is logged in - initialize from storage
+  const getInitialAuthState = () => {
     const token = localStorage.getItem("session_token") || sessionStorage.getItem("session_token");
     const userData = localStorage.getItem("user") || sessionStorage.getItem("user");
-    
     if (token && userData) {
-      setIsLoggedIn(true);
       try {
-        setUser(JSON.parse(userData));
+        return { isLoggedIn: true, user: JSON.parse(userData) };
       } catch (e) {
-        console.error("Error parsing user data", e);
+        return { isLoggedIn: false, user: null };
       }
     }
-  }, []);
+    return { isLoggedIn: false, user: null };
+  };
+  
+  const [authState, setAuthState] = useState(getInitialAuthState);
+  const { isLoggedIn, user } = authState;
 
   useEffect(() => {
     // Trigger sweep animation after initial fade-in
@@ -368,8 +368,7 @@ export default function HomePage() {
     localStorage.removeItem("user");
     sessionStorage.removeItem("session_token");
     sessionStorage.removeItem("user");
-    setIsLoggedIn(false);
-    setUser(null);
+    setAuthState({ isLoggedIn: false, user: null });
     navigate("/");
   };
 
