@@ -316,21 +316,32 @@ async def login(credentials: UserLogin, response: Response):
         max_age=30 * 24 * 60 * 60  # 30 days
     )
     
+    # Determine admin status - check PRIMARY_ADMIN_EMAILS or role field
+    user_email = user["email"].lower()
+    is_admin = user_email in PRIMARY_ADMIN_EMAILS or user.get("role") == "admin" or user.get("is_admin", False)
+    
     return {
         "user_id": user["user_id"],
         "email": user["email"],
         "username": user.get("username", ""),
         "name": user.get("name", ""),
         "session_token": session_token,
-        "is_admin": user.get("is_admin", False)
+        "is_admin": is_admin
     }
 
 @api_router.get("/auth/me")
 async def get_me(user: User = Depends(get_current_user)):
     """Get current authenticated user"""
-    # Check if user is admin
+    # Check if user is admin - use same logic as is_admin_user()
     user_doc = await db.users.find_one({"user_id": user.user_id}, {"_id": 0})
-    is_admin = user_doc.get("is_admin", False) if user_doc else False
+    
+    # Determine admin status - check PRIMARY_ADMIN_EMAILS or role field
+    user_email = user.email.lower() if user.email else ""
+    is_admin = (
+        user_email in PRIMARY_ADMIN_EMAILS or 
+        (user_doc and user_doc.get("role") == "admin") or 
+        (user_doc and user_doc.get("is_admin", False))
+    )
     
     return {
         "user_id": user.user_id,
