@@ -29,22 +29,6 @@ import { SPORT_CONFIG } from "@/contexts/SportContext";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Tier badge component
-const TierBadge = ({ tier }) => {
-  const config = {
-    free: { bg: "bg-gray-100", text: "text-gray-700", label: "Free" },
-    bronze: { bg: "bg-amber-100", text: "text-amber-700", label: "Bronze" },
-    silver: { bg: "bg-slate-200", text: "text-slate-700", label: "Silver" },
-    gold: { bg: "bg-yellow-100", text: "text-yellow-700", label: "Gold" }
-  }[tier] || { bg: "bg-gray-100", text: "text-gray-700", label: tier };
-  
-  return (
-    <span className={`px-3 py-1 rounded-full text-sm font-medium ${config.bg} ${config.text}`}>
-      {config.label}
-    </span>
-  );
-};
-
 export default function AccountDashboard({ user, onLogout }) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -54,23 +38,9 @@ export default function AccountDashboard({ user, onLogout }) {
   
   const { 
     tier = 'free', 
-    features = {}, 
     loading: subscriptionLoading,
-    isAdmin = false,
-    isTrial = false,
-    trialEnd
+    isAdmin = false
   } = useSubscriptionFeatures() || {};
-
-  // Default features if not loaded
-  const safeFeatures = {
-    maxTeams: features?.maxTeams ?? 2,
-    liveStats: features?.liveStats ?? false,
-    pdfExport: features?.pdfExport ?? false,
-    embedWidgets: features?.embedWidgets ?? false,
-    advancedStats: features?.advancedStats ?? false,
-    seasonStats: features?.seasonStats ?? false,
-    ...features
-  };
 
   useEffect(() => {
     const fetchData = async () => {
