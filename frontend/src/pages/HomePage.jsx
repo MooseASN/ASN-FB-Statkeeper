@@ -606,13 +606,13 @@ export default function HomePage() {
             }`}
           >
             {isLoggedIn ? (
-              /* Logged in - Go to dashboard (or sport selection if no sport selected) */
+              /* Logged in - Go to account dashboard */
               <Button 
                 size="lg" 
                 onClick={handleGoToDashboard}
                 className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide"
               >
-                {selectedSport ? 'Go to Dashboard' : 'Select Sport'}
+                Go to Dashboard
               </Button>
             ) : (
               /* Not logged in - Sign in flow */
