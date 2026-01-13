@@ -741,8 +741,7 @@ async def update_display_name(data: dict, user: User = Depends(get_current_user)
 
 # ============ ADMIN ENDPOINTS ============
 
-# Primary admin emails - these users always have admin access
-PRIMARY_ADMIN_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
+# Note: PRIMARY_ADMIN_EMAILS is defined at the top of the file
 RESERVED_EMAILS = ["antlersportsnetwork@gmail.com", "jared@antlersn.com"]
 RESERVED_USERNAMES = ["admin"]
 
