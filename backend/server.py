@@ -321,7 +321,8 @@ async def login(credentials: UserLogin, response: Response):
         "email": user["email"],
         "username": user.get("username", ""),
         "name": user.get("name", ""),
-        "session_token": session_token
+        "session_token": session_token,
+        "is_admin": user.get("is_admin", False)
     }
 
 @api_router.get("/auth/me")
