@@ -474,16 +474,64 @@ export default function HomePage() {
                 Support
               </Button>
             </Link>
-            <Link to="/login">
-              <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
-                Sign In
-              </Button>
-            </Link>
-            <Link to="/pricing">
-              <Button className="bg-white text-black hover:bg-gray-200 font-semibold">
-                Get Started
-              </Button>
-            </Link>
+            
+            {isLoggedIn ? (
+              /* Logged in - Show account dropdown */
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="border-gray-600 text-white hover:bg-gray-800 gap-2">
+                    <User className="w-4 h-4" />
+                    <span className="hidden sm:inline">{user?.name || user?.email?.split('@')[0] || 'Account'}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-56 bg-gray-900 border-gray-700">
+                  <DropdownMenuItem 
+                    onClick={() => navigate("/dashboard")}
+                    className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                  >
+                    <LayoutDashboard className="w-4 h-4 mr-2" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => navigate("/select-sport")}
+                    className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                  >
+                    <Trophy className="w-4 h-4 mr-2" />
+                    Select Sport
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => navigate("/settings")}
+                    className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Account Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-gray-700" />
+                  <DropdownMenuItem 
+                    onClick={handleSignOut}
+                    className="text-red-400 hover:text-red-300 hover:bg-gray-800 cursor-pointer"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              /* Not logged in - Show Sign In and Get Started buttons */
+              <>
+                <Link to="/login">
+                  <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
+                    Sign In
+                  </Button>
+                </Link>
+                <Button 
+                  onClick={handleGetStarted}
+                  className="bg-white text-black hover:bg-gray-200 font-semibold"
+                >
+                  Get Started
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
