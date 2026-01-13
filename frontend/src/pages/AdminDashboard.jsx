@@ -443,8 +443,8 @@ export default function AdminDashboard({ user, onLogout }) {
     return <LoadingScreen message="Loading admin dashboard..." />;
   }
   
-  // Show unauthorized message before redirect
-  if (unauthorized || !user?.is_admin) {
+  // Show unauthorized message before redirect (only for non-admin users)
+  if (unauthorized) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-800 flex flex-col items-center justify-center text-white">
         <div className="text-center">
