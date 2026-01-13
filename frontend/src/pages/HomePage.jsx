@@ -602,13 +602,13 @@ export default function HomePage() {
             }`}
           >
             {isLoggedIn ? (
-              /* Logged in - Go to dashboard */
+              /* Logged in - Go to dashboard (or sport selection if no sport selected) */
               <Button 
                 size="lg" 
-                onClick={() => navigate("/dashboard")}
+                onClick={handleGoToDashboard}
                 className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide"
               >
-                Go to Dashboard
+                {selectedSport ? 'Go to Dashboard' : 'Select Sport'}
               </Button>
             ) : (
               /* Not logged in - Sign in flow */
