@@ -12,6 +12,15 @@ import YardLineSelector from "./YardLineSelector";
 
 /**
  * KickoffFieldView - Mini football field visualization for kickoff
+ * 
+ * AMERICAN FOOTBALL FIELD:
+ * - Total: 120 yards (100-yard playing field + two 10-yard end zones)
+ * - Kickoffs typically from the 35-yard line
+ * 
+ * COORDINATE SYSTEM:
+ * - 0 = Goal line at left (kicking team's if kicking right)
+ * - 50 = Midfield
+ * - 100 = Goal line at right
  */
 function KickoffFieldView({ 
   kickoffYardLine, 
@@ -22,132 +31,155 @@ function KickoffFieldView({
   receivingTeamColor,
   specialResult
 }) {
-  // Field representation: 0% = left end zone, 100% = right end zone
-  // The 50 yard line is at 50%
-  // 
-  // For kickoffs:
-  // - Kickoff from 35 means kicker is on their OWN 35 (35% or 65% from their end zone)
-  // - Fielded at 5 means returner catches at THEIR OWN 5 (near their end zone)
-  // - The kick travels from kicker's side to returner's side
-  //
-  // If kicking LEFT: Kicker is on RIGHT side (100 - 35 = 65%), ball goes to LEFT end zone area
-  // If kicking RIGHT: Kicker is on LEFT side (35%), ball goes to RIGHT end zone area
+  // Field dimensions
+  const END_ZONE_PERCENT = (10 / 120) * 100; // 8.33%
+  
+  // Convert yard line to visual position within the playing field area
+  const yardToVisual = (yard, isFromReceivingSide = false) => {
+    // For kicks going left: kicking team is on RIGHT, receiving on LEFT
+    // For kicks going right: kicking team is on LEFT, receiving on RIGHT
+    const clampedYard = Math.max(0, Math.min(100, yard));
+    return clampedYard;
+  };
   
   let kickoffPos, fieldedPos, returnedPos;
   
   if (direction === 'left') {
-    // Kicking towards left end zone (0%)
-    // Kicker starts on the right side of the field
-    kickoffPos = 100 - kickoffYardLine; // e.g., 35 yard line = 65% from left
-    // Returner catches near left end zone (their territory)
-    fieldedPos = fieldedAt || 5; // e.g., 5 yard line = 5% from left
-    // Return moves back towards the middle
+    // Kicking towards left (receiving team's end zone is on left)
+    // Kicker starts at their 35 = 100 - 35 = 65% from left
+    kickoffPos = 100 - kickoffYardLine;
+    // Returner catches near their goal line (left side)
+    fieldedPos = fieldedAt || 5;
+    // Return position
     if (specialResult === 'touchback') {
-      returnedPos = 25; // Touchback at 25 yard line
+      returnedPos = 25; // Ball at 25 yard line
     } else if (specialResult === 'touchdown') {
-      returnedPos = 0; // Left end zone
+      returnedPos = 0; // Returned to kicking team's end zone (which is on right, so 0 means TD at left end zone for receiving team running back)
     } else {
       returnedPos = returnedTo || 25;
     }
   } else {
-    // Kicking towards right end zone (100%)
-    // Kicker starts on the left side of the field
-    kickoffPos = kickoffYardLine; // e.g., 35 yard line = 35% from left
-    // Returner catches near right end zone (their territory)
-    fieldedPos = 100 - (fieldedAt || 5); // e.g., 5 yard line = 95% from left
-    // Return moves back towards the middle
+    // Kicking towards right (receiving team's end zone is on right)
+    // Kicker starts at their 35 = 35% from left
+    kickoffPos = kickoffYardLine;
+    // Returner catches near their goal line (right side)
+    fieldedPos = 100 - (fieldedAt || 5);
+    // Return position
     if (specialResult === 'touchback') {
-      returnedPos = 75; // Touchback at 25 yard line (from right side)
+      returnedPos = 75; // Ball at their 25 (100 - 25 = 75)
     } else if (specialResult === 'touchdown') {
-      returnedPos = 100; // Right end zone
+      returnedPos = 100;
     } else {
       returnedPos = 100 - (returnedTo || 25);
     }
   }
 
   return (
-    <div className="bg-green-800 rounded-lg p-3 relative overflow-hidden" style={{ height: '120px' }}>
-      {/* Field lines */}
-      <div className="absolute inset-0 flex">
-        {[0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((line) => (
-          <div 
-            key={line} 
-            className="flex-1 border-r border-white/30 relative"
-            style={{ borderRightWidth: line === 50 ? '2px' : '1px' }}
-          >
-            {line > 0 && line < 100 && (
-              <span className="absolute bottom-1 left-1/2 -translate-x-1/2 text-[8px] text-white/60 font-mono">
-                {line <= 50 ? line : 100 - line}
-              </span>
-            )}
-          </div>
-        ))}
-      </div>
-      
-      {/* End zones */}
-      <div className="absolute left-0 top-0 bottom-0 w-[5%] bg-blue-900/50 flex items-center justify-center">
-        <span className="text-[8px] text-white/80 rotate-90 whitespace-nowrap">END ZONE</span>
-      </div>
-      <div className="absolute right-0 top-0 bottom-0 w-[5%] bg-red-900/50 flex items-center justify-center">
-        <span className="text-[8px] text-white/80 -rotate-90 whitespace-nowrap">END ZONE</span>
-      </div>
-      
-      {/* Kickoff position marker */}
+    <div className="bg-green-900 rounded-lg relative overflow-hidden border-2 border-white/30" style={{ height: '120px' }}>
+      {/* End zones - 8.33% each (10 yards of 120) */}
       <div 
-        className="absolute top-4 w-4 h-4 rounded-full border-2 border-white shadow-lg z-10"
-        style={{ 
-          left: `calc(${kickoffPos}% - 8px)`,
-          backgroundColor: kickingTeamColor || '#f59e0b'
-        }}
-        title={`Kickoff from ${kickoffYardLine}`}
-      />
+        className="absolute left-0 top-0 bottom-0 flex items-center justify-center"
+        style={{ width: `${END_ZONE_PERCENT}%`, backgroundColor: direction === 'left' ? receivingTeamColor || '#3b82f6' : kickingTeamColor || '#f59e0b' }}
+      >
+        <span className="text-[7px] text-white/80 rotate-[-90deg] whitespace-nowrap font-semibold">
+          {direction === 'left' ? 'RCV' : 'KICK'}
+        </span>
+      </div>
+      <div 
+        className="absolute right-0 top-0 bottom-0 flex items-center justify-center"
+        style={{ width: `${END_ZONE_PERCENT}%`, backgroundColor: direction === 'left' ? kickingTeamColor || '#f59e0b' : receivingTeamColor || '#3b82f6' }}
+      >
+        <span className="text-[7px] text-white/80 rotate-90 whitespace-nowrap font-semibold">
+          {direction === 'left' ? 'KICK' : 'RCV'}
+        </span>
+      </div>
       
-      {/* Kick trajectory line */}
-      {fieldedAt && (
+      {/* Goal lines */}
+      <div className="absolute top-0 bottom-0 w-0.5 bg-white" style={{ left: `${END_ZONE_PERCENT}%` }} />
+      <div className="absolute top-0 bottom-0 w-0.5 bg-white" style={{ right: `${END_ZONE_PERCENT}%` }} />
+      
+      {/* Playing field area */}
+      <div className="absolute top-0 bottom-0" style={{ left: `${END_ZONE_PERCENT}%`, right: `${END_ZONE_PERCENT}%` }}>
+        {/* Yard lines */}
+        {[10, 20, 30, 40, 50, 60, 70, 80, 90].map((line) => {
+          const displayYard = line <= 50 ? line : 100 - line;
+          return (
+            <div key={line}>
+              <div 
+                className={`absolute top-0 bottom-0 ${line === 50 ? 'w-0.5 bg-white/70' : 'w-px bg-white/30'}`}
+                style={{ left: `${line}%` }}
+              />
+              {(line === 10 || line === 30 || line === 50 || line === 70 || line === 90) && (
+                <span 
+                  className="absolute bottom-1 text-[7px] text-white/60 font-mono"
+                  style={{ left: `${line}%`, transform: 'translateX(-50%)' }}
+                >
+                  {displayYard}
+                </span>
+              )}
+            </div>
+          );
+        })}
+        
+        {/* Kickoff position marker */}
         <div 
-          className="absolute top-6 h-0.5 bg-yellow-400/50"
+          className="absolute top-4 w-4 h-4 rounded-full border-2 border-white shadow-lg z-10"
           style={{ 
-            left: `${Math.min(kickoffPos, fieldedPos)}%`,
-            width: `${Math.abs(fieldedPos - kickoffPos)}%`
+            left: `${kickoffPos}%`,
+            transform: 'translateX(-50%)',
+            backgroundColor: kickingTeamColor || '#f59e0b'
           }}
+          title={`Kickoff from ${kickoffYardLine}`}
         />
-      )}
-      
-      {/* Fielded at marker */}
-      {fieldedAt && (
-        <div 
-          className="absolute top-4 w-3 h-3 rounded-full border-2 border-white shadow-lg z-10"
-          style={{ 
-            left: `calc(${fieldedPos}% - 6px)`,
-            backgroundColor: receivingTeamColor || '#3b82f6'
-          }}
-          title={`Fielded at ${fieldedAt}`}
-        />
-      )}
-      
-      {/* Return trajectory line */}
-      {returnedTo && !specialResult && (
-        <div 
-          className="absolute top-6 h-1 bg-green-400"
-          style={{ 
-            left: `${Math.min(fieldedPos, returnedPos)}%`,
-            width: `${Math.abs(returnedPos - fieldedPos)}%`
-          }}
-        />
-      )}
-      
-      {/* Ball position (returned to) */}
-      {returnedTo && (
-        <div 
-          className="absolute top-3 w-5 h-5 rounded-full border-2 border-yellow-400 shadow-lg z-20 flex items-center justify-center"
-          style={{ 
-            left: `calc(${returnedPos}% - 10px)`,
-            backgroundColor: specialResult === 'touchdown' ? '#22c55e' : 
-                            specialResult === 'touchback' ? '#3b82f6' : 
-                            receivingTeamColor || '#3b82f6'
-          }}
-          title={specialResult || `Returned to ${returnedTo}`}
-        >
+        
+        {/* Kick trajectory line */}
+        {fieldedAt && (
+          <div 
+            className="absolute top-6 h-0.5 bg-yellow-400/60"
+            style={{ 
+              left: `${Math.min(kickoffPos, fieldedPos)}%`,
+              width: `${Math.abs(fieldedPos - kickoffPos)}%`
+            }}
+          />
+        )}
+        
+        {/* Fielded at marker */}
+        {fieldedAt && (
+          <div 
+            className="absolute top-4 w-3 h-3 rounded-full border-2 border-white shadow-lg z-10"
+            style={{ 
+              left: `${fieldedPos}%`,
+              transform: 'translateX(-50%)',
+              backgroundColor: receivingTeamColor || '#3b82f6'
+            }}
+            title={`Fielded at ${fieldedAt}`}
+          />
+        )}
+        
+        {/* Return trajectory line */}
+        {returnedTo && !specialResult && (
+          <div 
+            className="absolute top-6 h-1 bg-green-400"
+            style={{ 
+              left: `${Math.min(fieldedPos, returnedPos)}%`,
+              width: `${Math.abs(returnedPos - fieldedPos)}%`
+            }}
+          />
+        )}
+        
+        {/* Ball position (returned to) */}
+        {returnedTo && (
+          <div 
+            className="absolute top-3 w-5 h-5 rounded-full border-2 border-yellow-400 shadow-lg z-20 flex items-center justify-center"
+            style={{ 
+              left: `${returnedPos}%`,
+              transform: 'translateX(-50%)',
+              backgroundColor: specialResult === 'touchdown' ? '#22c55e' : 
+                              specialResult === 'touchback' ? '#6b7280' : 
+                              receivingTeamColor || '#3b82f6'
+            }}
+            title={specialResult || `Returned to ${returnedTo}`}
+          >
           <span className="text-[8px] font-bold text-white">🏈</span>
         </div>
       )}
