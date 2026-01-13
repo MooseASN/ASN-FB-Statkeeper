@@ -7638,6 +7638,7 @@ async def stripe_webhook(request: Request):
                             {"user_id": user_id},
                             {"$set": {
                                 "subscription_status": "active",
+                                "subscription_tier": transaction.get("tier", "bronze"),
                                 "subscription_package": transaction.get("package_id"),
                                 "subscription_start": datetime.now(timezone.utc).isoformat(),
                                 "subscription_end": subscription_end.isoformat(),
@@ -7645,6 +7646,125 @@ async def stripe_webhook(request: Request):
                             }}
                         )
                         logger.info(f"Webhook: Activated subscription for user: {user_id}")
+        
+        # Handle subscription updated - apply pending tier changes
+        elif webhook_response.event_type == "customer.subscription.updated":
+            # Parse the raw webhook body to get subscription details
+            import json
+            try:
+                event_data = json.loads(body)
+                subscription_data = event_data.get("data", {}).get("object", {})
+                subscription_id = subscription_data.get("id")
+                
+                if subscription_id:
+                    # Find user with this subscription
+                    user = await db.users.find_one(
+                        {"stripe_subscription_id": subscription_id},
+                        {"_id": 0, "user_id": 1, "pending_tier_change": 1}
+                    )
+                    
+                    if user and user.get("pending_tier_change"):
+                        new_tier = user.get("pending_tier_change")
+                        
+                        # Get the new price amount from subscription
+                        items = subscription_data.get("items", {}).get("data", [])
+                        if items:
+                            price_data = items[0].get("price", {})
+                            new_amount = price_data.get("unit_amount", 0) / 100  # Convert from cents
+                            interval = price_data.get("recurring", {}).get("interval", "month")
+                            
+                            logger.info(f"Applying pending tier change for user {user['user_id']}: {new_tier} at ${new_amount}/{interval}")
+                            
+                            # Apply the tier change
+                            await db.users.update_one(
+                                {"user_id": user["user_id"]},
+                                {
+                                    "$set": {
+                                        "subscription_tier": new_tier,
+                                        "updated_at": datetime.now(timezone.utc).isoformat()
+                                    },
+                                    "$unset": {
+                                        "pending_tier_change": "",
+                                        "tier_change_date": "",
+                                        "pending_package": ""
+                                    }
+                                }
+                            )
+                            logger.info(f"Webhook: Applied tier change to {new_tier} for user: {user['user_id']}")
+            except Exception as e:
+                logger.error(f"Error processing subscription update: {e}")
+        
+        # Handle subscription canceled/deleted
+        elif webhook_response.event_type in ["customer.subscription.deleted", "customer.subscription.canceled"]:
+            import json
+            try:
+                event_data = json.loads(body)
+                subscription_data = event_data.get("data", {}).get("object", {})
+                subscription_id = subscription_data.get("id")
+                
+                if subscription_id:
+                    # Find and update user
+                    user = await db.users.find_one(
+                        {"stripe_subscription_id": subscription_id},
+                        {"_id": 0, "user_id": 1}
+                    )
+                    
+                    if user:
+                        await db.users.update_one(
+                            {"user_id": user["user_id"]},
+                            {
+                                "$set": {
+                                    "subscription_status": "canceled",
+                                    "subscription_tier": "bronze",  # Downgrade to free tier
+                                    "updated_at": datetime.now(timezone.utc).isoformat()
+                                },
+                                "$unset": {
+                                    "stripe_subscription_id": "",
+                                    "pending_tier_change": "",
+                                    "tier_change_date": "",
+                                    "pending_package": ""
+                                }
+                            }
+                        )
+                        logger.info(f"Webhook: Subscription canceled for user: {user['user_id']}, downgraded to bronze")
+            except Exception as e:
+                logger.error(f"Error processing subscription cancellation: {e}")
+        
+        # Handle invoice paid - update subscription period
+        elif webhook_response.event_type == "invoice.paid":
+            import json
+            try:
+                event_data = json.loads(body)
+                invoice_data = event_data.get("data", {}).get("object", {})
+                subscription_id = invoice_data.get("subscription")
+                
+                if subscription_id:
+                    user = await db.users.find_one(
+                        {"stripe_subscription_id": subscription_id},
+                        {"_id": 0, "user_id": 1}
+                    )
+                    
+                    if user:
+                        # Get the subscription to get the new period end
+                        import stripe as stripe_lib
+                        stripe_lib.api_key = stripe_api_key
+                        subscription = stripe_lib.Subscription.retrieve(subscription_id)
+                        
+                        subscription_end = datetime.fromtimestamp(
+                            subscription.current_period_end, tz=timezone.utc
+                        )
+                        
+                        await db.users.update_one(
+                            {"user_id": user["user_id"]},
+                            {"$set": {
+                                "subscription_status": "active",
+                                "subscription_end": subscription_end.isoformat(),
+                                "updated_at": datetime.now(timezone.utc).isoformat()
+                            }}
+                        )
+                        logger.info(f"Webhook: Updated subscription period for user: {user['user_id']}")
+            except Exception as e:
+                logger.error(f"Error processing invoice paid: {e}")
         
         return {"received": True}
         
