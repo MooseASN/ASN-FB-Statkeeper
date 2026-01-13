@@ -423,12 +423,18 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
     
     // Save the previous drive if it had plays
     if (currentDrive.playCount > 0) {
+      // Calculate net yards based on direction of play
+      // Home team advances towards 100, away team advances towards 0
+      const driveDirection = currentDrive.team === 'home' ? 1 : -1;
+      const rawYards = ballPosition - currentDrive.startPosition;
+      const netYards = rawYards * driveDirection;
+      
       const endedDrive = {
         ...currentDrive,
         endPeriod: quarter,
         endClock: clockTime,
         endPosition: ballPosition,
-        netYards: ballPosition - currentDrive.startPosition,
+        netYards: netYards,
       };
       setAllDrives(prev => [...prev, endedDrive]);
     }
@@ -439,12 +445,18 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
 
   // End the current drive with a result
   const endDrive = useCallback((result, endPosition = ballPosition) => {
+    // Calculate net yards based on direction of play
+    // Home team advances towards 100, away team advances towards 0
+    const driveDirection = currentDrive.team === 'home' ? 1 : -1;
+    const rawYards = endPosition - currentDrive.startPosition;
+    const netYards = rawYards * driveDirection;
+    
     const endedDrive = {
       ...currentDrive,
       endPeriod: quarter,
       endClock: clockTime,
       endPosition: endPosition,
-      netYards: endPosition - currentDrive.startPosition,
+      netYards: netYards,
       result: result,
     };
     
@@ -454,14 +466,20 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
 
   // Add a play to the current drive
   const addPlayToDrive = useCallback((play) => {
-    const yardsGained = play.end_spot - play.start_spot;
-    
-    setCurrentDrive(prev => ({
-      ...prev,
-      plays: [...prev.plays, play],
-      playCount: play.no_play ? prev.playCount : prev.playCount + 1,
-      netYards: play.end_spot - prev.startPosition,
-    }));
+    setCurrentDrive(prev => {
+      // Calculate net yards based on direction of play
+      // Home team advances towards 100, away team advances towards 0
+      const driveDirection = prev.team === 'home' ? 1 : -1;
+      const rawYards = play.end_spot - prev.startPosition;
+      const netYards = rawYards * driveDirection;
+      
+      return {
+        ...prev,
+        plays: [...prev.plays, play],
+        playCount: play.no_play ? prev.playCount : prev.playCount + 1,
+        netYards: netYards,
+      };
+    });
   }, []);
 
   // Calculate drive time from start to current
