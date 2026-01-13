@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, Settings, LayoutDashboard, LogOut, Trophy } from "lucide-react";
-import { useSport } from "@/context/SportContext";
+import { useSport } from "@/contexts/SportContext";
 
 // Sports data
 const sportsData = [
