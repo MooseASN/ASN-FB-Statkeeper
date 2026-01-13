@@ -259,10 +259,6 @@ export default function AccountDashboard({ user, onLogout }) {
             <Settings className="w-4 h-4 mr-2" />
             Account Settings
           </Button>
-          <Button variant="outline" onClick={() => navigate("/pricing")}>
-            <CreditCard className="w-4 h-4 mr-2" />
-            Manage Subscription
-          </Button>
         </div>
       </main>
     </div>
