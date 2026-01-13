@@ -201,99 +201,17 @@ export default function AccountDashboard({ user, onLogout }) {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Subscription Card */}
-          <Card className="lg:col-span-2">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-yellow-500" />
-                  Subscription
-                </CardTitle>
-                <TierBadge tier={tier} />
-              </div>
-              {isTrial && trialEnd && (
-                <CardDescription className="text-amber-600">
-                  Trial ends {new Date(trialEnd).toLocaleDateString()}
-                </CardDescription>
-              )}
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {/* Features Grid */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="flex items-center gap-2 text-sm">
-                    {safeFeatures.maxTeams === -1 ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <span className="w-4 h-4 text-center text-xs font-medium text-gray-500">{safeFeatures.maxTeams}</span>
-                    )}
-                    <span className="text-gray-700">
-                      {safeFeatures.maxTeams === -1 ? 'Unlimited Teams' : `Teams (${totalTeams}/${safeFeatures.maxTeams})`}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    {safeFeatures.liveStats ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <X className="w-4 h-4 text-gray-300" />
-                    )}
-                    <span className={safeFeatures.liveStats ? "text-gray-700" : "text-gray-400"}>
-                      Live Stats Sharing
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    {safeFeatures.pdfExport ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <X className="w-4 h-4 text-gray-300" />
-                    )}
-                    <span className={safeFeatures.pdfExport ? "text-gray-700" : "text-gray-400"}>
-                      PDF Export
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    {safeFeatures.embedWidgets ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <X className="w-4 h-4 text-gray-300" />
-                    )}
-                    <span className={safeFeatures.embedWidgets ? "text-gray-700" : "text-gray-400"}>
-                      Embed Widgets
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    {safeFeatures.advancedStats ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <X className="w-4 h-4 text-gray-300" />
-                    )}
-                    <span className={safeFeatures.advancedStats ? "text-gray-700" : "text-gray-400"}>
-                      Advanced Statistics
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 text-sm">
-                    {safeFeatures.seasonStats ? (
-                      <Check className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <X className="w-4 h-4 text-gray-300" />
-                    )}
-                    <span className={safeFeatures.seasonStats ? "text-gray-700" : "text-gray-400"}>
-                      Season Statistics
-                    </span>
-                  </div>
-                </div>
-
-                {tier !== 'gold' && !isAdmin && (
-                  <div className="pt-4 border-t">
-                    <Button onClick={() => navigate("/pricing")} className="w-full">
-                      <Star className="w-4 h-4 mr-2" />
-                      Upgrade Your Plan
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+          {/* Subscription Management - Full Width */}
+          <div className="lg:col-span-2">
+            <SubscriptionManager 
+              user={user} 
+              currentTier={tier}
+              onTierChange={(newTier) => {
+                // Refresh subscription features
+                window.location.reload();
+              }}
+            />
+          </div>
 
           {/* Quick Stats Card */}
           <Card>
