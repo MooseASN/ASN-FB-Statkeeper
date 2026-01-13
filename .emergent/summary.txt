@@ -1,175 +1,161 @@
 <analysis>**original_problem_statement:**
 The user's initial goal was to build a Baseball stat-tracking application. This has since expanded into a full-featured, multi-sport platform (Baseball, Football, Basketball) with a commercial subscription model.
 
-Recent user requests have focused on feature enhancements, bug fixes, and addressing technical debt:
-1.  **Demo Flow:** Make  a sport selection page, and for the football demo, add a simple/advanced mode selector.
-2.  **UI/UX:** Perform a mobile responsiveness and empty states audit. Add a field view to the football kickoff workflow.
-3.  **Feature Implementation:** Implement a comprehensive bonus/double bonus rule system for basketball. Make the baseball play-by-play log fully editable.
-4.  **Bug Fixes & Loopholes:**
-    *   Fix an admin feature access bug where Gold-tier perks (like unlimited banners) weren't being applied correctly due to a UI loading state issue.
-    *   Close a loophole allowing users to upload team logos without the required subscription.
-    *   Consolidate redundant Share and Live Stats buttons in the baseball live game UI.
-    *   Add an End Game button to the baseball stat tracker.
-    *   Resolve a production Stripe payment error (Invalid API Key) and a subsequent white screen bug during the free trial checkout process.
-5.  **Technical Debt:** Begin refactoring the monolithic  and  files.
+Recent user requests have focused on feature enhancements, bug fixes, and addressing technical debt, including:
+1.  **Football Demo:** Implement a simple/advanced mode selector, add a Sack button, fix player selection lists, and resolve a bug where stats were not appearing in the box score.
+2.  **UI/UX:** Fix yardage input buttons, correct kickoff field view visuals, and standardize all loading screens with the StatMoose logo and spinner.
+3.  **Bug Fixes & Loopholes:**
+    *   Resolve a production deployment error related to the  library.
+    *   Fix a recurring Stripe Invalid API Key error.
+    *   Fix a non-working player substitution function in the basketball simple/demo modes.
+    *   Correct the authentication flow on the homepage, including the behavior of the Get Started button and adding an account dropdown for logged-in users.
+    *   Create a dedicated Account Dashboard for non-admin users and ensure it's accessible and working.
+    *   Secure the  dashboard so it's inaccessible to non-admin users.
+    *   Fix a bug where the  UI did not update correctly after a user logs out.
+    *   Restore the original, feature-rich admin dashboard for admin users, ensuring they are not directed to the new non-admin dashboard.
 
 **User's preferred language**: English
 
 **what currently exists?**
-The application is a full-stack, multi-sport (Baseball, Football, Basketball) stat-tracking platform with a React frontend, FastAPI backend, and MongoDB database. It includes a multi-tiered subscription model (Bronze, Silver, Gold) integrated with Stripe.
+The application is a full-stack, multi-sport stat-tracking platform with a React frontend, FastAPI backend, and MongoDB database. It includes a multi-tiered subscription model integrated with Stripe. Key systems include an Admin Dashboard for administrative tasks and a newly created Account Dashboard () for regular users to manage their teams and subscriptions.
 
-Key systems include:
--   **Admin Dashboard:** Comprehensive controls for managing users, pricing, and beta features.
--   **Subscription & Feature Gating:** A  hook controls access to premium features. Recent fixes have made this more robust by handling UI loading states.
--   **Demo Flow:** A  route now allows sport selection. The basketball demo has a simple/advanced mode choice.
--   **Live Game Modes:** All sports have live stat-tracking capabilities. Baseball features an editable play-by-play log and a new End Game button. Basketball includes an automated bonus/double bonus system. The embed dialog is now consistent across all sports.
--   **Stripe Integration:** The checkout flow for free trials has been fixed to prevent a white screen hang by improving loading state management on the pricing page. The production API key has been corrected.
+The recent development session successfully implemented numerous features and fixes. The football demo now has a working simple/advanced mode selector, a Sack button, and correct stat tracking for the box score. The kickoff workflow is functional in both simple and advanced football modes. Critical bugs, including a  deployment error and a Stripe payment issue, have been resolved. The basketball player substitution is now working, and the application's loading screens have been standardized. The user authentication and dashboard navigation logic has been significantly reworked to provide separate experiences for admin and non-admin users.
 
 **Last working item**:
--   **Last item agent was working:** The agent was beginning to work on a three-part user request for the football demo and simple mode:
-    1.  Create a simple/advanced mode selector for the football demo, mirroring the existing basketball demo selector.
-    2.  In simple football mode, ensure the tackler selection list pulls players from the defensive team.
-    3.  Add a Sack button to simple football mode, which also uses a player selector for the defensive team.
--   **Status:** NOT STARTED
+-   **Last item agent was working:** The agent was debugging why the admin user was being redirected to the new non-admin dashboard () instead of their dedicated admin dashboard (). The root cause was identified: the backend's login () and session check () endpoints were not returning the  flag. The agent implemented a fix by adding this flag to both backend responses.
+-   **Status:** IN PROGRESS
 -   **Agent Testing Done:** N
 -   **Which testing method agent to use?** Frontend testing agent
 -   **User Testing Done:** N
 
 **All Pending/In progress Issue list**:
-N/A
+-   **Issue 1:** Verify Admin Dashboard Flow After Login (Priority: P0)
+    -   **Description:** The backend has been fixed to return the  flag on login. The full end-to-end frontend flow must now be verified to ensure an admin user is correctly routed to the  dashboard and sees the correct, feature-rich content.
+    -   **Next debug checklist:**
+        1.  Log in using the admin credentials.
+        2.  Confirm the post-login redirect goes to the .
+        3.  On the , verify that the main dashboard button and the account dropdown menu link to .
+        4.  Click the link and confirm the URL is .
+        5.  Verify that the  page loads the original dashboard with user management, beta features, etc., and not the new non-admin .
+    -   **Why fix this issue and what will be achieved with the fix?** This will restore the correct, separate dashboard experiences for admin and non-admin users, fulfilling a critical user requirement.
+    -   **Status:** IN PROGRESS
+    -   **Is recurring issue?** Y
+    -   **Should Test frontend/backend/both after fix?** Frontend
 
 **In progress Task List**:
-
--   **Task 1:** Implement Football Demo and Simple Mode Enhancements
-    -   **Description:** The user requested three changes:
-        1.  On the  page, when a user selects football, they should be presented with a choice between Simple Mode and Advanced Mode, similar to how the basketball demo works.
-        2.  In the Simple Football live game, when recording a tackle, the player selector should only show players from the defensive team.
-        3.  In Simple Football live game, add a new Sack button. When clicked, it should also present a player selector showing only players from the defensive team.
-    -   **Where to resume:**
-        1.  Create a  page, mirroring the structure of .
-        2.  Update  to route  to this new selector page.
-        3.  Modify  (or a similar demo football file).
-        4.  Locate the logic for recording a tackle and adjust the player list source for the tackler selection.
-        5.  Add a new Sack button and implement its logic, reusing the defensive player selection logic.
-    -   **What will be achieved with this?** The football demo will offer more options, consistent with other sports, and the simple mode will be more intuitive.
-    -   **Status:** NOT STARTED
-    -   **Should Test frontend/backend/both after fix?** Frontend
-    -   **Blocked on something:** No
+N/A
 
 **Upcoming and Future Tasks**
 -   **Upcoming Tasks:**
-    -   **P1:  Decomposition:** Break down the monolithic  file (~7500 lines) into modular routers. This is a high-priority technical debt item.
-    -   **P1:  Refactor:** Refactor the large  component (~4700 lines) into smaller components and hooks. This is another high-priority technical debt item.
+    -   **P1:  Decomposition:** Break down the monolithic  file into modular routers.
+    -   **P1:  Refactor:** Refactor the large  component into smaller components and hooks.
     -   **P2: PWA Mobile App:** Implement Add to Home Screen functionality.
     -   **P2: Onboarding Flow:** Create a guided setup wizard for new users (Create Team -> Add Players -> Start Game).
     -   **P2: Team/Parent Portal:** A read-only shareable link for fans to follow team stats.
 -   **Future Tasks:**
-    -   **P3: Email Notifications:** Implement game reminders and stat summaries using the existing Resend integration.
+    -   **P3: Email Notifications:** Implement game reminders and stat summaries using the Resend integration.
     -   **P3: Real-time Push Notifications:** For game starts, score updates, etc.
     -   **P3: Game Highlights Generator:** Auto-generate shareable social media cards post-game.
-    -   **P3: Season Stats Dashboard:** Aggregated player/team stats across all games in a season.
+    -   **P3: Season Stats Dashboard:** Aggregated player/team stats across a season.
     -   **P3: Import/Export Functionality:** CSV export for stats and roster import.
 
 **Completed work in this session**
--   **Feature: Demo Sport Selection Page (DONE):** Created a new  route and  page that mimics the home page's sport selection UI.
--   **Feature: Basketball Bonus Rules (DONE):** Implemented a full bonus/double bonus system for basketball, including settings in , backend logic in , and updated UI in  and .
--   **Feature: Embed Dialog & Kickoff Field View (DONE):** Refactored  to place the live stats link at the top and added this functionality to all live game modes. Added a visual field view to the football .
--   **Feature: Editable Baseball Play-by-Play (DONE):** Updated  hook and  to allow editing and deleting individual plays.
--   **Enhancement: Mobile Responsiveness & Empty States (DONE):** Audited and improved mobile layouts and empty state messages across key pages like , , , and .
--   **Bug Fix: Admin Feature Access (DONE):** Fixed a bug where admin users didn't get Gold-tier features by ensuring  handles the  state of the  hook.
--   **Bug Fix: Team Logo Upload Loophole (DONE):** Closed a loophole allowing users to upload team logos without the required subscription by adding feature gating to  and .
--   **Bug Fix: Baseball Live Game UI (DONE):** Consolidated share buttons and added an End Game button in .
--   **Bug Fix: Stripe Free Trial Flow (DONE):** Resolved a white screen bug by updating the Stripe API key and adding better loading state management to .
--   **Refactoring:**
-    -   **:** Started refactoring by extracting  into its own component.
-    -   **Backend Python:** Fixed a recurring  error by correcting database object checks in .
--   **Linting:** Fixed multiple linting errors in , , and .
+-   **Feature: Football Demo Enhancements (DONE):** Created a simple/advanced mode selector, added a Sack button, fixed player selection logic, and implemented structured play logging to fix the box score.
+-   **Feature: Football Yards Input Fix (DONE):** Reworked the yards input component to use +/- buttons and support negative yardage.
+-   **Feature: Football Kickoff Workflow (DONE):** Added a full kickoff workflow to simple mode, corrected field view visuals, and added a field view to the simple mode kickoff dialog.
+-   **Bug Fix:  Deployment Error (DONE):** Resolved a critical  that was blocking production deployments by modifying .
+-   **Bug Fix: Stripe Integration (DONE):** Verified the API key and confirmed the Stripe checkout flow is fully functional.
+-   **Bug Fix: Basketball Player Substitution (DONE):** Fixed the substitution feature in  for both demo and regular modes.
+-   **Feature: Homepage Auth & Navigation (DONE):** Reworked the  to be auth-aware, with a proper login flow and a dynamic user account dropdown.
+-   **Feature: User Account Dashboard (DONE):** Created and implemented a new  dashboard for non-admin users and fixed a loading crash.
+-   **Feature: Standardized Loading Screens (DONE):** Updated  and integrated it across major pages (, , , ).
+-   **Security: Admin Dashboard Protection (DONE):** Strengthened access controls for the  route.
+-   **Bug Fix: Backend  Flag (DONE):** Modified the  and  endpoints to correctly return the  status.
 
 **Earlier issues found/mentioned but not fixed**
--   **Linting Warnings:** Several files, including  and , have non-critical warnings related to hook dependency arrays () that do not break functionality.
+-   **Linting Warnings:** Several files, including  and , have non-critical warnings related to hook dependency arrays ().
 
 **Known issue recurrence from previous fork**
--   N/A
+N/A
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Component Extraction:** Began refactoring  by extracting  into its own file.
--   **State-Driven UI:** The basketball bonus rule system automatically updates the UI based on backend calculations of team fouls and game settings.
--   **Asynchronous State Handling:** Fixed a bug in  by properly handling the  state from  to prevent race conditions.
--   **Robust Checkout Flow:** Fixed a UI hang in  by adding a loading indicator during payment verification and a timeout fallback for the Stripe redirect.
--   **In-place Editing:** Implemented an editable play-by-play log in  using a component with local edit state that calls hook functions (, ).
+-   **Conditional Routing & UI:** The application now heavily uses the  flag, fetched from the backend, to conditionally render UI elements (like dropdown menu items) and navigate users to different dashboards ( vs. ).
+-   **Local State for Demo Mode:** The basketball substitution bug was resolved by using local component state () to manage players on the floor in demo mode, bypassing backend API calls that would otherwise fail.
+-   **Structured Event Logging:** The simple football mode was fixed to generate structured play data objects instead of simple text strings. This enables the box score component to accurately calculate and display player stats.
+-   **Backend Dependency Management:** A critical deployment error was resolved by modifying  to handle an incompatibility between  and a newer version of  during application startup.
+-   **Safe Hook Usage:** A white screen crash on the  was fixed by adding a fallback/default state for the  object returned by the  hook, preventing errors when accessing its properties before data has loaded.
 
 **key DB schema**
--   **games:** Added new fields to support basketball bonus rules:
-    -   
-    -   
-    -   
+No database schema changes were made in this session.
 
 **changes in tech stack**
--   N/A
+-   The backend dependency  was effectively pinned to  in  as part of debugging a deployment issue, though the final fix was a code-level change.
 
 **All files of reference**
 -   
--    (as a template)
 -   
--    (for refactoring)
--    (for refactoring)
+-   
+-   
+-   
+-   
+-   
 -   
 
 **Areas that need refactoring**:
--   ** Decomposition (High Priority):** At ~7500 lines, this file is a major source of technical debt. A gradual, router-by-router extraction is recommended.
--   ** Component (High Priority):** Now at ~4700 lines. Still needs to be broken down into smaller components and hooks.
+-   ** (High Priority):** Remains a large, monolithic file that needs to be broken down into modular routers.
+-   ** (High Priority):** Still a very large component that should be decomposed.
+-   **Lint Warnings:** The  warnings should be addressed in the future for better code quality.
 
 **key api endpoints**
 -   **Modified:**
-    -   : Updated to accept and store new basketball bonus rule settings.
-    -   : Updated basketball foul logic to automatically calculate and set bonus status.
+    -   : Now includes an  boolean flag in the response object.
+    -   : Now includes an  boolean flag in the response object.
 
 **Critical Info for New Agent**
--   The immediate task is to implement the football demo enhancements (simple/advanced mode selector, and simple mode tackle/sack logic).
--   After the current task, the user has approved tackling the high-priority technical debt items: refactoring  and . These are high-risk changes and must be done incrementally with thorough testing at each step.
--   The Stripe checkout flow issues have been resolved by updating the API key in the  file and, more importantly, improving the frontend loading state management in .
+-   The most critical task is to verify the admin login and dashboard flow. The backend fix (adding  to auth responses) is complete, but the full end-to-end frontend experience has not been validated. Admins must be routed to  and see the correct dashboard.
+-   The user has been very clear about maintaining a strict separation between the admin dashboard () and the new non-admin account dashboard (). Do not merge them or give admins the non-admin view.
+-   The logic for this separation is primarily in  and , which check the  flag.
 
 **documents and test reports created in this job**
 -   
 -   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **Request:** Fix admin feature access bug and start refactoring  & . (Status: **PARTIALLY COMPLETED**).
-2.  **Request:** Add embed option to all sports, move link to top, add field view to kickoff workflow. (Status: **COMPLETED**).
-3.  **Request:** Close logo upload loophole, consolidate baseball share buttons, add End Game button to baseball. (Status: **COMPLETED**).
-4.  **Request:** Make baseball play-by-play log editable. (Status: **COMPLETED**).
-5.  **Request:** Analyze and fix deployment errors. (Status: **ADDRESSED**).
-6.  **Request:** Fix Stripe Invalid API Key error. (Status: **ADDRESSED**).
-7.  **Feedback:** I get a continuous white loading screen after selecting a free trial. (Status: **COMPLETED**).
-8.  **Feedback:** It works now, it worked when opening a full preview screen in a separate tab. (Status: **ACKNOWLEDGED**).
-9.  **Query:** What additions should we make? (Status: **ADDRESSED**).
-10. **Request:** On football demo, add simple/advanced mode selector. In simple mode, fix tackle selection and add a sack button. (Status: **PENDING**).
+1.  **Request:** The dashboard button from the home page goes straight to the basketball sport... -> Led to creating . (COMPLETED)
+2.  **Report:** The /my-account goes to a white screen. (COMPLETED)
+3.  **Report:** After logging out, the sign-in home button does not properly go to the sign-in page. (COMPLETED)
+4.  **Request:** The admin should see the same as it was. Only non-admins should have the newly added layout. (COMPLETED - logic implemented)
+5.  **Request:** Make sure users can search for /admin and access the admin page without having the proper credential -> user meant prevent access. (COMPLETED)
+6.  **Report:** I want the old admin dashboard for the admin only. I no longer see users, beta modes, or anything that was previously there. (IN PROGRESS - this is the current task)
 
 **Project Health Check:**
--   **Broken:** None.
--   **Mocked:** The  routes use static initial data.
--   **Needs Refactoring:**
-    1.   (7500+ lines) - High priority, high risk.
-    2.   (4700+ lines) - High priority.
+-   **Broken:** The admin user's navigation flow to their specific dashboard () is not fully verified after the latest backend fix.
+-   **Mocked:** All  routes use static initial data.
+-   **Needs Refactoring:**  (high priority),  (high priority).
 
 **3rd Party Integrations**
--   **Stripe:** Used for recurring subscriptions. The API key was recently updated.
+-   **Stripe:** Used for recurring subscriptions.
 -   **Resend:** Used for transactional emails.
 -   **reportlab:** Used for PDF generation.
 -   **lucide-react:** Used for UI icons.
 -   **emergentintegrations:** Used for the LLM-powered support chatbot.
 
 **Testing status**
--   **Testing agent used after significant changes:** YES (for the basketball bonus rules feature)
+-   **Testing agent used after significant changes:** YES (for Football Demo, Kickoff, and Basketball Substitution features).
 -   **Troubleshoot agent used after agent stuck in loop:** NO
--   **Test files created:** []
--   **Known regressions:** None.
+-   **Test files created:**
+    -   
+    -   
+    -   
+-   **Known regressions:** The admin dashboard access was broken during development and is the subject of the current fix.
 
 **Credentials to test flow:**
 -   **Admin User:**  / 
 
 **What agent forgot to execute**
--   The agent had just begun investigating the user's latest request for football demo enhancements when the session concluded. The task is pending but was not forgotten.</analysis>
+-   The agent correctly identified and fixed the backend issue causing the admin dashboard problem (missing  flag). However, the session ended before a full end-to-end test of the admin login flow could be performed to verify the fix on the frontend.</analysis>
