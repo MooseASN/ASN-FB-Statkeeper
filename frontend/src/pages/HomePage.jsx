@@ -357,6 +357,28 @@ export default function HomePage() {
   const [authState, setAuthState] = useState(getInitialAuthState);
   const { isLoggedIn, user } = authState;
 
+  // Re-check auth state when component mounts or when navigating back to home
+  useEffect(() => {
+    const checkAuth = () => {
+      const currentState = getInitialAuthState();
+      setAuthState(currentState);
+    };
+    
+    // Check on mount
+    checkAuth();
+    
+    // Listen for storage changes (in case logout happens in another tab)
+    window.addEventListener('storage', checkAuth);
+    
+    // Also check when the window gains focus (user comes back to tab)
+    window.addEventListener('focus', checkAuth);
+    
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      window.removeEventListener('focus', checkAuth);
+    };
+  }, []);
+
   useEffect(() => {
     // Trigger sweep animation after initial fade-in
     const timer = setTimeout(() => {
