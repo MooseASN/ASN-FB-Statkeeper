@@ -195,6 +195,7 @@ function KickoffFieldView({
           Return
         </span>
       </div>
+      </div>
     </div>
   );
 }
