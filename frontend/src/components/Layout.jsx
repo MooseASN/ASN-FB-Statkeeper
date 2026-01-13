@@ -158,9 +158,9 @@ export default function Layout({ children, user, onLogout }) {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate("/dashboard")} className="cursor-pointer">
+                    <DropdownMenuItem onClick={() => navigate("/my-account")} className="cursor-pointer">
                       <LayoutDashboard className="w-4 h-4 mr-2" />
-                      Dashboard
+                      My Dashboard
                     </DropdownMenuItem>
                     {isAdminUser(user) && (
                       <>
