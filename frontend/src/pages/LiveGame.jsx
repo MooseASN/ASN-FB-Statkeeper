@@ -540,15 +540,14 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onRe
         <>
           {/* Row 1: Number | Name + Shooting Splits | Points */}
           <div className="flex items-center gap-2 sm:gap-3 mb-3">
-            {/* On-floor checkbox */}
-            {clockEnabled && (
-              <Checkbox
-                checked={isOnFloor}
-                onCheckedChange={() => onToggleFloor(player.id)}
-                disabled={!isOnFloor && !canCheckIn}
-                className="w-4 h-4 sm:w-5 sm:h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 flex-shrink-0"
-              />
-            )}
+            {/* Always show checkbox for player selection */}
+            <Checkbox
+              checked={isOnFloor}
+              onCheckedChange={() => onToggleFloor(player.id)}
+              disabled={!isOnFloor && !canCheckIn}
+              className="w-4 h-4 sm:w-5 sm:h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500 flex-shrink-0"
+              title={isOnFloor ? "On floor (click to sub out)" : (canCheckIn ? "Click to sub in" : "5 players max on floor")}
+            />
             
             {/* Player Number */}
             <div 
