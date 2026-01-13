@@ -462,14 +462,14 @@ const ExpandedPlayerCard = ({ player, teamColor, onShotClick, onStatUpdate, onRe
         <>
           {/* Header with player info */}
           <div className="flex items-center gap-3 mb-4">
-            {clockEnabled && (
-              <Checkbox
-                checked={isOnFloor}
-                onCheckedChange={() => onToggleFloor(player.id)}
-                disabled={!isOnFloor && !canCheckIn}
-                className="w-5 h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
-              />
-            )}
+            {/* Always show checkbox for player selection */}
+            <Checkbox
+              checked={isOnFloor}
+              onCheckedChange={() => onToggleFloor(player.id)}
+              disabled={!isOnFloor && !canCheckIn}
+              className="w-5 h-5 data-[state=checked]:bg-green-500 data-[state=checked]:border-green-500"
+              title={isOnFloor ? "On floor (click to sub out)" : (canCheckIn ? "Click to sub in" : "5 players max on floor")}
+            />
             <div 
               className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-white font-bold text-base sm:text-lg flex-shrink-0"
               style={{ backgroundColor: teamColor }}
