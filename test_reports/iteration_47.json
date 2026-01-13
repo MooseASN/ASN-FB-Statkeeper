@@ -1,0 +1,141 @@
+{
+  "summary": "Completed frontend testing of basketball demo mode player substitution, home page auth state handling, and login redirect. All features working correctly.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "Home Page (logged in)",
+        "issues": ["Account dropdown shows 'Admin' for admin users instead of user name/email - this is correct behavior as the user's name is 'Admin'"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/frontend/src/pages/LiveGame.jsx",
+    "/app/frontend/src/pages/HomePage.jsx",
+    "/app/frontend/src/pages/Login.jsx"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [],
+  "updated_files": [],
+  "success_rate": {
+    "backend": "N/A (frontend only testing)",
+    "frontend": "100%"
+  },
+  "test_credentials": {
+    "admin": {
+      "email": "antlersportsnetwork@gmail.com",
+      "password": "NoahTheJew1997",
+      "role": "admin",
+      "tier": "gold (effective)"
+    }
+  },
+  "seed_data_creation": "Demo mode uses hardcoded team data - Northside Tigers (home) and Eastwood Eagles (away) with 10 players each",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Basketball demo mode player substitution fully tested. Home page auth state handling verified. Admin user gets Gold tier access automatically.",
+  "features_tested": {
+    "1_basketball_demo_checkboxes_visible": {
+      "status": "PASS",
+      "details": {
+        "description": "Player checkboxes are visible for all players in demo mode",
+        "total_checkboxes": 20,
+        "home_team_checkboxes": 10,
+        "away_team_checkboxes": 10
+      }
+    },
+    "2_basketball_demo_sub_out": {
+      "status": "PASS",
+      "details": {
+        "description": "Can uncheck a player to sub them out",
+        "initial_on_floor": 5,
+        "after_sub_out": 4,
+        "checkbox_state_change": "checked -> unchecked"
+      }
+    },
+    "3_basketball_demo_sub_in": {
+      "status": "PASS",
+      "details": {
+        "description": "Can check a player to sub them in (only if less than 5 on floor)",
+        "after_sub_in": 5,
+        "checkbox_state_change": "unchecked -> checked"
+      }
+    },
+    "4_basketball_demo_5_player_limit": {
+      "status": "PASS",
+      "details": {
+        "description": "Cannot sub in more than 5 players - checkbox is disabled",
+        "verification": "Checkbox click timed out because element was not enabled"
+      }
+    },
+    "5_basketball_demo_local_state": {
+      "status": "PASS",
+      "details": {
+        "description": "Local state updates correctly when toggling players (no API call needed in demo mode)",
+        "note": "Demo mode uses local state for player check-in/out instead of API calls"
+      }
+    },
+    "6_homepage_not_logged_in_get_started": {
+      "status": "PASS",
+      "details": {
+        "description": "'Get Started' button redirects to /login for non-logged users",
+        "nav_button": "Get Started button visible in nav",
+        "hero_button": "Get Started button visible in hero section",
+        "redirect_url": "/login"
+      }
+    },
+    "7_homepage_not_logged_in_sign_in": {
+      "status": "PASS",
+      "details": {
+        "description": "'Sign In' button visible in nav for non-logged users",
+        "location": "Navigation bar"
+      }
+    },
+    "8_login_redirect_to_home": {
+      "status": "PASS",
+      "details": {
+        "description": "After successful login, redirects to home page (/) not /select-sport",
+        "redirect_url": "https://statsport.preview.emergentagent.com/"
+      }
+    },
+    "9_homepage_logged_in_account_dropdown": {
+      "status": "PASS",
+      "details": {
+        "description": "Shows account dropdown with user name instead of 'Get Started'",
+        "button_text": "Admin (user's name)",
+        "dropdown_options": ["Dashboard", "Select Sport", "Account Settings", "Sign Out"]
+      }
+    },
+    "10_homepage_logged_in_go_to_dashboard": {
+      "status": "PASS",
+      "details": {
+        "description": "Hero section shows 'Go to Dashboard' button instead of 'Get Started'",
+        "button_text": "Go to Dashboard"
+      }
+    },
+    "11_admin_gold_tier_access": {
+      "status": "PASS",
+      "details": {
+        "description": "Admin user has Gold tier access (all features unlocked)",
+        "api_response": {
+          "tier": "gold",
+          "actual_tier": "bronze",
+          "is_admin": true
+        }
+      }
+    }
+  },
+  "mocked_data": {
+    "note": "Demo mode uses local state for player substitution instead of API calls",
+    "basketball_demo": {
+      "home_team": "Northside Tigers",
+      "away_team": "Eastwood Eagles",
+      "players_per_team": 10,
+      "initial_on_floor": 5
+    }
+  }
+}
