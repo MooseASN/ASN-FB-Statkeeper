@@ -75,6 +75,13 @@ export default function AdminDashboard({ user, onLogout }) {
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [migrating, setMigrating] = useState(false);
   
+  // Check if user is admin - redirect if not
+  useEffect(() => {
+    if (user && !user.is_admin) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+  
   // Beta mode settings
   const [betaSettings, setBetaSettings] = useState({
     site_beta_enabled: false,
