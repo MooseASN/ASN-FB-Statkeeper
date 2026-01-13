@@ -221,62 +221,62 @@ export default function AccountDashboard({ user, onLogout }) {
                 {/* Features Grid */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex items-center gap-2 text-sm">
-                    {features.maxTeams === -1 ? (
+                    {safeFeatures.maxTeams === -1 ? (
                       <Check className="w-4 h-4 text-green-500" />
                     ) : (
-                      <span className="w-4 h-4 text-center text-xs font-medium text-gray-500">{features.maxTeams}</span>
+                      <span className="w-4 h-4 text-center text-xs font-medium text-gray-500">{safeFeatures.maxTeams}</span>
                     )}
                     <span className="text-gray-700">
-                      {features.maxTeams === -1 ? 'Unlimited Teams' : `Teams (${totalTeams}/${features.maxTeams})`}
+                      {safeFeatures.maxTeams === -1 ? 'Unlimited Teams' : `Teams (${totalTeams}/${safeFeatures.maxTeams})`}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    {features.liveStats ? (
+                    {safeFeatures.liveStats ? (
                       <Check className="w-4 h-4 text-green-500" />
                     ) : (
                       <X className="w-4 h-4 text-gray-300" />
                     )}
-                    <span className={features.liveStats ? "text-gray-700" : "text-gray-400"}>
+                    <span className={safeFeatures.liveStats ? "text-gray-700" : "text-gray-400"}>
                       Live Stats Sharing
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    {features.pdfExport ? (
+                    {safeFeatures.pdfExport ? (
                       <Check className="w-4 h-4 text-green-500" />
                     ) : (
                       <X className="w-4 h-4 text-gray-300" />
                     )}
-                    <span className={features.pdfExport ? "text-gray-700" : "text-gray-400"}>
+                    <span className={safeFeatures.pdfExport ? "text-gray-700" : "text-gray-400"}>
                       PDF Export
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    {features.embedWidgets ? (
+                    {safeFeatures.embedWidgets ? (
                       <Check className="w-4 h-4 text-green-500" />
                     ) : (
                       <X className="w-4 h-4 text-gray-300" />
                     )}
-                    <span className={features.embedWidgets ? "text-gray-700" : "text-gray-400"}>
+                    <span className={safeFeatures.embedWidgets ? "text-gray-700" : "text-gray-400"}>
                       Embed Widgets
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    {features.advancedStats ? (
+                    {safeFeatures.advancedStats ? (
                       <Check className="w-4 h-4 text-green-500" />
                     ) : (
                       <X className="w-4 h-4 text-gray-300" />
                     )}
-                    <span className={features.advancedStats ? "text-gray-700" : "text-gray-400"}>
+                    <span className={safeFeatures.advancedStats ? "text-gray-700" : "text-gray-400"}>
                       Advanced Statistics
                     </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
-                    {features.seasonStats ? (
+                    {safeFeatures.seasonStats ? (
                       <Check className="w-4 h-4 text-green-500" />
                     ) : (
                       <X className="w-4 h-4 text-gray-300" />
                     )}
-                    <span className={features.seasonStats ? "text-gray-700" : "text-gray-400"}>
+                    <span className={safeFeatures.seasonStats ? "text-gray-700" : "text-gray-400"}>
                       Season Statistics
                     </span>
                   </div>
