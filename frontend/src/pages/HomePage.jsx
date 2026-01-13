@@ -590,16 +590,32 @@ export default function HomePage() {
               heroInView ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
           >
-            <Link to="/pricing">
-              <Button size="lg" className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide">
-                Get Started
+            {isLoggedIn ? (
+              /* Logged in - Go to sport selection */
+              <Button 
+                size="lg" 
+                onClick={() => navigate("/select-sport")}
+                className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide"
+              >
+                Go to Dashboard
               </Button>
-            </Link>
-            <Link to="/login">
-              <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 px-10 py-6 text-lg font-bold uppercase tracking-wide">
-                Sign In
-              </Button>
-            </Link>
+            ) : (
+              /* Not logged in - Sign in flow */
+              <>
+                <Button 
+                  size="lg" 
+                  onClick={handleGetStarted}
+                  className="bg-white text-black hover:bg-gray-200 px-10 py-6 text-lg font-bold uppercase tracking-wide"
+                >
+                  Get Started
+                </Button>
+                <Link to="/login">
+                  <Button size="lg" variant="outline" className="border-gray-600 text-white hover:bg-gray-800 px-10 py-6 text-lg font-bold uppercase tracking-wide">
+                    Sign In
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </section>
