@@ -5,60 +5,39 @@ import { cn } from "@/lib/utils";
 export function LoadingScreen({ message = "" }) {
   return (
     <div className="min-h-screen bg-gradient-to-br from-zinc-900 via-black to-zinc-800 flex flex-col items-center justify-center">
-      {/* Logo */}
+      {/* Logo with spinning circle */}
       <div className="relative mb-8">
         {/* StatMoose Logo - White */}
-        <svg 
-          width="120" 
-          height="120" 
-          viewBox="0 0 120 120" 
-          fill="none" 
-          xmlns="http://www.w3.org/2000/svg"
-          className="text-white"
-        >
-          {/* Moose antler silhouette */}
-          <path 
-            d="M60 20C60 20 45 10 30 25C15 40 25 55 25 55L35 50C35 50 30 40 40 30C50 20 60 25 60 25V20Z" 
-            fill="currentColor"
-          />
-          <path 
-            d="M60 20C60 20 75 10 90 25C105 40 95 55 95 55L85 50C85 50 90 40 80 30C70 20 60 25 60 25V20Z" 
-            fill="currentColor"
-          />
-          {/* Moose head */}
-          <ellipse cx="60" cy="55" rx="18" ry="22" fill="currentColor"/>
-          {/* Moose snout */}
-          <ellipse cx="60" cy="72" rx="10" ry="8" fill="currentColor"/>
-          {/* Text: SM */}
-          <text x="60" y="95" textAnchor="middle" fill="currentColor" fontSize="20" fontWeight="bold" fontFamily="system-ui">
-            StatMoose
-          </text>
-        </svg>
+        <img 
+          src="/logo-white.png" 
+          alt="StatMoose" 
+          className="w-24 h-24 object-contain"
+        />
         
         {/* Spinning circle around logo */}
-        <div className="absolute inset-0 -m-4">
+        <div className="absolute inset-0 -m-6">
           <svg 
             className="w-full h-full animate-spin" 
             style={{ animationDuration: '2s' }}
-            viewBox="0 0 128 128"
+            viewBox="0 0 144 144"
           >
             <circle
-              cx="64"
-              cy="64"
-              r="60"
+              cx="72"
+              cy="72"
+              r="68"
               stroke="rgba(255,255,255,0.1)"
               strokeWidth="2"
               fill="none"
             />
             <circle
-              cx="64"
-              cy="64"
-              r="60"
+              cx="72"
+              cy="72"
+              r="68"
               stroke="white"
               strokeWidth="2"
               fill="none"
               strokeLinecap="round"
-              strokeDasharray="90 270"
+              strokeDasharray="100 314"
             />
           </svg>
         </div>
