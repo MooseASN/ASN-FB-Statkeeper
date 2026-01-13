@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, X, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { LoadingScreen } from '../components/LoadingScreen';
 import { toast } from 'sonner';
 import axios from 'axios';
 
