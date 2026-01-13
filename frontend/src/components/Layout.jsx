@@ -158,17 +158,18 @@ export default function Layout({ children, user, onLogout }) {
                       {user.email}
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => navigate("/my-account")} className="cursor-pointer">
-                      <LayoutDashboard className="w-4 h-4 mr-2" />
-                      My Dashboard
-                    </DropdownMenuItem>
-                    {isAdminUser(user) && (
-                      <>
-                        <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer text-amber-600">
-                          <Shield className="w-4 h-4 mr-2" />
-                          Admin Dashboard
-                        </DropdownMenuItem>
-                      </>
+                    {isAdminUser(user) ? (
+                      /* Admin users - show Admin Dashboard as primary */
+                      <DropdownMenuItem onClick={() => navigate("/admin")} className="cursor-pointer text-amber-600">
+                        <Shield className="w-4 h-4 mr-2" />
+                        Admin Dashboard
+                      </DropdownMenuItem>
+                    ) : (
+                      /* Non-admin users - show My Dashboard */
+                      <DropdownMenuItem onClick={() => navigate("/my-account")} className="cursor-pointer">
+                        <LayoutDashboard className="w-4 h-4 mr-2" />
+                        My Dashboard
+                      </DropdownMenuItem>
                     )}
                     {schoolInfo && (
                       <>
