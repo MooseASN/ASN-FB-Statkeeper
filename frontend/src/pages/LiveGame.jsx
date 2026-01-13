@@ -1029,6 +1029,21 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
 
   // Player check-in/out for minutes tracking
   const handlePlayerCheckIn = async (playerId) => {
+    // In demo mode, update local state only
+    if (demoMode) {
+      setGame(prevGame => {
+        if (!prevGame) return prevGame;
+        const isHome = prevGame.home_player_stats?.some(p => p.id === playerId);
+        const floorKey = isHome ? 'home_on_floor' : 'away_on_floor';
+        const currentFloor = prevGame[floorKey] || [];
+        if (currentFloor.length >= 5 || currentFloor.includes(playerId)) {
+          return prevGame;
+        }
+        return { ...prevGame, [floorKey]: [...currentFloor, playerId] };
+      });
+      return;
+    }
+    
     try {
       await axios.post(`${API}/games/${id}/players/${playerId}/check-in`);
       fetchGame();
@@ -1038,6 +1053,18 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   };
 
   const handlePlayerCheckOut = async (playerId) => {
+    // In demo mode, update local state only
+    if (demoMode) {
+      setGame(prevGame => {
+        if (!prevGame) return prevGame;
+        const isHome = prevGame.home_player_stats?.some(p => p.id === playerId);
+        const floorKey = isHome ? 'home_on_floor' : 'away_on_floor';
+        const currentFloor = prevGame[floorKey] || [];
+        return { ...prevGame, [floorKey]: currentFloor.filter(id => id !== playerId) };
+      });
+      return;
+    }
+    
     try {
       await axios.post(`${API}/games/${id}/players/${playerId}/check-out`);
       fetchGame();
