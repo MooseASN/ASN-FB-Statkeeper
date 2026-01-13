@@ -23,6 +23,7 @@ import {
   Shield
 } from "lucide-react";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { SubscriptionManager } from "@/components/SubscriptionManager";
 import { useSubscriptionFeatures } from "@/hooks/useSubscriptionFeatures";
 import { SPORT_CONFIG } from "@/contexts/SportContext";
 
