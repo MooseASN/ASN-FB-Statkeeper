@@ -1,0 +1,32 @@
+{
+  "name": "StatMoose",
+  "short_name": "StatMoose",
+  "description": "Live sports statistics tracker for basketball, football, and baseball",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["sports", "utilities"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}
