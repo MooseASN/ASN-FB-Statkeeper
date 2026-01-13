@@ -14,6 +14,36 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 13, 2026 - FOOTBALL FIELD VIEW FIX ✅
+
+**Bug Fix: Incorrect Football Field Dimensions**
+- American football field: 120 yards total (100-yard playing field + two 10-yard end zones)
+- Fixed end zone visual width from 10% to 8.33% (10/120 yards)
+- 5-yard line now correctly appears inside the playing field, not in the end zone
+- Yard lines (10, 20, 30, 40, 50, 60, 70, 80, 90) correctly positioned
+
+**Components Fixed:**
+- `FootballField.jsx` - Main field visualization
+- `FieldViewDialog.jsx` - Play field view with ball position
+- `PuntFieldView.jsx` - Punt trajectory visualization
+- `FieldGoalFieldView.jsx` - Field goal attempts
+- `KickoffWorkflowDialog.jsx` - Kickoff workflow field
+- `SimpleFootballLiveGame.jsx` (SimpleKickoffFieldView)
+
+**Technical Details:**
+```javascript
+// Correct end zone calculation
+const END_ZONE_PERCENT = (10 / 120) * 100; // 8.33%
+const FIELD_PERCENT = 100 - (2 * END_ZONE_PERCENT); // 83.33%
+```
+
+**Testing:**
+- All frontend tests passed (100% success rate)
+- Syntax error in KickoffWorkflowDialog.jsx fixed
+- Test report: `/app/test_reports/iteration_51.json`
+
+---
+
 ### January 13, 2026 - SUBSCRIPTION MANAGEMENT UI, PWA & REFACTORING ✅
 
 **Feature: Subscription Management UI**
