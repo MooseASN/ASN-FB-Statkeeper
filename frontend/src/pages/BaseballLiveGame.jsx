@@ -1651,9 +1651,24 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
       setHomeStats(res.data.home_player_stats || []);
       setAwayStats(res.data.away_player_stats || []);
       setPlays(res.data.play_by_play || []);
+      
+      // Load saved lineup configuration if it exists
+      if (res.data.home_batting_order && res.data.home_batting_order.length > 0) {
+        setHomeBattingOrder(res.data.home_batting_order);
+        setStartersConfigured(true);
+      }
+      if (res.data.away_batting_order && res.data.away_batting_order.length > 0) {
+        setAwayBattingOrder(res.data.away_batting_order);
+      }
+      if (res.data.home_defense) {
+        setHomeDefense(res.data.home_defense);
+      }
+      if (res.data.away_defense) {
+        setAwayDefense(res.data.away_defense);
+      }
     } catch (error) {
       toast.error("Failed to load game");
-      navigate("/dashboard");
+      navigate("/");
     } finally {
       setLoading(false);
     }
@@ -1676,12 +1691,17 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
         inning_scores: updatedGame.inning_scores,
         home_player_stats: homeStats,
         away_player_stats: awayStats,
-        play_by_play: playByPlay
+        play_by_play: playByPlay,
+        // Save lineup configuration
+        home_batting_order: homeBattingOrder,
+        away_batting_order: awayBattingOrder,
+        home_defense: homeDefense,
+        away_defense: awayDefense
       });
     } catch (error) {
       console.error("Failed to save game:", error);
     }
-  }, [id, demoMode, homeStats, awayStats, playByPlay]);
+  }, [id, demoMode, homeStats, awayStats, playByPlay, homeBattingOrder, awayBattingOrder, homeDefense, awayDefense]);
   
   useEffect(() => {
     if (!demoMode) {
