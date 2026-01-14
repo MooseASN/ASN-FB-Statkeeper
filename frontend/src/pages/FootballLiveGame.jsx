@@ -1073,8 +1073,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
         ? Math.min(100, newBallPosition + 10) 
         : Math.max(0, newBallPosition - 10);
       setFirstDownMarker(newFDMarker);
-      // Start new drive for receiving team
-      startNewDrive('turnover', newPossession);
+      // Start new drive for receiving team - pass newBallPosition explicitly
+      startNewDrive('turnover', newPossession, newBallPosition);
       toast.info('Fumble - turnover! New drive started.');
     } else {
       setBallPosition(newBallPosition);
