@@ -631,7 +631,7 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
       // Only navigate away on initial load failure
       if (isInitialLoad) {
         toast.error("Failed to load game");
-        navigate("/dashboard");
+        navigate("/");
       }
       // Silently ignore refresh errors
     } finally {
