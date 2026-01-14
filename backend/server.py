@@ -1877,6 +1877,11 @@ class GameUpdate(BaseModel):
     inning_scores: Optional[dict] = None  # {"home": [int], "away": [int]}
     home_player_stats: Optional[List[dict]] = None
     away_player_stats: Optional[List[dict]] = None
+    # Baseball lineup configuration
+    home_batting_order: Optional[List[dict]] = None
+    away_batting_order: Optional[List[dict]] = None
+    home_defense: Optional[dict] = None
+    away_defense: Optional[dict] = None
 
 # Sponsor Banner Model
 class SponsorBanner(BaseModel):
