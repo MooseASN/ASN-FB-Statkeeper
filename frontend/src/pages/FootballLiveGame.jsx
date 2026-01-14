@@ -2542,7 +2542,7 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/")}
             className="text-zinc-400 hover:text-white"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
