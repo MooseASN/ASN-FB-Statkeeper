@@ -2716,7 +2716,7 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
             <Button 
               variant="ghost" 
               size="sm" 
-              onClick={() => navigate(demoMode ? "/" : "/dashboard")}
+              onClick={() => navigate("/")}
               className="text-zinc-400 hover:text-white"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
