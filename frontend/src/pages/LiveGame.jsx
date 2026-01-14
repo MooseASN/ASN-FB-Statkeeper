@@ -1786,7 +1786,7 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
               <Button 
                 variant="ghost" 
                 size="icon" 
-                onClick={() => navigate("/")} 
+                onClick={() => navigate(demoMode ? "/" : "/dashboard/basketball")} 
                 className="text-white hover:bg-white/10"
                 data-testid="back-btn"
               >
