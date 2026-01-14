@@ -801,7 +801,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
       }, 500);
     } else {
       // Start a new drive for the receiving team after kickoff
-      startNewDrive('kickoff', receivingTeam);
+      // Pass newBallPos explicitly since setBallPosition hasn't updated state yet
+      startNewDrive('kickoff', receivingTeam, newBallPos);
     }
     
     // Close workflow
