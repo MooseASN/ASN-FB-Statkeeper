@@ -2818,10 +2818,16 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
               plays={playByPlay} 
               onUpdatePlay={updatePlay}
               onDeletePlay={deletePlay}
+              homeRoster={homeRoster}
+              awayRoster={awayRoster}
               onRecalculateStats={() => {
                 // Note: Full stat recalculation would require tracking metadata with each play
                 // For now, just show a toast that the play was edited
-                toast.info("Play updated. Manual stat adjustments may be needed.");
+                toast.info("Play updated. Stats will be recalculated.");
+                // Trigger a save to persist the changes
+                if (game) {
+                  saveGame(game);
+                }
               }}
             />
             <BattingOrder 
