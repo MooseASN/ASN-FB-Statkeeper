@@ -14,6 +14,49 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (January 2026)
 
+### January 14, 2026 - MULTI-SPORT FIXES ✅
+
+**Task 5: Baseball Score on Sport Home Page**
+- Verified: Baseball game scores save correctly to backend via PUT endpoint
+- `home_score` and `away_score` persist when games are saved
+- **Note:** Demo games don't save to backend by design - only real games with logged-in users persist
+
+**Task 4: Baseball Lineup Persistence**
+- Added `home_batting_order`, `away_batting_order`, `home_defense`, `away_defense` fields to GameUpdate model
+- `fetchGame` now loads lineup configuration if present and sets `startersConfigured=true`
+- `handleStarterConfigComplete` immediately saves lineup to backend
+- Users won't be asked to configure lineups for in-progress games anymore
+
+**Task 3: Baseball Play-by-Play Edit Enhancement**
+- Enhanced `PlayByPlayLog` component with:
+  - Player dropdown (from combined home/away rosters)
+  - Play type dropdown (Single, Double, Triple, Home Run, Walk, Strikeout, etc.)
+  - RBI input field
+  - Description override option
+- Changes trigger stats recalculation notification
+
+**Task 2: Back Buttons Go to Home**
+- All demo mode back buttons now navigate to "/" (home page):
+  - `FootballLiveGame.jsx` - Back button
+  - `SimpleFootballLiveGame.jsx` - Back button
+  - `LiveGame.jsx` (Basketball) - Back button
+  - `BaseballLiveGame.jsx` - Back button
+  - `FootballDemoSelector.jsx` - Back button
+  - `DemoLiveGameAdvanced.jsx`, `DemoLiveGameClassic.jsx`, `DemoLiveGameQuick.jsx` - Back buttons
+
+**Task 1: Football Drive Calculator**
+- Fixed `netYards` calculation using direction multiplier:
+  - Home team: direction = 1 (advances towards 100)
+  - Away team: direction = -1 (advances towards 0)
+- Added `startPos` parameter to `startNewDrive` for React state timing fix
+- Formula: `netYards = (endPosition - startPosition) * driveDirection`
+
+**Testing:**
+- All tests passed (100% backend + frontend success rate)
+- Test report: `/app/test_reports/iteration_54.json`
+
+---
+
 ### January 13, 2026 - FOOTBALL FIELD VIEW FIX ✅
 
 **Bug Fix: Incorrect Football Field Dimensions**
