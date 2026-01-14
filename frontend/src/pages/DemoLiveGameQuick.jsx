@@ -43,10 +43,10 @@ export default function DemoLiveGameQuick() {
         <div className="text-center">
           <p className="text-red-500">{error || "Failed to load demo"}</p>
           <button 
-            onClick={() => navigate("/demo/basketball")}
+            onClick={() => navigate("/")}
             className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg"
           >
-            Back to Demo Selection
+            Back to Home
           </button>
         </div>
       </div>
