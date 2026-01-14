@@ -1727,6 +1727,18 @@ export default function BaseballLiveGame({ demoMode = false, initialDemoData = n
     setAwayDefense(config.awayDefense);
     setStartersConfigured(true);
     setShowStarterConfig(false);
+    
+    // Save lineup configuration to backend immediately
+    if (!demoMode && game) {
+      axios.put(`${API}/games/${id}`, {
+        ...game,
+        home_batting_order: config.homeBattingOrder,
+        away_batting_order: config.awayBattingOrder,
+        home_defense: config.homeDefense,
+        away_defense: config.awayDefense
+      }).catch(err => console.error("Failed to save lineup:", err));
+    }
+    
     toast.success("Starters configured! Game is ready.");
   };
   
