@@ -1488,7 +1488,7 @@ export default function SimpleFootballLiveGame({ demoMode = false, initialDemoDa
     <div className="h-screen bg-black text-white flex flex-col overflow-hidden" data-testid="simple-football-page">
       {/* Header */}
       <div className="bg-zinc-900 border-b border-zinc-800 px-4 py-2 flex items-center justify-between shrink-0">
-        <Button variant="ghost" size="sm" onClick={() => navigate(demoMode ? "/select-sport" : "/dashboard")} className="text-zinc-400" data-testid="back-btn">
+        <Button variant="ghost" size="sm" onClick={() => navigate("/")} className="text-zinc-400" data-testid="back-btn">
           <ArrowLeft className="w-4 h-4 mr-1" />Back
         </Button>
         <div className="flex items-center gap-1 text-orange-500">
