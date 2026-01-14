@@ -1153,32 +1153,81 @@ const BattingOrder = ({ players, currentBatterIndex, onSelectBatter, onSubstitut
 
 // Play by Play Log Component - Compact version
 // Editable Play-by-Play Log Component
-const PlayByPlayLog = ({ plays, onUpdatePlay, onDeletePlay, onRecalculateStats }) => {
-  const [editingPlayId, setEditingPlayId] = useState(null);
-  const [editText, setEditText] = useState("");
+const PlayByPlayLog = ({ plays, onUpdatePlay, onDeletePlay, onRecalculateStats, homeRoster, awayRoster }) => {
+  const [editingPlay, setEditingPlay] = useState(null);
   const [showAllPlays, setShowAllPlays] = useState(false);
   const [confirmDeleteId, setConfirmDeleteId] = useState(null);
   
+  // Play types for the dropdown
+  const PLAY_TYPES = [
+    { value: 'single', label: 'Single', category: 'hit' },
+    { value: 'double', label: 'Double', category: 'hit' },
+    { value: 'triple', label: 'Triple', category: 'hit' },
+    { value: 'home_run', label: 'Home Run', category: 'hit' },
+    { value: 'walk', label: 'Walk (BB)', category: 'on_base' },
+    { value: 'hbp', label: 'Hit By Pitch', category: 'on_base' },
+    { value: 'strikeout_swinging', label: 'Strikeout (Swinging)', category: 'out' },
+    { value: 'strikeout_looking', label: 'Strikeout (Looking)', category: 'out' },
+    { value: 'groundout', label: 'Groundout', category: 'out' },
+    { value: 'flyout', label: 'Flyout', category: 'out' },
+    { value: 'lineout', label: 'Lineout', category: 'out' },
+    { value: 'popout', label: 'Popout', category: 'out' },
+    { value: 'fielders_choice', label: "Fielder's Choice", category: 'out' },
+    { value: 'double_play', label: 'Double Play', category: 'out' },
+    { value: 'triple_play', label: 'Triple Play', category: 'out' },
+    { value: 'sacrifice_fly', label: 'Sacrifice Fly', category: 'sacrifice' },
+    { value: 'sacrifice_bunt', label: 'Sacrifice Bunt', category: 'sacrifice' },
+    { value: 'error', label: 'Reached on Error', category: 'other' },
+    { value: 'run_scored', label: 'Run Scored', category: 'other' },
+  ];
+  
   const handleStartEdit = (play) => {
-    setEditingPlayId(play.id);
-    setEditText(play.description);
+    // Parse play to extract player and type
+    setEditingPlay({
+      ...play,
+      editedPlayer: play.batterId || play.batter_id || '',
+      editedType: play.playType || play.play_type || 'single',
+      editedDescription: play.description,
+      editedRbi: play.rbi || 0,
+    });
   };
   
-  const handleSaveEdit = (play) => {
-    if (editText.trim() !== play.description) {
-      onUpdatePlay(play.id, { description: editText.trim() });
-      // Trigger stats recalculation if the edit affects scoring
-      if (onRecalculateStats) {
-        onRecalculateStats();
+  const handleSaveEdit = () => {
+    if (!editingPlay) return;
+    
+    const allPlayers = [...(homeRoster || []), ...(awayRoster || [])];
+    const player = allPlayers.find(p => p.player_number === editingPlay.editedPlayer);
+    const playType = PLAY_TYPES.find(t => t.value === editingPlay.editedType);
+    
+    // Build new description
+    let newDescription = editingPlay.editedDescription;
+    if (player && playType) {
+      newDescription = `${playType.label} - #${player.player_number} ${player.player_name}`;
+      if (editingPlay.editedRbi > 0) {
+        newDescription += ` (${editingPlay.editedRbi} RBI)`;
       }
     }
-    setEditingPlayId(null);
-    setEditText("");
+    
+    onUpdatePlay(editingPlay.id, { 
+      description: newDescription,
+      batterId: editingPlay.editedPlayer,
+      batter_id: editingPlay.editedPlayer,
+      playType: editingPlay.editedType,
+      play_type: editingPlay.editedType,
+      rbi: editingPlay.editedRbi,
+      lastEdited: new Date().toISOString()
+    });
+    
+    // Trigger stats recalculation
+    if (onRecalculateStats) {
+      onRecalculateStats();
+    }
+    
+    setEditingPlay(null);
   };
   
   const handleCancelEdit = () => {
-    setEditingPlayId(null);
-    setEditText("");
+    setEditingPlay(null);
   };
   
   const handleDelete = (playId) => {
@@ -1189,6 +1238,9 @@ const PlayByPlayLog = ({ plays, onUpdatePlay, onDeletePlay, onRecalculateStats }
       onRecalculateStats();
     }
   };
+  
+  // Combine rosters for player selection
+  const allPlayers = [...(homeRoster || []), ...(awayRoster || [])];
   
   const displayPlays = showAllPlays ? plays : plays?.slice(0, 10);
   
@@ -1214,38 +1266,102 @@ const PlayByPlayLog = ({ plays, onUpdatePlay, onDeletePlay, onRecalculateStats }
               key={play.id} 
               className="text-xs text-zinc-300 mb-1 pb-1 border-b border-zinc-800/50 group relative"
             >
-              {editingPlayId === play.id ? (
-                // Edit mode
-                <div className="space-y-1">
-                  <div className="flex items-center gap-1">
-                    <span className="text-zinc-500 flex-shrink-0">{play.inning}</span>
+              {editingPlay?.id === play.id ? (
+                // Enhanced Edit mode
+                <div className="space-y-2 bg-zinc-800 rounded p-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-zinc-500 text-[10px]">{play.inning}</span>
+                    <span className="text-zinc-400 text-[10px]">Edit Play</span>
+                  </div>
+                  
+                  {/* Player selector */}
+                  <div>
+                    <label className="text-[10px] text-zinc-500 block mb-1">Player</label>
+                    <select
+                      value={editingPlay.editedPlayer}
+                      onChange={(e) => setEditingPlay(prev => ({ ...prev, editedPlayer: e.target.value }))}
+                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs text-white"
+                    >
+                      <option value="">Select player...</option>
+                      {allPlayers.map(p => (
+                        <option key={p.player_number} value={p.player_number}>
+                          #{p.player_number} {p.player_name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  
+                  {/* Play type selector */}
+                  <div>
+                    <label className="text-[10px] text-zinc-500 block mb-1">Play Type</label>
+                    <select
+                      value={editingPlay.editedType}
+                      onChange={(e) => setEditingPlay(prev => ({ ...prev, editedType: e.target.value }))}
+                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs text-white"
+                    >
+                      <optgroup label="Hits">
+                        {PLAY_TYPES.filter(t => t.category === 'hit').map(t => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="On Base">
+                        {PLAY_TYPES.filter(t => t.category === 'on_base').map(t => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Outs">
+                        {PLAY_TYPES.filter(t => t.category === 'out').map(t => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </optgroup>
+                      <optgroup label="Other">
+                        {PLAY_TYPES.filter(t => t.category === 'sacrifice' || t.category === 'other').map(t => (
+                          <option key={t.value} value={t.value}>{t.label}</option>
+                        ))}
+                      </optgroup>
+                    </select>
+                  </div>
+                  
+                  {/* RBI input */}
+                  <div>
+                    <label className="text-[10px] text-zinc-500 block mb-1">RBI</label>
                     <input
-                      type="text"
-                      value={editText}
-                      onChange={(e) => setEditText(e.target.value)}
-                      className="flex-1 bg-zinc-800 border border-zinc-600 rounded px-2 py-1 text-xs text-white"
-                      autoFocus
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') handleSaveEdit(play);
-                        if (e.key === 'Escape') handleCancelEdit();
-                      }}
+                      type="number"
+                      min="0"
+                      max="4"
+                      value={editingPlay.editedRbi}
+                      onChange={(e) => setEditingPlay(prev => ({ ...prev, editedRbi: parseInt(e.target.value) || 0 }))}
+                      className="w-20 bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs text-white"
                     />
                   </div>
-                  <div className="flex gap-1 justify-end">
+                  
+                  {/* Description (for custom text) */}
+                  <div>
+                    <label className="text-[10px] text-zinc-500 block mb-1">Description (optional override)</label>
+                    <input
+                      type="text"
+                      value={editingPlay.editedDescription}
+                      onChange={(e) => setEditingPlay(prev => ({ ...prev, editedDescription: e.target.value }))}
+                      className="w-full bg-zinc-700 border border-zinc-600 rounded px-2 py-1 text-xs text-white"
+                      placeholder="Auto-generated from player/play type"
+                    />
+                  </div>
+                  
+                  <div className="flex gap-1 justify-end pt-1">
                     <Button
                       size="sm"
                       variant="ghost"
-                      className="h-5 text-[10px] px-2 text-zinc-400"
+                      className="h-6 text-[10px] px-2 text-zinc-400"
                       onClick={handleCancelEdit}
                     >
                       Cancel
                     </Button>
                     <Button
                       size="sm"
-                      className="h-5 text-[10px] px-2 bg-green-600 hover:bg-green-700"
-                      onClick={() => handleSaveEdit(play)}
+                      className="h-6 text-[10px] px-3 bg-green-600 hover:bg-green-700"
+                      onClick={handleSaveEdit}
                     >
-                      Save
+                      Save Changes
                     </Button>
                   </div>
                 </div>
