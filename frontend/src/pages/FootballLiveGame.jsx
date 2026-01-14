@@ -403,13 +403,17 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   }, [possession]);
 
   // Start a new drive
-  const startNewDrive = useCallback((reason, newPossession = possession) => {
+  // Optional startPos parameter allows passing the correct position when React state hasn't updated yet
+  const startNewDrive = useCallback((reason, newPossession = possession, startPos = null) => {
+    // Use provided startPos, or fall back to current ballPosition
+    const effectiveStartPosition = startPos !== null ? startPos : ballPosition;
+    
     const newDrive = {
       id: `drive-${Date.now()}`,
       team: newPossession,
       startPeriod: quarter,
       startClock: clockTime,
-      startPosition: ballPosition,
+      startPosition: effectiveStartPosition,
       startReason: reason,
       plays: [],
       playCount: 0,
@@ -426,14 +430,14 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
       // Calculate net yards based on direction of play
       // Home team advances towards 100, away team advances towards 0
       const driveDirection = currentDrive.team === 'home' ? 1 : -1;
-      const rawYards = ballPosition - currentDrive.startPosition;
+      const rawYards = effectiveStartPosition - currentDrive.startPosition;
       const netYards = rawYards * driveDirection;
       
       const endedDrive = {
         ...currentDrive,
         endPeriod: quarter,
         endClock: clockTime,
-        endPosition: ballPosition,
+        endPosition: effectiveStartPosition,
         netYards: netYards,
       };
       setAllDrives(prev => [...prev, endedDrive]);
