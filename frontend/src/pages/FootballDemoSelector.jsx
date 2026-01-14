@@ -121,10 +121,10 @@ export default function FootballDemoSelector() {
               className="h-10 w-auto"
             />
           </Link>
-          <Link to="/demo">
+          <Link to="/">
             <Button variant="ghost" className="text-gray-300 hover:text-white hover:bg-gray-800">
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Sports
+              Back to Home
             </Button>
           </Link>
         </div>
