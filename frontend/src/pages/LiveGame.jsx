@@ -2151,27 +2151,40 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                     {Array.from({ length: game?.total_timeouts || 4 }, (_, i) => (
                       <div
                         key={i}
-                        className="w-3 h-3 rounded-full"
+                        className="w-3 h-3 rounded-full cursor-pointer"
                         style={{
                           backgroundColor: i < (game?.home_timeouts_used || 0) ? '#d1d5db' : homeColor
                         }}
+                        onClick={handleEditTimeouts}
+                        title="Click to edit timeouts"
                       />
                     ))}
                   </div>
-                  {isActive && (
+                  <div className="flex items-center gap-1 mt-2">
+                    {isActive && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="text-xs h-7"
+                        onClick={() => {
+                          setTimeoutTeam("home");
+                          setTimeoutDialogOpen(true);
+                        }}
+                        disabled={(game?.home_timeouts_used || 0) >= (game?.total_timeouts || 4)}
+                      >
+                        Timeout
+                      </Button>
+                    )}
                     <Button
                       size="sm"
-                      variant="outline"
-                      className="mt-2 text-xs h-7"
-                      onClick={() => {
-                        setTimeoutTeam("home");
-                        setTimeoutDialogOpen(true);
-                      }}
-                      disabled={(game?.home_timeouts_used || 0) >= (game?.total_timeouts || 4)}
+                      variant="ghost"
+                      className="text-xs h-7 px-2"
+                      onClick={handleEditTimeouts}
+                      title="Edit timeouts"
                     >
-                      Timeout
+                      <Edit className="w-3 h-3" />
                     </Button>
-                  )}
+                  </div>
                   {/* Bonus Button */}
                   {isActive && (
                     <div className="flex flex-col items-center mt-2">
