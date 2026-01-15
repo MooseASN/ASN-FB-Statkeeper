@@ -2421,7 +2421,8 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                     <p>Steals: <span className="font-medium text-foreground">{homeTeamStats.steals}</span></p>
                     <p>Blocks: <span className="font-medium text-foreground">{homeTeamStats.blocks}</span></p>
                     <p>Turnovers: <span className="font-medium text-foreground">{homeTeamStats.turnovers}</span></p>
-                    <p>Team Fouls: <span className="font-medium text-foreground">{homeTeamStats.fouls}</span></p>
+                    <p>Player Fouls: <span className="font-medium text-foreground">{homeTeamStats.fouls}</span></p>
+                    <p>Team Fouls (Qtr): <span className="font-medium text-foreground">{game?.home_team_fouls || 0}</span></p>
                   </div>
                 </div>
                 <div>
@@ -2439,7 +2440,8 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                     <p>Steals: <span className="font-medium text-foreground">{awayTeamStats.steals}</span></p>
                     <p>Blocks: <span className="font-medium text-foreground">{awayTeamStats.blocks}</span></p>
                     <p>Turnovers: <span className="font-medium text-foreground">{awayTeamStats.turnovers}</span></p>
-                    <p>Team Fouls: <span className="font-medium text-foreground">{awayTeamStats.fouls}</span></p>
+                    <p>Player Fouls: <span className="font-medium text-foreground">{awayTeamStats.fouls}</span></p>
+                    <p>Team Fouls (Qtr): <span className="font-medium text-foreground">{game?.away_team_fouls || 0}</span></p>
                   </div>
                 </div>
               </div>
