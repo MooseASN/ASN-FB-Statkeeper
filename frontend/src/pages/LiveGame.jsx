@@ -2182,7 +2182,7 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                       onClick={handleEditTimeouts}
                       title="Edit timeouts"
                     >
-                      <Edit className="w-3 h-3" />
+                      <Pencil className="w-3 h-3" />
                     </Button>
                   </div>
                   {/* Bonus Button */}
