@@ -2246,10 +2246,12 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                     {Array.from({ length: game?.total_timeouts || 4 }, (_, i) => (
                       <div
                         key={i}
-                        className="w-3 h-3 rounded-full"
+                        className="w-3 h-3 rounded-full cursor-pointer"
                         style={{
                           backgroundColor: i < (game?.away_timeouts_used || 0) ? '#d1d5db' : awayColor
                         }}
+                        onClick={handleEditTimeouts}
+                        title="Click to edit timeouts"
                       />
                     ))}
                   </div>
