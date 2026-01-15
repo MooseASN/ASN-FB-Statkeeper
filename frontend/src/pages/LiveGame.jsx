@@ -755,6 +755,8 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   // Timeout state
   const [timeoutDialogOpen, setTimeoutDialogOpen] = useState(false);
   const [timeoutTeam, setTimeoutTeam] = useState(null); // "home" or "away"
+  const [editTimeoutsOpen, setEditTimeoutsOpen] = useState(false);
+  const [editTimeoutsData, setEditTimeoutsData] = useState({ home: 0, away: 0, total: 4 });
   
   // Assist flow state (for showing assist modal after made 2pt/3pt)
   const [assistModalOpen, setAssistModalOpen] = useState(false);
