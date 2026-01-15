@@ -2892,6 +2892,66 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Edit Timeouts Dialog */}
+      <Dialog open={editTimeoutsOpen} onOpenChange={setEditTimeoutsOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Timeouts</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-4">
+            <div>
+              <Label>Total Timeouts Per Team</Label>
+              <Input
+                type="number"
+                min="1"
+                max="10"
+                value={editTimeoutsData.total}
+                onChange={(e) => setEditTimeoutsData({ ...editTimeoutsData, total: parseInt(e.target.value) || 4 })}
+                className="mt-1"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label style={{ color: homeColor }}>{game?.home_team_name} Used</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max={editTimeoutsData.total}
+                  value={editTimeoutsData.home}
+                  onChange={(e) => setEditTimeoutsData({ ...editTimeoutsData, home: parseInt(e.target.value) || 0 })}
+                  className="mt-1"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Remaining: {editTimeoutsData.total - editTimeoutsData.home}
+                </p>
+              </div>
+              <div>
+                <Label style={{ color: awayColor }}>{game?.away_team_name} Used</Label>
+                <Input
+                  type="number"
+                  min="0"
+                  max={editTimeoutsData.total}
+                  value={editTimeoutsData.away}
+                  onChange={(e) => setEditTimeoutsData({ ...editTimeoutsData, away: parseInt(e.target.value) || 0 })}
+                  className="mt-1"
+                />
+                <p className="text-xs text-muted-foreground mt-1">
+                  Remaining: {editTimeoutsData.total - editTimeoutsData.away}
+                </p>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={() => setEditTimeoutsOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSaveTimeoutEdit} data-testid="save-timeouts-btn">
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Note Dialog */}
       <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
         <DialogContent>
