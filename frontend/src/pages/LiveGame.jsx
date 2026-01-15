@@ -1085,6 +1085,44 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
     }
   };
 
+  // Open timeout editing dialog
+  const handleEditTimeouts = () => {
+    setEditTimeoutsData({
+      home: game?.home_timeouts_used || 0,
+      away: game?.away_timeouts_used || 0,
+      total: game?.total_timeouts || 4
+    });
+    setEditTimeoutsOpen(true);
+  };
+
+  // Save timeout edits
+  const handleSaveTimeoutEdit = async () => {
+    if (demoMode) {
+      setGame(prev => ({
+        ...prev,
+        home_timeouts_used: editTimeoutsData.home,
+        away_timeouts_used: editTimeoutsData.away,
+        total_timeouts: editTimeoutsData.total
+      }));
+      toast.success("Timeouts updated");
+      setEditTimeoutsOpen(false);
+      return;
+    }
+
+    try {
+      await axios.put(`${API}/games/${id}`, {
+        home_timeouts_used: editTimeoutsData.home,
+        away_timeouts_used: editTimeoutsData.away,
+        total_timeouts: editTimeoutsData.total
+      });
+      toast.success("Timeouts updated");
+      setEditTimeoutsOpen(false);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to update timeouts");
+    }
+  };
+
   // Format clock time as MM:SS
   const formatClockTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
