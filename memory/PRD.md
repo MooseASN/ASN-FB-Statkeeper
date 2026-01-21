@@ -11,8 +11,47 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 - **Multi-tenant school/organization management system**
 - **Subscription-based pricing with Stripe integration**
 - **Shared access - allow multiple users to manage the same teams/games**
+- **Public API with API key authentication for external integrations**
 
 ## Latest Updates (January 2026)
+
+### January 21, 2026 - PUBLIC API & FOOTBALL BUG FIX ✅
+
+**Feature: Public API with API Key Authentication**
+- Created complete API key management system with create, list, delete operations
+- New endpoints:
+  - `POST /api/public-api-keys` - Create new API key (returns full key only once)
+  - `GET /api/public-api-keys` - List user's API keys (excludes full key)
+  - `DELETE /api/public-api-keys/{key_id}` - Delete/revoke an API key
+  - `GET /api/games/public` - List games with filters (?date, ?status, ?sport)
+  - `GET /api/games/{game_id}/rosters` - Get rosters with player stats
+- All public endpoints require `X-API-Key` header for authentication
+- API keys are prefixed with `pk_` for easy identification
+- Added API Keys section in Account Settings with:
+  - Create key form with name input
+  - List of existing keys with prefix and last used date
+  - Delete button for each key
+  - Documentation of available endpoints
+
+**Bug Fix: Football Drive Calculator Stale State**
+- Fixed React stale state closure bug in drive tracking
+- Updated all `startNewDrive` calls to pass `newBallPosition` explicitly
+- Affected scenarios now fixed:
+  - Fumble recovery (line 1077)
+  - Turnover on downs (run play - line 1109)
+  - Interception (line 1254)
+  - Turnover on downs (incomplete pass - line 1272)
+  - Turnover on downs (sack - line 1306)
+  - Punt return (line 1445)
+  - Turnover on downs (blocked punt - line 1460)
+  - After field goal (line 1522)
+
+**Testing:**
+- All 14 backend tests passed (100% success rate)
+- Test report: `/app/test_reports/iteration_55.json`
+- Test file: `/app/tests/test_public_api.py`
+
+---
 
 ### January 14, 2026 - MULTI-SPORT FIXES ✅
 
