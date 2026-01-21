@@ -1319,6 +1319,278 @@ async def verify_beta_password(sport: str = Body(...), password: str = Body(...)
     
     return {"valid": False, "error": "Invalid type"}
 
+# ==================== PUBLIC API (API KEY AUTHENTICATED) ====================
+
+class PublicAPIKeyCreate(BaseModel):
+    name: str  # Name/description for the API key
+
+class PublicAPIKeyResponse(BaseModel):
+    id: str
+    name: str
+    key_prefix: str  # First 8 chars of the key for identification
+    created_at: str
+    last_used: Optional[str] = None
+    is_active: bool = True
+
+async def verify_public_api_key(request: Request) -> dict:
+    """Verify a public API key from the X-API-Key header"""
+    api_key = request.headers.get("X-API-Key")
+    if not api_key:
+        raise HTTPException(status_code=401, detail="API key required. Include X-API-Key header.")
+    
+    # Find the API key in database
+    key_doc = await db.public_api_keys.find_one({"key": api_key, "is_active": True}, {"_id": 0})
+    if not key_doc:
+        raise HTTPException(status_code=401, detail="Invalid or inactive API key")
+    
+    # Update last_used timestamp
+    await db.public_api_keys.update_one(
+        {"id": key_doc["id"]},
+        {"$set": {"last_used": datetime.now(timezone.utc).isoformat()}}
+    )
+    
+    return key_doc
+
+@api_router.post("/public-api-keys")
+async def create_public_api_key(data: PublicAPIKeyCreate, user: User = Depends(get_current_user)):
+    """Create a new public API key for the authenticated user"""
+    # Generate a secure API key
+    api_key = f"pk_{secrets.token_urlsafe(32)}"
+    key_id = f"apikey_{uuid.uuid4().hex[:12]}"
+    
+    key_doc = {
+        "id": key_id,
+        "user_id": user.user_id,
+        "name": data.name,
+        "key": api_key,
+        "key_prefix": api_key[:12],  # First 12 chars for display
+        "is_active": True,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "last_used": None
+    }
+    
+    await db.public_api_keys.insert_one(key_doc)
+    
+    # Return full key only on creation
+    return {
+        "id": key_id,
+        "name": data.name,
+        "key": api_key,  # Only returned on creation!
+        "key_prefix": api_key[:12],
+        "created_at": key_doc["created_at"],
+        "message": "Save this API key - it will not be shown again!"
+    }
+
+@api_router.get("/public-api-keys")
+async def list_public_api_keys(user: User = Depends(get_current_user)):
+    """List all API keys for the authenticated user"""
+    keys = await db.public_api_keys.find(
+        {"user_id": user.user_id},
+        {"_id": 0, "key": 0}  # Exclude full key from response
+    ).to_list(50)
+    
+    return {"api_keys": keys}
+
+@api_router.delete("/public-api-keys/{key_id}")
+async def delete_public_api_key(key_id: str, user: User = Depends(get_current_user)):
+    """Delete/revoke an API key"""
+    result = await db.public_api_keys.delete_one({
+        "id": key_id,
+        "user_id": user.user_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="API key not found")
+    
+    return {"success": True, "message": "API key deleted"}
+
+@api_router.get("/games/public")
+async def get_public_games(
+    request: Request,
+    date: Optional[str] = None,  # YYYY-MM-DD filter
+    status: Optional[str] = None,  # active, scheduled, completed, final
+    sport: Optional[str] = None,  # basketball, football, baseball
+    limit: int = 50,
+    offset: int = 0
+):
+    """
+    Public API endpoint to get a list of games.
+    Requires X-API-Key header for authentication.
+    
+    Query parameters:
+    - date: Filter by scheduled date (YYYY-MM-DD)
+    - status: Filter by game status (active, scheduled, completed, final)
+    - sport: Filter by sport type (basketball, football, baseball)
+    - limit: Maximum number of results (default 50, max 100)
+    - offset: Pagination offset
+    """
+    # Verify API key
+    api_key_info = await verify_public_api_key(request)
+    
+    # Build query based on API key owner's games
+    query = {"user_id": api_key_info["user_id"]}
+    
+    if date:
+        query["scheduled_date"] = date
+    
+    if status:
+        # Support both 'completed' and 'final' as status values
+        if status.lower() in ['completed', 'final']:
+            query["status"] = {"$in": ["completed", "final"]}
+        else:
+            query["status"] = status.lower()
+    
+    if sport:
+        query["sport"] = sport.lower()
+    
+    # Limit max results
+    limit = min(limit, 100)
+    
+    # Fetch games with selected fields only
+    games = await db.games.find(
+        query,
+        {
+            "_id": 0,
+            "id": 1,
+            "sport": 1,
+            "status": 1,
+            "home_team_id": 1,
+            "away_team_id": 1,
+            "home_team_name": 1,
+            "away_team_name": 1,
+            "home_team_color": 1,
+            "away_team_color": 1,
+            "home_team_logo": 1,
+            "away_team_logo": 1,
+            "scheduled_date": 1,
+            "scheduled_time": 1,
+            "share_code": 1,
+            "current_quarter": 1,
+            "current_inning": 1,
+            "inning_half": 1,
+            "created_at": 1,
+            "updated_at": 1,
+            "note": 1
+        }
+    ).sort("scheduled_date", -1).skip(offset).limit(limit).to_list(limit)
+    
+    # Calculate scores for each game
+    for game in games:
+        if game.get("sport") == "baseball":
+            # Get scores from game document
+            game_full = await db.games.find_one({"id": game["id"]}, {"_id": 0, "inning_scores": 1, "home_score": 1, "away_score": 1})
+            if game_full:
+                inning_scores = game_full.get("inning_scores", {"home": [], "away": []})
+                game["home_score"] = sum(inning_scores.get("home", [])) if inning_scores.get("home") else game_full.get("home_score", 0)
+                game["away_score"] = sum(inning_scores.get("away", [])) if inning_scores.get("away") else game_full.get("away_score", 0)
+        else:
+            # Get scores from quarter_scores or player stats
+            game_full = await db.games.find_one({"id": game["id"]}, {"_id": 0, "quarter_scores": 1})
+            if game_full and game_full.get("quarter_scores"):
+                qs = game_full["quarter_scores"]
+                game["home_score"] = sum(qs.get("home", []))
+                game["away_score"] = sum(qs.get("away", []))
+            else:
+                # Calculate from player stats
+                player_stats = await db.player_stats.find({"game_id": game["id"]}, {"_id": 0}).to_list(100)
+                home_team_id = game.get("home_team_id")
+                away_team_id = game.get("away_team_id")
+                
+                home_score = 0
+                away_score = 0
+                for ps in player_stats:
+                    points = ps.get("ft_made", 0) + (ps.get("fg2_made", 0) * 2) + (ps.get("fg3_made", 0) * 3)
+                    if ps.get("team_id") == home_team_id:
+                        home_score += points
+                    elif ps.get("team_id") == away_team_id:
+                        away_score += points
+                
+                game["home_score"] = home_score
+                game["away_score"] = away_score
+    
+    # Get total count for pagination
+    total_count = await db.games.count_documents(query)
+    
+    return {
+        "games": games,
+        "total": total_count,
+        "limit": limit,
+        "offset": offset,
+        "has_more": offset + len(games) < total_count
+    }
+
+@api_router.get("/games/{game_id}/rosters")
+async def get_game_rosters_public(game_id: str, request: Request):
+    """
+    Public API endpoint to get rosters for a specific game with player stats.
+    Requires X-API-Key header for authentication.
+    
+    Returns both team rosters with their stats for the game.
+    """
+    # Verify API key
+    api_key_info = await verify_public_api_key(request)
+    
+    # Fetch the game (must belong to API key owner)
+    game = await db.games.find_one(
+        {"id": game_id, "user_id": api_key_info["user_id"]},
+        {"_id": 0}
+    )
+    
+    if not game:
+        raise HTTPException(status_code=404, detail="Game not found or you don't have access to it")
+    
+    # Fetch player stats from database
+    player_stats = await db.player_stats.find({"game_id": game_id}, {"_id": 0}).to_list(100)
+    
+    home_stats = [s for s in player_stats if s.get("team_id") == game["home_team_id"]]
+    away_stats = [s for s in player_stats if s.get("team_id") == game["away_team_id"]]
+    
+    # Fall back to embedded stats if not in collection
+    if not home_stats and game.get("home_player_stats"):
+        home_stats = game.get("home_player_stats", [])
+    if not away_stats and game.get("away_player_stats"):
+        away_stats = game.get("away_player_stats", [])
+    
+    # Fetch team data for roster info
+    home_team = await db.teams.find_one({"id": game["home_team_id"]}, {"_id": 0})
+    away_team = await db.teams.find_one({"id": game["away_team_id"]}, {"_id": 0})
+    
+    # Build response
+    response = {
+        "game_id": game_id,
+        "sport": game.get("sport", "basketball"),
+        "status": game.get("status"),
+        "home_team": {
+            "team_id": game["home_team_id"],
+            "team_name": game.get("home_team_name", ""),
+            "team_color": game.get("home_team_color", "#000000"),
+            "team_logo": home_team.get("logo_url") or home_team.get("logo") if home_team else None,
+            "roster": home_team.get("roster", []) if home_team else [],
+            "player_stats": home_stats,
+            "starters": game.get("home_starters", []),
+            "on_floor": game.get("home_on_floor", [])
+        },
+        "away_team": {
+            "team_id": game["away_team_id"],
+            "team_name": game.get("away_team_name", ""),
+            "team_color": game.get("away_team_color", "#000000"),
+            "team_logo": away_team.get("logo_url") or away_team.get("logo") if away_team else None,
+            "roster": away_team.get("roster", []) if away_team else [],
+            "player_stats": away_stats,
+            "starters": game.get("away_starters", []),
+            "on_floor": game.get("away_on_floor", [])
+        }
+    }
+    
+    # Add sport-specific fields
+    if game.get("sport") == "baseball":
+        response["home_team"]["batting_order"] = game.get("home_batting_order", [])
+        response["home_team"]["defense"] = game.get("home_defense", {})
+        response["away_team"]["batting_order"] = game.get("away_batting_order", [])
+        response["away_team"]["defense"] = game.get("away_defense", {})
+    
+    return response
+
 # ==================== SHARED ACCESS / ADMIN ACCESS MANAGEMENT ====================
 
 class SharedAccessCreate(BaseModel):
