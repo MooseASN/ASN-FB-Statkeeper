@@ -818,6 +818,158 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
           </CardContent>
         </Card>
 
+        {/* Public API Keys */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Key className="w-5 h-5" />
+              Public API Keys
+            </CardTitle>
+            <CardDescription>
+              Create API keys to access your game data from external applications, websites, or fan portals
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* Create New Key */}
+            <div className="space-y-3">
+              <Label className="text-sm font-medium">Create New API Key</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="text"
+                  placeholder="Key name (e.g., Fan Portal, Website Integration)"
+                  value={newApiKeyName}
+                  onChange={(e) => setNewApiKeyName(e.target.value)}
+                  className="flex-1"
+                  disabled={creatingApiKey}
+                  onKeyDown={(e) => e.key === 'Enter' && handleCreateApiKey()}
+                />
+                <Button 
+                  onClick={handleCreateApiKey} 
+                  disabled={creatingApiKey || !newApiKeyName.trim()}
+                >
+                  {creatingApiKey ? (
+                    "Creating..."
+                  ) : (
+                    <>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Create Key
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                API keys provide read-only access to your games and rosters via the Public API. Include the key in the <code className="bg-slate-100 px-1 rounded">X-API-Key</code> header.
+              </p>
+            </div>
+            
+            {/* Existing Keys */}
+            {loadingApiKeys ? (
+              <div className="flex items-center justify-center py-4">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+              </div>
+            ) : apiKeys.length > 0 ? (
+              <div className="space-y-3 border-t pt-4">
+                <Label className="text-sm font-medium flex items-center gap-2">
+                  <Key className="w-4 h-4" />
+                  Your API Keys ({apiKeys.length})
+                </Label>
+                <div className="space-y-2">
+                  {apiKeys.map((key) => (
+                    <div 
+                      key={key.id} 
+                      className="flex items-center justify-between p-3 bg-slate-50 rounded-lg border"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate">{key.name}</p>
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <code className="bg-slate-200 px-2 py-0.5 rounded text-xs">{key.key_prefix}...</code>
+                          {key.last_used && (
+                            <span className="text-xs">
+                              Last used: {new Date(key.last_used).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDeleteApiKey(key.id, key.name)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                No API keys created yet. Create one above to enable external integrations.
+              </p>
+            )}
+            
+            {/* API Documentation Link */}
+            <div className="pt-2 border-t">
+              <p className="text-sm text-muted-foreground">
+                <strong>Available Endpoints:</strong>
+              </p>
+              <ul className="text-xs text-muted-foreground mt-2 space-y-1 list-disc list-inside">
+                <li><code className="bg-slate-100 px-1 rounded">GET /api/games/public</code> - List your games with filters (?date, ?status, ?sport)</li>
+                <li><code className="bg-slate-100 px-1 rounded">GET /api/games/&#123;id&#125;/rosters</code> - Get rosters and player stats for a game</li>
+                <li><code className="bg-slate-100 px-1 rounded">GET /api/games/share/&#123;code&#125;</code> - Get full game data by share code (no auth required)</li>
+              </ul>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* API Key Created Dialog */}
+        <Dialog open={showApiKeyDialog} onOpenChange={setShowApiKeyDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Key className="w-5 h-5 text-green-600" />
+                API Key Created!
+              </DialogTitle>
+              <DialogDescription>
+                Copy your API key now. For security, it will not be shown again.
+              </DialogDescription>
+            </DialogHeader>
+            {newlyCreatedKey && (
+              <div className="space-y-4">
+                <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <Label className="text-sm font-medium text-green-800">Your API Key</Label>
+                  <div className="flex items-center gap-2 mt-2">
+                    <code className="flex-1 p-2 bg-white border rounded text-sm break-all font-mono">
+                      {newlyCreatedKey.key}
+                    </code>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => copyToClipboard(newlyCreatedKey.key)}
+                    >
+                      <Copy className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg flex items-start gap-2">
+                  <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <span>
+                    <strong>Important:</strong> This is the only time you'll see this key. Save it somewhere secure.
+                  </span>
+                </div>
+              </div>
+            )}
+            <DialogFooter>
+              <Button onClick={() => {
+                setShowApiKeyDialog(false);
+                setNewlyCreatedKey(null);
+              }}>
+                Done
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
         {/* Subscription */}
         <Card>
           <CardHeader>
