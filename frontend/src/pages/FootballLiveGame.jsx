@@ -1105,8 +1105,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
             ? Math.max(0, newBallPosition - 10) 
             : Math.min(100, newBallPosition + 10);
           setFirstDownMarker(newFDMarker);
-          // Start new drive for receiving team
-          startNewDrive('turnover_on_downs', newPossession);
+          // Start new drive for receiving team - pass newBallPosition to avoid stale state
+          startNewDrive('turnover_on_downs', newPossession, newBallPosition);
           toast.info('Turnover on downs');
         } else {
           setDown(newDown);
@@ -1250,8 +1250,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
         ? Math.min(100, newBallPosition + 10) 
         : Math.max(0, newBallPosition - 10);
       setFirstDownMarker(newFDMarker);
-      // Start new drive after interception
-      startNewDrive('turnover', newPossession);
+      // Start new drive after interception - pass newBallPosition to avoid stale state
+      startNewDrive('turnover', newPossession, newBallPosition);
       toast.info(`${defTeamName} interception! New drive started.`);
     } else if (['incomplete', 'dropped', 'broken_up'].includes(selectedResult)) {
       // No yardage change, just advance down
@@ -1268,8 +1268,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
           ? Math.max(0, ballPosition - 10) 
           : Math.min(100, ballPosition + 10);
         setFirstDownMarker(newFDMarker);
-        // Start new drive for receiving team
-        startNewDrive('turnover_on_downs', newPossession);
+        // Start new drive for receiving team - pass ballPosition explicitly to avoid stale state
+        startNewDrive('turnover_on_downs', newPossession, ballPosition);
         toast.info('Turnover on downs');
       } else {
         setDown(newDown);
@@ -1302,8 +1302,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
             ? Math.max(0, newBallPosition - 10) 
             : Math.min(100, newBallPosition + 10);
           setFirstDownMarker(newFDMarker);
-          // Start new drive for receiving team
-          startNewDrive('turnover_on_downs', newPossession);
+          // Start new drive for receiving team - pass newBallPosition to avoid stale state
+          startNewDrive('turnover_on_downs', newPossession, newBallPosition);
           toast.info('Turnover on downs');
         } else {
           setDown(newDown);
@@ -1441,8 +1441,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
         : Math.min(100, newBallPosition + 10);
       setFirstDownMarker(newFDMarker);
       
-      // Start new drive for receiving team
-      startNewDrive('punt', newPossession);
+      // Start new drive for receiving team - pass newBallPosition to avoid stale state
+      startNewDrive('punt', newPossession, newBallPosition);
       toast.info(`${defTeamName} ball`);
     } else {
       // Blocked punt - offense keeps ball but loses down
@@ -1456,8 +1456,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
         setDown(1);
         setDistance(10);
         
-        // Start new drive for receiving team
-        startNewDrive('turnover_on_downs', newPossession);
+        // Start new drive for receiving team - pass ballPosition explicitly to avoid stale state
+        startNewDrive('turnover_on_downs', newPossession, ballPosition);
       }
     }
     
@@ -1518,8 +1518,8 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
       const newFDMarker = possession === 'home' ? 65 : 35;
       setFirstDownMarker(newFDMarker);
       
-      // Start new drive for receiving team
-      startNewDrive('after_score', newPossession);
+      // Start new drive for receiving team - pass newBallPos to avoid stale state
+      startNewDrive('after_score', newPossession, newBallPos);
     } else {
       // End current drive - missed FG
       endDrive('missed_fg', ballPosition);
