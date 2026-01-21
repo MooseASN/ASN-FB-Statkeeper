@@ -69,6 +69,14 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
   const [sharingAccess, setSharingAccess] = useState(false);
   const [loadingSharedAccess, setLoadingSharedAccess] = useState(false);
   
+  // API Keys state
+  const [apiKeys, setApiKeys] = useState([]);
+  const [loadingApiKeys, setLoadingApiKeys] = useState(false);
+  const [creatingApiKey, setCreatingApiKey] = useState(false);
+  const [newApiKeyName, setNewApiKeyName] = useState("");
+  const [newlyCreatedKey, setNewlyCreatedKey] = useState(null);
+  const [showApiKeyDialog, setShowApiKeyDialog] = useState(false);
+  
   // Subscription state
   const [subscription, setSubscription] = useState(null);
   const [loadingSubscription, setLoadingSubscription] = useState(false);
@@ -85,6 +93,7 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
     fetchSharedAccess();
     fetchSubscription();
     fetchPaymentMethods();
+    fetchApiKeys();
   }, []);
 
   const fetchProfile = async () => {
