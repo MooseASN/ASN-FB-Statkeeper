@@ -954,7 +954,7 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
                 <div className="text-sm text-amber-600 bg-amber-50 p-3 rounded-lg flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
                   <span>
-                    <strong>Important:</strong> This is the only time you'll see this key. Save it somewhere secure.
+                    <strong>Important:</strong> This is the only time you&apos;ll see this key. Save it somewhere secure.
                   </span>
                 </div>
               </div>
