@@ -245,6 +245,60 @@ export default function AccountSettings({ user, onLogout, onUserUpdate }) {
     }
   };
 
+  // API Keys functions
+  const fetchApiKeys = async () => {
+    setLoadingApiKeys(true);
+    try {
+      const res = await axios.get(`${API}/public-api-keys`);
+      setApiKeys(res.data.api_keys || []);
+    } catch (error) {
+      console.error("Failed to load API keys:", error);
+    } finally {
+      setLoadingApiKeys(false);
+    }
+  };
+
+  const handleCreateApiKey = async () => {
+    if (!newApiKeyName.trim()) {
+      toast.error("Please enter a name for your API key");
+      return;
+    }
+    
+    setCreatingApiKey(true);
+    try {
+      const res = await axios.post(`${API}/public-api-keys`, { name: newApiKeyName.trim() });
+      setNewlyCreatedKey(res.data);
+      setShowApiKeyDialog(true);
+      setNewApiKeyName("");
+      fetchApiKeys();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to create API key");
+    } finally {
+      setCreatingApiKey(false);
+    }
+  };
+
+  const handleDeleteApiKey = async (keyId, keyName) => {
+    if (!confirm(`Are you sure you want to delete the API key "${keyName}"? This cannot be undone.`)) return;
+    
+    try {
+      await axios.delete(`${API}/public-api-keys/${keyId}`);
+      toast.success("API key deleted");
+      fetchApiKeys();
+    } catch (error) {
+      toast.error(error.response?.data?.detail || "Failed to delete API key");
+    }
+  };
+
+  const copyToClipboard = async (text) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard!");
+    } catch (err) {
+      toast.error("Failed to copy");
+    }
+  };
+
   const fetchSecurityQuestion = async () => {
     try {
       const res = await axios.get(`${API}/account/security-question`);
