@@ -2089,7 +2089,7 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
             )}
             
             <div className={`space-y-${viewMode === "condensed" ? "1" : "3"}`}>
-              {sortByNumber(teamsFlipped ? awayStats : homeStats).map(player => (
+              {sortByNumber(teamsFlipped ? awayStats : homeStats, teamsFlipped ? (game?.away_on_floor || []) : (game?.home_on_floor || [])).map(player => (
                 <PlayerCard 
                   key={player.id}
                   player={player}
