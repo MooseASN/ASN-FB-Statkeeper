@@ -12,7 +12,8 @@ export default function DemoBaseballLiveGame() {
   useEffect(() => {
     const fetchDemoData = async () => {
       try {
-        const res = await axios.get(`${API}/demo/baseball`);
+        // Demo endpoints don't need credentials - disable withCredentials for this request
+        const res = await axios.get(`${API}/demo/baseball`, { withCredentials: false });
         setDemoData(res.data);
       } catch (error) {
         console.error("Failed to fetch demo data:", error);
