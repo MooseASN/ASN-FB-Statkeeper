@@ -14,7 +14,8 @@ export default function DemoLiveGameQuick() {
   useEffect(() => {
     const fetchDemoData = async () => {
       try {
-        const res = await axios.get(`${API}/demo/basketball/simple`);
+        // Demo endpoints don't need credentials - disable withCredentials for this request
+        const res = await axios.get(`${API}/demo/basketball/simple`, { withCredentials: false });
         setDemoData(res.data);
         setLoading(false);
       } catch (err) {
