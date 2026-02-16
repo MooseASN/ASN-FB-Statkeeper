@@ -9,7 +9,7 @@ import requests
 import os
 from datetime import datetime, timezone, timedelta
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://statmoose-api.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://multi-sport-stats.preview.emergentagent.com')
 
 # Test credentials
 TEST_EMAIL = "antlersportsnetwork@gmail.com"

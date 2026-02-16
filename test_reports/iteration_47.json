@@ -99,7 +99,7 @@
       "status": "PASS",
       "details": {
         "description": "After successful login, redirects to home page (/) not /select-sport",
-        "redirect_url": "https://statmoose-api.preview.emergentagent.com/"
+        "redirect_url": "https://multi-sport-stats.preview.emergentagent.com/"
       }
     },
     "9_homepage_logged_in_account_dropdown": {
