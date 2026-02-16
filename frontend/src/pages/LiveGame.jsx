@@ -2832,16 +2832,35 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
               The clock has reached 0:00. What would you like to do?
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="py-3 border-t border-b my-2">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <Checkbox
-                checked={resetFoulsOnAdvance}
-                onCheckedChange={setResetFoulsOnAdvance}
-                className="data-[state=checked]:bg-orange-500 data-[state=checked]:border-orange-500"
-              />
-              <span className="text-sm">Reset team fouls for next period</span>
-            </label>
+          
+          {/* Foul Reset Question */}
+          <div className="py-4 border-t border-b my-2">
+            <p className="text-sm font-medium mb-3 text-center">Reset team fouls for next period?</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={() => {
+                  setResetFoulsOnAdvance(true);
+                  handleNextPeriod(true);
+                }}
+                className="bg-blue-600 hover:bg-blue-700"
+                data-testid="reset-fouls-yes-btn"
+              >
+                Yes, Reset Fouls
+              </Button>
+              <Button
+                onClick={() => {
+                  setResetFoulsOnAdvance(false);
+                  handleNextPeriod(false);
+                }}
+                variant="outline"
+                className="border-gray-300"
+                data-testid="reset-fouls-no-btn"
+              >
+                No, Keep Fouls
+              </Button>
+            </div>
           </div>
+          
           <AlertDialogFooter className="flex-col sm:flex-row gap-2">
             <AlertDialogCancel>Continue Playing</AlertDialogCancel>
             {((game?.period_label === "Half" && game?.current_quarter === 1) || 
@@ -2852,16 +2871,9 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
                 className="gap-2"
               >
                 <Coffee className="w-4 h-4" />
-                Halftime
+                Go to Halftime
               </Button>
             )}
-            <AlertDialogAction
-              onClick={() => handleNextPeriod(resetFoulsOnAdvance)}
-              className="bg-green-600 hover:bg-green-700 gap-2"
-            >
-              <SkipForward className="w-4 h-4" />
-              Next {game?.period_label === "Half" ? "Half" : (game?.period_label || "Quarter")}
-            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
