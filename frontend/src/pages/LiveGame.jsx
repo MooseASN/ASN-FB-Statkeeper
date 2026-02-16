@@ -3020,6 +3020,128 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Quick Substitution Dialog */}
+      <Dialog open={subDialogOpen} onOpenChange={setSubDialogOpen}>
+        <DialogContent className="bg-white max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <ArrowLeftRight className="w-5 h-5" />
+              Quick Substitution - {subTeam === "home" ? game?.home_team_name : game?.away_team_name}
+            </DialogTitle>
+            <DialogDescription>
+              Tap a player on the floor to sub OUT, then tap a bench player to sub IN
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="grid grid-cols-2 gap-4 py-4">
+            {/* Players On Floor */}
+            <div>
+              <div className="text-sm font-medium text-green-700 mb-2 flex items-center gap-1">
+                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                On Floor (Sub OUT)
+              </div>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {(subTeam === "home" ? game?.home_on_floor : game?.away_on_floor)?.map(playerId => {
+                  const stats = subTeam === "home" ? homeStats : awayStats;
+                  const player = stats?.find(p => p.id === playerId);
+                  if (!player) return null;
+                  const isSelected = playerGoingOut === playerId;
+                  return (
+                    <button
+                      key={playerId}
+                      onClick={() => setPlayerGoingOut(isSelected ? null : playerId)}
+                      className={`w-full p-2 rounded-lg border text-left transition-all ${
+                        isSelected 
+                          ? 'bg-red-100 border-red-400 ring-2 ring-red-400' 
+                          : 'bg-green-50 border-green-200 hover:bg-green-100'
+                      }`}
+                      data-testid={`sub-out-${playerId}`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-lg" style={{ color: subTeam === "home" ? homeColor : awayColor }}>
+                          #{player.player_number}
+                        </span>
+                        <span className="font-medium truncate">{player.player_name}</span>
+                        {isSelected && <span className="ml-auto text-red-600 text-xs font-semibold">OUT</span>}
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            
+            {/* Bench Players */}
+            <div>
+              <div className="text-sm font-medium text-gray-600 mb-2">
+                Bench (Sub IN)
+              </div>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {(subTeam === "home" ? homeStats : awayStats)
+                  ?.filter(p => !(subTeam === "home" ? game?.home_on_floor : game?.away_on_floor)?.includes(p.id))
+                  .sort((a, b) => parseInt(a.player_number) - parseInt(b.player_number))
+                  .map(player => {
+                    const isSelected = playerGoingIn === player.id;
+                    return (
+                      <button
+                        key={player.id}
+                        onClick={() => setPlayerGoingIn(isSelected ? null : player.id)}
+                        className={`w-full p-2 rounded-lg border text-left transition-all ${
+                          isSelected 
+                            ? 'bg-blue-100 border-blue-400 ring-2 ring-blue-400' 
+                            : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                        }`}
+                        data-testid={`sub-in-${player.id}`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-lg" style={{ color: subTeam === "home" ? homeColor : awayColor }}>
+                            #{player.player_number}
+                          </span>
+                          <span className="font-medium truncate">{player.player_name}</span>
+                          {isSelected && <span className="ml-auto text-blue-600 text-xs font-semibold">IN</span>}
+                        </div>
+                      </button>
+                    );
+                  })}
+              </div>
+            </div>
+          </div>
+          
+          {/* Selection Summary */}
+          {(playerGoingIn || playerGoingOut) && (
+            <div className="bg-gray-100 rounded-lg p-3 flex items-center justify-center gap-3">
+              {playerGoingOut && (
+                <span className="px-2 py-1 bg-red-100 text-red-700 rounded font-medium text-sm">
+                  #{(subTeam === "home" ? homeStats : awayStats)?.find(p => p.id === playerGoingOut)?.player_number} OUT
+                </span>
+              )}
+              {playerGoingIn && playerGoingOut && (
+                <ArrowLeftRight className="w-4 h-4 text-gray-500" />
+              )}
+              {playerGoingIn && (
+                <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded font-medium text-sm">
+                  #{(subTeam === "home" ? homeStats : awayStats)?.find(p => p.id === playerGoingIn)?.player_number} IN
+                </span>
+              )}
+            </div>
+          )}
+          
+          <DialogFooter className="gap-2">
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button 
+              onClick={handleQuickSub}
+              disabled={!playerGoingIn || !playerGoingOut}
+              className="bg-orange-500 hover:bg-orange-600"
+              data-testid="confirm-substitution-btn"
+            >
+              <ArrowLeftRight className="w-4 h-4 mr-2" />
+              Make Substitution
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Timeout Dialog */}
       <AlertDialog open={timeoutDialogOpen} onOpenChange={setTimeoutDialogOpen}>
         <AlertDialogContent>
