@@ -48,6 +48,30 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 **Feature: Jumbotron Live Preview**
 - Added toggle in configuration page to switch between mock and live preview
+
+### February 16, 2026 - CODE DECOMPOSITION (IN PROGRESS)
+
+**Backend Decomposition Started**
+- Created `/app/backend/utils/` directory structure:
+  - `database.py` - MongoDB connection and shared DB instance
+  - `auth.py` - Password hashing, User model, auth helpers
+  - `__init__.py` - Module exports
+- Created `/app/backend/routes/` directory structure:
+  - `auth.py` - Auth routes (register, login, logout, me)
+  - `__init__.py` - Router exports
+- **Status**: Foundation laid, gradual migration in progress (server.py still contains all routes but can be incrementally migrated)
+
+**FootballLiveGame.jsx Decomposition Started**
+- Created `/app/frontend/src/hooks/football/` directory:
+  - `useKickoffWorkflow.js` - Kickoff state & handlers (~80 lines extracted)
+  - `useFootballDialogs.js` - Dialog visibility state (~60 lines)
+  - `usePlayState.js` - All play input state (~130 lines)
+  - `index.js` - Module exports
+- **Existing components already extracted**:
+  - `FootballField.jsx`, `KickoffDialog.jsx`, `PlayerSelector.jsx`
+  - `YardLineSelector.jsx`, `FieldViewDialog.jsx`, `PuntFieldView.jsx`
+  - `FieldGoalFieldView.jsx`, `KickoffWorkflowDialog.jsx`
+- **Status**: Hooks created and ready for integration; main component still works as-is
 - Live preview uses actual game data via scaled iframe
 - Shows scaled preview with actual layout and dimensions
 
