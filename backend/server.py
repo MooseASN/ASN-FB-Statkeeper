@@ -5802,19 +5802,56 @@ async def generate_public_boxscore_pdf(game_id: str):
     elements.append(Paragraph(f"Date: {game_date} {game_time} | Status: {status} | Quarter: {quarter}", info_style))
     
     # Score
-    home_score = sum(game.get('home_quarter_scores', [0, 0, 0, 0]))
-    away_score = sum(game.get('away_quarter_scores', [0, 0, 0, 0]))
+    q_scores = game.get('quarter_scores', {"home": [0,0,0,0], "away": [0,0,0,0]})
+    home_qs_raw = q_scores.get('home', [0, 0, 0, 0])
+    away_qs_raw = q_scores.get('away', [0, 0, 0, 0])
+    
+    # Determine period type (halves vs quarters)
+    period_label = game.get("period_label", "Quarter")
+    regulation_periods = 2 if period_label == "Half" else 4
+    
+    # Only show overtime columns if they have non-zero scores
+    actual_periods = len(home_qs_raw)
+    overtime_periods = 0
+    if actual_periods > regulation_periods:
+        for i in range(regulation_periods, actual_periods):
+            home_ot = home_qs_raw[i] if i < len(home_qs_raw) else 0
+            away_ot = away_qs_raw[i] if i < len(away_qs_raw) else 0
+            if home_ot > 0 or away_ot > 0:
+                overtime_periods = i - regulation_periods + 1
+    
+    total_periods = regulation_periods + overtime_periods
+    home_qs = home_qs_raw[:total_periods]
+    away_qs = away_qs_raw[:total_periods]
+    
+    # Pad if needed
+    while len(home_qs) < total_periods:
+        home_qs.append(0)
+    while len(away_qs) < total_periods:
+        away_qs.append(0)
+        
+    home_score = sum(home_qs)
+    away_score = sum(away_qs)
     score_style = ParagraphStyle('Score', parent=styles['Heading2'], fontSize=12, alignment=1, spaceAfter=10)
     elements.append(Paragraph(f"SCORE: {game['away_team_name']} {away_score} - {game['home_team_name']} {home_score}", score_style))
     
-    # Quarter scores table
-    quarter_data = [['Team', 'Q1', 'Q2', 'Q3', 'Q4', 'Total']]
-    home_qs = game.get('home_quarter_scores', [0, 0, 0, 0])
-    away_qs = game.get('away_quarter_scores', [0, 0, 0, 0])
+    # Quarter scores table with proper period labels
+    def get_period_label(q):
+        if period_label == "Half":
+            if q <= 2:
+                return f"H{q}"
+            return f"OT{q-2}"
+        if q <= 4:
+            return f"Q{q}"
+        return f"OT{q-4}"
+    
+    quarter_headers = ['Team'] + [get_period_label(i+1) for i in range(total_periods)] + ['Total']
+    quarter_data = [quarter_headers]
     quarter_data.append([game['away_team_name'][:12]] + [str(q) for q in away_qs] + [str(away_score)])
     quarter_data.append([game['home_team_name'][:12]] + [str(q) for q in home_qs] + [str(home_score)])
     
-    quarter_table = Table(quarter_data, colWidths=[1.3*inch, 0.5*inch, 0.5*inch, 0.5*inch, 0.5*inch, 0.6*inch])
+    col_widths = [1.3*inch] + [0.5*inch] * total_periods + [0.6*inch]
+    quarter_table = Table(quarter_data, colWidths=col_widths)
     quarter_table.setStyle(TableStyle([
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#333333')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
