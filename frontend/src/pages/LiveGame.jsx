@@ -2935,6 +2935,44 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
         </AlertDialogContent>
       </AlertDialog>
 
+      {/* Manual Quarter Advance Dialog */}
+      <AlertDialog open={showManualQuarterAdvanceDialog} onOpenChange={(open) => {
+        setShowManualQuarterAdvanceDialog(open);
+        if (!open) setPendingQuarterChange(null);
+      }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Advance to {getQuarterLabel(pendingQuarterChange || 1)}</AlertDialogTitle>
+            <AlertDialogDescription>
+              You are advancing to a new period.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4 border-t border-b my-2">
+            <p className="text-sm font-medium mb-3 text-center">Reset team fouls?</p>
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                onClick={() => handleQuarterChange(pendingQuarterChange, true)}
+                className="bg-blue-600 hover:bg-blue-700"
+                data-testid="manual-reset-fouls-yes-btn"
+              >
+                Yes, Reset Fouls
+              </Button>
+              <Button
+                onClick={() => handleQuarterChange(pendingQuarterChange, false)}
+                variant="outline"
+                className="border-gray-300"
+                data-testid="manual-reset-fouls-no-btn"
+              >
+                No, Keep Fouls
+              </Button>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {/* Timeout Dialog */}
       <AlertDialog open={timeoutDialogOpen} onOpenChange={setTimeoutDialogOpen}>
         <AlertDialogContent>
