@@ -1593,6 +1593,13 @@ async def get_game_rosters_public(game_id: str, request: Request):
 
 # ==================== JUMBOTRON MODE ====================
 
+class JumbotronDisplay(BaseModel):
+    id: Optional[str] = None
+    name: str = "Main Display"
+    width: int = 1920
+    height: int = 1080
+    layout: str = "full"  # 'full', 'scorers', 'minimal'
+
 class JumbotronScheduleItem(BaseModel):
     id: Optional[str] = None
     source_type: str  # 'statmoose' or 'prestosports'
@@ -1605,19 +1612,42 @@ class JumbotronConfigCreate(BaseModel):
     name: str
     width: int = 1920
     height: int = 1080
+    displays: List[JumbotronDisplay] = []
     schedule: List[JumbotronScheduleItem] = []
 
 class JumbotronConfigUpdate(BaseModel):
     name: Optional[str] = None
     width: Optional[int] = None
     height: Optional[int] = None
+    displays: Optional[List[JumbotronDisplay]] = None
     schedule: Optional[List[JumbotronScheduleItem]] = None
 
 @api_router.post("/jumbotron/configs")
 async def create_jumbotron_config(data: JumbotronConfigCreate, user: User = Depends(get_current_user)):
-    """Create a new jumbotron configuration"""
+    """Create a new jumbotron configuration with multiple display outputs"""
     config_id = f"jmb_{uuid.uuid4().hex[:12]}"
     embed_code = f"jmb_{secrets.token_urlsafe(8)}"
+    
+    # Process displays
+    displays = []
+    for disp in data.displays:
+        displays.append({
+            "id": disp.id or f"disp_{uuid.uuid4().hex[:8]}",
+            "name": disp.name,
+            "width": disp.width,
+            "height": disp.height,
+            "layout": disp.layout
+        })
+    
+    # If no displays provided, create default from width/height
+    if not displays:
+        displays = [{
+            "id": f"disp_{uuid.uuid4().hex[:8]}",
+            "name": "Main Display",
+            "width": data.width,
+            "height": data.height,
+            "layout": "full"
+        }]
     
     # Process schedule items and assign IDs
     schedule = []
@@ -1637,6 +1667,7 @@ async def create_jumbotron_config(data: JumbotronConfigCreate, user: User = Depe
         "name": data.name,
         "width": data.width,
         "height": data.height,
+        "displays": displays,
         "embed_code": embed_code,
         "schedule": schedule,
         "created_at": datetime.now(timezone.utc).isoformat(),
@@ -1647,6 +1678,7 @@ async def create_jumbotron_config(data: JumbotronConfigCreate, user: User = Depe
     config.pop("_id", None)
     
     return config
+
 
 @api_router.get("/jumbotron/configs")
 async def list_jumbotron_configs(user: User = Depends(get_current_user)):
