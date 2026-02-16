@@ -240,13 +240,13 @@ function TeamPanel({
             <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.ft_made}-{totals.ft_att}
             </div>
-            <div className="text-xl text-white text-center" style={broadcastFont}>
+            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.reb}
             </div>
-            <div className="text-xl text-white text-center" style={broadcastFont}>
+            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.ast}
             </div>
-            <div className="text-xl text-white text-center" style={broadcastFont}>
+            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.pf}
             </div>
           </div>
