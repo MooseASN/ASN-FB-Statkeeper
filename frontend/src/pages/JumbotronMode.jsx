@@ -895,6 +895,8 @@ export default function JumbotronMode() {
                     index={index}
                     onUpdate={(updated) => updateDisplay(index, updated)}
                     onDelete={deleteDisplay}
+                    schedule={schedule}
+                    configId={editingConfig?._id}
                   />
                 ))}
               </TabsContent>
