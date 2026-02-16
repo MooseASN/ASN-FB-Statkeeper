@@ -12,51 +12,42 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 - **Subscription-based pricing with Stripe integration**
 - **Shared access - allow multiple users to manage the same teams/games**
 - **Public API with API key authentication for external integrations**
-- **Jumbotron Mode - venue scoreboard displays with scheduling**
+- **Jumbotron Mode - venue scoreboard displays with scheduling and multiple layouts**
 
 ## Latest Updates (February 2026)
 
-### February 13, 2026 - JUMBOTRON MODE & BASKETBALL ROSTER SORTING ✅
+### February 13, 2026 - JUMBOTRON MODE ENHANCED ✅
 
-**Feature: Jumbotron Mode**
-- Created standalone Jumbotron Mode feature accessible from sport selection screen
-- Features:
-  - Create custom jumbotron configurations with name and display size
-  - Preset sizes: 1080p, 720p, 4K, Square, Vertical, and Custom
-  - Schedule multiple games/sources with start/end times (perfect for tournaments)
-  - Support for two source types:
-    - **StatMoose games** - Select from user's scheduled/live games or paste share code
-    - **PrestoSports links** - Parse external box score XML URLs
-  - Automatic source switching based on schedule
-  - Output options: Direct link or iframe embed code
-- New Backend Endpoints:
-  - `POST /api/jumbotron/configs` - Create jumbotron configuration
-  - `GET /api/jumbotron/configs` - List user's jumbotron configs
-  - `GET /api/jumbotron/configs/{id}` - Get specific config
-  - `PUT /api/jumbotron/configs/{id}` - Update config
-  - `DELETE /api/jumbotron/configs/{id}` - Delete config
-  - `GET /api/jumbotron/embed/{embedCode}` - Public endpoint for embed data
-  - `POST /api/jumbotron/parse-prestosports` - Parse PrestoSports XML
-  - `GET /api/jumbotron/user-games` - Get user's games for selection
-- New Frontend Pages:
-  - `/jumbotron-mode` - Configuration management page
-  - `/jumbotron/live/{embedCode}` - Live jumbotron display
-- Added Jumbotron Mode card to Demo Sport Selection page
+**Jumbotron Mode - Multiple Display Support & Layouts**
+- **Montserrat Bold Font** - All jumbotron displays now use Montserrat Bold for professional broadcast look
+- **Multiple Displays per Event** - Create different sized outputs for same tournament:
+  - HD Overhead (1920×1080) - Full stats display
+  - Scorers Table Wide (1920×400) - Stat leaders + center scoreboard
+  - Minimal Score (1280×200) - Score only display
+- **Three Layout Types:**
+  - **Full Stats** - Complete player stats table with team headers
+  - **Scorers Table** - 3 stat leaders per team on sides, team logos/names/scores in center
+  - **Minimal** - Just team names, logos, and large scores
+- **Layout Auto-Detection** - Automatically selects layout based on aspect ratio:
+  - Aspect ratio > 3 → Scorers table
+  - Aspect ratio > 2.5 → Minimal
+  - Otherwise → Full stats
+- **URL Parameter Support** - Force layout with `?layout=full|scorers|minimal`
+- **Updated Backend Models:**
+  - Added `JumbotronDisplay` model with id, name, width, height, layout
+  - Configs now support `displays[]` array for multiple outputs
+- **Improved Space Utilization:**
+  - Full layout fills entire screen with no dead space
+  - Tables use `tableLayout: fixed` for consistent column widths
+  - Stats rows scale to available height
 
 **Feature: Basketball Roster Sorting**
-- Modified `sortByNumber()` in `LiveGame.jsx` to accept `onFloorIds` parameter
-- On-floor players (checked) now always appear at TOP of roster list
-- Players sorted by jersey number within each group (on-floor vs bench)
+- On-floor players (checked) always appear at TOP of roster list
+- Players sorted by jersey number within each group
 - Substitutions immediately reorder the list
 
 **Bug Fix: Demo Mode CORS Issue**
-- Fixed CORS error when loading demo games from external preview URL
-- Added `withCredentials: false` to all 5 demo loader components:
-  - `DemoLiveGameClassic.jsx`
-  - `DemoLiveGameAdvanced.jsx`
-  - `DemoLiveGameQuick.jsx`
-  - `DemoBaseballLiveGame.jsx`
-  - `DemoFootballLiveGame.jsx`
+- Added `withCredentials: false` to all demo loader components
 
 ---
 
