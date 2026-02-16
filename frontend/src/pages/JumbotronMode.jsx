@@ -169,8 +169,26 @@ const JumbotronPreview = ({ display }) => {
 };
 
 // Display Output Component
-const DisplayOutput = ({ display, index, onUpdate, onDelete }) => {
+const DisplayOutput = ({ display, index, onUpdate, onDelete, schedule, configId }) => {
   const [expanded, setExpanded] = useState(index === 0);
+  const [showLivePreview, setShowLivePreview] = useState(false);
+  
+  // Get the first game from schedule for live preview
+  const firstGame = schedule?.find(s => s.game_id);
+  const previewUrl = firstGame && configId ? 
+    `${process.env.REACT_APP_BACKEND_URL}/jumbotron/live/${configId}?layout=${display.layout}&display=${display.id}` : 
+    null;
+  
+  // Scale preview to fit container
+  const getScaledPreviewSize = () => {
+    const maxWidth = 500;
+    const scale = maxWidth / display.width;
+    return {
+      width: maxWidth,
+      height: Math.round(display.height * scale)
+    };
+  };
+  const scaledSize = getScaledPreviewSize();
   
   return (
     <div className="border border-zinc-700 rounded-lg bg-zinc-800/50 overflow-hidden">
