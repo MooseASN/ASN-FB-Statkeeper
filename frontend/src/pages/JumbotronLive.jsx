@@ -358,10 +358,6 @@ function ScorersTableLayout({ game, homeStats, awayStats, eventLogo }) {
 }
 
 // ============ MINIMAL SCOREBOARD LAYOUT ============
-  );
-}
-
-// ============ MINIMAL SCOREBOARD LAYOUT ============
 function MinimalScoreboardLayout({ game, homeStats, awayStats }) {
   const homeColor = game.home_team_color || "#6cb4ee";
   const awayColor = game.away_team_color || "#003366";
