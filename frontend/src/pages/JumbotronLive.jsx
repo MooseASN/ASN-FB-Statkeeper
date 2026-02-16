@@ -74,7 +74,6 @@ function FullDisplayLayout({ game, homeStats, awayStats, homeOnFloor, awayOnFloo
   const getBonus = (fouls) => fouls >= 7;
   const getDoubleBonus = (fouls) => fouls >= 10;
   
-  // Get display players
   const getDisplayPlayers = (stats, onFloor) => {
     let players = [];
     if (onFloor && onFloor.length > 0) {
@@ -110,76 +109,84 @@ function FullDisplayLayout({ game, homeStats, awayStats, homeOnFloor, awayOnFloo
     
     return (
       <div className="flex-1 flex flex-col min-h-0 overflow-hidden" style={{ background: 'linear-gradient(180deg, #0d1117 0%, #161b22 100%)' }}>
-        {/* Team Header */}
-        <div className="flex items-center justify-between px-6 py-3" style={{ backgroundColor: teamColor }}>
-          <div className="flex items-center gap-4">
-            {teamLogo && <img src={teamLogo} alt="" className="h-14 w-14 object-contain" />}
-            <span className="text-3xl font-bold text-white uppercase tracking-wide">{teamName}</span>
+        {/* Team Header - LARGER */}
+        <div className="flex items-center justify-between px-8 py-4" style={{ backgroundColor: teamColor }}>
+          <div className="flex items-center gap-6">
+            {teamLogo && <img src={teamLogo} alt="" className="h-20 w-20 object-contain" />}
+            <span className="text-5xl font-extrabold text-white uppercase tracking-wide" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.5)' }}>
+              {teamName}
+            </span>
           </div>
-          <div className="flex items-center gap-8 text-white">
+          <div className="flex items-center gap-12 text-white">
             <div className="text-center">
-              <div className="text-xs uppercase opacity-70 tracking-wider">TIMEOUTS</div>
-              <div className="text-2xl font-bold">{timeouts}</div>
+              <div className="text-lg uppercase opacity-80 tracking-wider font-bold">TIMEOUTS</div>
+              <div className="text-4xl font-extrabold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>{timeouts}</div>
             </div>
             <div className="text-center">
-              <div className="text-xs uppercase opacity-70 tracking-wider">FOULS</div>
-              <div className="text-2xl font-bold">{fouls}</div>
+              <div className="text-lg uppercase opacity-80 tracking-wider font-bold">FOULS</div>
+              <div className="text-4xl font-extrabold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>{fouls}</div>
             </div>
             {(inBonus || doubleBonus) && (
-              <div className="px-4 py-2 rounded-lg font-bold uppercase text-sm tracking-wider"
-                style={{ backgroundColor: doubleBonus ? '#dc2626' : '#f59e0b' }}>
+              <div className="px-6 py-3 rounded-lg font-extrabold uppercase text-xl tracking-wider"
+                style={{ backgroundColor: doubleBonus ? '#dc2626' : '#f59e0b', textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
                 {doubleBonus ? 'DOUBLE BONUS' : 'BONUS'}
               </div>
             )}
           </div>
         </div>
         
-        {/* Stats Table - fills remaining space */}
-        <div className="flex-1 overflow-hidden px-4 py-2">
+        {/* Stats Table - LARGER FONTS */}
+        <div className="flex-1 overflow-hidden px-6 py-3">
           <table className="w-full h-full text-white" style={{ tableLayout: 'fixed' }}>
             <thead>
-              <tr className="bg-black/40">
-                <th className="w-[8%] py-2 text-center font-bold uppercase text-sm tracking-wider">#</th>
-                <th className="w-[22%] py-2 text-left font-bold uppercase text-sm tracking-wider">PLAYER</th>
-                <th className="w-[10%] py-2 text-center font-bold uppercase text-sm tracking-wider">FG</th>
-                <th className="w-[10%] py-2 text-center font-bold uppercase text-sm tracking-wider">3PT</th>
-                <th className="w-[10%] py-2 text-center font-bold uppercase text-sm tracking-wider">FT</th>
-                <th className="w-[10%] py-2 text-center font-bold uppercase text-sm tracking-wider">REB</th>
-                <th className="w-[10%] py-2 text-center font-bold uppercase text-sm tracking-wider">AST</th>
-                <th className="w-[8%] py-2 text-center font-bold uppercase text-sm tracking-wider">PF</th>
-                <th className="w-[12%] py-2 text-center font-bold uppercase text-sm tracking-wider text-yellow-400">PTS</th>
+              <tr className="bg-black/50">
+                <th className="w-[8%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">#</th>
+                <th className="w-[22%] py-3 text-left font-extrabold uppercase text-xl tracking-wider">PLAYER</th>
+                <th className="w-[10%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">FG</th>
+                <th className="w-[10%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">3PT</th>
+                <th className="w-[10%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">FT</th>
+                <th className="w-[10%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">REB</th>
+                <th className="w-[10%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">AST</th>
+                <th className="w-[8%] py-3 text-center font-extrabold uppercase text-xl tracking-wider">PF</th>
+                <th className="w-[12%] py-3 text-center font-extrabold uppercase text-xl tracking-wider text-yellow-400">PTS</th>
               </tr>
             </thead>
             <tbody>
               {players.map((player, idx) => (
                 <tr key={idx} className={idx % 2 === 0 ? 'bg-white/5' : ''}>
-                  <td className="py-2 text-center font-bold text-lg" style={{ color: teamColor }}>
+                  <td className="py-3 text-center font-extrabold text-2xl" style={{ color: teamColor, textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
                     {player.player_number || player.number}
                   </td>
-                  <td className="py-2 text-left font-semibold truncate text-base">
+                  <td className="py-3 text-left font-bold truncate text-2xl">
                     {player.player_name || player.name}
                   </td>
-                  <td className="py-2 text-center text-base">{player.fg}</td>
-                  <td className="py-2 text-center text-base">{player.fg3}</td>
-                  <td className="py-2 text-center text-base">{player.ft}</td>
-                  <td className="py-2 text-center text-base">{player.totalReb}</td>
-                  <td className="py-2 text-center text-base">{player.ast}</td>
-                  <td className="py-2 text-center text-base">{player.pf}</td>
-                  <td className="py-2 text-center font-bold text-xl text-yellow-400">{player.pts}</td>
+                  <td className="py-3 text-center text-2xl font-semibold">{player.fg}</td>
+                  <td className="py-3 text-center text-2xl font-semibold">{player.fg3}</td>
+                  <td className="py-3 text-center text-2xl font-semibold">{player.ft}</td>
+                  <td className="py-3 text-center text-2xl font-semibold">{player.totalReb}</td>
+                  <td className="py-3 text-center text-2xl font-semibold">{player.ast}</td>
+                  <td className="py-3 text-center text-2xl font-semibold">{player.pf}</td>
+                  <td className="py-3 text-center font-extrabold text-3xl text-yellow-400" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                    {player.pts}
+                  </td>
                 </tr>
               ))}
               {/* Totals Row */}
-              <tr className="bg-black/60 border-t-2 border-white/20">
-                <td className="py-2" colSpan={2}>
-                  <span className="font-bold uppercase text-sm tracking-wider pl-4">TEAM TOTALS</span>
+              <tr className="bg-black/70 border-t-4 border-white/30">
+                <td className="py-3" colSpan={2}>
+                  <span className="font-extrabold uppercase text-2xl tracking-wider pl-6" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                    TEAM TOTALS
+                  </span>
                 </td>
-                <td className="py-2 text-center font-semibold">{totals.fg_made}-{totals.fg_att}</td>
-                <td className="py-2 text-center font-semibold">{totals.fg3_made}-{totals.fg3_att}</td>
-                <td className="py-2 text-center font-semibold">{totals.ft_made}-{totals.ft_att}</td>
-                <td className="py-2 text-center font-semibold">{totals.reb}</td>
-                <td className="py-2 text-center font-semibold">{totals.ast}</td>
-                <td className="py-2 text-center font-semibold">{totals.pf}</td>
-                <td className="py-2 text-center font-bold text-2xl text-yellow-400">{totals.pts}</td>
+                <td className="py-3 text-center font-bold text-2xl">{totals.fg_made}-{totals.fg_att}</td>
+                <td className="py-3 text-center font-bold text-2xl">{totals.fg3_made}-{totals.fg3_att}</td>
+                <td className="py-3 text-center font-bold text-2xl">{totals.ft_made}-{totals.ft_att}</td>
+                <td className="py-3 text-center font-bold text-2xl">{totals.reb}</td>
+                <td className="py-3 text-center font-bold text-2xl">{totals.ast}</td>
+                <td className="py-3 text-center font-bold text-2xl">{totals.pf}</td>
+                <td className="py-3 text-center font-extrabold text-4xl text-yellow-400" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+                  {totals.pts}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -227,17 +234,21 @@ function ScorersTableLayout({ game, homeStats, awayStats }) {
   const awayLeaders = getStatLeaders(awayStats, 3);
   
   const StatLeader = ({ player, teamColor, reverse }) => (
-    <div className={`flex items-center gap-4 ${reverse ? 'flex-row-reverse text-right' : ''}`}>
+    <div className={`flex items-center gap-5 ${reverse ? 'flex-row-reverse text-right' : ''}`}>
       <div 
-        className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-xl text-white flex-shrink-0"
-        style={{ backgroundColor: teamColor }}
+        className="w-20 h-20 rounded-full flex items-center justify-center font-extrabold text-3xl text-white flex-shrink-0"
+        style={{ backgroundColor: teamColor, textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
       >
         {player.number}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="font-bold text-white text-lg truncate">{player.name}</div>
-        <div className="text-yellow-400 font-bold text-2xl">{player.pts} PTS</div>
-        <div className="text-gray-400 text-sm">
+        <div className="font-bold text-white text-2xl truncate" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
+          {player.name}
+        </div>
+        <div className="text-yellow-400 font-extrabold text-4xl" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+          {player.pts} PTS
+        </div>
+        <div className="text-gray-300 text-lg font-semibold">
           {player.totalReb} REB • {player.ast} AST
         </div>
       </div>
@@ -247,47 +258,55 @@ function ScorersTableLayout({ game, homeStats, awayStats }) {
   return (
     <div className="h-full w-full flex items-stretch" style={{ backgroundColor: '#0a0a12' }}>
       {/* Home Leaders (Left) */}
-      <div className="flex-1 flex flex-col justify-center gap-4 px-6 py-4" style={{ borderRight: '2px solid #1a1a2e' }}>
+      <div className="flex-1 flex flex-col justify-center gap-6 px-8 py-4" style={{ borderRight: '3px solid #1a1a2e' }}>
         {homeLeaders.map((player, idx) => (
           <StatLeader key={idx} player={player} teamColor={homeColor} reverse={false} />
         ))}
       </div>
       
       {/* Center Scoreboard */}
-      <div className="w-[40%] flex flex-col items-center justify-center px-8" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0d1117 100%)' }}>
+      <div className="w-[35%] flex flex-col items-center justify-center px-8" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0d1117 100%)' }}>
         {/* Home Team */}
-        <div className="flex items-center gap-6 mb-4">
+        <div className="flex items-center gap-6 mb-2">
           {game.home_team_logo && (
-            <img src={game.home_team_logo} alt="" className="h-20 w-20 object-contain" />
+            <img src={game.home_team_logo} alt="" className="h-24 w-24 object-contain" />
           )}
           <div className="text-center">
-            <div className="text-2xl font-bold text-white uppercase tracking-wider">{game.home_team_name}</div>
-            <div className="text-7xl font-black text-white mt-1" style={{ color: homeColor }}>{homeScore}</div>
+            <div className="text-3xl font-extrabold text-white uppercase tracking-wider" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+              {game.home_team_name}
+            </div>
+            <div className="text-8xl font-black mt-1" style={{ color: homeColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}>
+              {homeScore}
+            </div>
           </div>
         </div>
         
         {/* VS Divider */}
-        <div className="w-full flex items-center gap-4 my-4">
-          <div className="flex-1 h-0.5 bg-white/20" />
-          <span className="text-gray-500 font-bold text-xl">VS</span>
-          <div className="flex-1 h-0.5 bg-white/20" />
+        <div className="w-full flex items-center gap-4 my-3">
+          <div className="flex-1 h-1 bg-white/20" />
+          <span className="text-gray-400 font-extrabold text-2xl">VS</span>
+          <div className="flex-1 h-1 bg-white/20" />
         </div>
         
         {/* Away Team */}
-        <div className="flex items-center gap-6 mt-4">
+        <div className="flex items-center gap-6 mt-2">
           {game.away_team_logo && (
-            <img src={game.away_team_logo} alt="" className="h-20 w-20 object-contain" />
+            <img src={game.away_team_logo} alt="" className="h-24 w-24 object-contain" />
           )}
           <div className="text-center">
-            <div className="text-2xl font-bold text-white uppercase tracking-wider">{game.away_team_name}</div>
-            <div className="text-7xl font-black text-white mt-1" style={{ color: awayColor }}>{awayScore}</div>
+            <div className="text-3xl font-extrabold text-white uppercase tracking-wider" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+              {game.away_team_name}
+            </div>
+            <div className="text-8xl font-black mt-1" style={{ color: awayColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}>
+              {awayScore}
+            </div>
           </div>
         </div>
         
         {/* Period/Quarter */}
         {(game.current_quarter || game.period) && (
-          <div className="mt-6 px-6 py-2 bg-white/10 rounded-lg">
-            <span className="text-gray-300 font-bold uppercase tracking-wider">
+          <div className="mt-4 px-8 py-3 bg-white/10 rounded-lg">
+            <span className="text-gray-200 font-extrabold uppercase tracking-wider text-xl">
               {game.period_label || `Q${game.current_quarter || game.period}`}
             </span>
           </div>
@@ -295,7 +314,7 @@ function ScorersTableLayout({ game, homeStats, awayStats }) {
       </div>
       
       {/* Away Leaders (Right) */}
-      <div className="flex-1 flex flex-col justify-center gap-4 px-6 py-4" style={{ borderLeft: '2px solid #1a1a2e' }}>
+      <div className="flex-1 flex flex-col justify-center gap-6 px-8 py-4" style={{ borderLeft: '3px solid #1a1a2e' }}>
         {awayLeaders.map((player, idx) => (
           <StatLeader key={idx} player={player} teamColor={awayColor} reverse={true} />
         ))}
@@ -314,29 +333,37 @@ function MinimalScoreboardLayout({ game, homeStats, awayStats }) {
   
   return (
     <div className="h-full w-full flex items-center justify-center" style={{ backgroundColor: '#0a0a12' }}>
-      <div className="flex items-center gap-12">
+      <div className="flex items-center gap-16">
         {/* Home Team */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           {game.home_team_logo && (
-            <img src={game.home_team_logo} alt="" className="h-24 w-24 object-contain" />
+            <img src={game.home_team_logo} alt="" className="h-32 w-32 object-contain" />
           )}
           <div>
-            <div className="text-3xl font-bold text-white uppercase">{game.home_team_name}</div>
-            <div className="text-8xl font-black" style={{ color: homeColor }}>{homeScore}</div>
+            <div className="text-4xl font-extrabold text-white uppercase" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+              {game.home_team_name}
+            </div>
+            <div className="text-9xl font-black" style={{ color: homeColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}>
+              {homeScore}
+            </div>
           </div>
         </div>
         
         {/* Divider */}
-        <div className="text-5xl text-gray-600 font-bold">—</div>
+        <div className="text-6xl text-gray-500 font-black">—</div>
         
         {/* Away Team */}
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-8">
           <div className="text-right">
-            <div className="text-3xl font-bold text-white uppercase">{game.away_team_name}</div>
-            <div className="text-8xl font-black" style={{ color: awayColor }}>{awayScore}</div>
+            <div className="text-4xl font-extrabold text-white uppercase" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+              {game.away_team_name}
+            </div>
+            <div className="text-9xl font-black" style={{ color: awayColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}>
+              {awayScore}
+            </div>
           </div>
           {game.away_team_logo && (
-            <img src={game.away_team_logo} alt="" className="h-24 w-24 object-contain" />
+            <img src={game.away_team_logo} alt="" className="h-32 w-32 object-contain" />
           )}
         </div>
       </div>
@@ -423,15 +450,13 @@ export default function JumbotronLive() {
     return () => { mounted = false; clearInterval(gameInterval); };
   }, [currentSource]);
 
-  // Determine layout based on config dimensions or URL param
+  // Determine layout
   const getLayout = () => {
     if (layoutParam === 'scorers' || layoutParam === 'table') return 'scorers';
     if (layoutParam === 'minimal') return 'minimal';
     if (config) {
       const aspectRatio = config.width / config.height;
-      // If very wide (aspect ratio > 3), use scorers table layout
       if (aspectRatio > 3) return 'scorers';
-      // If moderately wide (aspect ratio > 2), use minimal
       if (aspectRatio > 2.5) return 'minimal';
     }
     return 'full';
@@ -440,7 +465,9 @@ export default function JumbotronLive() {
   if (loading && !game) {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a12', fontFamily: "'Montserrat', sans-serif" }}>
-        <div className="text-white text-5xl font-bold animate-pulse">LOADING...</div>
+        <div className="text-white text-6xl font-extrabold animate-pulse" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.5)' }}>
+          LOADING...
+        </div>
       </div>
     );
   }
@@ -449,8 +476,10 @@ export default function JumbotronLive() {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a12', fontFamily: "'Montserrat', sans-serif" }}>
         <div className="text-center">
-          <h2 className="text-5xl text-white font-bold mb-4">{error || "No Game Data"}</h2>
-          <p className="text-gray-400 text-2xl">Embed: {embedCode}</p>
+          <h2 className="text-6xl text-white font-extrabold mb-6" style={{ textShadow: '3px 3px 6px rgba(0,0,0,0.5)' }}>
+            {error || "No Game Data"}
+          </h2>
+          <p className="text-gray-400 text-3xl font-bold">Embed: {embedCode}</p>
         </div>
       </div>
     );
@@ -459,7 +488,9 @@ export default function JumbotronLive() {
   if (!game) {
     return (
       <div className="h-screen w-screen flex items-center justify-center" style={{ backgroundColor: '#0a0a12', fontFamily: "'Montserrat', sans-serif" }}>
-        <div className="text-white text-3xl font-bold">Waiting for game data...</div>
+        <div className="text-white text-4xl font-extrabold" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+          Waiting for game data...
+        </div>
       </div>
     );
   }
@@ -485,7 +516,7 @@ export default function JumbotronLive() {
       {/* Google Fonts - Montserrat Bold */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
-        * { font-family: 'Montserrat', sans-serif; }
+        * { font-family: 'Montserrat', sans-serif !important; }
       `}</style>
       
       {layout === 'scorers' && (
@@ -506,7 +537,10 @@ export default function JumbotronLive() {
       
       {/* Schedule label */}
       {currentSource?.label && (
-        <div className="absolute bottom-3 right-3 px-4 py-2 rounded-lg bg-black/70 text-white text-sm font-bold uppercase tracking-wider">
+        <div 
+          className="absolute bottom-4 right-4 px-6 py-3 rounded-lg bg-black/80 text-white text-lg font-extrabold uppercase tracking-wider"
+          style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}
+        >
           {currentSource.label}
         </div>
       )}
