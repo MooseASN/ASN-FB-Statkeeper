@@ -5668,9 +5668,32 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     q_scores = game.get("quarter_scores", {"home": [0,0,0,0], "away": [0,0,0,0]})
     home_scores = q_scores.get("home", [0,0,0,0])
     away_scores = q_scores.get("away", [0,0,0,0])
-    total_quarters = max(4, len(home_scores), len(away_scores))
     
-    # Pad scores arrays if needed
+    # Determine period type (halves vs quarters)
+    period_label = game.get("period_label", "Quarter")
+    regulation_periods = 2 if period_label == "Half" else 4
+    
+    # Calculate actual quarters to display:
+    # - At minimum, show regulation periods (2 for halves, 4 for quarters)
+    # - Only show overtime columns if they have non-zero scores
+    actual_periods_played = len(home_scores)
+    
+    # Check if there are any overtime periods with actual scores
+    overtime_periods = 0
+    if actual_periods_played > regulation_periods:
+        for i in range(regulation_periods, actual_periods_played):
+            home_ot = home_scores[i] if i < len(home_scores) else 0
+            away_ot = away_scores[i] if i < len(away_scores) else 0
+            if home_ot > 0 or away_ot > 0:
+                overtime_periods = i - regulation_periods + 1
+    
+    total_quarters = regulation_periods + overtime_periods
+    
+    # Trim scores arrays to only show periods with data
+    home_scores = home_scores[:total_quarters]
+    away_scores = away_scores[:total_quarters]
+    
+    # Pad scores arrays if needed (only up to total_quarters)
     while len(home_scores) < total_quarters:
         home_scores.append(0)
     while len(away_scores) < total_quarters:
