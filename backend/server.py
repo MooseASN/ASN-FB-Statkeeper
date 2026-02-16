@@ -5705,6 +5705,10 @@ async def generate_boxscore_pdf(game_id: str, user: User = Depends(get_current_u
     # Quarter-by-Quarter Score Table - compact
     def get_quarter_label(q):
         label = game.get("period_label", "Quarter")
+        if label == "Half":
+            if q <= 2:
+                return f"H{q}"  # H1, H2 for halves
+            return f"OT{q-2}"
         prefix = "P" if label == "Period" else "Q"
         if q <= 4:
             return f"{prefix}{q}"
