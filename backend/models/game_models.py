@@ -199,12 +199,12 @@ class PlayerStats(BaseModel):
 
 class EventCreate(BaseModel):
     name: str
-    sport: str = "basketball"
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
     location: Optional[str] = None
-    description: Optional[str] = None
-    logo_url: Optional[str] = None
+    start_date: str
+    end_date: Optional[str] = None
+    logo_data: Optional[str] = None
+    color: str = "#000000"
+    sport: str = "basketball"
 
 
 class Event(BaseModel):
@@ -212,14 +212,15 @@ class Event(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str = ""
     name: str
-    sport: str = "basketball"
-    start_date: Optional[str] = None
-    end_date: Optional[str] = None
     location: Optional[str] = None
-    description: Optional[str] = None
-    logo_url: Optional[str] = None
-    games: List[str] = []
+    start_date: str = ""
+    end_date: Optional[str] = None
+    logo_data: Optional[str] = None
+    color: str = "#000000"
+    game_ids: List[str] = []
+    sport: str = "basketball"
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 
 # ============ JUMBOTRON MODELS ============
