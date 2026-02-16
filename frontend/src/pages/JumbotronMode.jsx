@@ -31,9 +31,142 @@ const DISPLAY_PRESETS = [
 // Layout types
 const LAYOUT_TYPES = [
   { value: "full", label: "Full Stats", description: "Complete player stats table with team headers" },
-  { value: "scorers", label: "Scorers Table", description: "3 stat leaders per team with center scoreboard" },
+  { value: "scorers", label: "Scorers Table", description: "Stat leaders + score (horizontal layout)" },
   { value: "minimal", label: "Minimal Score", description: "Just team names, logos, and scores" }
 ];
+
+// Preview Component - Shows a scaled preview of the jumbotron output
+const JumbotronPreview = ({ display }) => {
+  const { width, height, layout } = display;
+  const aspectRatio = width / height;
+  
+  // Scale to fit in preview container (max 400px width)
+  const previewWidth = Math.min(400, width / 4);
+  const previewHeight = previewWidth / aspectRatio;
+  
+  // Demo data for preview
+  const demoData = {
+    homeTeam: "TIGERS",
+    awayTeam: "EAGLES",
+    homeScore: 72,
+    awayScore: 68,
+    homeColor: "#f97316",
+    awayColor: "#3b82f6"
+  };
+  
+  if (layout === "scorers") {
+    return (
+      <div 
+        className="rounded border border-zinc-600 overflow-hidden"
+        style={{ 
+          width: previewWidth, 
+          height: Math.max(previewHeight, 80),
+          background: '#0a0a12',
+          fontFamily: "'Montserrat', sans-serif"
+        }}
+      >
+        <div className="h-full flex items-center justify-between px-2" style={{ fontSize: '8px' }}>
+          {/* Home Stats */}
+          <div className="flex items-center gap-1">
+            <div className="flex flex-col gap-0.5">
+              <div className="text-gray-400 font-bold">PTS <span className="text-white">24</span></div>
+              <div className="text-gray-400 font-bold">REB <span className="text-white">8</span></div>
+              <div className="text-gray-400 font-bold">AST <span className="text-white">5</span></div>
+            </div>
+            <div className="text-white font-bold text-center" style={{ fontSize: '6px' }}>{demoData.homeTeam}</div>
+            <div className="font-black text-lg" style={{ color: demoData.homeColor }}>{demoData.homeScore}</div>
+          </div>
+          
+          {/* VS */}
+          <div className="px-2 py-1 rounded bg-zinc-800 text-white font-bold" style={{ fontSize: '7px' }}>VS</div>
+          
+          {/* Away Stats */}
+          <div className="flex items-center gap-1">
+            <div className="font-black text-lg" style={{ color: demoData.awayColor }}>{demoData.awayScore}</div>
+            <div className="text-white font-bold text-center" style={{ fontSize: '6px' }}>{demoData.awayTeam}</div>
+            <div className="flex flex-col gap-0.5 text-right">
+              <div className="text-gray-400 font-bold"><span className="text-white">22</span> PTS</div>
+              <div className="text-gray-400 font-bold"><span className="text-white">6</span> REB</div>
+              <div className="text-gray-400 font-bold"><span className="text-white">7</span> AST</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  if (layout === "minimal") {
+    return (
+      <div 
+        className="rounded border border-zinc-600 overflow-hidden"
+        style={{ 
+          width: previewWidth, 
+          height: Math.max(previewHeight, 60),
+          background: '#0a0a12',
+          fontFamily: "'Montserrat', sans-serif"
+        }}
+      >
+        <div className="h-full flex items-center justify-center gap-4" style={{ fontSize: '10px' }}>
+          <div className="text-center">
+            <div className="text-white font-bold">{demoData.homeTeam}</div>
+            <div className="font-black text-2xl" style={{ color: demoData.homeColor }}>{demoData.homeScore}</div>
+          </div>
+          <div className="text-gray-500 font-bold">—</div>
+          <div className="text-center">
+            <div className="text-white font-bold">{demoData.awayTeam}</div>
+            <div className="font-black text-2xl" style={{ color: demoData.awayColor }}>{demoData.awayScore}</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Full layout preview
+  return (
+    <div 
+      className="rounded border border-zinc-600 overflow-hidden"
+      style={{ 
+        width: previewWidth, 
+        height: Math.max(previewHeight, 100),
+        background: '#0a0a12',
+        fontFamily: "'Montserrat', sans-serif"
+      }}
+    >
+      <div className="h-full flex flex-col">
+        {/* Home Team */}
+        <div className="flex-1 flex flex-col" style={{ borderBottom: '1px solid #1a1a2e' }}>
+          <div className="px-2 py-1 flex items-center justify-between" style={{ backgroundColor: demoData.homeColor }}>
+            <span className="text-white font-bold" style={{ fontSize: '8px' }}>{demoData.homeTeam}</span>
+            <span className="text-white font-bold" style={{ fontSize: '6px' }}>TO: 5 | FOULS: 3</span>
+          </div>
+          <div className="flex-1 px-1 py-0.5 text-white" style={{ fontSize: '5px' }}>
+            <div className="grid grid-cols-9 gap-0.5 font-bold text-gray-400 mb-0.5">
+              <span>#</span><span>PLAYER</span><span>FG</span><span>3PT</span><span>FT</span><span>REB</span><span>AST</span><span>PF</span><span className="text-yellow-400">PTS</span>
+            </div>
+            <div className="grid grid-cols-9 gap-0.5">
+              <span>23</span><span>Johnson</span><span>4-8</span><span>2-4</span><span>2-2</span><span>5</span><span>3</span><span>2</span><span className="text-yellow-400 font-bold">12</span>
+            </div>
+          </div>
+        </div>
+        {/* Away Team */}
+        <div className="flex-1 flex flex-col">
+          <div className="px-2 py-1 flex items-center justify-between" style={{ backgroundColor: demoData.awayColor }}>
+            <span className="text-white font-bold" style={{ fontSize: '8px' }}>{demoData.awayTeam}</span>
+            <span className="text-white font-bold" style={{ fontSize: '6px' }}>TO: 4 | FOULS: 5</span>
+          </div>
+          <div className="flex-1 px-1 py-0.5 text-white" style={{ fontSize: '5px' }}>
+            <div className="grid grid-cols-9 gap-0.5 font-bold text-gray-400 mb-0.5">
+              <span>#</span><span>PLAYER</span><span>FG</span><span>3PT</span><span>FT</span><span>REB</span><span>AST</span><span>PF</span><span className="text-yellow-400">PTS</span>
+            </div>
+            <div className="grid grid-cols-9 gap-0.5">
+              <span>11</span><span>Williams</span><span>5-10</span><span>1-3</span><span>3-4</span><span>7</span><span>4</span><span>3</span><span className="text-yellow-400 font-bold">14</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 // Display Output Component
 const DisplayOutput = ({ display, index, onUpdate, onDelete }) => {
