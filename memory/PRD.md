@@ -57,9 +57,11 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
   - `auth.py` - Password hashing, User model, auth helpers
   - `__init__.py` - Module exports
 - Created `/app/backend/routes/` directory structure:
-  - `auth.py` - Auth routes (register, login, logout, me)
+  - `auth.py` - Auth routes (register, login, logout, me) - ~200 lines
+  - `demo.py` - Demo mode endpoints (basketball, football, baseball) - ~250 lines
   - `__init__.py` - Router exports
 - **Status**: Foundation laid, gradual migration in progress (server.py still contains all routes but can be incrementally migrated)
+- **Migration Strategy**: New features can use modular routes; existing routes work as-is
 
 **FootballLiveGame.jsx Decomposition Started**
 - Created `/app/frontend/src/hooks/football/` directory:
@@ -71,9 +73,10 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
   - `FootballField.jsx`, `KickoffDialog.jsx`, `PlayerSelector.jsx`
   - `YardLineSelector.jsx`, `FieldViewDialog.jsx`, `PuntFieldView.jsx`
   - `FieldGoalFieldView.jsx`, `KickoffWorkflowDialog.jsx`
-- **Status**: Hooks created and ready for integration; main component still works as-is
-- Live preview uses actual game data via scaled iframe
-- Shows scaled preview with actual layout and dimensions
+- **Existing hooks already in use**:
+  - `useGameClock.js`, `useTimeouts.js`, `useDriveState.js`
+  - `useGameHistory.js`, `useFootballPlayWorkflow.js`
+- **Status**: Component already has significant decomposition; remaining inline state could be extracted but isn't blocking
 
 ### February 13, 2026 - JUMBOTRON MODE ENHANCED ✅
 
