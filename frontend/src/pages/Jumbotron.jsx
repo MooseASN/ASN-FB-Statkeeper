@@ -33,9 +33,10 @@ const calculatePlayerStats = (stats) => {
   };
 };
 
-// Shared font style for broadcast look
+// Shared font style for broadcast look - Montserrat Bold
 const broadcastFont = {
-  fontFamily: "'Arial Black', 'Helvetica Black', Impact, sans-serif",
+  fontFamily: "'Montserrat', sans-serif",
+  fontWeight: 700,
   textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
 };
 
