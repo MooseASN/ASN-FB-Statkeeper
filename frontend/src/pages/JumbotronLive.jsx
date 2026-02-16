@@ -356,48 +356,8 @@ function ScorersTableLayout({ game, homeStats, awayStats, eventLogo }) {
     </div>
   );
 }
-          </div>
-        </div>
-        
-        {/* VS Divider */}
-        <div className="w-full flex items-center gap-4 my-3">
-          <div className="flex-1 h-1 bg-white/20" />
-          <span className="text-gray-400 font-extrabold text-2xl">VS</span>
-          <div className="flex-1 h-1 bg-white/20" />
-        </div>
-        
-        {/* Away Team */}
-        <div className="flex items-center gap-6 mt-2">
-          {game.away_team_logo && (
-            <img src={game.away_team_logo} alt="" className="h-24 w-24 object-contain" />
-          )}
-          <div className="text-center">
-            <div className="text-3xl font-extrabold text-white uppercase tracking-wider" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-              {game.away_team_name}
-            </div>
-            <div className="text-8xl font-black mt-1" style={{ color: awayColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}>
-              {awayScore}
-            </div>
-          </div>
-        </div>
-        
-        {/* Period/Quarter */}
-        {(game.current_quarter || game.period) && (
-          <div className="mt-4 px-8 py-3 bg-white/10 rounded-lg">
-            <span className="text-gray-200 font-extrabold uppercase tracking-wider text-xl">
-              {game.period_label || `Q${game.current_quarter || game.period}`}
-            </span>
-          </div>
-        )}
-      </div>
-      
-      {/* Away Leaders (Right) */}
-      <div className="flex-1 flex flex-col justify-center gap-6 px-8 py-4" style={{ borderLeft: '3px solid #1a1a2e' }}>
-        {awayLeaders.map((player, idx) => (
-          <StatLeader key={idx} player={player} teamColor={awayColor} reverse={true} />
-        ))}
-      </div>
-    </div>
+
+// ============ MINIMAL SCOREBOARD LAYOUT ============
   );
 }
 
