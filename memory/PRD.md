@@ -51,23 +51,24 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ### February 16, 2026 - CODE DECOMPOSITION (IN PROGRESS)
 
-**Backend Decomposition - SIGNIFICANT PROGRESS**
+**Backend Decomposition - MAJOR PROGRESS (~1,800 lines extracted)**
 - Created `/app/backend/utils/` directory structure:
-  - `database.py` - MongoDB connection and shared DB instance
-  - `auth.py` - Password hashing, User model, auth helpers
+  - `database.py` - MongoDB connection and shared DB instance (~20 lines)
+  - `auth.py` - Password hashing, User model, auth helpers (~94 lines)
   - `__init__.py` - Module exports
 - Created `/app/backend/models/` directory structure:
-  - `game_models.py` - All Pydantic models (Team, Game, PlayerStats, Event, Jumbotron, Sponsor) - ~280 lines
+  - `game_models.py` - All Pydantic models (Team, Game, PlayerStats, Event, Jumbotron, Sponsor) (~280 lines)
   - `__init__.py` - Module exports
 - Created `/app/backend/routes/` directory structure:
-  - `auth.py` - Auth routes (register, login, logout, me) - ~200 lines
-  - `demo.py` - Demo mode endpoints (basketball, football, baseball) - ~250 lines
-  - `teams.py` - Team CRUD, logo upload, roster CSV - ~180 lines
-  - `jumbotron.py` - Jumbotron configs, embed, PrestoSports parsing - ~280 lines
+  - `auth.py` - Auth routes (register, login, logout, me) - ~222 lines
+  - `demo.py` - Demo mode endpoints (basketball, football, baseball) - ~268 lines
+  - `teams.py` - Team CRUD, logo upload, roster CSV - ~162 lines
+  - `jumbotron.py` - Jumbotron configs, embed, PrestoSports parsing - ~319 lines
+  - `events.py` - Event/tournament CRUD, public ticker, game management - ~284 lines
+  - `sponsors.py` - Sponsor banner CRUD, reorder - ~107 lines
   - `__init__.py` - Router exports
-- **Status**: ~1,200 lines extracted into modular files; server.py still serves all routes (no breaking changes)
-- **Migration Strategy**: New features use modular routes; existing routes work as-is
-- **Remaining to extract**: games.py (~1200 lines), events.py (~350 lines), pdf.py (~600 lines), sponsors.py (~600 lines), schools.py (~400 lines)
+- **Status**: ~1,810 lines extracted into modular files; server.py still serves all routes (zero breaking changes)
+- **Remaining to extract**: games.py (~1200 lines - largest section), pdf.py (~600 lines), schools.py (~400 lines)
 
 **FootballLiveGame.jsx Decomposition Started**
 - Created `/app/frontend/src/hooks/football/` directory:
