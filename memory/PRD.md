@@ -51,17 +51,23 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ### February 16, 2026 - CODE DECOMPOSITION (IN PROGRESS)
 
-**Backend Decomposition Started**
+**Backend Decomposition - SIGNIFICANT PROGRESS**
 - Created `/app/backend/utils/` directory structure:
   - `database.py` - MongoDB connection and shared DB instance
   - `auth.py` - Password hashing, User model, auth helpers
   - `__init__.py` - Module exports
+- Created `/app/backend/models/` directory structure:
+  - `game_models.py` - All Pydantic models (Team, Game, PlayerStats, Event, Jumbotron, Sponsor) - ~280 lines
+  - `__init__.py` - Module exports
 - Created `/app/backend/routes/` directory structure:
   - `auth.py` - Auth routes (register, login, logout, me) - ~200 lines
   - `demo.py` - Demo mode endpoints (basketball, football, baseball) - ~250 lines
+  - `teams.py` - Team CRUD, logo upload, roster CSV - ~180 lines
+  - `jumbotron.py` - Jumbotron configs, embed, PrestoSports parsing - ~280 lines
   - `__init__.py` - Router exports
-- **Status**: Foundation laid, gradual migration in progress (server.py still contains all routes but can be incrementally migrated)
-- **Migration Strategy**: New features can use modular routes; existing routes work as-is
+- **Status**: ~1,200 lines extracted into modular files; server.py still serves all routes (no breaking changes)
+- **Migration Strategy**: New features use modular routes; existing routes work as-is
+- **Remaining to extract**: games.py (~1200 lines), events.py (~350 lines), pdf.py (~600 lines), sponsors.py (~600 lines), schools.py (~400 lines)
 
 **FootballLiveGame.jsx Decomposition Started**
 - Created `/app/frontend/src/hooks/football/` directory:
@@ -77,6 +83,7 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
   - `useGameClock.js`, `useTimeouts.js`, `useDriveState.js`
   - `useGameHistory.js`, `useFootballPlayWorkflow.js`
 - **Status**: Component already has significant decomposition; remaining inline state could be extracted but isn't blocking
+
 
 ### February 13, 2026 - JUMBOTRON MODE ENHANCED ✅
 
