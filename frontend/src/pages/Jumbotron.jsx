@@ -327,7 +327,10 @@ export default function Jumbotron() {
   const awayTimeouts = game.away_timeouts ?? (game.total_timeouts || 5) - (game.away_timeouts_used || 0);
 
   return (
-    <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0f1a' }} data-testid="jumbotron-page">
+    <div className="h-screen w-screen flex flex-col overflow-hidden" style={{ backgroundColor: '#0f0f1a', fontFamily: "'Montserrat', sans-serif" }} data-testid="jumbotron-page">
+      {/* Google Fonts - Montserrat Bold */}
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');`}</style>
+      
       <TeamPanel
         teamName={game.home_team_name}
         teamLogo={game.home_team_logo}
