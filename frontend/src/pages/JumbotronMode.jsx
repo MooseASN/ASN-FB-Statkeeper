@@ -8,23 +8,152 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   ArrowLeft, Monitor, Plus, Trash2, Copy, ExternalLink, 
-  Calendar, Clock, Link as LinkIcon, Settings, Play, Tv2,
-  ChevronDown, ChevronUp, GripVertical
+  Calendar, Clock, Link as LinkIcon, Settings, Tv2,
+  ChevronDown, ChevronUp, GripVertical, Layers, LayoutGrid
 } from "lucide-react";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
-// Preset sizes for jumbotron
-const PRESET_SIZES = [
-  { label: "1080p (1920×1080)", width: 1920, height: 1080 },
-  { label: "720p (1280×720)", width: 1280, height: 720 },
-  { label: "4K (3840×2160)", width: 3840, height: 2160 },
-  { label: "Square (1080×1080)", width: 1080, height: 1080 },
-  { label: "Vertical (1080×1920)", width: 1080, height: 1920 },
-  { label: "Custom", width: 0, height: 0 }
+// Preset sizes for jumbotron displays
+const DISPLAY_PRESETS = [
+  { label: "HD Overhead (1920×1080)", width: 1920, height: 1080, layout: "full", description: "Full stats display" },
+  { label: "4K Display (3840×2160)", width: 3840, height: 2160, layout: "full", description: "Full stats display" },
+  { label: "Scorers Table Wide (1920×400)", width: 1920, height: 400, layout: "scorers", description: "Stat leaders + score" },
+  { label: "Scorers Table Ultra-Wide (2560×400)", width: 2560, height: 400, layout: "scorers", description: "Stat leaders + score" },
+  { label: "Minimal Score (1280×200)", width: 1280, height: 200, layout: "minimal", description: "Score only" },
+  { label: "Square (1080×1080)", width: 1080, height: 1080, layout: "full", description: "Full stats display" },
+  { label: "Custom", width: 0, height: 0, layout: "full", description: "Set your own dimensions" }
 ];
+
+// Layout types
+const LAYOUT_TYPES = [
+  { value: "full", label: "Full Stats", description: "Complete player stats table with team headers" },
+  { value: "scorers", label: "Scorers Table", description: "3 stat leaders per team with center scoreboard" },
+  { value: "minimal", label: "Minimal Score", description: "Just team names, logos, and scores" }
+];
+
+// Display Output Component
+const DisplayOutput = ({ display, index, onUpdate, onDelete }) => {
+  const [expanded, setExpanded] = useState(index === 0);
+  
+  return (
+    <div className="border border-zinc-700 rounded-lg bg-zinc-800/50 overflow-hidden">
+      <div 
+        className="flex items-center gap-3 p-3 cursor-pointer hover:bg-zinc-700/30"
+        onClick={() => setExpanded(!expanded)}
+      >
+        <Monitor className="w-4 h-4 text-orange-500" />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-medium text-white truncate">
+            {display.name || `Display ${index + 1}`}
+          </p>
+          <p className="text-xs text-zinc-400">
+            {display.width}×{display.height}px • {LAYOUT_TYPES.find(l => l.value === display.layout)?.label || 'Full Stats'}
+          </p>
+        </div>
+        <Button variant="ghost" size="sm" className="text-zinc-400" onClick={(e) => { e.stopPropagation(); setExpanded(!expanded); }}>
+          {expanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+        </Button>
+      </div>
+      
+      {expanded && (
+        <div className="p-4 border-t border-zinc-700 space-y-4">
+          <div>
+            <Label className="text-zinc-300">Display Name</Label>
+            <Input
+              value={display.name || ""}
+              onChange={(e) => onUpdate({ ...display, name: e.target.value })}
+              placeholder="e.g., Main Jumbotron, Scorers Table"
+              className="mt-1 bg-zinc-900 border-zinc-700 text-white"
+            />
+          </div>
+          
+          <div>
+            <Label className="text-zinc-300">Preset Size</Label>
+            <Select
+              value={DISPLAY_PRESETS.find(p => p.width === display.width && p.height === display.height)?.label || "Custom"}
+              onValueChange={(val) => {
+                const preset = DISPLAY_PRESETS.find(p => p.label === val);
+                if (preset && preset.width > 0) {
+                  onUpdate({ ...display, width: preset.width, height: preset.height, layout: preset.layout });
+                }
+              }}
+            >
+              <SelectTrigger className="mt-1 bg-zinc-900 border-zinc-700 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {DISPLAY_PRESETS.map((preset) => (
+                  <SelectItem key={preset.label} value={preset.label}>
+                    <div>
+                      <span>{preset.label}</span>
+                      {preset.description && <span className="text-zinc-500 ml-2 text-xs">({preset.description})</span>}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-zinc-300">Width (px)</Label>
+              <Input
+                type="number"
+                value={display.width}
+                onChange={(e) => onUpdate({ ...display, width: parseInt(e.target.value) || 0 })}
+                className="mt-1 bg-zinc-900 border-zinc-700 text-white"
+              />
+            </div>
+            <div>
+              <Label className="text-zinc-300">Height (px)</Label>
+              <Input
+                type="number"
+                value={display.height}
+                onChange={(e) => onUpdate({ ...display, height: parseInt(e.target.value) || 0 })}
+                className="mt-1 bg-zinc-900 border-zinc-700 text-white"
+              />
+            </div>
+          </div>
+          
+          <div>
+            <Label className="text-zinc-300">Layout Style</Label>
+            <Select value={display.layout || "full"} onValueChange={(val) => onUpdate({ ...display, layout: val })}>
+              <SelectTrigger className="mt-1 bg-zinc-900 border-zinc-700 text-white">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LAYOUT_TYPES.map((layout) => (
+                  <SelectItem key={layout.value} value={layout.value}>
+                    <div>
+                      <span className="font-medium">{layout.label}</span>
+                      <span className="text-zinc-500 ml-2 text-xs">- {layout.description}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex justify-end pt-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => onDelete(display.id)}
+              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Remove Display
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // Schedule Item Component
 const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
@@ -36,14 +165,14 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
         className="flex items-center gap-3 p-3 cursor-pointer hover:bg-zinc-700/30"
         onClick={() => setExpanded(!expanded)}
       >
-        <GripVertical className="w-4 h-4 text-zinc-500" />
+        <Calendar className="w-4 h-4 text-blue-500" />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-white truncate">
-            {item.label || `Slot ${index + 1}`}
+            {item.label || `Game ${index + 1}`}
           </p>
           <p className="text-xs text-zinc-400 truncate">
-            {item.source_type === 'statmoose' ? 'StatMoose Game' : 'PrestoSports'}
-            {item.start_time && ` • Starts: ${new Date(item.start_time).toLocaleString()}`}
+            {item.source_type === 'statmoose' ? 'StatMoose' : 'PrestoSports'}
+            {item.start_time && ` • ${new Date(item.start_time).toLocaleString()}`}
           </p>
         </div>
         <Button variant="ghost" size="sm" className="text-zinc-400">
@@ -54,11 +183,11 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
       {expanded && (
         <div className="p-4 border-t border-zinc-700 space-y-4">
           <div>
-            <Label className="text-zinc-300">Slot Name</Label>
+            <Label className="text-zinc-300">Game Name</Label>
             <Input
               value={item.label || ""}
               onChange={(e) => onUpdate({ ...item, label: e.target.value })}
-              placeholder="e.g., Game 1, Finals, etc."
+              placeholder="e.g., Game 1, Championship, etc."
               className="mt-1 bg-zinc-900 border-zinc-700 text-white"
             />
           </div>
@@ -81,13 +210,10 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
           
           {item.source_type === 'statmoose' ? (
             <div>
-              <Label className="text-zinc-300">Select Game or Paste Share Link</Label>
+              <Label className="text-zinc-300">Select Game or Paste Share Code</Label>
               <div className="mt-1 space-y-2">
                 {userGames && userGames.length > 0 && (
-                  <Select
-                    value={item.source_url}
-                    onValueChange={(value) => onUpdate({ ...item, source_url: value })}
-                  >
+                  <Select value={item.source_url} onValueChange={(value) => onUpdate({ ...item, source_url: value })}>
                     <SelectTrigger className="bg-zinc-900 border-zinc-700 text-white">
                       <SelectValue placeholder="Select a game..." />
                     </SelectTrigger>
@@ -100,11 +226,10 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
                     </SelectContent>
                   </Select>
                 )}
-                <div className="text-xs text-zinc-500 text-center">or</div>
                 <Input
                   value={item.source_url}
                   onChange={(e) => onUpdate({ ...item, source_url: e.target.value })}
-                  placeholder="Paste share code or full jumbotron URL"
+                  placeholder="Or paste share code"
                   className="bg-zinc-900 border-zinc-700 text-white"
                 />
               </div>
@@ -115,12 +240,9 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
               <Input
                 value={item.source_url}
                 onChange={(e) => onUpdate({ ...item, source_url: e.target.value })}
-                placeholder="https://example.com/sports/wbkb/2025-26/boxscores/game.xml"
+                placeholder="https://example.com/sports/wbkb/boxscores/game.xml"
                 className="mt-1 bg-zinc-900 border-zinc-700 text-white"
               />
-              <p className="text-xs text-zinc-500 mt-1">
-                Enter the full URL to the PrestoSports box score XML
-              </p>
             </div>
           )}
           
@@ -146,14 +268,9 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
           </div>
           
           <div className="flex justify-end">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => onDelete(item.id)}
-              className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-            >
+            <Button variant="ghost" size="sm" onClick={() => onDelete(item.id)} className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
               <Trash2 className="w-4 h-4 mr-2" />
-              Remove Slot
+              Remove Game
             </Button>
           </div>
         </div>
@@ -173,11 +290,10 @@ export default function JumbotronMode() {
   const [showDialog, setShowDialog] = useState(false);
   const [editingConfig, setEditingConfig] = useState(null);
   const [configName, setConfigName] = useState("");
-  const [configWidth, setConfigWidth] = useState(1920);
-  const [configHeight, setConfigHeight] = useState(1080);
+  const [displays, setDisplays] = useState([]);
   const [schedule, setSchedule] = useState([]);
-  const [selectedPreset, setSelectedPreset] = useState("1080p (1920×1080)");
   const [saving, setSaving] = useState(false);
+  const [activeTab, setActiveTab] = useState("displays");
   
   // Output dialog
   const [showOutputDialog, setShowOutputDialog] = useState(false);
@@ -189,21 +305,15 @@ export default function JumbotronMode() {
 
   const checkAuthAndFetchData = async () => {
     try {
-      // Check if user is logged in
       const profileRes = await axios.get(`${API}/account/profile`);
       if (profileRes.data) {
         setIsLoggedIn(true);
-        
-        // Fetch user's jumbotron configs
         const configsRes = await axios.get(`${API}/jumbotron/configs`);
         setConfigs(configsRes.data.configs || []);
-        
-        // Fetch user's games for selection
         const gamesRes = await axios.get(`${API}/jumbotron/user-games`);
         setUserGames(gamesRes.data.games || []);
       }
     } catch (error) {
-      // User not logged in - that's ok, show demo/guest mode
       setIsLoggedIn(false);
     } finally {
       setLoading(false);
@@ -213,9 +323,9 @@ export default function JumbotronMode() {
   const openCreateDialog = () => {
     setEditingConfig(null);
     setConfigName("");
-    setConfigWidth(1920);
-    setConfigHeight(1080);
-    setSelectedPreset("1080p (1920×1080)");
+    setDisplays([
+      { id: `disp_${Date.now()}`, name: "Main Jumbotron", width: 1920, height: 1080, layout: "full" }
+    ]);
     setSchedule([{
       id: `slot_${Date.now()}`,
       source_type: "statmoose",
@@ -224,30 +334,46 @@ export default function JumbotronMode() {
       end_time: null,
       label: "Game 1"
     }]);
+    setActiveTab("displays");
     setShowDialog(true);
   };
 
   const openEditDialog = (config) => {
     setEditingConfig(config);
     setConfigName(config.name);
-    setConfigWidth(config.width);
-    setConfigHeight(config.height);
+    // Support legacy single-display configs
+    if (config.displays && config.displays.length > 0) {
+      setDisplays(config.displays);
+    } else {
+      setDisplays([{ id: `disp_${Date.now()}`, name: "Main Display", width: config.width, height: config.height, layout: "full" }]);
+    }
     setSchedule(config.schedule || []);
-    
-    // Find matching preset
-    const preset = PRESET_SIZES.find(p => p.width === config.width && p.height === config.height);
-    setSelectedPreset(preset ? preset.label : "Custom");
-    
+    setActiveTab("displays");
     setShowDialog(true);
   };
 
-  const handlePresetChange = (presetLabel) => {
-    setSelectedPreset(presetLabel);
-    const preset = PRESET_SIZES.find(p => p.label === presetLabel);
-    if (preset && preset.width > 0) {
-      setConfigWidth(preset.width);
-      setConfigHeight(preset.height);
+  const addDisplay = () => {
+    setDisplays([...displays, {
+      id: `disp_${Date.now()}`,
+      name: `Display ${displays.length + 1}`,
+      width: 1920,
+      height: 400,
+      layout: "scorers"
+    }]);
+  };
+
+  const updateDisplay = (index, updated) => {
+    const newDisplays = [...displays];
+    newDisplays[index] = updated;
+    setDisplays(newDisplays);
+  };
+
+  const deleteDisplay = (dispId) => {
+    if (displays.length <= 1) {
+      toast.error("You need at least one display");
+      return;
     }
+    setDisplays(displays.filter(d => d.id !== dispId));
   };
 
   const addScheduleSlot = () => {
@@ -261,9 +387,9 @@ export default function JumbotronMode() {
     }]);
   };
 
-  const updateScheduleSlot = (index, updatedItem) => {
+  const updateScheduleSlot = (index, updated) => {
     const newSchedule = [...schedule];
-    newSchedule[index] = updatedItem;
+    newSchedule[index] = updated;
     setSchedule(newSchedule);
   };
 
@@ -273,19 +399,20 @@ export default function JumbotronMode() {
 
   const handleSave = async () => {
     if (!configName.trim()) {
-      toast.error("Please enter a name for your jumbotron");
+      toast.error("Please enter an event name");
       return;
     }
-    
+    if (displays.length === 0) {
+      toast.error("Please add at least one display");
+      return;
+    }
     if (schedule.length === 0) {
-      toast.error("Please add at least one game/source");
+      toast.error("Please add at least one game");
       return;
     }
-    
-    // Validate schedule items
     for (const item of schedule) {
       if (!item.source_url) {
-        toast.error(`Please select a game or enter a URL for "${item.label || 'slot'}"`);
+        toast.error(`Please select a game source for "${item.label || 'slot'}"`);
         return;
       }
     }
@@ -294,37 +421,37 @@ export default function JumbotronMode() {
     try {
       const payload = {
         name: configName,
-        width: configWidth,
-        height: configHeight,
+        width: displays[0].width, // Primary display for backwards compat
+        height: displays[0].height,
+        displays: displays,
         schedule: schedule
       };
       
       if (editingConfig) {
         await axios.put(`${API}/jumbotron/configs/${editingConfig.id}`, payload);
-        toast.success("Jumbotron updated!");
+        toast.success("Event updated!");
       } else {
         await axios.post(`${API}/jumbotron/configs`, payload);
-        toast.success("Jumbotron created!");
+        toast.success("Event created!");
       }
       
       setShowDialog(false);
       checkAuthAndFetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Failed to save jumbotron");
+      toast.error(error.response?.data?.detail || "Failed to save");
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (configId) => {
-    if (!confirm("Are you sure you want to delete this jumbotron configuration?")) return;
-    
+    if (!confirm("Delete this jumbotron event?")) return;
     try {
       await axios.delete(`${API}/jumbotron/configs/${configId}`);
-      toast.success("Jumbotron deleted");
+      toast.success("Deleted");
       checkAuthAndFetchData();
     } catch (error) {
-      toast.error("Failed to delete jumbotron");
+      toast.error("Failed to delete");
     }
   };
 
@@ -336,35 +463,42 @@ export default function JumbotronMode() {
   const copyToClipboard = async (text) => {
     try {
       await navigator.clipboard.writeText(text);
-      toast.success("Copied to clipboard!");
+      toast.success("Copied!");
     } catch (err) {
       toast.error("Failed to copy");
     }
   };
 
-  const getJumbotronUrl = (config) => {
+  const getJumbotronUrl = (config, display = null) => {
     const baseUrl = process.env.REACT_APP_BACKEND_URL?.replace('-api', '') || window.location.origin;
-    return `${baseUrl}/jumbotron/live/${config.embed_code}`;
+    let url = `${baseUrl}/jumbotron/live/${config.embed_code}`;
+    if (display && display.layout) {
+      url += `?layout=${display.layout}`;
+    }
+    return url;
   };
 
-  const getIframeCode = (config) => {
-    const url = getJumbotronUrl(config);
-    return `<iframe src="${url}" width="${config.width}" height="${config.height}" frameborder="0" allowfullscreen></iframe>`;
+  const getIframeCode = (config, display) => {
+    const url = getJumbotronUrl(config, display);
+    return `<iframe src="${url}" width="${display.width}" height="${display.height}" frameborder="0" allowfullscreen style="border:0;"></iframe>`;
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center" style={{ fontFamily: "'Montserrat', sans-serif" }}>
         <div className="text-center">
           <Tv2 className="w-12 h-12 text-orange-500 animate-pulse mx-auto" />
-          <p className="mt-4 text-zinc-400">Loading...</p>
+          <p className="mt-4 text-zinc-400 font-semibold">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="min-h-screen bg-black text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+      {/* Google Fonts */}
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');`}</style>
+      
       {/* Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-black/95 backdrop-blur-sm border-b border-zinc-800">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -374,22 +508,12 @@ export default function JumbotronMode() {
           <div className="flex items-center gap-4">
             {isLoggedIn ? (
               <Link to="/dashboard">
-                <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                  Dashboard
-                </Button>
+                <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800 font-semibold">Dashboard</Button>
               </Link>
             ) : (
               <>
-                <Link to="/login">
-                  <Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/pricing">
-                  <Button className="bg-orange-500 hover:bg-orange-600 text-white">
-                    Get Started
-                  </Button>
-                </Link>
+                <Link to="/login"><Button variant="ghost" className="text-zinc-300 hover:text-white hover:bg-zinc-800 font-semibold">Sign In</Button></Link>
+                <Link to="/pricing"><Button className="bg-orange-500 hover:bg-orange-600 text-white font-bold">Get Started</Button></Link>
               </>
             )}
           </div>
@@ -402,68 +526,49 @@ export default function JumbotronMode() {
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <div>
-              <Button
-                variant="ghost"
-                onClick={() => navigate(-1)}
-                className="text-zinc-400 hover:text-white mb-2"
-              >
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Back
+              <Button variant="ghost" onClick={() => navigate(-1)} className="text-zinc-400 hover:text-white mb-2 font-semibold">
+                <ArrowLeft className="w-4 h-4 mr-2" />Back
               </Button>
-              <h1 className="text-3xl font-bold flex items-center gap-3">
+              <h1 className="text-3xl font-black flex items-center gap-3 uppercase tracking-wide">
                 <Tv2 className="w-8 h-8 text-orange-500" />
                 Jumbotron Mode
               </h1>
-              <p className="text-zinc-400 mt-2">
-                Create custom scoreboard displays for venue screens and jumbotrons
+              <p className="text-zinc-400 mt-2 font-medium">
+                Create venue displays with multiple screen sizes for tournaments
               </p>
             </div>
             {isLoggedIn && (
-              <Button onClick={openCreateDialog} className="bg-orange-500 hover:bg-orange-600">
-                <Plus className="w-4 h-4 mr-2" />
-                New Jumbotron
+              <Button onClick={openCreateDialog} className="bg-orange-500 hover:bg-orange-600 font-bold">
+                <Plus className="w-4 h-4 mr-2" />New Event
               </Button>
             )}
           </div>
 
-          {/* Not Logged In State */}
+          {/* Not Logged In */}
           {!isLoggedIn && (
             <Card className="bg-zinc-900 border-zinc-800">
               <CardHeader className="text-center">
-                <CardTitle className="text-white">Sign In Required</CardTitle>
-                <CardDescription className="text-zinc-400">
-                  Create an account or sign in to create and manage jumbotron displays
-                </CardDescription>
+                <CardTitle className="text-white font-bold">Sign In Required</CardTitle>
+                <CardDescription className="text-zinc-400">Create an account to manage jumbotron displays</CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center gap-4">
-                <Link to="/login">
-                  <Button variant="outline" className="border-zinc-700 text-white hover:bg-zinc-800">
-                    Sign In
-                  </Button>
-                </Link>
-                <Link to="/pricing">
-                  <Button className="bg-orange-500 hover:bg-orange-600">
-                    Get Started Free
-                  </Button>
-                </Link>
+                <Link to="/login"><Button variant="outline" className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">Sign In</Button></Link>
+                <Link to="/pricing"><Button className="bg-orange-500 hover:bg-orange-600 font-bold">Get Started Free</Button></Link>
               </CardContent>
             </Card>
           )}
 
-          {/* Logged In - Config List */}
+          {/* Config List */}
           {isLoggedIn && (
             <div className="space-y-4">
               {configs.length === 0 ? (
                 <Card className="bg-zinc-900 border-zinc-800">
                   <CardContent className="py-12 text-center">
                     <Tv2 className="w-12 h-12 text-zinc-600 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-white mb-2">No Jumbotrons Yet</h3>
-                    <p className="text-zinc-400 mb-6">
-                      Create your first jumbotron display for venue scoreboards
-                    </p>
-                    <Button onClick={openCreateDialog} className="bg-orange-500 hover:bg-orange-600">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Create Jumbotron
+                    <h3 className="text-lg font-bold text-white mb-2">No Events Yet</h3>
+                    <p className="text-zinc-400 mb-6 font-medium">Create your first jumbotron event</p>
+                    <Button onClick={openCreateDialog} className="bg-orange-500 hover:bg-orange-600 font-bold">
+                      <Plus className="w-4 h-4 mr-2" />Create Event
                     </Button>
                   </CardContent>
                 </Card>
@@ -474,53 +579,38 @@ export default function JumbotronMode() {
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Monitor className="w-5 h-5 text-orange-500" />
+                            <Tv2 className="w-5 h-5 text-orange-500" />
                             {config.name}
                           </h3>
-                          <div className="mt-2 flex items-center gap-4 text-sm text-zinc-400">
-                            <span>{config.width}×{config.height}px</span>
+                          <div className="mt-2 flex items-center gap-4 text-sm text-zinc-400 font-medium">
+                            <span className="flex items-center gap-1">
+                              <Layers className="w-4 h-4" />
+                              {config.displays?.length || 1} display(s)
+                            </span>
                             <span>•</span>
-                            <span>{config.schedule?.length || 0} game(s) scheduled</span>
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-4 h-4" />
+                              {config.schedule?.length || 0} game(s)
+                            </span>
                           </div>
-                          {config.schedule && config.schedule.length > 0 && (
-                            <div className="mt-3 space-y-1">
-                              {config.schedule.slice(0, 3).map((slot, i) => (
-                                <p key={slot.id} className="text-xs text-zinc-500">
-                                  {slot.label || `Slot ${i + 1}`}: {slot.source_type === 'statmoose' ? 'StatMoose' : 'PrestoSports'}
-                                  {slot.start_time && ` - ${new Date(slot.start_time).toLocaleString()}`}
-                                </p>
+                          {config.displays && config.displays.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {config.displays.map((disp, i) => (
+                                <span key={i} className="text-xs bg-zinc-800 px-2 py-1 rounded font-medium">
+                                  {disp.name}: {disp.width}×{disp.height}
+                                </span>
                               ))}
-                              {config.schedule.length > 3 && (
-                                <p className="text-xs text-zinc-500">+{config.schedule.length - 3} more</p>
-                              )}
                             </div>
                           )}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => showOutput(config)}
-                            className="border-zinc-700 text-white hover:bg-zinc-800"
-                          >
-                            <LinkIcon className="w-4 h-4 mr-2" />
-                            Get Link
+                          <Button variant="outline" size="sm" onClick={() => showOutput(config)} className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">
+                            <LinkIcon className="w-4 h-4 mr-2" />Get Links
                           </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openEditDialog(config)}
-                            className="border-zinc-700 text-white hover:bg-zinc-800"
-                          >
-                            <Settings className="w-4 h-4 mr-2" />
-                            Edit
+                          <Button variant="outline" size="sm" onClick={() => openEditDialog(config)} className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">
+                            <Settings className="w-4 h-4 mr-2" />Edit
                           </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleDelete(config.id)}
-                            className="text-red-400 hover:text-red-300 hover:bg-red-900/20"
-                          >
+                          <Button variant="ghost" size="sm" onClick={() => handleDelete(config.id)} className="text-red-400 hover:text-red-300 hover:bg-red-900/20">
                             <Trash2 className="w-4 h-4" />
                           </Button>
                         </div>
@@ -536,28 +626,28 @@ export default function JumbotronMode() {
           <div className="mt-12 grid md:grid-cols-3 gap-6">
             <Card className="bg-zinc-900/50 border-zinc-800">
               <CardContent className="pt-6 text-center">
+                <Layers className="w-8 h-8 text-orange-500 mx-auto mb-3" />
+                <h3 className="font-bold text-white mb-2">Multiple Displays</h3>
+                <p className="text-sm text-zinc-400 font-medium">
+                  Create different sized outputs for overhead screens and scorers tables
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="bg-zinc-900/50 border-zinc-800">
+              <CardContent className="pt-6 text-center">
                 <Calendar className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-                <h3 className="font-bold text-white mb-2">Schedule Games</h3>
-                <p className="text-sm text-zinc-400">
-                  Queue multiple games for tournaments with automatic switching
+                <h3 className="font-bold text-white mb-2">Tournament Ready</h3>
+                <p className="text-sm text-zinc-400 font-medium">
+                  Schedule multiple games with automatic switching
                 </p>
               </CardContent>
             </Card>
             <Card className="bg-zinc-900/50 border-zinc-800">
               <CardContent className="pt-6 text-center">
-                <Monitor className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-                <h3 className="font-bold text-white mb-2">Custom Sizes</h3>
-                <p className="text-sm text-zinc-400">
-                  Set exact dimensions to match your venue's display requirements
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="bg-zinc-900/50 border-zinc-800">
-              <CardContent className="pt-6 text-center">
-                <LinkIcon className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-                <h3 className="font-bold text-white mb-2">Easy Embed</h3>
-                <p className="text-sm text-zinc-400">
-                  Get a simple link or iframe code for any display system
+                <LayoutGrid className="w-8 h-8 text-orange-500 mx-auto mb-3" />
+                <h3 className="font-bold text-white mb-2">Layout Options</h3>
+                <p className="text-sm text-zinc-400 font-medium">
+                  Full stats, scorers table, or minimal score display
                 </p>
               </CardContent>
             </Card>
@@ -567,91 +657,68 @@ export default function JumbotronMode() {
 
       {/* Create/Edit Dialog */}
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-700 text-white">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-700 text-white">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 font-bold">
               <Tv2 className="w-5 h-5 text-orange-500" />
-              {editingConfig ? "Edit Jumbotron" : "Create Jumbotron"}
+              {editingConfig ? "Edit Event" : "Create Event"}
             </DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Configure your jumbotron display settings and schedule games
+            <DialogDescription className="text-zinc-400 font-medium">
+              Configure displays and schedule games for your event
             </DialogDescription>
           </DialogHeader>
           
-          <div className="space-y-6 py-4">
-            {/* Name */}
+          <div className="space-y-4 py-4">
             <div>
-              <Label className="text-zinc-300">Jumbotron Name</Label>
+              <Label className="text-zinc-300 font-semibold">Event Name</Label>
               <Input
                 value={configName}
                 onChange={(e) => setConfigName(e.target.value)}
-                placeholder="e.g., Main Court Display, Tournament Board"
-                className="mt-1 bg-zinc-800 border-zinc-700 text-white"
+                placeholder="e.g., Winter Tournament, Championship Night"
+                className="mt-1 bg-zinc-800 border-zinc-700 text-white font-medium"
               />
             </div>
             
-            {/* Size */}
-            <div>
-              <Label className="text-zinc-300">Display Size</Label>
-              <div className="mt-2 grid grid-cols-2 gap-4">
-                <Select value={selectedPreset} onValueChange={handlePresetChange}>
-                  <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PRESET_SIZES.map((preset) => (
-                      <SelectItem key={preset.label} value={preset.label}>
-                        {preset.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <div className="flex items-center gap-2">
-                  <Input
-                    type="number"
-                    value={configWidth}
-                    onChange={(e) => {
-                      setConfigWidth(parseInt(e.target.value) || 0);
-                      setSelectedPreset("Custom");
-                    }}
-                    className="bg-zinc-800 border-zinc-700 text-white"
-                    placeholder="Width"
-                  />
-                  <span className="text-zinc-500">×</span>
-                  <Input
-                    type="number"
-                    value={configHeight}
-                    onChange={(e) => {
-                      setConfigHeight(parseInt(e.target.value) || 0);
-                      setSelectedPreset("Custom");
-                    }}
-                    className="bg-zinc-800 border-zinc-700 text-white"
-                    placeholder="Height"
-                  />
-                  <span className="text-zinc-500 text-sm">px</span>
-                </div>
-              </div>
-            </div>
-            
-            {/* Schedule */}
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <Label className="text-zinc-300">Game Schedule</Label>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={addScheduleSlot}
-                  className="border-zinc-700 text-white hover:bg-zinc-800"
-                >
-                  <Plus className="w-4 h-4 mr-1" />
-                  Add Game
-                </Button>
-              </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-zinc-800">
+                <TabsTrigger value="displays" className="font-semibold">
+                  <Monitor className="w-4 h-4 mr-2" />
+                  Displays ({displays.length})
+                </TabsTrigger>
+                <TabsTrigger value="schedule" className="font-semibold">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Schedule ({schedule.length})
+                </TabsTrigger>
+              </TabsList>
               
-              <div className="space-y-3">
+              <TabsContent value="displays" className="mt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-zinc-400 font-medium">Add displays for different screens (overhead, scorers table, etc.)</p>
+                  <Button variant="outline" size="sm" onClick={addDisplay} className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">
+                    <Plus className="w-4 h-4 mr-1" />Add Display
+                  </Button>
+                </div>
+                {displays.map((display, index) => (
+                  <DisplayOutput
+                    key={display.id}
+                    display={display}
+                    index={index}
+                    onUpdate={(updated) => updateDisplay(index, updated)}
+                    onDelete={deleteDisplay}
+                  />
+                ))}
+              </TabsContent>
+              
+              <TabsContent value="schedule" className="mt-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-zinc-400 font-medium">Schedule games with start times for automatic switching</p>
+                  <Button variant="outline" size="sm" onClick={addScheduleSlot} className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">
+                    <Plus className="w-4 h-4 mr-1" />Add Game
+                  </Button>
+                </div>
                 {schedule.length === 0 ? (
                   <div className="text-center py-6 border border-dashed border-zinc-700 rounded-lg">
-                    <p className="text-zinc-500 text-sm">No games scheduled. Click "Add Game" to get started.</p>
+                    <p className="text-zinc-500 text-sm font-medium">No games scheduled. Click "Add Game" to start.</p>
                   </div>
                 ) : (
                   schedule.map((item, index) => (
@@ -665,16 +732,14 @@ export default function JumbotronMode() {
                     />
                   ))
                 )}
-              </div>
-            </div>
+              </TabsContent>
+            </Tabs>
           </div>
           
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDialog(false)} className="border-zinc-700 text-white hover:bg-zinc-800">
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={saving} className="bg-orange-500 hover:bg-orange-600">
-              {saving ? "Saving..." : (editingConfig ? "Save Changes" : "Create Jumbotron")}
+            <Button variant="outline" onClick={() => setShowDialog(false)} className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">Cancel</Button>
+            <Button onClick={handleSave} disabled={saving} className="bg-orange-500 hover:bg-orange-600 font-bold">
+              {saving ? "Saving..." : (editingConfig ? "Save Changes" : "Create Event")}
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -682,91 +747,71 @@ export default function JumbotronMode() {
 
       {/* Output Dialog */}
       <Dialog open={showOutputDialog} onOpenChange={setShowOutputDialog}>
-        <DialogContent className="max-w-xl bg-zinc-900 border-zinc-700 text-white">
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto bg-zinc-900 border-zinc-700 text-white">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 font-bold">
               <LinkIcon className="w-5 h-5 text-orange-500" />
-              Jumbotron Output
+              Display Links & Embed Codes
             </DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Use these links to display your jumbotron
+            <DialogDescription className="text-zinc-400 font-medium">
+              Use these links on your venue displays
             </DialogDescription>
           </DialogHeader>
           
           {outputConfig && (
             <div className="space-y-6 py-4">
-              {/* Direct Link */}
-              <div>
-                <Label className="text-zinc-300 mb-2 block">Direct Link</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    readOnly
-                    value={getJumbotronUrl(outputConfig)}
-                    className="bg-zinc-800 border-zinc-700 text-white font-mono text-sm"
-                  />
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => copyToClipboard(getJumbotronUrl(outputConfig))}
-                    className="border-zinc-700 hover:bg-zinc-800"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => window.open(getJumbotronUrl(outputConfig), '_blank')}
-                    className="border-zinc-700 hover:bg-zinc-800"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                  </Button>
+              {/* For each display */}
+              {(outputConfig.displays || [{ name: "Main Display", width: outputConfig.width, height: outputConfig.height, layout: "full" }]).map((display, idx) => (
+                <div key={idx} className="border border-zinc-700 rounded-lg p-4 bg-zinc-800/30">
+                  <h3 className="font-bold text-white mb-3 flex items-center gap-2">
+                    <Monitor className="w-4 h-4 text-orange-500" />
+                    {display.name || `Display ${idx + 1}`}
+                    <span className="text-xs text-zinc-500 font-normal ml-2">
+                      {display.width}×{display.height}px • {LAYOUT_TYPES.find(l => l.value === display.layout)?.label || 'Full'}
+                    </span>
+                  </h3>
+                  
+                  {/* Direct Link */}
+                  <div className="mb-4">
+                    <Label className="text-zinc-400 text-sm font-semibold">Direct Link</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input readOnly value={getJumbotronUrl(outputConfig, display)} className="bg-zinc-900 border-zinc-700 text-white font-mono text-xs" />
+                      <Button variant="outline" size="icon" onClick={() => copyToClipboard(getJumbotronUrl(outputConfig, display))} className="border-zinc-700 hover:bg-zinc-800">
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      <Button variant="outline" size="icon" onClick={() => window.open(getJumbotronUrl(outputConfig, display), '_blank')} className="border-zinc-700 hover:bg-zinc-800">
+                        <ExternalLink className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  
+                  {/* Iframe */}
+                  <div>
+                    <Label className="text-zinc-400 text-sm font-semibold">Embed Code</Label>
+                    <div className="relative mt-1">
+                      <textarea readOnly value={getIframeCode(outputConfig, display)} rows={2} className="w-full bg-zinc-900 border border-zinc-700 rounded-md p-2 text-white font-mono text-xs resize-none" />
+                      <Button variant="outline" size="sm" onClick={() => copyToClipboard(getIframeCode(outputConfig, display))} className="absolute top-1 right-1 border-zinc-600 hover:bg-zinc-700 text-xs font-semibold">
+                        <Copy className="w-3 h-3 mr-1" />Copy
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Open this link in full screen on your display
-                </p>
-              </div>
+              ))}
               
-              {/* Iframe Code */}
-              <div>
-                <Label className="text-zinc-300 mb-2 block">Embed Code (iframe)</Label>
-                <div className="relative">
-                  <textarea
-                    readOnly
-                    value={getIframeCode(outputConfig)}
-                    rows={3}
-                    className="w-full bg-zinc-800 border border-zinc-700 rounded-md p-3 text-white font-mono text-xs resize-none"
-                  />
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => copyToClipboard(getIframeCode(outputConfig))}
-                    className="absolute top-2 right-2 border-zinc-600 hover:bg-zinc-700"
-                  >
-                    <Copy className="w-3 h-3 mr-1" />
-                    Copy
-                  </Button>
-                </div>
-                <p className="text-xs text-zinc-500 mt-1">
-                  Paste this code into your website or display system
-                </p>
-              </div>
-              
-              {/* Size Info */}
+              {/* Schedule Info */}
               <div className="bg-zinc-800/50 rounded-lg p-4">
-                <p className="text-sm text-zinc-300">
-                  <strong>Display Size:</strong> {outputConfig.width}×{outputConfig.height}px
-                </p>
-                <p className="text-sm text-zinc-300 mt-1">
-                  <strong>Scheduled Games:</strong> {outputConfig.schedule?.length || 0}
-                </p>
+                <p className="text-sm text-zinc-300 font-semibold mb-2">Scheduled Games: {outputConfig.schedule?.length || 0}</p>
+                {outputConfig.schedule && outputConfig.schedule.map((slot, i) => (
+                  <p key={i} className="text-xs text-zinc-500">
+                    • {slot.label || `Game ${i + 1}`}: {new Date(slot.start_time).toLocaleString()}
+                  </p>
+                ))}
               </div>
             </div>
           )}
           
           <DialogFooter>
-            <Button onClick={() => setShowOutputDialog(false)} className="bg-orange-500 hover:bg-orange-600">
-              Done
-            </Button>
+            <Button onClick={() => setShowOutputDialog(false)} className="bg-orange-500 hover:bg-orange-600 font-bold">Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
