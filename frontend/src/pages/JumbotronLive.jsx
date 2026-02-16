@@ -222,10 +222,10 @@ function FullDisplayLayout({ game, homeStats, awayStats, homeOnFloor, awayOnFloo
   );
 }
 
-// ============ SCORERS TABLE LAYOUT (Short & Wide) ============
-function ScorersTableLayout({ game, homeStats, awayStats }) {
-  const homeColor = game.home_team_color || "#6cb4ee";
-  const awayColor = game.away_team_color || "#003366";
+// ============ SCORERS TABLE LAYOUT (Short & Wide - Horizontal) ============
+function ScorersTableLayout({ game, homeStats, awayStats, eventLogo }) {
+  const homeColor = game.home_team_color || "#f97316";
+  const awayColor = game.away_team_color || "#3b82f6";
   
   const homeScore = game.home_score ?? calculateTeamScore(homeStats);
   const awayScore = game.away_score ?? calculateTeamScore(awayStats);
@@ -233,51 +233,129 @@ function ScorersTableLayout({ game, homeStats, awayStats }) {
   const homeLeaders = getStatLeaders(homeStats, 3);
   const awayLeaders = getStatLeaders(awayStats, 3);
   
-  const StatLeader = ({ player, teamColor, reverse }) => (
-    <div className={`flex items-center gap-5 ${reverse ? 'flex-row-reverse text-right' : ''}`}>
-      <div 
-        className="w-20 h-20 rounded-full flex items-center justify-center font-extrabold text-3xl text-white flex-shrink-0"
-        style={{ backgroundColor: teamColor, textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
-      >
-        {player.number}
+  // Stat categories to show
+  const getTopStats = (leaders) => {
+    if (!leaders || leaders.length === 0) {
+      return [
+        { label: 'PTS', value: 0, player: 'N/A' },
+        { label: 'REB', value: 0, player: 'N/A' },
+        { label: 'AST', value: 0, player: 'N/A' }
+      ];
+    }
+    
+    // Find leaders for each category
+    const ptsLeader = leaders.reduce((max, p) => p.pts > max.pts ? p : max, leaders[0]);
+    const rebLeader = leaders.reduce((max, p) => p.totalReb > max.totalReb ? p : max, leaders[0]);
+    const astLeader = leaders.reduce((max, p) => p.ast > max.ast ? p : max, leaders[0]);
+    
+    return [
+      { label: 'PTS', value: ptsLeader.pts, player: ptsLeader.name, number: ptsLeader.number },
+      { label: 'REB', value: rebLeader.totalReb, player: rebLeader.name, number: rebLeader.number },
+      { label: 'AST', value: astLeader.ast, player: astLeader.name, number: astLeader.number }
+    ];
+  };
+  
+  const homeTopStats = getTopStats(homeLeaders);
+  const awayTopStats = getTopStats(awayLeaders);
+  
+  const StatCategory = ({ stat, teamColor, align }) => (
+    <div className={`flex flex-col ${align === 'right' ? 'items-end text-right' : 'items-start text-left'}`}>
+      <div className="text-gray-400 text-lg font-bold uppercase tracking-wider">{stat.label}</div>
+      <div className="text-white text-4xl font-black" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+        {stat.value}
       </div>
-      <div className="flex-1 min-w-0">
-        <div className="font-bold text-white text-2xl truncate" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.5)' }}>
-          {player.name}
-        </div>
-        <div className="text-yellow-400 font-extrabold text-4xl" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-          {player.pts} PTS
-        </div>
-        <div className="text-gray-300 text-lg font-semibold">
-          {player.totalReb} REB • {player.ast} AST
-        </div>
+      <div className="text-gray-300 text-base font-semibold truncate max-w-[150px]">
+        #{stat.number} {stat.player?.split(' ').pop()}
       </div>
     </div>
   );
   
   return (
-    <div className="h-full w-full flex items-stretch" style={{ backgroundColor: '#0a0a12' }}>
-      {/* Home Leaders (Left) */}
-      <div className="flex-1 flex flex-col justify-center gap-6 px-8 py-4" style={{ borderRight: '3px solid #1a1a2e' }}>
-        {homeLeaders.map((player, idx) => (
-          <StatLeader key={idx} player={player} teamColor={homeColor} reverse={false} />
-        ))}
+    <div className="h-full w-full flex items-center justify-between px-8" style={{ backgroundColor: '#0a0a12' }}>
+      {/* HOME SIDE - Left */}
+      {/* Home Top 3 Stat Categories */}
+      <div className="flex items-center gap-8">
+        <div className="flex flex-col justify-center gap-4">
+          {homeTopStats.map((stat, idx) => (
+            <StatCategory key={idx} stat={stat} teamColor={homeColor} align="left" />
+          ))}
+        </div>
+        
+        {/* Home Team Name */}
+        <div className="flex flex-col items-center">
+          {game.home_team_logo && (
+            <img src={game.home_team_logo} alt="" className="h-16 w-16 object-contain mb-2" />
+          )}
+          <div className="text-2xl font-extrabold text-white uppercase tracking-wider" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            {game.home_team_name}
+          </div>
+        </div>
+        
+        {/* Home Score */}
+        <div 
+          className="text-8xl font-black px-6"
+          style={{ color: homeColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
+        >
+          {homeScore}
+        </div>
       </div>
       
-      {/* Center Scoreboard */}
-      <div className="w-[35%] flex flex-col items-center justify-center px-8" style={{ background: 'linear-gradient(180deg, #1a1a2e 0%, #0d1117 100%)' }}>
-        {/* Home Team */}
-        <div className="flex items-center gap-6 mb-2">
-          {game.home_team_logo && (
-            <img src={game.home_team_logo} alt="" className="h-24 w-24 object-contain" />
+      {/* CENTER - VS Badge or Event Logo */}
+      <div className="flex flex-col items-center justify-center px-8">
+        {eventLogo ? (
+          <img src={eventLogo} alt="" className="h-24 w-auto object-contain" />
+        ) : (
+          <div 
+            className="px-8 py-4 rounded-xl font-black text-4xl text-white uppercase tracking-wider"
+            style={{ 
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #2d3748 100%)',
+              border: '3px solid #4a5568',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.5)'
+            }}
+          >
+            VS
+          </div>
+        )}
+        {/* Period/Quarter */}
+        {(game.current_quarter || game.period) && (
+          <div className="mt-3 px-4 py-1 bg-white/10 rounded-lg">
+            <span className="text-gray-300 font-bold uppercase tracking-wider text-lg">
+              {game.period_label || `Q${game.current_quarter || game.period}`}
+            </span>
+          </div>
+        )}
+      </div>
+      
+      {/* AWAY SIDE - Right */}
+      <div className="flex items-center gap-8">
+        {/* Away Score */}
+        <div 
+          className="text-8xl font-black px-6"
+          style={{ color: awayColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}
+        >
+          {awayScore}
+        </div>
+        
+        {/* Away Team Name */}
+        <div className="flex flex-col items-center">
+          {game.away_team_logo && (
+            <img src={game.away_team_logo} alt="" className="h-16 w-16 object-contain mb-2" />
           )}
-          <div className="text-center">
-            <div className="text-3xl font-extrabold text-white uppercase tracking-wider" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
-              {game.home_team_name}
-            </div>
-            <div className="text-8xl font-black mt-1" style={{ color: homeColor, textShadow: '4px 4px 8px rgba(0,0,0,0.5)' }}>
-              {homeScore}
-            </div>
+          <div className="text-2xl font-extrabold text-white uppercase tracking-wider" style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}>
+            {game.away_team_name}
+          </div>
+        </div>
+        
+        {/* Away Top 3 Stat Categories */}
+        <div className="flex flex-col justify-center gap-4">
+          {awayTopStats.map((stat, idx) => (
+            <StatCategory key={idx} stat={stat} teamColor={awayColor} align="right" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
           </div>
         </div>
         
