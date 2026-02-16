@@ -57,6 +57,9 @@ import PricingPage from "@/pages/PricingPage";
 import PaymentSuccessPage from "@/pages/PaymentSuccessPage";
 // Support page
 import SupportPage from "@/pages/SupportPage";
+// Jumbotron Mode
+import JumbotronMode from "@/pages/JumbotronMode";
+import JumbotronLive from "@/pages/JumbotronLive";
 
 // Error handling
 import ErrorBoundary from "@/components/ErrorBoundary";
