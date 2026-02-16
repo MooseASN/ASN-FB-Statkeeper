@@ -772,6 +772,12 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   const [assistModalOpen, setAssistModalOpen] = useState(false);
   const [assistTeam, setAssistTeam] = useState(null);
   const [assistScorer, setAssistScorer] = useState(null);
+  
+  // Quick substitution state
+  const [subDialogOpen, setSubDialogOpen] = useState(false);
+  const [subTeam, setSubTeam] = useState(null); // "home" or "away"
+  const [playerGoingIn, setPlayerGoingIn] = useState(null);
+  const [playerGoingOut, setPlayerGoingOut] = useState(null);
 
   // Ref for fetchGame to avoid circular dependency with sync
   const fetchGameRef = useRef(null);
