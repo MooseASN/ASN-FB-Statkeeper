@@ -100,21 +100,21 @@ function TeamPanel({
       }}
     >
       <div className="relative z-10 flex flex-col h-full min-h-0">
-        {/* Team Header - More compact */}
+        {/* Team Header - LARGER */}
         <div 
-          className="flex items-center px-4 py-2 flex-shrink-0"
+          className="flex items-center px-6 py-4 flex-shrink-0"
           style={{ 
             background: `linear-gradient(90deg, ${teamColor}40 0%, transparent 60%)`,
             borderBottom: `4px solid ${teamColor}`
           }}
         >
           {/* Team Logo */}
-          <div className="flex-shrink-0 mr-4">
+          <div className="flex-shrink-0 mr-6">
             {teamLogo ? (
-              <img src={teamLogo} alt={teamName} className="w-16 h-16 object-contain drop-shadow-lg" />
+              <img src={teamLogo} alt={teamName} className="w-20 h-20 object-contain drop-shadow-lg" />
             ) : (
               <div 
-                className="w-16 h-16 rounded-lg flex items-center justify-center text-4xl text-white shadow-lg"
+                className="w-20 h-20 rounded-lg flex items-center justify-center text-5xl text-white shadow-lg"
                 style={{ backgroundColor: teamColor, ...broadcastFont }}
               >
                 {teamName?.charAt(0) || '?'}
@@ -124,27 +124,27 @@ function TeamPanel({
           
           {/* Team Name */}
           <h2 
-            className="text-4xl text-white uppercase tracking-wide flex-1"
+            className="text-5xl text-white uppercase tracking-wide flex-1"
             style={broadcastFont}
           >
             {teamName}
           </h2>
           
           {/* Stats */}
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <span className="text-gray-300 text-xl uppercase" style={broadcastFont}>Timeouts</span>
-              <span className="text-white text-3xl" style={broadcastFont}>{timeouts}</span>
+          <div className="flex items-center gap-10">
+            <div className="flex items-center gap-3">
+              <span className="text-gray-300 text-2xl uppercase" style={broadcastFont}>Timeouts</span>
+              <span className="text-white text-4xl" style={broadcastFont}>{timeouts}</span>
             </div>
             
-            <div className="flex items-center gap-2">
-              <span className="text-gray-300 text-xl uppercase" style={broadcastFont}>Fouls</span>
-              <span className="text-white text-3xl" style={broadcastFont}>{totalFouls}</span>
+            <div className="flex items-center gap-3">
+              <span className="text-gray-300 text-2xl uppercase" style={broadcastFont}>Fouls</span>
+              <span className="text-white text-4xl" style={broadcastFont}>{totalFouls}</span>
             </div>
             
             {(inBonus || doubleBonus) && (
               <div 
-                className="px-4 py-1 rounded-md text-xl text-white uppercase"
+                className="px-6 py-2 rounded-md text-2xl text-white uppercase"
                 style={{ 
                   backgroundColor: '#1e40af',
                   border: '2px solid #3b82f6',
@@ -157,22 +157,22 @@ function TeamPanel({
           </div>
         </div>
         
-        {/* Stats Table */}
+        {/* Stats Table - LARGER FONTS */}
         <div className="flex-1 px-4 min-h-0 flex flex-col">
           {/* Header Row */}
           <div 
-            className="grid grid-cols-[70px_1fr_70px_90px_90px_90px_70px_60px_60px] gap-1 py-1 flex-shrink-0"
+            className="grid grid-cols-[80px_1fr_80px_100px_100px_100px_80px_70px_70px] gap-1 py-2 flex-shrink-0"
             style={{ backgroundColor: '#1e3a5f' }}
           >
-            <div className="text-gray-100 text-lg uppercase pl-3" style={broadcastFont}>#</div>
-            <div className="text-gray-100 text-lg uppercase" style={broadcastFont}>Player</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>PTS</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>FG</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>3FG</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>FT</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>REB</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>A</div>
-            <div className="text-gray-100 text-lg uppercase text-center" style={broadcastFont}>PF</div>
+            <div className="text-gray-100 text-xl uppercase pl-4 font-extrabold" style={broadcastFont}>#</div>
+            <div className="text-gray-100 text-xl uppercase font-extrabold" style={broadcastFont}>Player</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>PTS</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>FG</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>3FG</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>FT</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>REB</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>A</div>
+            <div className="text-gray-100 text-xl uppercase text-center font-extrabold" style={broadcastFont}>PF</div>
           </div>
 
           {/* Player Rows - stretch to fill available space */}
