@@ -1100,6 +1100,47 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
       }
     }
   };
+  
+  // Open quick substitution dialog
+  const openSubstitutionDialog = (team) => {
+    setSubTeam(team);
+    setPlayerGoingIn(null);
+    setPlayerGoingOut(null);
+    setSubDialogOpen(true);
+  };
+  
+  // Handle quick substitution
+  const handleQuickSub = async () => {
+    if (!playerGoingIn || !playerGoingOut) {
+      toast.error("Select one player going in and one going out");
+      return;
+    }
+    
+    if (demoMode) {
+      // Demo mode - update local state
+      setGame(prev => {
+        const onFloorKey = subTeam === "home" ? "home_on_floor" : "away_on_floor";
+        const currentOnFloor = prev[onFloorKey] || [];
+        const newOnFloor = currentOnFloor
+          .filter(id => id !== playerGoingOut)
+          .concat([playerGoingIn]);
+        return { ...prev, [onFloorKey]: newOnFloor };
+      });
+      toast.success("Substitution complete");
+      setSubDialogOpen(false);
+      return;
+    }
+    
+    try {
+      // Real mode - make API calls
+      await handlePlayerCheckOut(playerGoingOut);
+      await handlePlayerCheckIn(playerGoingIn);
+      toast.success("Substitution complete");
+      setSubDialogOpen(false);
+    } catch (error) {
+      toast.error("Failed to make substitution");
+    }
+  };
 
   // Open timeout editing dialog
   const handleEditTimeouts = () => {
