@@ -291,12 +291,40 @@ const DisplayOutput = ({ display, index, onUpdate, onDelete, schedule, configId 
           
           {/* Preview */}
           <div>
-            <Label className="text-zinc-300 mb-2 block">Preview</Label>
-            <div className="bg-zinc-900 rounded-lg p-4 flex items-center justify-center">
-              <JumbotronPreview display={display} />
+            <div className="flex items-center justify-between mb-2">
+              <Label className="text-zinc-300">Preview</Label>
+              {previewUrl && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowLivePreview(!showLivePreview)}
+                  className="text-xs text-orange-400 hover:text-orange-300"
+                >
+                  {showLivePreview ? 'Show Mock Preview' : 'Show Live Preview'}
+                </Button>
+              )}
+            </div>
+            <div className="bg-zinc-900 rounded-lg p-4 flex flex-col items-center justify-center overflow-hidden">
+              {showLivePreview && previewUrl ? (
+                <div style={{ width: scaledSize.width, height: scaledSize.height }} className="rounded overflow-hidden border border-zinc-600">
+                  <iframe
+                    src={previewUrl}
+                    style={{ 
+                      width: display.width, 
+                      height: display.height,
+                      transform: `scale(${scaledSize.width / display.width})`,
+                      transformOrigin: 'top left',
+                      border: 'none'
+                    }}
+                    title="Live Preview"
+                  />
+                </div>
+              ) : (
+                <JumbotronPreview display={display} />
+              )}
             </div>
             <p className="text-xs text-zinc-500 mt-2 text-center">
-              Scaled preview • Actual size: {display.width}×{display.height}px
+              {showLivePreview ? 'Live preview with actual game data' : 'Mock preview'} • Actual size: {display.width}×{display.height}px
             </p>
           </div>
           
