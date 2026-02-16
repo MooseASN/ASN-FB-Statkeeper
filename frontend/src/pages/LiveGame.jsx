@@ -2663,9 +2663,21 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
             {/* Quick Entry Section - Players On Floor */}
             {game?.clock_enabled && (teamsFlipped ? game?.home_on_floor : game?.away_on_floor)?.length > 0 && (
               <div className="mb-3 p-2 bg-green-50 rounded-lg border border-green-200">
-                <div className="text-xs text-green-700 font-medium mb-2 flex items-center gap-1">
-                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  On Floor - Quick Entry
+                <div className="flex items-center justify-between mb-2">
+                  <div className="text-xs text-green-700 font-medium flex items-center gap-1">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    On Floor - Quick Entry
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openSubstitutionDialog(teamsFlipped ? "home" : "away")}
+                    className="h-6 px-2 text-xs text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+                    data-testid="quick-sub-away-btn"
+                  >
+                    <ArrowLeftRight className="w-3 h-3 mr-1" />
+                    Sub
+                  </Button>
                 </div>
                 <div className="grid grid-cols-5 gap-1">
                   {(teamsFlipped ? game?.home_on_floor : game?.away_on_floor).map(playerId => {
