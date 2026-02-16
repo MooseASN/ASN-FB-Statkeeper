@@ -248,6 +248,10 @@ function AppRoutes({ user, onLogin, onLogout }) {
       
       {/* Jumbotron display - public full-screen view */}
       <Route path="/jumbotron/:shareCode" element={<Jumbotron />} />
+      <Route path="/jumbotron/live/:embedCode" element={<JumbotronLive />} />
+      
+      {/* Jumbotron Mode - configuration page */}
+      <Route path="/jumbotron-mode" element={<JumbotronMode />} />
     </Routes>
   );
 }
