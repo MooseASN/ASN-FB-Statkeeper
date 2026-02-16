@@ -178,41 +178,41 @@ function TeamPanel({
           {/* Player Rows - stretch to fill available space */}
           <div className="flex-1 flex flex-col justify-evenly min-h-0">
             {displayPlayers.length === 0 ? (
-              <div className="text-center text-gray-400 text-2xl py-2" style={broadcastFont}>
+              <div className="text-center text-gray-400 text-3xl py-2" style={broadcastFont}>
                 No players on floor
               </div>
             ) : (
               displayPlayers.map((player, index) => (
                 <div 
                   key={index}
-                  className="grid grid-cols-[70px_1fr_70px_90px_90px_90px_70px_60px_60px] gap-1 items-center flex-1"
+                  className="grid grid-cols-[80px_1fr_80px_100px_100px_100px_80px_70px_70px] gap-1 items-center flex-1"
                   style={{ backgroundColor: index % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.03)' }}
                 >
-                  <div className="text-2xl text-white pl-3" style={broadcastFont}>
+                  <div className="text-3xl text-white pl-4 font-extrabold" style={broadcastFont}>
                     {player.number || '?'}
                   </div>
-                  <div className="text-2xl text-white uppercase truncate" style={broadcastFont}>
+                  <div className="text-3xl text-white uppercase truncate font-bold" style={broadcastFont}>
                     {player.name?.split(' ').pop() || 'Unknown'}
                   </div>
-                  <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
+                  <div className="text-3xl text-yellow-400 text-center font-extrabold" style={broadcastFont}>
                     {player.pts}
                   </div>
-                  <div className="text-xl text-white text-center" style={broadcastFont}>
+                  <div className="text-2xl text-white text-center font-semibold" style={broadcastFont}>
                     {player.fg}
                   </div>
-                  <div className="text-xl text-white text-center" style={broadcastFont}>
+                  <div className="text-2xl text-white text-center font-semibold" style={broadcastFont}>
                     {player.fg3}
                   </div>
-                  <div className="text-xl text-white text-center" style={broadcastFont}>
+                  <div className="text-2xl text-white text-center font-semibold" style={broadcastFont}>
                     {player.ft}
                   </div>
-                  <div className="text-xl text-white text-center" style={broadcastFont}>
+                  <div className="text-2xl text-white text-center font-semibold" style={broadcastFont}>
                     {player.totalReb}
                   </div>
-                  <div className="text-xl text-white text-center" style={broadcastFont}>
+                  <div className="text-2xl text-white text-center font-semibold" style={broadcastFont}>
                     {player.ast}
                   </div>
-                  <div className={`text-xl text-center ${player.pf >= 5 ? 'text-red-400' : 'text-white'}`} style={broadcastFont}>
+                  <div className={`text-2xl text-center font-semibold ${player.pf >= 5 ? 'text-red-400' : 'text-white'}`} style={broadcastFont}>
                     {player.pf}
                   </div>
                 </div>
@@ -222,22 +222,22 @@ function TeamPanel({
 
           {/* TOTALS Row */}
           <div 
-            className="grid grid-cols-[70px_1fr_70px_90px_90px_90px_70px_60px_60px] gap-1 py-1 items-center flex-shrink-0"
+            className="grid grid-cols-[80px_1fr_80px_100px_100px_100px_80px_70px_70px] gap-1 py-2 items-center flex-shrink-0"
             style={{ backgroundColor: '#1e40af' }}
           >
-            <div className="text-xl text-white uppercase pl-3 col-span-2" style={broadcastFont}>
+            <div className="text-2xl text-white uppercase pl-4 col-span-2 font-extrabold" style={broadcastFont}>
               TOTALS
             </div>
-            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
+            <div className="text-3xl text-yellow-400 text-center font-extrabold" style={broadcastFont}>
               {totals.pts}
             </div>
-            <div className="text-xl text-white text-center" style={broadcastFont}>
+            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.fg_made}-{totals.fg_att}
             </div>
-            <div className="text-xl text-white text-center" style={broadcastFont}>
+            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.fg3_made}-{totals.fg3_att}
             </div>
-            <div className="text-xl text-white text-center" style={broadcastFont}>
+            <div className="text-2xl text-white text-center font-bold" style={broadcastFont}>
               {totals.ft_made}-{totals.ft_att}
             </div>
             <div className="text-xl text-white text-center" style={broadcastFont}>
