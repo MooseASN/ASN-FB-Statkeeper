@@ -1719,6 +1719,17 @@ async def update_jumbotron_config(config_id: str, data: JumbotronConfigUpdate, u
         update_data["width"] = data.width
     if data.height is not None:
         update_data["height"] = data.height
+    if data.displays is not None:
+        displays = []
+        for disp in data.displays:
+            displays.append({
+                "id": disp.id or f"disp_{uuid.uuid4().hex[:8]}",
+                "name": disp.name,
+                "width": disp.width,
+                "height": disp.height,
+                "layout": disp.layout
+            })
+        update_data["displays"] = displays
     if data.schedule is not None:
         schedule = []
         for item in data.schedule:
