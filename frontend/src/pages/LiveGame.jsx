@@ -1326,9 +1326,37 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
     }
   };
 
-  const handleQuarterChange = async (quarter) => {
+  const handleQuarterChange = async (quarter, resetFouls = null) => {
+    const currentQuarter = game?.current_quarter || 1;
+    
+    // If advancing to a higher quarter and no reset preference specified, show dialog
+    if (quarter > currentQuarter && resetFouls === null) {
+      setPendingQuarterChange(quarter);
+      setShowManualQuarterAdvanceDialog(true);
+      return;
+    }
+    
     try {
-      await axios.put(`${API}/games/${id}`, { current_quarter: quarter });
+      // If advancing forward and we have a reset preference, use the next-period endpoint
+      if (quarter > currentQuarter && resetFouls !== null) {
+        // We may be jumping multiple quarters, use direct update but also handle fouls
+        if (resetFouls) {
+          await axios.put(`${API}/games/${id}`, { 
+            current_quarter: quarter,
+            home_team_fouls: 0,
+            away_team_fouls: 0,
+            home_bonus: null,
+            away_bonus: null
+          });
+        } else {
+          await axios.put(`${API}/games/${id}`, { current_quarter: quarter });
+        }
+      } else {
+        // Going backwards or staying same, just update quarter
+        await axios.put(`${API}/games/${id}`, { current_quarter: quarter });
+      }
+      setShowManualQuarterAdvanceDialog(false);
+      setPendingQuarterChange(null);
       fetchGame();
     } catch (error) {
       toast.error("Failed to update quarter");
