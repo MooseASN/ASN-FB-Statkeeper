@@ -16,6 +16,41 @@ StatMoose is a multi-sport stat tracking application for basketball, football, a
 
 ## Latest Updates (February 2026)
 
+### February 16, 2026 - BASKETBALL FOUL RESET PROMPT & QUICK SUBSTITUTION UI ✅
+
+**Feature: Basketball Foul Reset Prompt**
+- When advancing quarters/halves in Classic mode, shows explicit YES/NO dialog:
+  - "Reset Team Fouls?" with "Yes, Reset Fouls" and "No, Keep Fouls" buttons
+  - No more checkbox - clear intentional choice required
+- Manual quarter advance (clicking Q2/Q3/Q4 buttons) also triggers foul reset prompt
+- If fouls are reset, bonus status is cleared
+- Works in both Classic and Advanced basketball modes
+
+**Feature: Quick Player Substitution UI (Basketball)**
+- Added "Sub" button in Quick Entry section for both teams
+- One-tap substitution dialog:
+  - Left column: Players on floor (tap to select OUT)
+  - Right column: Bench players (tap to select IN)
+  - Selection summary shows "#X OUT ⇄ #Y IN"
+  - "Make Substitution" button executes the swap
+- Visual feedback: Red highlight for player going out, blue for player coming in
+
+**Bug Fix: PDF Box Score Period Columns**
+- PDF now correctly shows periods based on game type:
+  - Halves: Shows H1, H2 (not Q1-Q4)
+  - Quarters: Shows Q1, Q2, Q3, Q4
+- Overtime columns only shown if OT periods have non-zero scores
+- Public PDF endpoint also updated with same logic
+
+**Bug Fix: Jumbotron Scorers Table Layout**
+- Fixed orphaned code block that was causing rendering issues
+- ScorersTableLayout component now properly structured
+
+**Feature: Jumbotron Live Preview**
+- Added toggle in configuration page to switch between mock and live preview
+- Live preview uses actual game data via scaled iframe
+- Shows scaled preview with actual layout and dimensions
+
 ### February 13, 2026 - JUMBOTRON MODE ENHANCED ✅
 
 **Jumbotron Mode - Multiple Display Support & Layouts**
