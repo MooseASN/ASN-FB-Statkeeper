@@ -741,6 +741,8 @@ export default function LiveGame({ demoMode = false, initialDemoData = null }) {
   const [showPeriodEndDialog, setShowPeriodEndDialog] = useState(false);
   const [resetFoulsOnAdvance, setResetFoulsOnAdvance] = useState(true);
   const [showHalftimeExitDialog, setShowHalftimeExitDialog] = useState(false);
+  const [showManualQuarterAdvanceDialog, setShowManualQuarterAdvanceDialog] = useState(false);
+  const [pendingQuarterChange, setPendingQuarterChange] = useState(null);
 
   // Note state
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
