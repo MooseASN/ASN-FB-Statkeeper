@@ -168,11 +168,42 @@ export default function DemoSportSelection() {
       </section>
 
       {/* Sports Selection Grid */}
-      <section className="bg-black pb-16">
+      <section className="bg-black pb-8">
         <div className="flex flex-col md:flex-row">
           {sportsData.map((sport, index) => (
             <SportCard key={sport.name} sport={sport} index={index} />
           ))}
+        </div>
+      </section>
+
+      {/* Jumbotron Mode Card */}
+      <section className="bg-black pb-16 px-6">
+        <div className="max-w-3xl mx-auto">
+          <Link to="/jumbotron-mode" data-testid="jumbotron-mode-link">
+            <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-orange-600 via-orange-500 to-amber-500 p-1 group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+              <div className="bg-black/90 rounded-lg p-6 md:p-8 flex items-center gap-6">
+                <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 md:w-10 md:h-10 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                    <polyline points="17 2 12 7 7 2"></polyline>
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-2xl md:text-3xl font-black text-white uppercase tracking-wide">
+                    Jumbotron Mode
+                  </h3>
+                  <p className="text-gray-400 mt-2 text-sm md:text-base">
+                    Create custom scoreboard displays for venue screens. Schedule multiple games, use StatMoose or PrestoSports data, and get embed links.
+                  </p>
+                </div>
+                <div className="hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-orange-500/20 group-hover:bg-orange-500/40 transition-colors">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-orange-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </Link>
         </div>
       </section>
 
