@@ -405,6 +405,42 @@ export default function SportSelection({ user, onLogout }) {
           </Card>
         </div>
 
+        {/* Jumbotron Mode Button */}
+        <div className="mt-12 max-w-2xl mx-auto">
+          <button
+            onClick={() => navigate("/jumbotron-mode")}
+            className="w-full group relative overflow-hidden rounded-xl border-2 border-orange-500/30 bg-gradient-to-r from-slate-800 via-slate-800/95 to-slate-800 hover:border-orange-500 hover:from-orange-500/10 hover:via-orange-500/5 hover:to-slate-800 transition-all duration-300 p-6"
+            data-testid="jumbotron-mode-btn"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-orange-500 to-orange-600 flex items-center justify-center shadow-lg shadow-orange-500/20 group-hover:shadow-orange-500/40 transition-shadow">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-7 h-7 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="2" y="7" width="20" height="15" rx="2" ry="2"/>
+                    <polyline points="17 2 12 7 7 2"/>
+                  </svg>
+                </div>
+                <div className="text-left">
+                  <h3 className="text-xl font-bold text-white group-hover:text-orange-400 transition-colors">
+                    Jumbotron Mode
+                  </h3>
+                  <p className="text-slate-400 text-sm mt-1">
+                    Create venue displays for scoreboards, tickers & tournaments
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-orange-500">
+                <span className="text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">Launch</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 transform group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
+            {/* Decorative elements */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-500/10 to-transparent rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+          </button>
+        </div>
+
         <p className="text-center text-slate-500 text-sm mt-12">
           You can switch sports at any time from the dashboard
         </p>
