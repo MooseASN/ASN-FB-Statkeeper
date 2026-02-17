@@ -1004,10 +1004,16 @@ export default function JumbotronMode() {
               
               {/* Schedule Info */}
               <div className="bg-zinc-800/50 rounded-lg p-4">
+                <p className="text-sm text-orange-400 font-semibold mb-2">
+                  One link serves ALL scheduled games
+                </p>
+                <p className="text-xs text-zinc-400 mb-3">
+                  The embed links above will automatically cycle through your scheduled games based on their start times.
+                </p>
                 <p className="text-sm text-zinc-300 font-semibold mb-2">Scheduled Games: {outputConfig.schedule?.length || 0}</p>
                 {outputConfig.schedule && outputConfig.schedule.map((slot, i) => (
                   <p key={i} className="text-xs text-zinc-500">
-                    • {slot.label || `Game ${i + 1}`}: {new Date(slot.start_time).toLocaleString()}
+                    • {slot.label || `Game ${i + 1}`}: {slot.source_type === 'statmoose' ? 'StatMoose' : 'PrestoSports'} - {new Date(slot.start_time).toLocaleString()}
                   </p>
                 ))}
               </div>
