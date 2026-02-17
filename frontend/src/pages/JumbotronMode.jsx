@@ -442,8 +442,12 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
               <Input
                 type="datetime-local"
                 value={item.start_time ? item.start_time.slice(0, 16) : ""}
-                onChange={(e) => onUpdate({ ...item, start_time: new Date(e.target.value).toISOString() })}
-                className="mt-1 bg-zinc-900 border-zinc-700 text-white"
+                onChange={(e) => {
+                  if (e.target.value) {
+                    onUpdate({ ...item, start_time: new Date(e.target.value).toISOString() });
+                  }
+                }}
+                className="mt-1 bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
               />
             </div>
             <div>
@@ -452,7 +456,7 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
                 type="datetime-local"
                 value={item.end_time ? item.end_time.slice(0, 16) : ""}
                 onChange={(e) => onUpdate({ ...item, end_time: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                className="mt-1 bg-zinc-900 border-zinc-700 text-white"
+                className="mt-1 bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
               />
             </div>
           </div>
