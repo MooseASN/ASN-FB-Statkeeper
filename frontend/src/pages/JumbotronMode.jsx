@@ -819,25 +819,25 @@ export default function JumbotronMode() {
                 <Layers className="w-8 h-8 text-orange-500 mx-auto mb-3" />
                 <h3 className="font-bold text-white mb-2">Multiple Displays</h3>
                 <p className="text-sm text-zinc-400 font-medium">
-                  Create different sized outputs for overhead screens and scorers tables
+                  Create different sized outputs for overhead screens, scorers tables, and tickers - all from one event
                 </p>
               </CardContent>
             </Card>
             <Card className="bg-zinc-900/50 border-zinc-800">
               <CardContent className="pt-6 text-center">
                 <Calendar className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-                <h3 className="font-bold text-white mb-2">Tournament Ready</h3>
+                <h3 className="font-bold text-white mb-2">Multi-Game Scheduling</h3>
                 <p className="text-sm text-zinc-400 font-medium">
-                  Schedule multiple games with automatic switching
+                  Schedule StatMoose games AND PrestoSports feeds - games switch automatically based on time
                 </p>
               </CardContent>
             </Card>
             <Card className="bg-zinc-900/50 border-zinc-800">
               <CardContent className="pt-6 text-center">
-                <LayoutGrid className="w-8 h-8 text-orange-500 mx-auto mb-3" />
-                <h3 className="font-bold text-white mb-2">Layout Options</h3>
+                <LinkIcon className="w-8 h-8 text-orange-500 mx-auto mb-3" />
+                <h3 className="font-bold text-white mb-2">One Embed Link</h3>
                 <p className="text-sm text-zinc-400 font-medium">
-                  Full stats, scorers table, or minimal score display
+                  Get one embed URL per display size that cycles through all your scheduled games
                 </p>
               </CardContent>
             </Card>
