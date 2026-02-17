@@ -882,8 +882,14 @@ export default function JumbotronMode() {
               </TabsList>
               
               <TabsContent value="displays" className="mt-4 space-y-3">
+                <div className="bg-zinc-800/50 rounded-lg p-4 mb-4">
+                  <p className="text-sm text-zinc-300 font-medium">
+                    <strong className="text-orange-400">Create multiple display sizes</strong> - Each display gets its own embed link. 
+                    Use different sizes for overhead screens (1920×1080), scorers tables (1920×400), and more.
+                  </p>
+                </div>
                 <div className="flex items-center justify-between">
-                  <p className="text-sm text-zinc-400 font-medium">Add displays for different screens (overhead, scorers table, etc.)</p>
+                  <p className="text-sm text-zinc-400 font-medium">Each display shows all scheduled games</p>
                   <Button variant="outline" size="sm" onClick={addDisplay} className="border-zinc-700 text-white hover:bg-zinc-800 font-semibold">
                     <Plus className="w-4 h-4 mr-1" />Add Display
                   </Button>
