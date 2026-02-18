@@ -121,17 +121,25 @@ input, textarea, select {
 /* Dark themed datetime-local inputs */
 input[type="datetime-local"].dark-datetime,
 input[type="datetime-local"][class*="bg-zinc"],
-input[type="datetime-local"][class*="bg-slate"] {
+input[type="datetime-local"][class*="bg-slate"],
+input[type="date"][class*="bg-zinc"],
+input[type="date"][class*="bg-slate"],
+input[type="time"][class*="bg-zinc"],
+input[type="time"][class*="bg-slate"] {
   color-scheme: dark;
 }
 
-input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator {
   filter: invert(1);
   cursor: pointer;
   opacity: 0.7;
 }
 
-input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover {
   opacity: 1;
 }
 
