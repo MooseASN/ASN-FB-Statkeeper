@@ -438,26 +438,61 @@ const ScheduleItem = ({ item, index, onUpdate, onDelete, userGames }) => {
           
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <Label className="text-zinc-300">Start Time</Label>
-              <Input
-                type="datetime-local"
-                value={item.start_time ? item.start_time.slice(0, 16) : ""}
-                onChange={(e) => {
-                  if (e.target.value) {
-                    onUpdate({ ...item, start_time: new Date(e.target.value).toISOString() });
-                  }
-                }}
-                className="mt-1 bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
-              />
+              <Label className="text-zinc-300">Start Date & Time</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <Input
+                  type="date"
+                  value={item.start_time ? item.start_time.slice(0, 10) : ""}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      const currentTime = item.start_time ? item.start_time.slice(11, 16) : "12:00";
+                      onUpdate({ ...item, start_time: new Date(`${e.target.value}T${currentTime}`).toISOString() });
+                    }
+                  }}
+                  className="bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
+                />
+                <Input
+                  type="time"
+                  value={item.start_time ? item.start_time.slice(11, 16) : ""}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      const currentDate = item.start_time ? item.start_time.slice(0, 10) : new Date().toISOString().slice(0, 10);
+                      onUpdate({ ...item, start_time: new Date(`${currentDate}T${e.target.value}`).toISOString() });
+                    }
+                  }}
+                  className="bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
+                />
+              </div>
             </div>
             <div>
-              <Label className="text-zinc-300">End Time (Optional)</Label>
-              <Input
-                type="datetime-local"
-                value={item.end_time ? item.end_time.slice(0, 16) : ""}
-                onChange={(e) => onUpdate({ ...item, end_time: e.target.value ? new Date(e.target.value).toISOString() : null })}
-                className="mt-1 bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
-              />
+              <Label className="text-zinc-300">End Date & Time (Optional)</Label>
+              <div className="grid grid-cols-2 gap-2 mt-1">
+                <Input
+                  type="date"
+                  value={item.end_time ? item.end_time.slice(0, 10) : ""}
+                  onChange={(e) => {
+                    if (e.target.value) {
+                      const currentTime = item.end_time ? item.end_time.slice(11, 16) : "23:59";
+                      onUpdate({ ...item, end_time: new Date(`${e.target.value}T${currentTime}`).toISOString() });
+                    } else {
+                      onUpdate({ ...item, end_time: null });
+                    }
+                  }}
+                  className="bg-zinc-900 border-zinc-700 text-white [color-scheme:dark]"
+                />
+                <Input
+                  type="time"
+                  value={item.end_time ? item.end_time.slice(11, 16) : ""}
+                  onChange={(e) => {
+                    if (e.target.value && item.end_time) {
+                      const currentDate = item.end_time.slice(0, 10);
+                      onUpdate({ ...item, end_time: new Date(`${currentDate}T${e.target.value}`).toISOString() });
+                    }
+                  }}
+                  disabled={!item.end_time}
+                  className="bg-zinc-900 border-zinc-700 text-white [color-scheme:dark] disabled:opacity-50"
+                />
+              </div>
             </div>
           </div>
           
