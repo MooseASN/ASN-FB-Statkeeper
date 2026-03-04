@@ -7,7 +7,7 @@ import requests
 import json
 from datetime import datetime
 
-BACKEND_URL = "https://multi-sport-stats.preview.emergentagent.com/api"
+BACKEND_URL = "https://moose-stats-staging.preview.emergentagent.com/api"
 ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
 ADMIN_PASSWORD = "test123"
 FOOTBALL_GAME_ID = "a640f656-1ea6-4929-8589-82f58a1069d9"

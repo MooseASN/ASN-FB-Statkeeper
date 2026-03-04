@@ -90,7 +90,7 @@
         "url": "/service-worker.js",
         "registered": true,
         "active": true,
-        "scope": "https://multi-sport-stats.preview.emergentagent.com/",
+        "scope": "https://moose-stats-staging.preview.emergentagent.com/",
         "console_log": "StatMoose SW registered"
       }
     },

@@ -14,7 +14,7 @@ import time
 from datetime import datetime
 
 # Get backend URL from environment
-BACKEND_URL = "https://multi-sport-stats.preview.emergentagent.com/api"
+BACKEND_URL = "https://moose-stats-staging.preview.emergentagent.com/api"
 
 # Test credentials and data
 ADMIN_EMAIL = "antlersportsnetwork@gmail.com"

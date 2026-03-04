@@ -9,7 +9,7 @@ import pytest
 import requests
 import os
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://multi-sport-stats.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://moose-stats-staging.preview.emergentagent.com')
 
 class TestTrialPeriods:
     """P1: Test trial periods for premium tiers"""

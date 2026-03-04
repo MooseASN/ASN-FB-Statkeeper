@@ -9,7 +9,7 @@ import io
 import csv
 from datetime import datetime
 
-BACKEND_URL = "https://multi-sport-stats.preview.emergentagent.com/api"
+BACKEND_URL = "https://moose-stats-staging.preview.emergentagent.com/api"
 ADMIN_EMAIL = "antlersportsnetwork@gmail.com"
 ADMIN_PASSWORD = "test123"
 
