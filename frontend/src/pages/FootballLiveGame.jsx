@@ -26,6 +26,8 @@ import {
   Share2,
   HelpCircle,
   Code,
+  Users,
+  Edit,
 } from "lucide-react";
 import PenaltyWorkflowDialog from "@/components/PenaltyWorkflowDialog";
 import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
@@ -131,6 +133,13 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
   // Editable play log
   const [editingPlayId, setEditingPlayId] = useState(null);
   const [editPlayData, setEditPlayData] = useState(null);
+  
+  // Edit player state
+  const [editPlayerOpen, setEditPlayerOpen] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [editPlayerData, setEditPlayerData] = useState({ number: "", name: "" });
+  const [editPlayerTeam, setEditPlayerTeam] = useState(null); // 'home' or 'away'
+  const [showRosterDialog, setShowRosterDialog] = useState(false);
   
   // Current play
   const [selectedPlayType, setSelectedPlayType] = useState(null);
@@ -2178,6 +2187,54 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
     setEditPlayData(null);
   };
 
+  // Edit player handlers
+  const handleEditPlayer = (player, team) => {
+    setEditingPlayer(player);
+    setEditPlayerTeam(team);
+    setEditPlayerData({
+      number: player.number || "",
+      name: player.name || ""
+    });
+    setEditPlayerOpen(true);
+  };
+
+  const handleSavePlayerEdit = async () => {
+    if (!editingPlayer) return;
+    
+    if (demoMode) {
+      // Update local roster for demo mode
+      const updateRoster = (roster) => 
+        roster.map(p => 
+          p.id === editingPlayer.id 
+            ? { ...p, number: editPlayerData.number, name: editPlayerData.name }
+            : p
+        );
+      
+      if (editPlayerTeam === 'home') {
+        setHomeRoster(updateRoster(homeRoster));
+      } else {
+        setAwayRoster(updateRoster(awayRoster));
+      }
+      toast.success("Player updated");
+      setEditPlayerOpen(false);
+      setEditingPlayer(null);
+      return;
+    }
+    
+    try {
+      await axios.put(`${API}/games/${id}/players/${editingPlayer.id}`, {
+        player_number: editPlayerData.number,
+        player_name: editPlayerData.name
+      });
+      toast.success("Player updated");
+      setEditPlayerOpen(false);
+      setEditingPlayer(null);
+      fetchGame(false);
+    } catch (error) {
+      toast.error("Failed to update player");
+    }
+  };
+
   // Undo last play
   const undoLastPlay = () => {
     if (playLog.length === 0) return;
@@ -2564,6 +2621,15 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
             />
           </div>
           <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-zinc-400 hover:text-white"
+              onClick={() => setShowRosterDialog(true)}
+              title="Manage Rosters"
+            >
+              <Users className="w-4 h-4" />
+            </Button>
             <Button
               variant="ghost"
               size="sm"
@@ -4760,6 +4826,96 @@ export default function FootballLiveGame({ user, onLogout, demoMode = false, ini
         sport="football"
         gameTitle={`${game?.away_team_name || 'Away'} vs ${game?.home_team_name || 'Home'}`}
       />
+      
+      {/* Edit Player Dialog */}
+      <Dialog open={editPlayerOpen} onOpenChange={setEditPlayerOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit Player</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium">Player Number</label>
+              <Input
+                value={editPlayerData.number}
+                onChange={(e) => setEditPlayerData(prev => ({ ...prev, number: e.target.value }))}
+                placeholder="Number"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Player Name</label>
+              <Input
+                value={editPlayerData.name}
+                onChange={(e) => setEditPlayerData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Name"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditPlayerOpen(false)}>Cancel</Button>
+            <Button onClick={handleSavePlayerEdit} className="bg-blue-600 hover:bg-blue-700">Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Roster Management Dialog */}
+      <Dialog open={showRosterDialog} onOpenChange={setShowRosterDialog}>
+        <DialogContent className="bg-white max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Rosters</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-6 py-4">
+            {/* Home Team */}
+            <div>
+              <h3 className="font-bold text-lg mb-3" style={{ color: game?.home_team_color || '#dc2626' }}>
+                {game?.home_team_name || 'Home Team'}
+              </h3>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {homeRoster.map(player => (
+                  <div key={player.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
+                    <span className="font-medium">#{player.number} - {player.name}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditPlayer(player, 'home')}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Away Team */}
+            <div>
+              <h3 className="font-bold text-lg mb-3" style={{ color: game?.away_team_color || '#2563eb' }}>
+                {game?.away_team_name || 'Away Team'}
+              </h3>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {awayRoster.map(player => (
+                  <div key={player.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
+                    <span className="font-medium">#{player.number} - {player.name}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditPlayer(player, 'away')}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowRosterDialog(false)}>Done</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

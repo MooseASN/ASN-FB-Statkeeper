@@ -19,6 +19,7 @@ import { useOfflineQueue } from "@/hooks/useOfflineQueue";
 import ConnectionStatus from "@/components/ConnectionStatus";
 import { useSubscriptionFeatures } from "@/hooks/useSubscriptionFeatures";
 import EmbedSnippetGenerator from "@/components/EmbedSnippetGenerator";
+import BoxScoreEditor from "@/components/BoxScoreEditor";
 
 const API = `${process.env.REACT_APP_BACKEND_URL}/api`;
 
@@ -125,6 +126,15 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
   const [importLoading, setImportLoading] = useState(false);
   const [bulkPlayers, setBulkPlayers] = useState([{ number: "", name: "" }]);
   const [newPlayer, setNewPlayer] = useState({ number: "", name: "" });
+  
+  // Edit player state
+  const [editPlayerOpen, setEditPlayerOpen] = useState(false);
+  const [editingPlayer, setEditingPlayer] = useState(null);
+  const [editPlayerData, setEditPlayerData] = useState({ number: "", name: "" });
+  const [showRosterDialog, setShowRosterDialog] = useState(false);
+  
+  // Box score editor state
+  const [boxScoreEditorOpen, setBoxScoreEditorOpen] = useState(false);
   
   // Time editing
   const [editMinutes, setEditMinutes] = useState(0);
@@ -604,6 +614,54 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Edit player handlers
+  const handleEditPlayer = (player) => {
+    setEditingPlayer(player);
+    setEditPlayerData({
+      number: player.player_number || "",
+      name: player.player_name || ""
+    });
+    setEditPlayerOpen(true);
+  };
+
+  const handleSavePlayerEdit = async () => {
+    if (!editingPlayer) return;
+    
+    try {
+      await axios.put(`${API}/games/${id}/players/${editingPlayer.id}`, {
+        player_number: editPlayerData.number,
+        player_name: editPlayerData.name
+      });
+      toast.success("Player updated");
+      setEditPlayerOpen(false);
+      setEditingPlayer(null);
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to update player");
+    }
+  };
+
+  // Handle end game with box score editing
+  const handleEndGame = () => {
+    setBoxScoreEditorOpen(true);
+  };
+
+  const handleSaveBoxScoreAndFinalize = async (editedHomeStats, editedAwayStats) => {
+    try {
+      for (const stat of editedHomeStats) {
+        await axios.put(`${API}/games/${id}/stats/${stat.id}`, stat);
+      }
+      for (const stat of editedAwayStats) {
+        await axios.put(`${API}/games/${id}/stats/${stat.id}`, stat);
+      }
+      await axios.put(`${API}/games/${id}`, { status: "final" });
+      toast.success("Game finalized with updated stats");
+      fetchGame();
+    } catch (error) {
+      toast.error("Failed to save stats or finalize game");
+    }
   };
 
   // Calculate team totals
@@ -2616,6 +2674,107 @@ export default function AdvancedLiveGame({ demoMode = false, initialDemoData = n
         sport="basketball"
         gameTitle={`${game?.away_team_name || 'Away'} vs ${game?.home_team_name || 'Home'}`}
       />
+      
+      {/* Box Score Editor */}
+      <BoxScoreEditor
+        open={boxScoreEditorOpen}
+        onOpenChange={setBoxScoreEditorOpen}
+        homeStats={homeStats}
+        awayStats={awayStats}
+        homeTeamName={game?.home_team_name || 'Home'}
+        awayTeamName={game?.away_team_name || 'Away'}
+        homeColor={homeColor}
+        awayColor={awayColor}
+        quarterScores={game?.quarter_scores}
+        onSave={handleSaveBoxScoreAndFinalize}
+      />
+      
+      {/* Edit Player Dialog */}
+      <Dialog open={editPlayerOpen} onOpenChange={setEditPlayerOpen}>
+        <DialogContent className="bg-white">
+          <DialogHeader>
+            <DialogTitle>Edit Player</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <label className="text-sm font-medium">Player Number</label>
+              <Input
+                value={editPlayerData.number}
+                onChange={(e) => setEditPlayerData(prev => ({ ...prev, number: e.target.value }))}
+                placeholder="Number"
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Player Name</label>
+              <Input
+                value={editPlayerData.name}
+                onChange={(e) => setEditPlayerData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="Name"
+                className="mt-1"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditPlayerOpen(false)}>Cancel</Button>
+            <Button onClick={handleSavePlayerEdit} className="bg-blue-600 hover:bg-blue-700">Save</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Roster Management Dialog */}
+      <Dialog open={showRosterDialog} onOpenChange={setShowRosterDialog}>
+        <DialogContent className="bg-white max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Manage Rosters</DialogTitle>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-6 py-4">
+            <div>
+              <h3 className="font-bold text-lg mb-3" style={{ color: homeColor }}>
+                {game?.home_team_name || 'Home Team'}
+              </h3>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {homeStats.map(player => (
+                  <div key={player.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
+                    <span className="font-medium">#{player.player_number} - {player.player_name}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditPlayer(player)}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="font-bold text-lg mb-3" style={{ color: awayColor }}>
+                {game?.away_team_name || 'Away Team'}
+              </h3>
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {awayStats.map(player => (
+                  <div key={player.id} className="flex items-center justify-between p-2 bg-gray-50 rounded hover:bg-gray-100">
+                    <span className="font-medium">#{player.player_number} - {player.player_name}</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleEditPlayer(player)}
+                      className="text-blue-600 hover:text-blue-700"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowRosterDialog(false)}>Done</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
